@@ -1,0 +1,15 @@
+*.fle
+*~
+FluorineEngine
+*.x
+*.bak
+*.trace
+*.txt
+*.cbp
+*.depend
+*.layout
+SConstruct
+*.bmp
+FE_*.py
+ValgrindOut.xml
+Makefile_OLD
