@@ -1,0 +1,545 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <sstream>
+
+//all needed types are included in CSL_Writer.h
+#include "CSL_Writer.h"
+#include "CSL_Parser.h"
+#include "Exceptions.h"
+
+using namespace std;
+
+class CSL_Interpreter {
+public:
+	FE_World* interpret(string path) {
+		//read the contents of the given file
+		string code = "";
+		string line;
+		ifstream in(path);
+		while (getline(in, line)) code += line;
+		in.close();
+
+		//define "world"
+		world = new FE_World();
+
+		//parse the code in the provided file
+		parser = new CSL_Parser();
+		AST = parser->parse(code);
+
+		//Interpret the AST
+		tag();
+
+		return world;
+	}
+
+private:
+	//variables declared globaly, so they can be accessed by multiple functions
+	CSL_Parser* parser;
+
+	//the return-variable of "FE_World* interpret()"
+	FE_World* world;
+
+	//pointer to AST
+	CNode* AST;
+
+	//pointer to the "CNode" that is currently being processed
+	CNode* curNode;
+
+	//pointer to the object that "node" is being converted to
+	FE_THREAD_SAFETY_OBJECT* curObj;
+
+	//variable to store the ID of the previously processed CNode, for future checking if the ID of the current CNode is allowed as a child of the previous one
+	string prevID = "";
+
+        //a function that converts "item" into a string (item usually is an integer or float)
+        template <typename T>
+        string convert(T item) {
+                stringstream ss;
+                ss << item;
+                return ss.str();
+        }
+
+        int convertToInt(string item) {
+                return 0;
+        }
+
+        float convertToFloat(string item) {
+                return 0.0;
+        }
+
+	//decide how curNode is going to be processed
+	void process() {
+		if (curNode->type == "tag") {
+			tag();
+		} else if (curNode->type == "closedtag") {
+			//commented out and throwing exception because "closedtag" is not being used by the fle file format
+			//closedtag();
+			throw UnexpectedTypeException("UnexpectedTypeException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": " + curNode->type);
+		} else if (curNode->type == "assignment") {
+			assignment();
+		} else if (curNode->type == "listassignments") {
+			listassignment();
+		} else if (curNode->type == "tagassignments") {
+			tagassignment();
+		}
+	}
+
+	void tag() {
+		//save pointers to the current FE_THREAD_SAFETY_OBJECT and CNode, in case they change
+		FE_THREAD_SAFETY_OBJECT *saveObj = curObj;
+		CNode *saveNode = curNode;
+
+		//check what ID curNode has and proceed accordingly
+		if (curNode->ID == "World"){
+
+		} else if (curNode->ID == "Scene") {
+			FE_Scene *scene = new FE_Scene();
+			curObj->scenes.push_back(scene);
+			curObj = scene;
+
+		} else if (curNode->ID == "Camera") {
+			FE_Camera *scene = new FE_Camera();
+			curObj->scenes.push_back(scene);
+			curObj = scene;
+
+		} else if (curNode->ID == "Light") {
+			FE_Light *scene = new FE_Light();
+			curObj->scenes.push_back(scene);
+			curObj = scene;
+
+		} else if (curNode->ID == "Interaction") {
+			FE_Interaction *interaction = new FE_Interaction();
+			curObj->interactions.push_back(interaction);
+			curObj = interaction;
+
+		} else if (curNode->ID == "Mesh") {
+
+		} else if (curNode->ID == "Vertex") {
+
+		} else if (curNode->ID == "UVMap") {
+
+		} else if (curNode->ID == "VertexGoup") {
+
+		} else if (curNode->ID == "Animation") {
+
+		} else if (curNode->ID == "Transformation") {
+
+		} else if (curNode->ID == "Polygon") {
+
+		} else if (curNode->ID == "Physics") {
+
+		} else if (curNode->ID == "Texture") {
+
+		} else if (curNode->ID == "Material") {
+
+		} else if (curNode->ID == "TextureCombineMode") {
+
+		} else {
+			throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": \"" + curNode->ID + "\"");
+		}
+
+		//save the ID of curNode
+		prevID = curNode->ID;
+
+		//process all children
+		for (auto& newNode : saveNode->children)
+			curNode = newNode;
+			process();
+
+		//change curObj and curNode back to the types they where before children where processed
+		curNode = saveNode;
+		curObj = saveObj;
+	}
+
+	//----------------------------------------------------------------------------------VARIABLES GET ADDED FROM HERE----------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	void assignment() {
+		//check the id of the parent CNode and proceed accordingly
+		if (prevID == "World") {
+			//no standart assignments in "World"
+		} else if (prevID == "Scene") {
+			if (curNode->ID == "gravity") {
+				curObj->gravity = convertToFloat(curNode->args[0]);
+			} else if (curNode->ID == "gravityaxis") {
+				curObj->gravityAxis = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Camera") {
+			if (curNode->ID == "aspect_ratio") {
+				curObj->aspect_ratio = curNode->args[0];
+			} else if (curNode->ID == "field_of_view") {
+				curObj->field_of_view = curNode->args[0];
+			} else if (curNode->ID == "near") {
+				curObj->near = convertToInt(curNode->args[0]);
+			} else if (curNode->ID == "far") {
+				curObj->far = convertToInt(curNode->args[0]);
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Light") {
+			if (curNode->ID == "light_type") {
+				curObj->light_type = curNode->args[0];
+			} else if (curNode->ID == "value") {
+				//TO BE DEFINED----------------------------------------------------
+                        } else if (curNode->ID == "fov") {
+                                //TO BE DEFINED----------------------------------------------------
+                        } else if (curNode->ID == "range") {
+                                //TO BE DEFINED----------------------------------------------------
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Interaction") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Mesh") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Vertex") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "UVMap") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "VertexGoup") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Animation") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Transformation") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Polygon") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Physics") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Texture") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Material") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "TextureCombineMode") {
+			if (curNode->ID == "") {
+
+			} else if (curNode->ID == "") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		}
+	}
+
+	void listassignment() {
+		//check the id of the parent CNode and proceed accordingly
+		if (prevID == "World") {
+			//no listassignments in "World"
+		} else if (prevID == "Scene") {
+			if (curNode->ID == "groups") {
+				for (auto& group : curNode->args)
+					curObj->groups.push_back(group);
+			} else if (curNode->ID == "cameras") {
+
+			} else if (curNode->ID == "lights") {
+
+			} else if (curNode->ID == "interactions") {
+
+			} else if (curNode->ID == "objects") {
+
+			} else if (curNode->ID == "textures") {
+
+			} else if (curNode->ID == "materials") {
+
+			} else if (curNode->ID == "textureCombineModes") {
+
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Camera") {
+			if (curNode->ID == "pos") {
+				curObj->pos_x = convertToFloat(curNode->args[0]);
+                                curObj->pos_y = convertToFloat(curNode->args[1]);
+                                curObj->pos_z = convertToFloat(curNode->args[2]);
+                                curObj->pos_w = convertToFloat(curNode->args[3]);
+			} else if (curNode->ID == "rot") {
+                                curObj->rot_x = convertToFloat(curNode->args[0]);
+                                curObj->rot_y = convertToFloat(curNode->args[1]);
+                                curObj->rot_z = convertToFloat(curNode->args[2]);
+                                curObj->rot_w = convertToFloat(curNode->args[3]);
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Light") {
+                        if (curNode->ID == "color") {
+				//TO BE DEFINED----------------------------------------------------
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Interaction") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Mesh") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Vertex") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "UVMap") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "VertexGoup") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Animation") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Transformation") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Polygon") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Physics") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Texture") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "Material") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		} else if (prevID == "TextureCombineMode") {
+                        if (curNode->ID == "") {
+
+                        } else if (curNode->ID == "") {
+
+                        } else {
+                                throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+                        }
+		}
+	}
+
+	void tagassignment() {
+		//check the id of the parent CNode and proceed accordingly
+		if (prevID == "World") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else if (curNode->ID == "loaded_scene") {
+				curObj->loaded_scene = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Scene") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Camera") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Light") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Interaction") {
+			//no tagassignments in "Interaction"
+		} else if (prevID == "Mesh") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Vertex") {
+			if (curNode->ID == "n") {
+				curObj->name = convertToInt(curNode->args[0]);
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "UVMap") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "VertexGoup") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Animation") {
+			//no tagassignments in "Animation"
+		} else if (prevID == "Transformation") {
+			if (curNode->ID == "bonename") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Polygon") {
+			if (curNode->ID == "n") {
+				curObj->name = convertToInt(curNode->args[0]);
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Physics") {
+			//no tagassignments in "Physics"
+		} else if (prevID == "Texture") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "Material") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		} else if (prevID == "TextureCombineMode") {
+			if (curNode->ID == "name") {
+				curObj->name = curNode->args[0];
+			} else {
+				throw UnknownIDException("UnknownIDException at " + convert(curNode->line) + "|" + convert(curNode->col) + ": variable \"" + curNode->ID + "\" is not recognized");
+			}
+		}
+	}
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------TO HERE---------------------------------------------------------------------------------------------------
+
+
+	/* commented out because "closedtag" is not beeing used by the fle file format
+	void closedtag() {
+		//save pointers to the current FE_THREAD_SAFETY_OBJECT and CNode, in case they change
+		CNode* savende = curNode;
+		FE_THREAD_SAFETY_OBJECT saveObj = curObj;
+
+		//process all children
+		for (auto& newNode : node->children)
+			process();
+
+		//change curObj and curNode back to the types they where before children where processed
+		curNode = saveNode;
+		curObj = saveObj;
+	}*/
+};

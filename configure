@@ -1,0 +1,193 @@
+#!/usr/bin/python
+
+
+##################################################################################
+# Just a lil' note:                                                              #
+# use as ./configure or python configure                                         #
+# Author: philsegeler@gmail.com                                                  #
+# Purpose: script that configures compilation of Fluorine Engine, finds all      #
+#          source/header files, creates a dependency tree                        #
+#          (which files include which) and generates a GNU Makefile              #
+#                                                                                #
+##################################################################################
+
+import os
+import sys
+import re
+
+current_dir = os.path.dirname(os.path.realpath(__file__))+"/"
+
+directories = [""]
+files = []
+headers = []
+dependencies = {}
+source_dependencies = {}
+header_dirs = set()
+
+# terminal argument defaults
+#valid values: linux64, win64, android(future), osx(future), linux32(future), win32(future)
+mode = "linux64"
+output_dir = ""
+verbose = False
+
+for arg in sys.argv:
+	if arg == "--win64":         mode = "win64"
+	elif arg == "--linux64":     mode = "linux64"
+	elif arg.startswith("obj="): output_dir = arg[4:]
+
+# directory where object files are stored
+if output_dir == "":
+	output_dir = os.path.join("obj", mode)
+######################################################
+### FUNCTION DEFINITIONS ###
+
+
+def search_dir(directory, ending = ".cpp"):
+
+    global files
+    global headers
+    
+    for name in os.listdir(current_dir + directory):
+        
+        # add cpp files
+        if name.endswith(ending):
+            
+            if ending == ".cpp": 
+                files.append([directory, name[0:-4]+".o"])
+            elif ending == ".h": 
+                headers.append(os.path.join(directory, name))
+                header_dirs.add(directory)
+            else: 
+                pass #pass means {} (do nothing)
+            
+        # search in the rest of directories
+        elif os.path.isdir(os.path.join(directory, name)) and not "External_Libs" in os.path.join(directory, name):
+        
+            search_dir(os.path.join(directory, name), ending)
+                
+
+def searchHeader(fname):
+
+    included_headers = []
+    
+    #find every #include preprocessor in ther file
+    with open(fname) as f:
+        for line in f.readlines():
+            if line.startswith("#include"):
+               #print(getEnclosed(line))
+               included_headers.extend(re.findall(r'"([^"]*)"', line))
+    
+    #replace includes with the full path
+    for dep in range(len(included_headers)):
+        is_found = False
+        for h in headers:
+           if included_headers[dep] in h:
+              included_headers[dep] = h
+              is_found = True 
+        if not is_found or not included_headers[dep].endswith(".h"):  
+            sys.exit("Error while processing '" + fname + "' dependencies\nNo such file or directory: '" + included_headers[dep] + "'\nPlease fix your freaking code!")
+    return included_headers
+    
+
+def getSubDeps(dep_file):
+    
+    final_deps = []
+    final_deps.append(dep_file)
+    #print( dep_file)
+    if len(dependencies[dep_file]) == 0:
+        return final_deps
+    else:
+        for dep in dependencies[dep_file]:
+            final_deps.extend(getSubDeps(dep))
+        return final_deps
+
+# find all source files in a given list of dependencies
+def findSource(final_deps):
+	return [k for k in final_deps if k.endswith(".cpp")][0]
+
+#convert all .cpp to .o
+def convert2Obj(sources):
+	return ["".join([k[0:-4], ".o"]) for k in sources]
+	
+######################################################
+### RUNNING CODE ###
+
+# find ALL .cpp and .h files
+for a_dir in directories:
+    search_dir(a_dir, ".cpp")
+    search_dir(a_dir, ".h")
+    
+#find dependencies in both header + source files
+for header in headers:
+    dependencies[header] = searchHeader(header)
+for source in files:
+	#replace source[0] with output_dir
+    dependencies[os.path.join(output_dir, source[1])[0:-2] + ".cpp"] = searchHeader(os.path.join(source[0], source[1])[0:-2] + ".cpp")
+    dependencies[os.path.join(output_dir, source[1])[0:-2] + ".cpp"].append(os.path.join(source[0], source[1])[0:-2] + ".cpp")
+
+#setup full (sub)dependencies of source files
+for s in dependencies:
+   if s.endswith(".cpp"):
+       source_dependencies[s] = set()
+       temp = []
+       for k in dependencies[s]:
+           if not k.endswith(".cpp"):
+               temp.extend(getSubDeps(k))
+       temp.append(k)
+       source_dependencies[s] = set(temp)
+
+
+if verbose: pass
+compiler = ""
+flags = ""
+libs = ""
+starting_dirs = "-Iinclude -Iinclude/Renderer -Iinclude/types -Iinclude/Carbon -Iinclude/Hydrogen_Engine"
+#LINUX
+if mode == "linux64":
+
+    compiler = "ccache g++"
+    flags = '-Wall -g -O0 -std=c++11 -I/usr/include ' + " ".join(["-I" + a_dir for a_dir in header_dirs if not a_dir == ""])
+    libs ='-lSDL2 -lGL -lGLEW -L/usr/lib -L/usr/local/lib'
+    ending = ""
+    
+#CROSS COMPILATION
+elif mode == "win64":
+
+    compiler = "x86_64-w64-mingw32-g++"
+    flags = '-Wall -g -std=c++11 ' + " ".join(["-I" + a_dir for a_dir in header_dirs if not a_dir == ""]) + ' -I/usr/x86_64-w64-mingw32/include -IExternal_Libs/SDL2/include -IExternal_Libs/glew-1.13.0/include -Dmain=SDL_main'
+    libs = "-LExternal_Libs -L/usr/x86_64-w64-mingw32/lib -lopengl32 -Wl,-Bstatic -lmingw32 -lwinpthread -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -Wl,-Bdynamic -lkernel32 -luser32 -lglu32 -mwindows -Wl,-Bdynamic -lglew32  -static-libgcc -Wl,-Bstatic -lSDL2main -Wl,-Bdynamic -lSDL2 -static-libstdc++"
+    ending = ".exe"
+    
+#####################################################
+### WRITE TO MAKEFILE ###
+
+data = "#" + mode + "\n\n"
+data += "all: FluorineEngine\n\n"
+data += "windows:\n"
+data += "\t./remake.sh --win64\n\n"
+data += "linux:\n"
+data += "\t./remake.sh --linux64\n\n"
+data += "CC = " + compiler + "\n\n"
+data += "CXXFLAGS = "+ flags + "\n\n"
+#data += "OBJ_FILES = " + " ".join([os.path.join(a[0], a[1]) for a in files]) + "\n\n"
+data += "OBJ_FILES = " + " ".join(convert2Obj(source_dependencies.keys())) + "\n\n"
+
+data += "LDFLAGS = " + libs + "\n\n"
+
+for source in source_dependencies:
+   data += source[0:-4] + ".o" + ": " + " ".join(source_dependencies[source]) + "\n"
+   data += "\t$(CC) -c $(CXXFLAGS) " + findSource(source_dependencies[source]) +" -o " + source[0:-4] + ".o\n\n"
+
+#keep this in any case
+#data += "%.o: %.cpp\n"
+#data += "\t$(CC) -c $(CXXFLAGS) $*.cpp -o $*.o\n\n"
+
+data += "FluorineEngine: $(OBJ_FILES)\n"
+data += "\t$(CC) -o FluorineEngine" + ending + " $(OBJ_FILES) $(LDFLAGS) \n\n"
+data += "clean: \n"
+#data += "\trm FluorineEngine" + ending + " " + " ".join([os.path.join(a[0], a[1]) for a in files]) 
+data += "\trm FluorineEngine" + ending + " " + " ".join(convert2Obj(source_dependencies.keys()))
+
+with open("Makefile", "w+") as makefile:
+    makefile.write(data)
+    
