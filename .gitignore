@@ -1,6 +1,6 @@
 *.fle
 *~
-FluorineEngine
+FluorineEngine*
 *.x
 *.bak
 *.trace
@@ -13,3 +13,6 @@ SConstruct
 FE_*.py
 ValgrindOut.xml
 Makefile_OLD
+Makefile_*
+*.o
+__pycache__
