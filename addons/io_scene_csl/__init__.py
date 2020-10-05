@@ -214,12 +214,7 @@ def handle_mesh(progress, cur_scene, obj):
             
         mesh.triangles.append(poly)
         tri_count += 1
-        
-    print("Mesh_data: ", len(mesh.triangles), " ", len(mesh.normals), " ", len(mesh.uvmaps[0].elements))
-    #print("Mesh_data: ", len(mesh.triangles), " ", len(mesh.normals))
-    
-    
-    
+    mesh.num_of_triangles = len(mesh.triangles)
     return mesh
 
 # return an OE_Camera
