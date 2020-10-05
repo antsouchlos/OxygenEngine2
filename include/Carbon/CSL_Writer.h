@@ -11,7 +11,7 @@ using namespace std;
 
 class CSL_Writer {
 public:
-	string output(FE_World *world) {
+    string output(FE_World *world) {
 		outputStr = "";
 
 		outputWorld(world);

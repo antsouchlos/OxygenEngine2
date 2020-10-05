@@ -16,3 +16,5 @@ Makefile_OLD
 Makefile_*
 *.o
 __pycache__
+CSL_Test
+csl_test.cpp
