@@ -62,16 +62,20 @@ class OE_UVMapData(OE_WriterBase):
         
         self.name = name_
         self.elements = elements_2
+        self.num_of_uvs = 0
     
     def __str__(self):
         temp0 = outputTypeTag(OE_WriterBase.genIndent(), self.classname, {"name": self.name})
         OE_WriterBase.indent += 1
         
-        temp1 = outputList(OE_WriterBase.genIndent(), "elements", self.elements)
+        self.num_of_uvs = len(self.elements)
+        
+        temp1 = outputVar(OE_WriterBase.genIndent(), "num_of_uvs", self.num_of_uvs)
+        temp2 = outputList(OE_WriterBase.genIndent(), "elements", self.elements)
         
         OE_WriterBase.indent -= 1
         tempn = outputClosingTag(OE_WriterBase.genIndent(), self.classname)
-        return "\n".join(optimizeList([temp0, temp1, tempn]))
+        return "\n".join(optimizeList([temp0, temp1, temp2, tempn]))
 
 ########################
 
@@ -120,7 +124,7 @@ class OE_VertexGroup(OE_WriterBase):
         
         OE_WriterBase.indent -= 1
         tempn = outputClosingTag(OE_WriterBase.genIndent(), self.classname)
-        return "\n".join(optimizeList([temp0, temp1, temp2, temp3, tempn]))
+        return "\n".join(optimizeList([temp0, temp2, temp3, temp1, tempn]))
 
 ########################
 
@@ -146,16 +150,18 @@ class OE_Mesh(OE_WriterBase):
         self.num_of_triangles= 0
         
     def __str__(self):
-        temp0 = outputTypeTag(OE_WriterBase.genIndent(), self.classname, {"name": self.name, "isDynamic":int(self.isDynamic), "visible":int(self.visible)})
+        temp0 = outputTypeTag(OE_WriterBase.genIndent(), self.classname, {"name": self.name, "isDynamic":int(self.isDynamic), "visible":int(self.visible), "num_uvs":len(self.uvmaps)})
         OE_WriterBase.indent += 1
         
-        temp1 = "\n".join(optimizeList([ outputList(OE_WriterBase.genIndent(), "vertices", self.vertices),
-                            outputList(OE_WriterBase.genIndent(), "normals", self.normals),
-                            outputList(OE_WriterBase.genIndent(), "current_state", self.current_state),
-                            outputList(OE_WriterBase.genIndent(), "textureCM_IDs", self.textureCM_IDs),
+        temp1 = "\n".join(optimizeList([ outputList(OE_WriterBase.genIndent(), "current_state", self.current_state),
                             outputVar(OE_WriterBase.genIndent(), "parent", self.parent),  
-                            outputVar(OE_WriterBase.genIndent(), "parent_type", self.parent_type), 
-                            outputVar(OE_WriterBase.genIndent(), "num_of_triangles", self.num_of_triangles)]))
+                            outputVar(OE_WriterBase.genIndent(), "parent_type", self.parent_type),
+                            outputVar(OE_WriterBase.genIndent(), "num_of_vertices", len(self.vertices)),
+                            outputVar(OE_WriterBase.genIndent(), "num_of_normals", len(self.normals)),
+                            outputVar(OE_WriterBase.genIndent(), "num_of_triangles", self.num_of_triangles),
+                            outputList(OE_WriterBase.genIndent(), "vertices", self.vertices),
+                            outputList(OE_WriterBase.genIndent(), "normals", self.normals),
+                            outputList(OE_WriterBase.genIndent(), "textureCM_IDs", self.textureCM_IDs)]))
         
         temp2 = "\n".join(optimizeList([ "\n".join([ str(k) for k in self.uvmaps]),
                             "\n".join([ str(k) for k in self.triangles]),
@@ -189,11 +195,11 @@ class OE_Light(OE_WriterBase):
         OE_WriterBase.indent += 1
         
         temp1 = "\n".join(optimizeList([ outputList(OE_WriterBase.genIndent(), "current_state", self.current_state),
+                            outputVar(OE_WriterBase.genIndent(), "parent", self.parent),  
+                            outputVar(OE_WriterBase.genIndent(), "parent_type", self.parent_type),
                             outputList(OE_WriterBase.genIndent(), "objects", self.objects),
                             outputList(OE_WriterBase.genIndent(), "color", self.color),
                             outputVar(OE_WriterBase.genIndent(), "intensity", self.intensity),
-                            outputVar(OE_WriterBase.genIndent(), "parent", self.parent),  
-                            outputVar(OE_WriterBase.genIndent(), "parent_type", self.parent_type),
                             outputVar(OE_WriterBase.genIndent(), "fov", self.fov),
                             outputVar(OE_WriterBase.genIndent(), "light_type", self.light_type),
                             outputVar(OE_WriterBase.genIndent(), "range", self.range_)]))
@@ -287,15 +293,14 @@ class OE_Texture(OE_WriterBase):
         
         self.name               = name_
         self.source             = 0
-        self.camera             = 0
+        self.camera             = ""
         self.path               = ""
         
     def __str__(self):
         temp0 = outputTypeTag(OE_WriterBase.genIndent(), self.classname, {"name": self.name})
         OE_WriterBase.indent += 1
         
-        temp1 = "\n".join(optimizeList([ outputList(OE_WriterBase.genIndent(), "textureCM_IDs", self.textureCM_IDs),
-                            outputVar(OE_WriterBase.genIndent(), "source", self.source),
+        temp1 = "\n".join(optimizeList([ outputVar(OE_WriterBase.genIndent(), "source", self.source),
                             outputVar(OE_WriterBase.genIndent(), "path", self.path),  
                             outputVar(OE_WriterBase.genIndent(), "camera", self.camera)]))
         
