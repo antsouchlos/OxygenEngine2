@@ -6,7 +6,7 @@
 //all needed types are included in CSL_Writer.h
 //#include "CSL_Writer.h"
 #include <Carbon/CSL_Parser.h>
-#include <Carbon/Exceptions.h>
+#include <Carbon/CSL_Exceptions.h>
 
 class CSL_Interpreter {
 public:

@@ -22,7 +22,7 @@ from bpy_extras.wm_utils.progress_report import (
 )
 
 print ([key for key in sys.modules.keys() if "FE" in key])
-from .FE_Utils import CSL_Writer as f
+from .OE_Utils import CSL_Writer as f
 
 # this is used to triangulate a mesh upon export
 
@@ -33,18 +33,6 @@ def mesh_triangulate(me):
     bmesh.ops.triangulate(bm, faces=bm.faces)
     bm.to_mesh(me)
     bm.free()
-
-# check if a specific vertex/normal/uv is in a list
-
-def is_included(v, l):
-    for i in range(len(l)//len(v)):
-        count = 0
-        for o in range(len(v)):
-            count += round(l[i*len(v)+o], f.OE_float_rounding_factor) == round(v[o], f.OE_float_rounding_factor)
-        if count == len(v):
-            #print("It is happening")
-            return i
-    return None
 
 # round floats
 
@@ -180,7 +168,6 @@ def handle_mesh(progress, cur_scene, obj):
             # and update mesh.normals
             nor = list(li.normal)
             nor_simplified = round_floats(nor)
-            #temp_id = is_included(nor, mesh.normals)
             if normal_dict.get(tuple(nor_simplified)) != None:
                 cur_v.append(normal_dict[tuple(nor_simplified)])
             else:
@@ -197,8 +184,6 @@ def handle_mesh(progress, cur_scene, obj):
                 uv_id = tri_count * 3 + vertex_count - 1
                 actual_uv = list(uv_map.data[uv_id].uv)
                 actual_uv_simplified = round_floats(actual_uv)
-                #temp_id = None
-                #temp_id = is_included(list(actual_uv[:]), uvmap.elements)
                 if uv_dicts[uv_count].get(tuple(actual_uv_simplified)) != None:
                     cur_v.append(uv_dicts[uv_count][tuple(actual_uv_simplified)])
                 else:
@@ -279,7 +264,7 @@ class ExportOxygenEngine(bpy.types.Operator, ExportHelper):
     
     use_selection: bpy.props.BoolProperty(
             name="Only selected objects",
-            description="",
+            description="Export only selected objects (and associated materials and textures)",
             default=False,
             )
     
