@@ -11,7 +11,7 @@
 #define CSL_LEXER_H_
 
 #include <types/OE_Libs.h>
-#include <Carbon/Exceptions.h>
+#include <Carbon/CSL_Exceptions.h>
 
 struct CSL_Char {
 		int lineIndex = -1;

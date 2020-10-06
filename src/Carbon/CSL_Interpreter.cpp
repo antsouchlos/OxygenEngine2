@@ -68,10 +68,10 @@ OE_World* CSL_Interpreter::processWorld() {
         } 
         else if (type == "assignment") {
              if (id == "loaded_viewport") {
-                world->loaded_viewport = OE_ViewportConfig::name2id[child->args[0]]; //INCOMPLETE
+                world->loaded_viewport = OE_ViewportConfig::name2id[child->args[0]]; 
             } 
             else if (id == "loaded_scene") {
-                world->loaded_scene = OE_Scene::name2id[child->args[0]]; //INCOMPLETE
+                world->loaded_scene = OE_Scene::name2id[child->args[0]];
             } 
             else {
                 throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"World\"");
@@ -286,7 +286,7 @@ OE_Light * CSL_Interpreter::processLight() {
             }
             else if (id == "objects"){
                 for (auto& x: child->args){
-                    light->objects.push_back(OE_Object::name2id[x]); // INCOMPLETE
+                    light->objects.push_back(OE_Object::name2id[x]);
                 } 
             }
             else {
@@ -407,7 +407,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
             } 
             else if (id == "textureCM_IDs"){
                 for (const auto& x: child->args){
-                    mesh->textureCM_IDs.push_back(OE_TCM::name2id[x]); // INCOMPLETE
+                    mesh->textureCM_IDs.push_back(OE_TCM::name2id[x]); 
                 } 
             }
             else if (id == "vertices") {
