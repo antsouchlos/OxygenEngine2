@@ -3,7 +3,7 @@
 using namespace std;
 
 size_t              OE_Material::current_id = 0;
-map<size_t, string> OE_Material::id2name;
+unordered_map<size_t, string> OE_Material::id2name;
 OE_Name2ID          OE_Material::name2id = OE_Name2ID(&OE_Material::id2name);
 
 OE_Material::OE_Material(){

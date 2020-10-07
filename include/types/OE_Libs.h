@@ -34,5 +34,6 @@
 #include <functional>
 #include <iomanip>
 #include <ctime>
+#include <bitset>
 
 #endif // OE_LIBS_H_INCLUDED

@@ -14,13 +14,13 @@ class OE_World : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         
         std::string to_str() const;
         
-    protected:
+    //protected:
         
-        std::size_t                                 loaded_scene;
-        std::map<std::size_t, OE_Scene*>            scenes;
+        std::size_t                                         loaded_scene;
+        std::unordered_map<std::size_t, OE_Scene*>          scenes;
         
-        std::size_t                                 loaded_viewport;
-        std::map<std::size_t, OE_ViewportConfig*>   viewports;                
+        std::size_t                                         loaded_viewport;
+        std::unordered_map<std::size_t, OE_ViewportConfig*> viewports;                
 };
 
 #endif

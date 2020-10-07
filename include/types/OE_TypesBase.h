@@ -88,12 +88,12 @@ class CSL_WriterBase{
 class OE_Name2ID : public OE_THREAD_SAFETY_OBJECT{
     public:
         
-        OE_Name2ID(std::map<std::size_t, std::string>*);
+        OE_Name2ID(std::unordered_map<std::size_t, std::string>*);
         
         std::size_t operator[](std::string name);
         std::size_t operator()(std::string name);
     private:
-        std::map<std::size_t, std::string>* id2name;
+        std::unordered_map<std::size_t, std::string>* id2name;
 };
 
 /// general function to write to the OE log file (OE_log.txt)
