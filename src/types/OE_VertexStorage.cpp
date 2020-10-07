@@ -2,7 +2,7 @@
 
 using namespace std;
 
-std::map<std::size_t, std::string> OE_UVMapData::id2name;
+std::unordered_map<std::size_t, std::string> OE_UVMapData::id2name;
 OE_Name2ID          OE_UVMapData::name2id = OE_Name2ID(&OE_UVMapData::id2name);
 
 OE_UVMapData::OE_UVMapData(){

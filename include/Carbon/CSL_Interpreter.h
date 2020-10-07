@@ -8,6 +8,9 @@
 #include <Carbon/CSL_Parser.h>
 #include <Carbon/CSL_Exceptions.h>
 
+// This is a helper function for the interpreter
+void OE_ReverseBitset(std::bitset<64>&);
+
 class CSL_Interpreter {
 public:
 	OE_World *interpret(string sourceCode);

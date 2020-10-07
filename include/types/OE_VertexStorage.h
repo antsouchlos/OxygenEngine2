@@ -19,7 +19,7 @@ class OE_UVMapData : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     friend class CSL_Interpreter;
     
     public:
-        static std::map<std::size_t, std::string> id2name;
+        static std::unordered_map<std::size_t, std::string> id2name;
         static OE_Name2ID name2id;
         std::size_t id;
         
@@ -42,6 +42,7 @@ class OE_VertexStorage{
     
     friend class CSL_Interpreter;
     friend class OE_Mesh32;
+    friend class OE_PolygonStorage32;
     
     public:
         OE_VertexStorage();

@@ -2,6 +2,16 @@
 
 using namespace std;
 
+// This is a helper function for the interpreter
+void OE_ReverseBitset(std::bitset<64>& bitseta){
+    std::bitset<64> temp;
+    for (size_t i=0;i < 32; i++){
+        temp[i] = bitseta[31-i];
+    }
+    bitseta = temp;
+}
+
+
 CSL_Interpreter::~CSL_Interpreter(){
     if (this->parser != nullptr)
         delete this->parser;
@@ -312,13 +322,19 @@ OE_Light * CSL_Interpreter::processLight() {
 
 OE_Mesh32* CSL_Interpreter::processMesh() {
     
-    bool vertices_reserved = false;
+    bool vertices_reserved = false; 
     bool normals_reserved = false;
     bool triangles_reserved = false;
     
-    bool uvs_set = false;    
+    bool uvs_set = false;    //true if num_of_uvs is set
+    bool map_chosen = false;
+    //bool uvs_done = false;  // true if all OE_UVMapDatas have being created and parsed
     
+    size_t vnum = 0;
+    size_t nnum = 0;
     size_t num_of_uvmaps = 0;
+    size_t num_of_triangles = 0;
+    
     OE_Mesh32* mesh = nullptr;
     
     for (auto& child : curNode->children) {
@@ -345,6 +361,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 triangles_reserved = true;
                 assert(uvs_set == true);
                 assert(uvs_set == true);
+                assert(map_chosen == true);
                 processTriangle(mesh, mesh->data.num_of_uvs);
                 
             }
@@ -371,18 +388,23 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 mesh->parent_type = stoi(child->args[0]);
             }
             else if (id == "num_of_vertices"){
-                if(!vertices_reserved)
+                if(!vertices_reserved){
                     mesh->data.vertices.positions.reserve(stoi(child->args[0]));
+                    vnum = stoi(child->args[0]);
+                }
                 vertices_reserved = true;
             } 
             else if (id == "num_of_normals"){
-                if(!normals_reserved)
+                if(!normals_reserved){
                     mesh->data.vertices.normals.reserve(stoi(child->args[0]));
+                    nnum = stoi(child->args[0]);
+                }
                 normals_reserved = true;
             }
             else if (id == "num_of_triangles"){
                 if(!triangles_reserved){
                     mesh->data.triangles.reserve(stoi(child->args[0]));
+                    num_of_triangles = stoi(child->args[0]);
                 }
                 triangles_reserved = true;
             }
@@ -442,33 +464,37 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 assert(mesh != nullptr);
                 mesh->data.num_of_uvs = stoi(child->args[0]);
                 uvs_set = true;
-                
-                // YES i am using a LAMBDA function here
-                // as a comparator for the index buffer map
-                // THIS will make changing a sole vertex only O(logn) complex
-                // AND it will make changing ALL vertices simultaneously O(nlogn) complex
-                
-                auto lambda_func = [&mesh](const uint32_t* lhs, const uint32_t* rhs) {
-                    for(size_t i=0; i< 2+ mesh->data.num_of_uvs; i++){
-                        if(lhs[i] < rhs[i]){
-                            return true;
-                        }
-                        else if (lhs[i] > rhs[i]){
-                            return false;
-                        }
-                        else continue;
-                    }
-                    return false;
-                };
-                
-                //NOTE: The comparator IS VITAL for the algorithm to work correctly and efficiently
-                mesh->data.index_buffer = map<uint32_t*, uint32_t, std::function<bool(uint32_t*, uint32_t*)>>(lambda_func);
-                //mesh->visible = !!stoi(child->args[0]);
             }
             else {
                 throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Mesh\"");
             }
         }
+        if (!map_chosen && uvs_set && vertices_reserved && normals_reserved && (num_of_uvmaps == mesh->data.num_of_uvs) && triangles_reserved){
+            
+            size_t uvnum = 0;
+            for (auto x : mesh->data.vertices.uvmaps){
+                uvnum = max(uvnum, x.elements.size());
+            }
+            size_t tnum = num_of_triangles;
+            // THIS here is a very big hack using polymorphism of C++
+            // Now i can dynamically choose on runtime if i want ordered or unordered maps
+            // Unordered map is O(1) fast on few vertices/triangles/etc ! (less than 65536 of each and less than 21845 triangles)
+            // Unordered map is also just as fast when no uv maps are present
+            // But ordered map O(logn) is faster on larger objects especially with several uv maps 
+            
+            if (vnum <= 65536 && nnum <= 65536 && uvnum <= 65536 && tnum*3 <= 65536 && num_of_uvmaps <= 2){
+                mesh->data.initUnorderedIB(mesh);
+            } 
+            else if (num_of_uvmaps == 0){
+                mesh->data.initUnorderedIB(mesh);
+            }
+            else{
+                mesh->data.initOrderedIB(mesh);
+            }
+            
+            map_chosen = true;
+        }
+        
         curNode = saveNode;
     }
     return mesh;
