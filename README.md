@@ -51,6 +51,11 @@ Reworked the C++ interpreter and writer classes to work with the updated .csl fo
 Now I will work on integrating the event handler, renderer and the rest to create a working window with renderer,
 so i can get the basics working. Then work can start by antsouchlos on the physics part.
 
+2020/20/07:
+
+Added optimizations to the loading of vertices. Switched to unordered_map in many OE base classes.
+Meshes can now choose dynamically at runtime between unordered map and ordered map according to the number of
+vertices and other mesh data.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
