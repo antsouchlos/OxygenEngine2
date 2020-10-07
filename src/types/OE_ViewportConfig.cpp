@@ -4,7 +4,7 @@
 using namespace std;
 
 size_t              OE_ViewportConfig::current_id = 0;
-map<size_t, string> OE_ViewportConfig::id2name;
+unordered_map<size_t, string> OE_ViewportConfig::id2name;
 OE_Name2ID          OE_ViewportConfig::name2id = OE_Name2ID(&OE_ViewportConfig::id2name);
 
 OE_ViewportConfig::OE_ViewportConfig(){

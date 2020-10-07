@@ -29,7 +29,7 @@ std::string OE_TCM_Texture::to_str() const{
 
 
 size_t OE_TCM::current_id = 0;
-map<size_t, string> OE_TCM::id2name;
+unordered_map<size_t, string> OE_TCM::id2name;
 OE_Name2ID          OE_TCM::name2id = OE_Name2ID(&OE_TCM::id2name);
 
 OE_TCM::OE_TCM(){

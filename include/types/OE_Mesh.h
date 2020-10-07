@@ -21,7 +21,7 @@ class OE_Mesh32 : public OE_Object{
         std::string getType() const;
         std::string to_str() const;
         
-    protected:
+    //protected:
         
         OE_PolygonStorage32         data;
         std::vector<std::size_t>    textureCM_IDs;

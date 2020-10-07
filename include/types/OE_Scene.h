@@ -18,7 +18,7 @@ class OE_Scene : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     
     public:
         
-        static std::map<std::size_t, std::string> id2name;
+        static std::unordered_map<std::size_t, std::string> id2name;
         static std::size_t current_id;
         static OE_Name2ID name2id;
         std::size_t id;
@@ -29,12 +29,12 @@ class OE_Scene : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         
         std::string to_str();
         
-    protected:
+    //protected:
         
-        std::map<std::size_t, OE_Object*>       objects;
-        std::map<std::size_t, OE_Texture*>      textures;
-        std::map<std::size_t, OE_Material*>     materials;
-        std::map<std::size_t, OE_TCM*>          texture_CMs;    
+        std::unordered_map<std::size_t, OE_Object*>       objects;
+        std::unordered_map<std::size_t, OE_Texture*>      textures;
+        std::unordered_map<std::size_t, OE_Material*>     materials;
+        std::unordered_map<std::size_t, OE_TCM*>          texture_CMs;    
 };
 
 

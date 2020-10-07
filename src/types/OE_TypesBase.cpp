@@ -72,7 +72,7 @@ std::string CSL_WriterBase::outputTypeTag(const std::string& name, const std::ma
 }
 
 
-OE_Name2ID::OE_Name2ID(std::map<std::size_t, std::string>* arg){
+OE_Name2ID::OE_Name2ID(std::unordered_map<std::size_t, std::string>* arg){
     this->id2name = arg;
 }
         

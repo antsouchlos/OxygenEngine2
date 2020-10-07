@@ -8,7 +8,7 @@ std::vector<float> OE_ObjectData::to_arr() const{
 
 
 size_t              OE_Object::current_id = 0;
-map<size_t, string> OE_Object::id2name;
+unordered_map<size_t, string> OE_Object::id2name;
 OE_Name2ID          OE_Object::name2id = OE_Name2ID(&OE_Object::id2name);
 
 OE_Object::OE_Object(){

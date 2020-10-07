@@ -3,7 +3,7 @@
 using namespace std;
 
 size_t OE_Scene::current_id = 0;
-map<size_t, string> OE_Scene::id2name;
+unordered_map<size_t, string> OE_Scene::id2name;
 OE_Name2ID          OE_Scene::name2id = OE_Name2ID(&OE_Scene::id2name);
 
 

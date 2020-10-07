@@ -5,7 +5,7 @@
 using namespace std;
 
 size_t              OE_VertexGroup::current_id = 0;
-map<size_t, string> OE_VertexGroup::id2name;
+unordered_map<size_t, string> OE_VertexGroup::id2name;
 OE_Name2ID          OE_VertexGroup::name2id = OE_Name2ID(&OE_VertexGroup::id2name);
 
 OE_VertexGroup::OE_VertexGroup(){
