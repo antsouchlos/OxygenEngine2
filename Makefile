@@ -4,11 +4,23 @@ all: CSL_Test
 
 CXX = g++
 
-CXXFLAGS = -Wall -g -O1 -std=c++14 -I/usr/include -Iinclude
+CXXFLAGS = -Wall -g -Og -std=c++14 -I/usr/include -Iinclude
 
 LDFLAGS = -lSDL2 -L/usr/lib -L/usr/local/lib
 
-OBJ_FILES = obj/OE_Camera.o obj/OE_Light.o obj/OE_Material.o obj/OE_Mesh.o obj/OE_Object.o obj/OE_PolygonStorage.o obj/OE_Scene.o obj/OE_TCM.o obj/OE_Texture.o obj/OE_VertexGroup.o obj/OE_VertexStorage.o obj/OE_ViewportConfig.o obj/OE_World.o obj/OE_TypesBase.o obj/CSL_Lexer.o obj/CSL_Parser.o obj/CSL_interpreter.o obj/csl_main_test.o
+OBJ_FILES = obj/OE_Camera.o obj/OE_Light.o obj/OE_Material.o obj/OE_Mesh.o obj/OE_Object.o obj/OE_PolygonStorage.o obj/OE_Scene.o obj/OE_TCM.o obj/OE_Texture.o obj/OE_VertexGroup.o obj/OE_VertexStorage.o obj/OE_ViewportConfig.o obj/OE_World.o obj/OE_TypesBase.o obj/CSL_Lexer.o obj/CSL_Parser.o obj/CSL_interpreter.o obj/csl_main_test.o obj/OE_EventParser.o obj/OE_Event.o obj/OE_EventHandler.o obj/OE_InputEventHandler.o
+
+obj/OE_EventHandler.o: src/Events/OE_EventHandler.cpp
+	$(CXX) -c $(CXXFLAGS) src/Events/OE_EventHandler.cpp -o obj/OE_EventHandler.o
+
+obj/OE_InputEventHandler.o: src/Events/OE_InputEventHandler.cpp
+	$(CXX) -c $(CXXFLAGS) src/Events/OE_InputEventHandler.cpp -o obj/OE_InputEventHandler.o
+
+obj/OE_EventParser.o: src/Events/OE_EventParser.cpp
+	$(CXX) -c $(CXXFLAGS) src/Events/OE_EventParser.cpp -o obj/OE_EventParser.o
+
+obj/OE_Event.o: src/Events/OE_Event.cpp
+	$(CXX) -c $(CXXFLAGS) src/Events/OE_Event.cpp -o obj/OE_Event.o
 
 obj/csl_main_test.o: csl_main_test.cpp
 	$(CXX) -c $(CXXFLAGS) csl_main_test.cpp -o obj/csl_main_test.o

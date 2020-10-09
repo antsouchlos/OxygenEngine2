@@ -1,5 +1,7 @@
 #include <Carbon/CSL_Interpreter.h>
 
+using namespace std;
+
 int main(){
         
     /*OE_World world;
@@ -87,7 +89,6 @@ int main(){
                 
                 t = clock();
                 vertex_buf2 = mesh->data.genVertexBuffer();
-                cout << "NRE VERTEX BUFFER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
                 t = clock();
                 for(const auto& vgroup : mesh->data.triangle_groups){
                     index_buf2 = mesh->data.genIndexBuffer(vgroup.first);
@@ -99,7 +100,7 @@ int main(){
     
     delete world3;
     
-    /*t = clock();
+    t = clock();
     cout << "CSL TEST BEGIN 4" << endl;
     world3 = interpreter.interpretFile("csl_2UVMAP_TEST.csl");
     t = clock();
@@ -122,7 +123,7 @@ int main(){
         }
     }
     cout << "NRE VERTEX/INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    delete world3;*/
+    delete world3;//*/
     
     ofstream myfile3;
     myfile3.open ("csl_very_large_object_test_copy.csl");

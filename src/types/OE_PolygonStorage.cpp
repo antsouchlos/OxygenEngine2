@@ -203,7 +203,6 @@ uint32_t* OE_PolygonStorage32::addTriangle(uint32_t* indices){
 std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
     
     vector<float> output;
-    
     // do the expensive allocation at the start
     output.reserve(vertex_buffer.size()*(6+this->num_of_uvs*2));
     

@@ -187,7 +187,7 @@ CSL_Token CSL_Lexer::getNextCToken() {
         //throw error if unexpected character is found
         else {
             if (absoluteColIndex <= maxLen)
-                throw UnexpectedCharacterException(errorMessage());
+                throw CSL_UnexpectedCharacterException(errorMessage());
 
             break;
         }
