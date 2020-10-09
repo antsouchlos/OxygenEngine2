@@ -70,11 +70,11 @@ OE_World* CSL_Interpreter::processWorld() {
                 world->viewports[vconf->id] = vconf;
             }
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"World\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"World\"");
             }
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
              if (id == "loaded_viewport") {
@@ -84,15 +84,15 @@ OE_World* CSL_Interpreter::processWorld() {
                 world->loaded_scene = OE_Scene::name2id[child->args[0]];
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"World\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"World\"");
             }
 
         } 
         else if (type == "listassignment") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variables in \"World\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variables in \"World\"");
         } 
         else if (type == "tagassignment") {
-                        throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variables in \"World\"");
+                        throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variables in \"World\"");
         }
         curNode = saveNode;
     }
@@ -134,26 +134,26 @@ OE_Scene* CSL_Interpreter::processScene() {
                 scene->texture_CMs[tcm->id] = tcm;
             } 
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"Scene\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"Scene\"");
             }
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
             assert (scene != nullptr);
-            throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Scene\"");
+            throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Scene\"");
         } 
         else if (type == "listassignment") {
             assert (scene != nullptr);
-            throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Scene\"");
+            throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Scene\"");
         }
         else if (type == "tagassignment") {
             if (id == "name") {
                 scene = new OE_Scene(child->args[0]);
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Scene\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Scene\"");
             }
         }
         curNode = saveNode;
@@ -171,10 +171,10 @@ OE_Camera * CSL_Interpreter::processCamera() {
         CSL_Node *saveNode = curNode;
         curNode = child;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Camera\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Camera\"");
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
             assert (camera != nullptr);
@@ -197,7 +197,7 @@ OE_Camera * CSL_Interpreter::processCamera() {
                 camera->far = stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Camera\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Camera\"");
             }
         } 
         else if (type == "listassignment") {
@@ -216,7 +216,7 @@ OE_Camera * CSL_Interpreter::processCamera() {
                 camera->current_state.sca_z = stof(child->args[9]);
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Camera\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Camera\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -228,7 +228,7 @@ OE_Camera * CSL_Interpreter::processCamera() {
                 camera->visible = !!stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Camera\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Camera\"");
             }
         }
         curNode = saveNode;
@@ -245,10 +245,10 @@ OE_Light * CSL_Interpreter::processLight() {
         CSL_Node *saveNode = curNode;
         curNode = child;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Light\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Light\"");
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
             assert (light != nullptr);
@@ -271,7 +271,7 @@ OE_Light * CSL_Interpreter::processLight() {
                 light->parent_type = stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Light\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Light\"");
             }
         }
         else if (type == "listassignment") {
@@ -300,7 +300,7 @@ OE_Light * CSL_Interpreter::processLight() {
                 } 
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Light\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Light\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -312,7 +312,7 @@ OE_Light * CSL_Interpreter::processLight() {
                 light->visible = !!stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Light\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Light\"");
             }
         }
         curNode = saveNode;
@@ -373,11 +373,11 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 num_of_uvmaps++;
             }
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"Mesh\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"Mesh\"");
             }
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
             assert (mesh != nullptr);
@@ -409,7 +409,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 triangles_reserved = true;
             }
             else{
-                throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variables in \"Mesh\"");
+                throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variables in \"Mesh\"");
             }
         } 
         else if (type == "listassignment") {
@@ -445,7 +445,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 } 
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Mesh\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Mesh\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -466,7 +466,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 uvs_set = true;
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Mesh\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Mesh\"");
             }
         }
         if (!map_chosen && uvs_set && vertices_reserved && normals_reserved && (num_of_uvmaps == mesh->data.num_of_uvs) && triangles_reserved){
@@ -511,10 +511,10 @@ void CSL_Interpreter::processUVMapData(OE_UVMapData &uvmap, const size_t& uvmapI
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"UVMapData\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"UVMapData\"");
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
             assert(hasInit == true);
@@ -525,7 +525,7 @@ void CSL_Interpreter::processUVMapData(OE_UVMapData &uvmap, const size_t& uvmapI
                 }
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
             }
         } 
         else if (type == "listassignment") {
@@ -537,7 +537,7 @@ void CSL_Interpreter::processUVMapData(OE_UVMapData &uvmap, const size_t& uvmapI
                 } 
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -546,7 +546,7 @@ void CSL_Interpreter::processUVMapData(OE_UVMapData &uvmap, const size_t& uvmapI
                 hasInit = true;
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"UVMapData\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"UVMapData\"");
             }
         }
         curNode = saveNode;
@@ -562,10 +562,10 @@ OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"VertexGroup\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"VertexGroup\"");
         }
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
             assert(vgroup != nullptr);
@@ -576,7 +576,7 @@ OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
                 vgroup->bone_id = 0;
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"VertexGroup\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"VertexGroup\"");
             }
         } 
         else if (type == "listassignment") {
@@ -586,7 +586,7 @@ OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
                     vgroup->polygons.push_back(stoi(polygon));
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"VertexGroup\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"VertexGroup\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -598,7 +598,7 @@ OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
                 vgroup->visible = !!stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"VertexGroup\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"VertexGroup\"");
             }
         }
 		curNode = saveNode;
@@ -615,13 +615,13 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Triangle\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Triangle\"");
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variables in \"Triangle\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variables in \"Triangle\"");
         } 
         else if (type == "listassignment") {
             if (id == "v1") {
@@ -675,11 +675,11 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
                 }
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Triangle\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Triangle\"");
             }
         } 
         else if (type == "tagassignment") {
-            throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Triangle\"");
+            throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Triangle\"");
         }
         curNode = saveNode;
     }
@@ -696,10 +696,10 @@ OE_Texture * CSL_Interpreter::processTexture() {
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Texture\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Texture\"");
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         }
         else if (type == "assignment") {
             assert(texture != nullptr);
@@ -710,18 +710,18 @@ OE_Texture * CSL_Interpreter::processTexture() {
                 texture->camera = OE_Camera::name2id[child->args[0]];
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Texture\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Texture\"");
             }
         } 
         else if (type == "listassignment") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variables in \"Texture\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variables in \"Texture\"");
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
                 texture = new OE_Texture(child->args[0]);
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Texture\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Texture\"");
             }
         }
         curNode = saveNode;
@@ -738,10 +738,10 @@ OE_Material * CSL_Interpreter::processMaterial() {
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Material\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"Material\"");
         }
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         }
         else if (type == "assignment") {
             assert(material != nullptr);
@@ -782,7 +782,7 @@ OE_Material * CSL_Interpreter::processMaterial() {
                 material->illuminosity = stof(child->args[0]);
             } 
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Material\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Material\"");
             }
         } 
         else if (type == "listassignment") {
@@ -792,7 +792,7 @@ OE_Material * CSL_Interpreter::processMaterial() {
                     material->textureCM_IDs.push_back(OE_TCM::name2id[x]);
             } 
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Material\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Material\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -800,7 +800,7 @@ OE_Material * CSL_Interpreter::processMaterial() {
                 material = new OE_Material(child->args[0]);
             } 
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Material\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Material\"");
             }
         }
         curNode = saveNode;
@@ -823,11 +823,11 @@ OE_TCM * CSL_Interpreter::processTCM() {
                 tcm->textures.push_back(tcm_tex);
             }
             else{
-                throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
+                throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
             }
         }
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         }
         else if (type == "assignment") {
             assert(tcm != nullptr);
@@ -850,18 +850,18 @@ OE_TCM * CSL_Interpreter::processTCM() {
                 tcm->texture_array = !!stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"TCM\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"TCM\"");
             }
         }
         else if (type == "listassignment") {
-            throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"TCM\"");
+            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"TCM\"");
         }
         else if (type == "tagassignment") {
             if (id == "name") {
                 tcm = new OE_TCM(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
             }
         }
         curNode = saveNode;
@@ -876,10 +876,10 @@ void CSL_Interpreter::processTCM_Texture(OE_TCM_Texture &tcm_tex) {
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
         }
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         }
         else if (type == "assignment") {
             if (id == "textureID") {
@@ -895,14 +895,14 @@ void CSL_Interpreter::processTCM_Texture(OE_TCM_Texture &tcm_tex) {
                 tcm_tex.uvmap = stoi(child->args[0]);
             }
             else {
-                throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"TCM\"");
+                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"TCM\"");
             }
         }
         else if (type == "listassignment") {
-            throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"TCM\"");
+            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"TCM\"");
         }
         else if (type == "tagassignment") {
-            throw UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
+            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
         }
         curNode = saveNode;
     }
@@ -917,13 +917,13 @@ OE_ViewportConfig* CSL_Interpreter::processViewportConfig() {
 
         CSL_Node *saveNode = curNode;
         if (type == "tag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"UVMapData\"");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"UVMapData\"");
         } 
         else if (type == "closedtag") {
-            throw UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
         } 
         else if (type == "assignment") {
-            throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
+            throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
         }
         else if (type == "listassignment") {
             assert(vconf != nullptr);
@@ -948,7 +948,7 @@ OE_ViewportConfig* CSL_Interpreter::processViewportConfig() {
                 } 
             }
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
             }
         } 
         else if (type == "tagassignment") {
@@ -956,7 +956,7 @@ OE_ViewportConfig* CSL_Interpreter::processViewportConfig() {
                 vconf = new OE_ViewportConfig( child->args[0]);
             } 
             else {
-                throw UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"UVMapData\"");
+                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"UVMapData\"");
             }
         }
         curNode = saveNode;

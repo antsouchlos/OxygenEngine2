@@ -5,66 +5,65 @@
  *      Author: andreas
  */
 
-#ifndef EXCEPTIONS_H_
-#define EXCEPTIONS_H_
+#ifndef CSL_EXCEPTIONS_H_
+#define CSL_EXCEPTIONS_H_
 
 #include <types/OE_Libs.h>
 
-using namespace std;
 
-class UnknownIDException : public exception {
+class CSL_UnknownIDException : public std::runtime_error {
 public:
-	UnknownIDException(string msg) {this->msg += msg; }
+	CSL_UnknownIDException(std::string msg) : std::runtime_error(msg) {this->msg += msg; }
 
 	virtual const char* what() const throw() { return msg.c_str(); }
 
-	virtual ~UnknownIDException() throw() {}
+	virtual ~CSL_UnknownIDException() throw() {}
 private:
-	string msg = "CSLInterpreterException: ";
+	std::string msg = "CSLInterpreterException: ";
 };
 
-class UnexpectedTypeException : public exception {
+class CSL_UnexpectedTypeException : public std::runtime_error {
 public:
-	UnexpectedTypeException(string msg) { this->msg += msg; }
+	CSL_UnexpectedTypeException(std::string msg): std::runtime_error(msg) { this->msg += msg; }
 
 	virtual const char* what() const throw() { return msg.c_str(); }
 
-	virtual ~UnexpectedTypeException() throw() {}
+	virtual ~CSL_UnexpectedTypeException() throw() {}
 private:
-	string msg = "CSLInterpreterException: ";
+	std::string msg = "CSLInterpreterException: ";
 };
 
-class UnknownTypeException : public exception {
+class CSL_UnknownTypeException : public std::runtime_error {
 public:
-	UnknownTypeException(string msg) {this-> msg += msg; }
+	CSL_UnknownTypeException(std::string msg) : std::runtime_error(msg) {this-> msg += msg; }
 
 	virtual const char* what() const throw() {return msg.c_str(); }
 
-	virtual ~UnknownTypeException() throw() {}
+	virtual ~CSL_UnknownTypeException() throw() {}
 private:
-	string msg = "CSLInterpreterException: ";
+	std::string msg = "CSLInterpreterException: ";
 };
 
-class UnexpectedTokenException : public exception {
+class CSL_UnexpectedTokenException : public std::runtime_error {
 public:
-	UnexpectedTokenException(string msg) { this->msg += msg; }
+	CSL_UnexpectedTokenException(std::string msg) : std::runtime_error(msg) { this->msg += msg; }
 
 	virtual const char* what() const throw() { return msg.c_str(); }
 
-	virtual ~UnexpectedTokenException() throw() {}
+	virtual ~CSL_UnexpectedTokenException() throw() {}
 private:
-	string msg = "CSLParserException: ";
+	std::string msg = "CSLParserException: ";
 };
 
-class UnexpectedCharacterException : public exception {
+class CSL_UnexpectedCharacterException : public std::runtime_error {
 public:
-	UnexpectedCharacterException(string msg) { this->msg += msg; }
+	CSL_UnexpectedCharacterException(std::string msg) : std::runtime_error(msg) { this->msg += msg; }
 
 	virtual const char* what() const throw() { return msg.c_str(); }
 
-	virtual ~UnexpectedCharacterException() throw() {}
+	virtual ~CSL_UnexpectedCharacterException() throw() {}
 private:
-	string msg = "CLexerException: ";
+	std::string msg = "CLexerException: ";
 };
 
 #endif /* EXCEPTIONS_H_ */

@@ -1,23 +1,24 @@
-#ifndef FE_INPUTEVENTHANDLER_H
-#define FE_INPUTEVENTHANDLER_H
-#include "FE_Event.h"
+#ifndef OE_INPUTEVENTHANDLER_H
+#define OE_INPUTEVENTHANDLER_H
+
+#include <Events/OE_Event.h>
 
 /** This class is intended to store any user inputs
   *
   */
-class FE_InputEventHandler{
-	friend class FE_EventHandler;
-	FE_InputEventHandler();
-	~FE_InputEventHandler();
+class OE_InputEventHandler{
+	friend class OE_EventHandler;
+	OE_InputEventHandler();
+	~OE_InputEventHandler();
 	
-	vector<FE_Event*> createEvents();
+	void createEvents(std::map<std::string, OE_Event*>*);
 	
 protected:
-	vector<string> active_events;
-	const map<Uint8, string> mouseList = {{SDL_BUTTON_LEFT, "1"}, {SDL_BUTTON_RIGHT, "2"}, {SDL_BUTTON_MIDDLE, "3"},
+	std::vector<std::string> active_events;
+	const std::unordered_map<Uint8, std::string> mouseList = {{SDL_BUTTON_LEFT, "1"}, {SDL_BUTTON_RIGHT, "2"}, {SDL_BUTTON_MIDDLE, "3"},
 										  {SDL_BUTTON_X1, "4"}, {SDL_BUTTON_X2, "5"}};
 										 
-	const map<int, string> keyList = {{SDLK_0, "0"}, {SDLK_1, "1"}, {SDLK_2, "2"}, {SDLK_3, "3"}, {SDLK_4, "4"}, {SDLK_5, "0"},
+	const std::unordered_map<int, std::string> keyList = {{SDLK_0, "0"}, {SDLK_1, "1"}, {SDLK_2, "2"}, {SDLK_3, "3"}, {SDLK_4, "4"}, {SDLK_5, "0"},
                                 {SDLK_6, "6"}, {SDLK_7, "7"}, {SDLK_8, "8"}, {SDLK_9, "9"}, {SDLK_a, "a"}, {SDLK_b, "b"},
                                 {SDLK_c, "c"}, {SDLK_d, "d"}, {SDLK_e, "e"}, {SDLK_f, "f"}, {SDLK_g, "g"},
                                 {SDLK_h, "h"}, {SDLK_i, "i"}, {SDLK_j, "j"}, {SDLK_k, "k"}, {SDLK_l, "l"},
@@ -35,4 +36,4 @@ protected:
                                          };
 };
 
-#endif //FE_INPUTEVENTHANDLER_H
+#endif //OE_INPUTEVENTHANDLER_H

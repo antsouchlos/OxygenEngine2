@@ -90,7 +90,7 @@ private:
     void factor();
 
     std::string errorMessage();
-	string convert(int num);
+	std::string convert(int num);
 };
 
 #endif /* CSL_PARSER_H_ */
