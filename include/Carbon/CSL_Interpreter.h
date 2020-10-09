@@ -13,8 +13,8 @@ void OE_ReverseBitset(std::bitset<64>&);
 
 class CSL_Interpreter {
 public:
-	OE_World *interpret(string sourceCode);
-	OE_World *interpretFile(string pathToFile);
+	OE_World *interpret(std::string sourceCode);
+	OE_World *interpretFile(std::string pathToFile);
     
     ~CSL_Interpreter();
     

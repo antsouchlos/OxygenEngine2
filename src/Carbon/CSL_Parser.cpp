@@ -55,7 +55,7 @@ void CSL_Parser::getNextCToken() {
         getNextCToken();
     } else if (token.type == "eos") {
         if (calledEOS) {
-            throw UnexpectedTokenException("unexpected end of string");
+            throw CSL_UnexpectedTokenException("unexpected end of string");
         }
 
     calledEOS = true;
@@ -67,7 +67,7 @@ void CSL_Parser::getNextCToken() {
         getNextCToken();
 
     if (!(token.cargo == cargo)) {
-        throw UnexpectedTokenException(errorMessage() + ", '" + cargo + "' expected");
+        throw CSL_UnexpectedTokenException(errorMessage() + ", '" + cargo + "' expected");
     }
 
     getNextCToken();
@@ -84,7 +84,7 @@ void CSL_Parser::Block() {
 void CSL_Parser::tags() {
     expectCargo("<");
     if (token.type != IDENTIFIER) {
-        throw UnexpectedTokenException(errorMessage());
+        throw CSL_UnexpectedTokenException(errorMessage());
     }
 
     if (token.cargo == "src") {
@@ -94,7 +94,7 @@ void CSL_Parser::tags() {
         expectCargo("=");
 
         if (token.type != STRING)
-            throw UnexpectedTokenException(errorMessage() + ", string expected");
+            throw CSL_UnexpectedTokenException(errorMessage() + ", string expected");
 
         string exCode = "";
         ifstream in((token.cargo).c_str());
@@ -107,7 +107,7 @@ void CSL_Parser::tags() {
 
         expectCargo("/");
         if (token.cargo != ">")
-            throw UnexpectedTokenException(errorMessage() + ", '" + ">" + "' expected");
+            throw CSL_UnexpectedTokenException(errorMessage() + ", '" + ">" + "' expected");
 
         parseInternal(exCode);
     } else {
@@ -169,7 +169,7 @@ void CSL_Parser::tagscontent() {
         }
 
         if(token.cargo != "</") {
-            if (token.type != IDENTIFIER && token.cargo != "<" && token.type != "eos") throw UnexpectedTokenException(errorMessage());
+            if (token.type != IDENTIFIER && token.cargo != "<" && token.type != "eos") throw CSL_UnexpectedTokenException(errorMessage());
         }
     }
 }
@@ -178,10 +178,10 @@ void CSL_Parser::ctag() {
     expectCargo("</");
 
     if (token.type != IDENTIFIER)
-        throw UnexpectedTokenException(errorMessage());
+        throw CSL_UnexpectedTokenException(errorMessage());
 
     if (token.cargo != currentCNode->ID) {
-        throw UnexpectedTokenException(errorMessage() + ", '" + currentCNode->ID + "' expected");
+        throw CSL_UnexpectedTokenException(errorMessage() + ", '" + currentCNode->ID + "' expected");
     }
 
     getNextCToken();
@@ -201,7 +201,7 @@ void CSL_Parser::content() {
 
 void CSL_Parser::statement() {
     if (token.type != IDENTIFIER) {
-        throw UnexpectedTokenException(errorMessage());
+        throw CSL_UnexpectedTokenException(errorMessage());
     }
 
     CSL_Node *assignmentCNode = new CSL_Node;
@@ -247,7 +247,7 @@ void CSL_Parser::factor() {
     } else if (token.type == STRING) {
         currentCNode->args.push_back(token.cargo);
     } else {
-        throw UnexpectedTokenException(errorMessage());
+        throw CSL_UnexpectedTokenException(errorMessage());
     }
 }
 

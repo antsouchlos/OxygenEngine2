@@ -102,10 +102,10 @@ class CSL_Lexer {
         bool isDoubleCharOperator2Char(char c);
         bool isSpaceChar(char c);
 
-        string errorMessage();
+        std::string errorMessage();
 
         //convert an integer into a string
-        string convert(int num);
+        std::string convert(int num);
 };
 
 #endif /* CSL_LEXER_H_ */

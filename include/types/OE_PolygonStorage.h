@@ -119,11 +119,8 @@ class OE_PolygonStorage32 {
         // This is the glue between the physics engine and the renderer
         // DO NOT TOUCH unless you REAAALLY know what you are doing (probably not)
         
-        std::vector<uint32_t*>                      vertex_buffer;
-        //std::map<uint32_t*, uint32_t, std::function<bool(uint32_t*, uint32_t*)>>               index_buffer;
-        //std::unordered_map<uint32_t*, uint32_t, std::function<size_t(uint32_t*)>, std::function<bool(uint32_t*, uint32_t*)>> index_buffer;
-        
-        OE_IndexBufferWrapperBase* index_buffer;
+        std::vector<uint32_t*>                      vertex_buffer;        
+        OE_IndexBufferWrapperBase*                  index_buffer;
         
         // optimize by using either an ordered or unordered map
         // depending on the number of triangles, vertices, uvs, polygons
