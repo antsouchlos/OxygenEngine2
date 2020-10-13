@@ -8,6 +8,8 @@
   */
 class OE_InputEventHandler{
 	friend class OE_EventHandler;
+    friend class OE_TaskManager;
+    
 	OE_InputEventHandler();
 	~OE_InputEventHandler();
 	
