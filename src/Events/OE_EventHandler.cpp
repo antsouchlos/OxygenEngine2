@@ -16,6 +16,7 @@ void OE_EventHandler::init(){
 OE_EventHandler::~OE_EventHandler(){
 
 	for(auto x: this->internal_events) delete x.second;
+    this->internal_events.clear();
 
 }
 
@@ -146,7 +147,7 @@ bool OE_EventHandler::havePendingEvents(){
 }
 
 /*IMPORTANT
- * this function is run in the main thread only
+ * this function is run in the main thread only in the 2020 version
  */
 int OE_EventHandler::handleAllEvents(OE_Task* task){
     
@@ -156,14 +157,17 @@ int OE_EventHandler::handleAllEvents(OE_Task* task){
         /// so that other threads target next events
         lockMutex();
         
+        this->happened_events.clear();
+        
         if(pending_events.empty()){
             unlockMutex();
             return 0;
         }
-        vector<string> events = std::exchange(this->pending_events, {});
+        
+        this->happened_events = std::exchange(this->pending_events, {});
         unlockMutex();
         
-        for (auto a_event: events)
+        for (auto a_event: happened_events)
             callIEvent(a_event, task, nullptr);
         
     }

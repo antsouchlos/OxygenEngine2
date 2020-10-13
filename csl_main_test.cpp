@@ -1,33 +1,18 @@
 #include <Carbon/CSL_Interpreter.h>
+#include <OE_TaskManager.h>
 
 using namespace std;
 
 int main(){
         
-    /*OE_World world;
-    cout << world.to_str() << endl;
+    OE_TaskManager taskMgr = OE_TaskManager();
     
-    OE_Scene scene;
-    cout << scene.to_str() << endl;
+    taskMgr.Init();
     
-    OE_Material m;
-    cout << m.to_str() << endl;
+    SDL_Delay(20);
+    taskMgr.Start();
     
-    OE_TCM tcm;
-    cout << tcm.to_str() << endl;
-    
-    OE_Texture tex;
-    cout << tex.to_str() << endl;
-    
-    OE_Mesh32 mesh;
-    cout << mesh.to_str() << endl;
-    
-    OE_Camera cam;
-    cout << cam.to_str() << endl;
-    
-    OE_Light l;
-    cout << l.to_str() << endl;*/
-    CSL_Interpreter interpreter;
+    /*CSL_Interpreter interpreter;
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     
@@ -125,10 +110,10 @@ int main(){
     cout << "NRE VERTEX/INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     delete world3;//*/
     
-    ofstream myfile3;
-    myfile3.open ("csl_very_large_object_test_copy.csl");
-    myfile3 << c;
-    myfile3.close();
+    //ofstream myfile3;
+    //myfile3.open ("csl_very_large_object_test_copy.csl");
+    //myfile3 << c;
+    //myfile3.close();
     
     //SDL_Delay(6000);
     

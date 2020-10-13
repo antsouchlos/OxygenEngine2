@@ -8,7 +8,19 @@ CXXFLAGS = -Wall -g -Og -std=c++14 -I/usr/include -Iinclude
 
 LDFLAGS = -lSDL2 -L/usr/lib -L/usr/local/lib
 
-OBJ_FILES = obj/OE_Camera.o obj/OE_Light.o obj/OE_Material.o obj/OE_Mesh.o obj/OE_Object.o obj/OE_PolygonStorage.o obj/OE_Scene.o obj/OE_TCM.o obj/OE_Texture.o obj/OE_VertexGroup.o obj/OE_VertexStorage.o obj/OE_ViewportConfig.o obj/OE_World.o obj/OE_TypesBase.o obj/CSL_Lexer.o obj/CSL_Parser.o obj/CSL_interpreter.o obj/csl_main_test.o obj/OE_EventParser.o obj/OE_Event.o obj/OE_EventHandler.o obj/OE_InputEventHandler.o
+OBJ_FILES = obj/OE_Camera.o obj/OE_Light.o obj/OE_Material.o obj/OE_Mesh.o obj/OE_Object.o obj/OE_PolygonStorage.o obj/OE_Scene.o obj/OE_TCM.o obj/OE_Texture.o obj/OE_VertexGroup.o obj/OE_VertexStorage.o obj/OE_ViewportConfig.o obj/OE_World.o obj/OE_TypesBase.o obj/CSL_Lexer.o obj/CSL_Parser.o obj/CSL_interpreter.o obj/csl_main_test.o obj/OE_EventParser.o obj/OE_Event.o obj/OE_EventHandler.o obj/OE_InputEventHandler.o obj/OE_Task.o obj/OE_DummyClasses.o obj/OE_TaskManager.o obj/OE_MutexCondition.o 
+
+obj/OE_MutexCondition.o: src/Events/OE_MutexCondition.cpp
+	$(CXX) -c $(CXXFLAGS) src/Events/OE_MutexCondition.cpp -o obj/OE_MutexCondition.o
+
+obj/OE_DummyClasses.o: src/OE_DummyClasses.cpp
+	$(CXX) -c $(CXXFLAGS) src/OE_DummyClasses.cpp -o obj/OE_DummyClasses.o
+
+obj/OE_TaskManager.o: src/OE_TaskManager.cpp
+	$(CXX) -c $(CXXFLAGS) src/OE_TaskManager.cpp -o obj/OE_TaskManager.o
+
+obj/OE_Task.o: src/OE_Task.cpp
+	$(CXX) -c $(CXXFLAGS) src/OE_Task.cpp -o obj/OE_Task.o
 
 obj/OE_EventHandler.o: src/Events/OE_EventHandler.cpp
 	$(CXX) -c $(CXXFLAGS) src/Events/OE_EventHandler.cpp -o obj/OE_EventHandler.o

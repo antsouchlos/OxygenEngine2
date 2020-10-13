@@ -1,6 +1,10 @@
-#include "FTask.h"
+#include <OE_Task.h>
 
-FTask::FTask(string name, int priority, int delay, int ticksa){
+using namespace std;
+
+OE_Task::OE_Task(){}
+
+OE_Task::OE_Task(string name, int priority, int delay, int ticksa){
     this->counter = 0;
     this->priority = priority;
     this->delay = delay;
@@ -11,7 +15,7 @@ FTask::FTask(string name, int priority, int delay, int ticksa){
     this->ticks = 0;
 }
 
-FTask::FTask(string name, int countera, int priority, int init_ticks, int ticks){
+OE_Task::OE_Task(string name, int countera, int priority, int init_ticks, int ticks){
     this->counter = countera;
     this->priority = priority;
     this->delay = 0;
@@ -21,37 +25,37 @@ FTask::FTask(string name, int countera, int priority, int init_ticks, int ticks)
     this->init_ticks = init_ticks;
 }
 
-FTask::~FTask(){
+OE_Task::~OE_Task(){
     //dtor
 }
-void FTask::update(){
+void OE_Task::update(){
     this->counter +=1;
     this->ticks = SDL_GetTicks()-this->delta_ticks;
     this->delta_ticks = SDL_GetTicks();
     //cout << "success" << endl;
 }
 
-int FTask::CONTINUE(){
+int OE_Task::CONTINUE(){
     return 0;
 }
-int FTask::FINISHED(){
+int OE_Task::FINISHED(){
     return 1;
 }
-int FTask::GetCounter(){
+int OE_Task::GetCounter(){
     return this->counter;
 }
-int FTask::GetPriority(){
+int OE_Task::GetPriority(){
     return this->priority;
 }
 
-int FTask::GetTime(){
+int OE_Task::GetTime(){
     return SDL_GetTicks()-this->init_ticks;
 }
 
-int FTask::GetElapsedTime(){
+int OE_Task::GetElapsedTime(){
     return this->ticks;
 }
 
-string FTask::GetName(){
+string OE_Task::GetName(){
     return this->name;
 }

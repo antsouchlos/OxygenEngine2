@@ -18,7 +18,7 @@ class OE_THREAD_SAFETY_OBJECT{
     
         bool changed;
         bool isStarted;
-    private:
+    protected:
         SDL_mutex*  wmutex;
         void*       data;
 };

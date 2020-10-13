@@ -3,8 +3,6 @@
 
 #include <types/OE_World.h>
 
-//all needed types are included in CSL_Writer.h
-//#include "CSL_Writer.h"
 #include <Carbon/CSL_Parser.h>
 #include <Carbon/CSL_Exceptions.h>
 
@@ -28,8 +26,6 @@ private:
 
 	//a pointer to the CNode currently beeing processed
 	CSL_Node *curNode{nullptr};
-
-	//void process();
 
 	//a function for each type
 	//the functions are called recursively (processWorld()->processScene()->processCamera->...)
