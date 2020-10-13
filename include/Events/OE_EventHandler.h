@@ -6,6 +6,8 @@
 
 class OE_EventHandler: OE_THREAD_SAFETY_OBJECT{
 public:
+    
+    friend class OE_TaskManager;
 
     OE_EventHandler();
     ~OE_EventHandler();
@@ -41,6 +43,7 @@ protected:
     std::vector<std::string> obsolete_events;
     std::vector<std::string> pending_events;
     
+    std::vector<std::string> happened_events;
     uint8_t index = -1;
     bool done;
     

@@ -87,12 +87,8 @@ bool OE_EventHandler::update(){
             done = true;
             return true;
         }
-        
         updateInputEvents();
-    
-    
     }
-
     return false;
 }
 
