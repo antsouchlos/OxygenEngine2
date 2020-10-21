@@ -3,8 +3,9 @@
 
 #include <OE_Task.h>
 #include <types/OE_World.h>
-#include <OE_DummyClasses.h>
+#include <OE_SDL_WindowSystem.h>
 #include <Events/OE_MutexCondition.h>
+#include <Renderer/NRE_RenderData.h>
 
 using namespace std;
 
@@ -17,7 +18,6 @@ class OE_TaskManager;
 typedef int(*OE_METHOD)(void*, OE_Task);
 
 struct OE_ThreadData{
-
     /* This struct is passed to the update_thread function
      * It passes the task manager pointer and the thread name it runs on
      * so it can run methods from classes inherited from OE_TaskManager class
@@ -25,7 +25,6 @@ struct OE_ThreadData{
      */
     static OE_TaskManager* taskMgr;
     std::string name;
-
 };
 
 struct OE_UnsyncThreadData{
@@ -45,7 +44,17 @@ struct OE_ThreadStruct {
     std::vector<OE_METHOD>      functions;
     std::vector<unsigned int>   task_queue;
     std::vector<void*>          task_data;
-
+    
+    // for new tasks to be run after the next frame
+    std::vector<OE_Task>        pending_tasks;
+    std::vector<OE_METHOD>      pending_functions;
+    std::vector<void*>          pending_task_data;
+    
+    // for tasks to be removed
+    std::queue<std::string>    to_be_removed;
+    
+    void updateTaskList();
+    
     std::string          name;
     bool                 synchronize, changed;
     bool                 flushed = false;
@@ -90,6 +99,7 @@ class OE_TaskManager: public OE_MutexCondition
         OE_PhysicsEngineBase*               physics{nullptr};
         OE_WindowSystemBase*                window{nullptr};
         
+        OE_World*                           world{nullptr};
 
         OE_Task                             events_task;
         
@@ -123,8 +133,9 @@ class OE_TaskManager: public OE_MutexCondition
         void Destroy();
         
         
-        // removes a task from the task list
-        //void RemoveTask(std::string);
+        // removes a task from the task list of a thread
+        void RemoveTask(std::string);
+        void RemoveTask(std::string, std::string);
 
         void updateThread(const std::string);
         

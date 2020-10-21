@@ -39,6 +39,29 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     return output;
 }
 
+void OE_ThreadStruct::updateTaskList(){
+    
+    for (size_t x=0; x < this->to_be_removed.size(); x++){
+        for (size_t i=0; i < this->tasks.size(); i++){
+            if (this->tasks[i].GetName() == this->to_be_removed.front()){
+                this->tasks.erase(this->tasks.begin() + i);
+                this->functions.erase(this->functions.begin() + i);
+                this->task_data.erase(this->task_data.begin() + i);
+            }
+        }
+        this->to_be_removed.pop();
+    }
+    
+    for (auto x: std::exchange(this->pending_tasks, {}))
+        this->tasks.push_back(x);
+    for (auto x: std::exchange(this->pending_functions, {}))
+        this->functions.push_back(x);
+    for (auto x: std::exchange(this->pending_task_data, {}))
+        this->task_data.push_back(x);
+}
+
+
+
 OE_TaskManager::OE_TaskManager()
 {
     completed_threads = 0;
@@ -58,11 +81,12 @@ OE_TaskManager::~OE_TaskManager()
 
 int OE_TaskManager::Init(){
     
-    this->window = new OE_WindowSystemBase();
+    this->window = new OE_SDL_WindowSystem();
     this->renderer = new OE_RendererBase();
+    this->renderer->screen = this->window;
     this->physics = new OE_PhysicsEngineBase();
     
-    this->window->init(800, 600, nullptr);
+    this->window->init(800, 600, "Oxygen Engine Test", false, nullptr);
     
     this->createCondition();
     this->createCondition();
@@ -72,7 +96,7 @@ int OE_TaskManager::Init(){
     this->events_task = OE_Task("OE_Physics", 0, 0, this->getTicks());
     
     this->event_handler.input_handler.createEvents(&this->event_handler.internal_events);
-    this->SetFrameRate(10);
+    this->SetFrameRate(200);
     this->done = false;
     
     this->CreateNewThread("default");
@@ -107,7 +131,7 @@ void OE_TaskManager::CreateNewThread(string thread_name){
     
     if(synchro)
         this->threadIDs[thread_name] = SDL_CreateThread(oxygen_engine_update_thread, thread_name.c_str(), (void*)data);
-    else
+    else //USELESS
         this->unsync_threadIDs[thread_name] = SDL_CreateThread(oxygen_engine_update_thread, thread_name.c_str(), (void*)data);
     
     unlockMutex();
@@ -131,9 +155,9 @@ void OE_TaskManager::Step(){
     }
     unlockMutex();
     done = this->event_handler.update();
-    
+
     this->renderer->updateSingleThread();
-    
+    this->window->update();
     // count how many times the step function has been called
     countar++;
 
@@ -156,8 +180,8 @@ void OE_TaskManager::Step(){
     
     this->events_task.update();
     this->event_handler.handleAllEvents(&events_task);
-    
-    this->renderer->updateData();
+    if (this->world != nullptr)
+        this->renderer->updateData();
 }
 
 void OE_TaskManager::Start(){
@@ -243,7 +267,7 @@ void OE_TaskManager::updateThread(const string name){
             this->unlockMutex();
 
             if( (local_framerate) > current_ticks ){
-                this->pause(local_framerate - (current_ticks));
+                //this->pause(local_framerate - (current_ticks));
                 this->current_framerate = 1000.0/(float)local_framerate;
             }
             else{
@@ -311,53 +335,77 @@ unsigned int OE_TaskManager::GetFrameRate(){
 
 void OE_TaskManager::SetFrameRate(unsigned int frametarget){
     // set desired framerate
-     this->framerate = 1000u/frametarget;
+    lockMutex();
+    this->framerate = 1000u/frametarget;
+    unlockMutex();
 }
 
 void OE_TaskManager::AddTask(string name, const OE_METHOD func, void* data){
 
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
-    this->threads["default"].tasks.push_back(task);
-    this->threads["default"].functions.push_back(func);
-    this->threads["default"].task_data.push_back(data);
+    lockMutex();
+    this->threads["default"].pending_tasks.push_back(task);
+    this->threads["default"].pending_functions.push_back(func);
+    this->threads["default"].pending_task_data.push_back(data);
     this->threads["default"].changed = true;
+    unlockMutex();
 
 }
 
 void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, void* data){
 
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
-    this->threads["default"].tasks.push_back(task);
-    this->threads["default"].functions.push_back(func);
-    this->threads["default"].task_data.push_back(data);
+    lockMutex();
+    this->threads["default"].pending_tasks.push_back(task);
+    this->threads["default"].pending_functions.push_back(func);
+    this->threads["default"].pending_task_data.push_back(data);
     this->threads["default"].changed = true;
+    unlockMutex();
 }
 
 void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, string threadname, void* data){
 
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
-    this->threads[threadname].tasks.push_back(task);
-    this->threads[threadname].functions.push_back(func);
-    this->threads[threadname].task_data.push_back(data);
+    lockMutex();
+    this->threads[threadname].pending_tasks.push_back(task);
+    this->threads[threadname].pending_functions.push_back(func);
+    this->threads[threadname].pending_task_data.push_back(data);
     this->threads[threadname].changed = true;
+    unlockMutex();
 }
 
 void OE_TaskManager::AddTask(string name, const OE_METHOD func, string threadname, void* data){
 
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
-    this->threads[threadname].tasks.push_back(task);
-    this->threads[threadname].functions.push_back(func);
-    this->threads[threadname].task_data.push_back(data);
+    lockMutex();
+    this->threads[threadname].pending_tasks.push_back(task);
+    this->threads[threadname].pending_functions.push_back(func);
+    this->threads[threadname].pending_task_data.push_back(data);
     this->threads[threadname].changed = true;
+    unlockMutex();
 }
 
 void OE_TaskManager::DoOnce(string name, const OE_METHOD func , int delay, void* data){
 
     OE_Task task = OE_Task(name, 0, delay, this->getTicks());
-    this->threads["default"].tasks.push_back(task);
-    this->threads["default"].functions.push_back(func);
-    this->threads["default"].task_data.push_back(data);
+    lockMutex();
+    this->threads["default"].pending_tasks.push_back(task);
+    this->threads["default"].pending_functions.push_back(func);
+    this->threads["default"].pending_task_data.push_back(data);
     this->threads["default"].changed = true;
+    unlockMutex();
+}
+
+void OE_TaskManager::RemoveTask(std::string name){
+    lockMutex();
+    this->threads["default"].to_be_removed.push(name);
+    unlockMutex();
+}
+
+void OE_TaskManager::RemoveTask(std::string name, std::string threadname){
+    lockMutex();
+    this->threads[threadname].to_be_removed.push(name);
+    unlockMutex();
 }
 
 OE_Task OE_TaskManager::GetTaskInfo(string threadname, string name){
@@ -415,6 +463,10 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
 }
 
 void OE_TaskManager::sortThreadTasks(const std::string& name){
+    
+    lockMutex();
+    this->threads[name].updateTaskList();
+    unlockMutex();
     
     this->threads[name].task_queue.clear();
 

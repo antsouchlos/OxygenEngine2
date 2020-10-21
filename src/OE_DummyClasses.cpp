@@ -14,9 +14,7 @@ OE_WindowSystemBase::~OE_WindowSystemBase(){
 
 }
 
-bool OE_WindowSystemBase::init(int x, int y, void* data){
-    SDL_Init(SDL_INIT_EVERYTHING);
-    window = SDL_CreateWindow( "some window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_SHOWN );
+bool OE_WindowSystemBase::init(int x, int y, string titlea, bool isFullscreen, void* data){
     return true;
 }
 
@@ -29,8 +27,7 @@ bool OE_WindowSystemBase::updateEvents(){
 }
 
 void OE_WindowSystemBase::destroy(){
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    
 }
 
 
