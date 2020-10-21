@@ -163,7 +163,13 @@ void OE_TaskManager::Step(){
 
     lockMutex();
     completed_threads++;
-    
+
+
+	// --------------------------------------------------------------
+	// 	Is this really the most elegant and efficient way to solve 
+	// 	the problem of a zombie thread?		- Anderas, est. 1999
+	// --------------------------------------------------------------
+
     if(completed_threads > getReadyThreads()){
         /// if this is the last motheyacking thread
         /// that slows down the game, signal all other threads
