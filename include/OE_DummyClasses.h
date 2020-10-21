@@ -27,7 +27,7 @@ public:
     virtual ~OE_WindowSystemBase();
     
     
-    virtual bool init(int, int, void*);
+    virtual bool init(int, int, std::string, bool, void*);
     virtual bool update();
     
     virtual bool updateEvents();
@@ -39,7 +39,11 @@ public:
     
     OE_OS os{OE_UNDEFINED};
     OE_WINSYS winsys{OE_NONE};
-    SDL_Window* window;
+    
+    // For different OpenGL versions
+    std::string title;
+    bool fullscreen{false};
+    int major{0}; int minor{0}; bool isES{false};
 };
 
 /** This is a dummy class aimed to be a base class for
