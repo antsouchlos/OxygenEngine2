@@ -8,11 +8,35 @@ CXXFLAGS = -Wall -g -Og -std=c++14 -I/usr/include -Iinclude
 
 LDFLAGS = -lSDL2 -L/usr/lib -L/usr/local/lib
 
-OBJ_FILES = obj/OE_Camera.o obj/OE_Light.o obj/OE_Material.o obj/OE_Mesh.o obj/OE_Object.o obj/OE_PolygonStorage.o obj/OE_Scene.o obj/OE_TCM.o obj/OE_Texture.o obj/OE_VertexGroup.o obj/OE_VertexStorage.o obj/OE_ViewportConfig.o obj/OE_World.o obj/OE_TypesBase.o obj/CSL_Lexer.o obj/CSL_Parser.o obj/CSL_interpreter.o obj/csl_main_test.o obj/OE_EventParser.o obj/OE_Event.o obj/OE_EventHandler.o obj/OE_InputEventHandler.o obj/OE_Task.o obj/OE_DummyClasses.o obj/OE_TaskManager.o obj/OE_MutexCondition.o 
+OBJ_FILES = obj/OE_Camera.o obj/OE_Light.o obj/OE_Material.o obj/OE_Mesh.o obj/OE_Object.o obj/OE_PolygonStorage.o obj/OE_Scene.o obj/OE_TCM.o obj/OE_Texture.o obj/OE_VertexGroup.o obj/OE_VertexStorage.o obj/OE_ViewportConfig.o obj/OE_World.o obj/OE_TypesBase.o obj/CSL_Lexer.o obj/CSL_Parser.o obj/CSL_interpreter.o obj/csl_main_test.o obj/OE_EventParser.o obj/OE_Event.o obj/OE_EventHandler.o obj/OE_InputEventHandler.o obj/OE_Task.o obj/OE_DummyClasses.o obj/OE_TaskManager.o obj/OE_MutexCondition.o obj/OE_Math.o obj/OE_API.o obj/NRE_RenderData.o obj/NRE_RendererMain.o obj/NRE_GPU_API.o obj/glad.o obj/NRE_GL3_API.o obj/OE_SDL_WindowSystem.o
+
+obj/OE_SDL_WindowSystem.o: src/OE_SDL_WindowSystem.cpp
+	$(CXX) -c $(CXXFLAGS) src/OE_SDL_WindowSystem.cpp -o obj/OE_SDL_WindowSystem.o
+
+obj/glad.o: src/Renderer/glad.c
+	$(CXX) -c $(CXXFLAGS) src/Renderer/glad.c -o obj/glad.o
+
+obj/NRE_GL3_API.o: src/Renderer/NRE_GL3_API.cpp
+	$(CXX) -c $(CXXFLAGS) src/Renderer/NRE_GL3_API.cpp -o obj/NRE_GL3_API.o
+	
+obj/NRE_GPU_API.o: src/Renderer/NRE_GPU_API.cpp
+	$(CXX) -c $(CXXFLAGS) src/Renderer/NRE_GPU_API.cpp -o obj/NRE_GPU_API.o
+
+obj/NRE_RendererMain.o: src/Renderer/NRE_RendererMain.cpp
+	$(CXX) -c $(CXXFLAGS) src/Renderer/NRE_RendererMain.cpp -o obj/NRE_RendererMain.o
+
+obj/NRE_RenderData.o: src/Renderer/NRE_RenderData.cpp
+	$(CXX) -c $(CXXFLAGS) src/Renderer/NRE_RenderData.cpp -o obj/NRE_RenderData.o
 
 obj/OE_MutexCondition.o: src/Events/OE_MutexCondition.cpp
 	$(CXX) -c $(CXXFLAGS) src/Events/OE_MutexCondition.cpp -o obj/OE_MutexCondition.o
 
+obj/OE_API.o: src/OE_API.cpp
+	$(CXX) -c $(CXXFLAGS) src/OE_API.cpp -o obj/OE_API.o
+	
+obj/OE_Math.o: src/OE_Math.cpp
+	$(CXX) -c $(CXXFLAGS) src/OE_Math.cpp -o obj/OE_Math.o
+	
 obj/OE_DummyClasses.o: src/OE_DummyClasses.cpp
 	$(CXX) -c $(CXXFLAGS) src/OE_DummyClasses.cpp -o obj/OE_DummyClasses.o
 
