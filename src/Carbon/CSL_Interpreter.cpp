@@ -497,6 +497,8 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
         
         curNode = saveNode;
     }
+    mesh->data.genVertexBufferInternally();
+    mesh->data.genIndexBuffersInternally();
     return mesh;
 }
 

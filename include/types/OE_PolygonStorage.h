@@ -6,6 +6,10 @@
 
 class OE_Mesh32;
 
+struct OE_IndexBufferReady{
+    std::vector<uint32_t> data;
+};
+
 /* This classes optimize the storage by either using
  * an ordered or an unordered map transparently
  */ 
@@ -88,12 +92,17 @@ class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
  * 
  * addTriangle()        : tries to add a specific index sequence ({vertex, normal, uv1...}). If the sequence
  *                      already exists, then it returns true. 
+ * 
+ * 
+ * IMPORTANT: DO NOT TOUCH anything protected or private unless you really know what you are doing
+ * A LOT of stuff will be broken if you do sth wrong
  */
 
 class OE_PolygonStorage32 {
     
     friend class CSL_Interpreter;
     friend class OE_Mesh32;
+    friend class NRE_Renderer;
     
     public:
         OE_PolygonStorage32();
@@ -102,9 +111,11 @@ class OE_PolygonStorage32 {
         uint32_t* addTriangle(uint32_t* indices);
         //int removeTriangle(size_t);
         
-        /// These two are used by the renderer
+        /// These four are used by the renderer
         std::vector<float>      genVertexBuffer();
         std::vector<uint32_t>   genIndexBuffer(const std::size_t &vgroup_id);
+        void genVertexBufferInternally();
+        void genIndexBuffersInternally();
         
         std::size_t                                 num_of_uvs;
     //protected:
@@ -113,7 +124,7 @@ class OE_PolygonStorage32 {
         std::vector<OE_Triangle32>                  triangles;
         std::unordered_map<std::size_t, OE_VertexGroup*>      triangle_groups;
 
-    private:
+    protected:
         
         // Internal but IMPORTANT stuff
         // This is the glue between the physics engine and the renderer
@@ -126,6 +137,15 @@ class OE_PolygonStorage32 {
         // depending on the number of triangles, vertices, uvs, polygons
         void initUnorderedIB(OE_Mesh32*);
         void initOrderedIB(OE_Mesh32*);
+        
+    private:
+        // This stuff is only of interest to the renderer
+        // Those vectors should be cleared after first use by the renderer on loading the object
+        std::vector<float> vbo;
+        std::unordered_map<std::size_t, OE_IndexBufferReady> ibos;
+        
+        bool vbo_exists{false};
+        bool ibos_exist{false};
 };
 
 void printArray(const uint32_t* x, const uint32_t& arrsize);
