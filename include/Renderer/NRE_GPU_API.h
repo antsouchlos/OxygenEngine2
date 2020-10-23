@@ -8,13 +8,13 @@
 /** platform-specific namespaces
   * -OpenGL ES 3.0/ OpenGL 3.2
   * -OpenGL 4.x
-  * -OpenGL 4.5 + GL_ARB_bindless_texture
-  * -Direct3D 9 (maybe, 5% chance to happen)
+  * -OpenGL 4.5 + GL_ARB_bindless_texture (UPDATE 2020: OpenGL 3.3/ OpenGL ES 3.0 + extensions
+  * -Direct3D 9 (maybe, 5% chance to happen UPDATE 2020: ZERO chance to happen) 
   */
 
 struct NRE_GPU_VertexLayoutInput{
-
-    size_t offset;
+    std::size_t vertex_buffer;
+    std::size_t offset;
     unsigned int amount;
     unsigned int stride;
 };
@@ -54,8 +54,8 @@ public:
     virtual void setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     virtual void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     virtual void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
-    virtual void setProgramUniformSlot(std::size_t, std::size_t, int);
-    virtual void setUniformState(std::size_t, int, uint32_t, uint32_t);
+    virtual void setProgramUniformSlot(std::size_t, std::string, int);
+    virtual void setUniformState(std::size_t, int, std::size_t, std::size_t);
     virtual void deleteUniformBuffer(std::size_t);
     
     virtual void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
