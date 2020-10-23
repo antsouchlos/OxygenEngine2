@@ -254,3 +254,20 @@ void OE_PolygonStorage32::initUnorderedIB(OE_Mesh32* mesh){
 void OE_PolygonStorage32::initOrderedIB(OE_Mesh32* mesh){
     this->index_buffer = new OE_IndexBufferMap(mesh);
 }
+
+void OE_PolygonStorage32::genVertexBufferInternally(){
+    if (!vbo_exists)
+        this->vbo = genVertexBuffer();
+    vbo_exists = true;
+    
+}
+
+void OE_PolygonStorage32::genIndexBuffersInternally(){
+    if (!ibos_exist){
+        for (auto vgroup : this->triangle_groups){
+            this->ibos[vgroup.first] = OE_IndexBufferReady();
+            this->ibos[vgroup.first].data = this->genIndexBuffer(vgroup.first);
+        }
+    }
+    ibos_exist = true;
+}
