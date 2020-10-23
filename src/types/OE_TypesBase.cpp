@@ -110,3 +110,14 @@ string CSL_Join(const string& connector,const vector<string>& lista){
 
     return output;
 }
+
+void OE_WriteToLog(string log){
+    OE_WriteToLog(log.c_str());
+}
+
+void OE_WriteToLog(const char* log){
+    SDL_RWops* logfile = SDL_RWFromFile("OE_GL_log.txt", "a");
+    SDL_RWwrite(logfile, log, 1, strlen(log));
+    SDL_RWclose(logfile);
+}
+
