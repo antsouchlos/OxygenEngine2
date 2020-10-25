@@ -35,7 +35,9 @@ enum NRE_GPU_BUFFER_USAGE{
 class NRE_GPU_API : public OE_THREAD_SAFETY_OBJECT{
 public:
     NRE_GPU_API();
-    ~NRE_GPU_API();
+    virtual ~NRE_GPU_API();
+    
+    virtual std::string getRenderingAPI();
     
     virtual std::size_t newVertexBuffer();
     virtual std::size_t newVertexLayout();
@@ -67,6 +69,7 @@ public:
     //void setProgramTCS(std::size_t, FE_GPU_Shader);
     //void setProgramTES(std::size_t, FE_GPU_Shader);
     virtual void setupProgram(std::size_t);
+    virtual void deleteProgram(std::size_t);
     
     virtual void draw(std::size_t, std::size_t, int, int);
     virtual void draw(std::size_t, std::size_t);

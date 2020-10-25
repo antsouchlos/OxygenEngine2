@@ -56,8 +56,7 @@ void OE_EventHandler::createUserEvent(string a_name){
 void OE_EventHandler::destroyIEvent(string a_name){
    lockMutex();
        
-   delete internal_events[a_name];
-   internal_events.erase(a_name);
+   this->obsolete_events.push_back(a_name);
 
    unlockMutex();
    //return output;

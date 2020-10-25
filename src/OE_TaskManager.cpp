@@ -82,11 +82,12 @@ OE_TaskManager::~OE_TaskManager()
 int OE_TaskManager::Init(){
     
     this->window = new OE_SDL_WindowSystem();
-    this->renderer = new OE_RendererBase();
+    this->renderer = new NRE_Renderer();
     this->renderer->screen = this->window;
     this->physics = new OE_PhysicsEngineBase();
     
     this->window->init(800, 600, "Oxygen Engine Test", false, nullptr);
+    this->renderer->init();
     
     this->createCondition();
     this->createCondition();
@@ -197,8 +198,11 @@ void OE_TaskManager::Step(){
     
     this->events_task.update();
     this->event_handler.handleAllEvents(&events_task);
-    if (this->world != nullptr)
+    if (this->world != nullptr){
+        this->physics->world = this->world;
+        this->renderer->world = this->world;
         this->renderer->updateData();
+    }
 }
 
 void OE_TaskManager::Start(){

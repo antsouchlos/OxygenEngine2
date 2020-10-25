@@ -57,6 +57,7 @@ class NRE_GL3_API : public NRE_GPU_API{
 public:
     NRE_GL3_API();
     ~NRE_GL3_API();
+    std::string getRenderingAPI();
     
     std::size_t newVertexBuffer();
     std::size_t newVertexLayout();
@@ -88,6 +89,7 @@ public:
     //void setProgramTCS(std::size_t, FE_GPU_Shader);
     //void setProgramTES(std::size_t, FE_GPU_Shader);
     void setupProgram(std::size_t);
+    void deleteProgram(std::size_t);
     
     void draw(std::size_t, std::size_t, int, int);
     void draw(std::size_t, std::size_t);
