@@ -1,16 +1,18 @@
-#include <Carbon/CSL_Interpreter.h>
-#include <OE_TaskManager.h>
+
+#include <OE_API.h>
 
 using namespace std;
+using namespace OE;
 
 int main(){
         
-    OE_TaskManager taskMgr = OE_TaskManager();
+    //OE_TaskManager taskMgr = OE_TaskManager();
     
-    taskMgr.Init();
-    
-    SDL_Delay(20);
-    taskMgr.Start();
+    //taskMgr.Init();
+    OE_Init();
+    OE_Pause(20);
+    //taskMgr.Start();
+    OE_Start();
     
     /*CSL_Interpreter interpreter;
     auto t = clock();

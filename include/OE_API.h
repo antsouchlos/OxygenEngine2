@@ -9,14 +9,12 @@
 
 namespace OE{
     
-    //int x=5;
-    static OE_TaskManager* OE_Main{nullptr};
-    
+    // GLOBAL VARIABLE
+    extern OE_TaskManager* OE_Main;
     
     /** Basic API functions for starting the Oxygen Engine
      *  and assigning tasks
      */
-    
     size_t OE_Init();
     size_t OE_Init(std::string, bool);
     size_t OE_Init(std::string, int, int, bool);
@@ -24,7 +22,7 @@ namespace OE{
     void OE_Start();
     void OE_Destroy();
     bool OE_IsDone();
-    void OE_Finish();
+    void OE_Finish(); // ?? Where do i even need this ???
     //size_t OE_InitFromFile(std::string); //TODO
     
     //------------------------BLOCK-------------------------//
@@ -44,6 +42,8 @@ namespace OE{
     void OE_SetEventFunc(std::string, const OE_EVENTFUNC, void*);
     
     void OE_DestroyEvent(std::string);
+    
+    void OE_Pause(int);
     
     //------------------------BLOCK-------------------------//
     
