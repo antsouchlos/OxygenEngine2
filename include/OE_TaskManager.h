@@ -5,15 +5,14 @@
 #include <types/OE_World.h>
 #include <OE_SDL_WindowSystem.h>
 #include <Events/OE_MutexCondition.h>
-#include <Renderer/NRE_RenderData.h>
+#include <Renderer/NRE_RendererMain.h>
 
-using namespace std;
 
 class OE_TaskManager;
 
 /* this is a shortcut type definition
  * to make code clearer.
- * It stores a pointer of a method of FTaskManager-derived classes
+ * It stores a pointer of a method of OE_TaskManager-derived classes
  */
 typedef int(*OE_METHOD)(void*, OE_Task);
 
@@ -117,8 +116,8 @@ class OE_TaskManager: public OE_MutexCondition
         */
         void AddTask(std::string, const OE_METHOD, void*);
         void AddTask(std::string, const OE_METHOD, int, void*);
-        void AddTask(std::string, const OE_METHOD, int, string, void*);
-        void AddTask(std::string, const OE_METHOD, string, void*);
+        void AddTask(std::string, const OE_METHOD, int, std::string, void*);
+        void AddTask(std::string, const OE_METHOD, std::string, void*);
         // similar to do-task, but only executes the function once after certain time has passed
         void DoOnce( std::string, const OE_METHOD, int, void*);
         OE_Task GetTaskInfo(std::string, std::string);

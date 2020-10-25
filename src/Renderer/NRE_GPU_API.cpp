@@ -5,7 +5,11 @@ NRE_GPU_API::NRE_GPU_API(){
 }
 
 NRE_GPU_API::~NRE_GPU_API(){
-    
+
+}
+
+std::string NRE_GPU_API::getRenderingAPI(){
+    return "undefined";
 }
 
 // default implementations of virtual methods of the GPU API (OpenGL/Vulkan/Metal/whatever
@@ -41,6 +45,7 @@ void NRE_GPU_API::setProgramFS(std::size_t, std::string){}
 //void setProgramTCS(std::size_t, FE_GPU_Shader){}
 //void setProgramTES(std::size_t, FE_GPU_Shader){}
 void NRE_GPU_API::setupProgram(std::size_t){}
+void NRE_GPU_API::deleteProgram(std::size_t){}
 
 void NRE_GPU_API::draw(std::size_t, std::size_t, int, int){}
 void NRE_GPU_API::draw(std::size_t, std::size_t){}

@@ -71,7 +71,8 @@ bool OE_PhysicsEngineBase::init(){
     return true;
 }
 
-bool OE_PhysicsEngineBase::updateMultiThread(OE_Task*, int){
+bool OE_PhysicsEngineBase::updateMultiThread(OE_Task* task, int thread_num){
+    //cout << task->GetElapsedTime();-
     return true;
 }
 
