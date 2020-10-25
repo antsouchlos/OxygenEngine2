@@ -41,7 +41,20 @@ NRE_GL3_API::NRE_GL3_API(){
 }
 
 NRE_GL3_API::~NRE_GL3_API(){
-    
+    for (auto x: vbos)
+        this->deleteVertexBuffer(x.first);
+    for (auto x: vaos)
+        this->deleteVertexLayout(x.first);
+    for (auto x: ibos)
+        this->deleteIndexBuffer(x.first);
+    for (auto x: ubos)
+        this->deleteUniformBuffer(x.first);
+    for (auto x: progs)
+        this->deleteProgram(x.first);
+}
+
+std::string NRE_GL3_API::getRenderingAPI(){
+    return "OpenGL";
 }
 
 //---------------------Create Objects-----------------------------//
@@ -340,6 +353,13 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         this->progs[id].uniforms.push_back(ubo_state);
     }
     
+}
+
+void NRE_GL3_API::deleteProgram(std::size_t id){
+    assert (this->progs.count(id) != 0);
+    glDeleteShader(this->progs[id].vs_handle);
+    glDeleteShader(this->progs[id].fs_handle);
+    glDeleteProgram(this->progs[id].handle);
 }
 
 //---------------------Draw calls-----------------------------//

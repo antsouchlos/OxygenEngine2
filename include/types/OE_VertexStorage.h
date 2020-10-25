@@ -43,6 +43,7 @@ class OE_VertexStorage{
     friend class CSL_Interpreter;
     friend class OE_Mesh32;
     friend class OE_PolygonStorage32;
+    friend class NRE_Renderer;
     
     public:
         OE_VertexStorage();

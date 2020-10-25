@@ -7,6 +7,7 @@
 class OE_World : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     
     friend class CSL_Interpreter;
+    friend class NRE_Renderer;
     
     public:    
         OE_World();
@@ -17,10 +18,10 @@ class OE_World : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     //protected:
         
         std::size_t                                         loaded_scene;
-        std::unordered_map<std::size_t, OE_Scene*>          scenes;
+        std::map<std::size_t, OE_Scene*>          scenes;
         
         std::size_t                                         loaded_viewport;
-        std::unordered_map<std::size_t, OE_ViewportConfig*> viewports;                
+        std::map<std::size_t, OE_ViewportConfig*> viewports;                
 };
 
 #endif

@@ -82,7 +82,9 @@ class OE_PhysicsEngineBase : public OE_THREAD_SAFETY_OBJECT {
     
     bool                isMultiThreaded{false};
     OE_World*           world{nullptr};   
-    OE_EventHandler*    handler{nullptr};
+    // You do not actually need this since you can use API functions directly in your 
+    // Physics engine .cpp :))
+    //OE_EventHandler*    handler{nullptr};
     std::string         name{"default"};
 };
 
