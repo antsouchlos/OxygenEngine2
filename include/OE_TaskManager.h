@@ -124,7 +124,7 @@ class OE_TaskManager: public OE_MutexCondition
         
         
         // Main functions
-        int Init();
+        int Init(std::string, int, int, bool);
         void CreateNewThread(std::string);
         void CreateUnsyncThread(std::string, const OE_METHOD, void*);
         void Step();
