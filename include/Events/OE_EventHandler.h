@@ -33,6 +33,8 @@ public:
     void updateInputEvents();
     int handleAllEvents(OE_Task*);
     
+    bool done;
+    
 protected:
 	
 	bool havePendingEvents();
@@ -45,7 +47,7 @@ protected:
     
     std::vector<std::string> happened_events;
     uint8_t index = -1;
-    bool done;
+    
     
     //SDL specific
     SDL_Event event;

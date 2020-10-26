@@ -3,6 +3,7 @@
 
 #include <OE_Task.h>
 #include <types/OE_World.h>
+#include <Carbon/CSL_Interpreter.h>
 #include <OE_SDL_WindowSystem.h>
 #include <Events/OE_MutexCondition.h>
 #include <Renderer/NRE_RendererMain.h>
@@ -99,7 +100,9 @@ class OE_TaskManager: public OE_MutexCondition
         OE_WindowSystemBase*                window{nullptr};
         
         OE_World*                           world{nullptr};
-
+        
+        OE_World*                           pending_world{nullptr}; // for loading a world
+        
         OE_Task                             events_task;
         
         
@@ -152,7 +155,7 @@ class OE_TaskManager: public OE_MutexCondition
         
     private:
         
-        
+        void updateWorld();
         void runThreadTasks(const std::string&);
         void sortThreadTasks(const std::string&);
 };

@@ -96,7 +96,7 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
     this->events_task = OE_Task("OE_Physics", 0, 0, this->getTicks());
     
-    this->event_handler.input_handler.createEvents(&this->event_handler.internal_events);
+    this->event_handler.init();
     this->SetFrameRate(200);
     this->done = false;
     
@@ -196,9 +196,12 @@ void OE_TaskManager::Step(){
     }
     unlockMutex();
     
+    this->updateWorld();
     this->events_task.update();
     this->event_handler.handleAllEvents(&events_task);
+    
     if (this->world != nullptr){
+        
         this->physics->world = this->world;
         this->renderer->world = this->world;
         this->renderer->updateData();
@@ -248,6 +251,11 @@ void OE_TaskManager::Destroy(){
     delete this->renderer;
     delete this->physics;
     delete this->window;
+    
+    if (this->world != nullptr)
+        delete this->world;
+    if (this->pending_world != nullptr)
+        delete this->pending_world;
     
     this->destroy(); // from OE_MutexCondition
 }
@@ -348,6 +356,14 @@ int OE_TaskManager::getReadyThreads(){
 /************************
  *  OTHER FUNCS
  * ***********************/
+
+void OE_TaskManager::updateWorld(){
+    lockMutex();
+    if (this->pending_world != nullptr)
+        this->world = this->pending_world;
+    this->pending_world = nullptr;
+    unlockMutex();
+}
 
 unsigned int OE_TaskManager::GetFrameRate(){
     // return active framerate
