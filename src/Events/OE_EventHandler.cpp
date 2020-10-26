@@ -10,7 +10,7 @@ OE_EventHandler::OE_EventHandler(){
 }
 void OE_EventHandler::init(){
 	this->input_handler.createEvents(&this->internal_events);
-
+    this->done = false;
 }
 
 OE_EventHandler::~OE_EventHandler(){

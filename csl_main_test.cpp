@@ -4,6 +4,11 @@
 using namespace std;
 using namespace OE;
 
+int OnLoadObject(void*, OE_Task* event_task, string event_name){
+    cout << "SUCCESSFULLY loaded '" << event_name << "'" << endl;
+    return 0;
+}
+
 int main(){
         
     //OE_TaskManager taskMgr = OE_TaskManager();
@@ -11,10 +16,13 @@ int main(){
     //taskMgr.Init();
     OE_Init();
     OE_Pause(20);
+    OE_LoadWorld("challenge_car.csl", &OnLoadObject, nullptr);
+    //OE_LoadWorld("fe_export_test.csl", &OnLoadObject, nullptr);
+    //OE_LoadWorld("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
     OE_Start();
     
-    /*CSL_Interpreter interpreter;
+    CSL_Interpreter interpreter;
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     
@@ -76,6 +84,7 @@ int main(){
                 
                 t = clock();
                 vertex_buf2 = mesh->data.genVertexBuffer();
+                cout << "NRE VERTEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
                 t = clock();
                 for(const auto& vgroup : mesh->data.triangle_groups){
                     index_buf2 = mesh->data.genIndexBuffer(vgroup.first);
@@ -87,7 +96,7 @@ int main(){
     
     delete world3;
     
-    t = clock();
+    /*t = clock();
     cout << "CSL TEST BEGIN 4" << endl;
     world3 = interpreter.interpretFile("csl_2UVMAP_TEST.csl");
     t = clock();

@@ -2,7 +2,7 @@
 #define OE_API_H_INCLUDED
 
 #include <OE_TaskManager.h>
-
+#include <OE_API_Helpers.h>
 
 // This is going to be a very long header with ALL avaiable API functions declared
 // TODO: Make this extern "C" so that we have a C compatible API (Long-term goal)
@@ -22,7 +22,7 @@ namespace OE{
     void OE_Start();
     void OE_Destroy();
     bool OE_IsDone();
-    void OE_Finish(); // ?? Where do i even need this ???
+    void OE_Finish();
     //size_t OE_InitFromFile(std::string); //TODO
     
     //------------------------BLOCK-------------------------//
