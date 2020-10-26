@@ -65,7 +65,7 @@ bool NRE_Renderer::updateData(){
 }
 
 void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
-    if (this->meshes.count(id) != 0){
+    if (this->meshes.count(id) == 0){
         mesh->data.genVertexBufferInternally();
         mesh->data.genIndexBuffersInternally();
         
@@ -85,7 +85,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
 }
 
 void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, OE_Mesh32* mesh){
-    if (this->vgroups.count(id) != 0){
+    if (this->vgroups.count(id) == 0){
         
         this->vgroups[id] = NRE_VGroupRenderData(); this->vgroups[id].id = id;
         this->vgroups[id].bone_mat = OE_Mat4x4(1.0f);

@@ -85,11 +85,12 @@ bool OE_EventHandler::update(){
         // exit before handling SDL events
         if(event.type == SDL_QUIT){ 
             done = true;
-            return true;
+            return done;
         }
         updateInputEvents();
     }
-    return false;
+    // This is needed to support things like OE_Finish()
+    return done;
 }
 
 void OE_EventHandler::updateInput(){

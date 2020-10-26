@@ -1,6 +1,7 @@
 #include <OE_API.h>
 
 using namespace OE;
+using namespace std;
 
 OE_TaskManager* OE::OE_Main = nullptr;
 
@@ -34,7 +35,12 @@ bool OE::OE_IsDone(){
     assert (OE_Main != nullptr);
     return OE_Main->done;
 }
-void OE::OE_Finish(){} // ?? Where do i even need this ???
+// ?? Where do i even need this ??? UPDATE: Now I remember
+void OE::OE_Finish(){
+    assert (OE_Main != nullptr);
+    OE_Main->event_handler.done = true;
+} 
+
 //size_t OE_InitFromFile(std::string); //TODO
     
 //------------------------BLOCK-------------------------//
@@ -113,6 +119,11 @@ void OE::OE_CreateUnsyncThread(std::string name, const OE_METHOD func, void* dat
 /** API functions for loading worlds/scenes/objects/etc.
  */
     
-void OE::OE_LoadWorld(std::string, const OE_EVENTFUNC, void*){
-    //TODO
+void OE::OE_LoadWorld(std::string filename, const OE_EVENTFUNC func, void* data){
+    
+    OE_CreateEvent("loaded-" + filename);
+    OE_SetEventFunc("loaded-" + filename, func, data);
+    string* argument = new string();
+    *argument = filename;
+    OE_CreateUnsyncThread("loading-" + filename, &OE_API_Helpers::load_world, (void*)argument);
 }
