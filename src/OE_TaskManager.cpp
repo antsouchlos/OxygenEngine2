@@ -164,23 +164,7 @@ void OE_TaskManager::Step(){
     lockMutex();
     completed_threads++;
 
-
-	// --------------------------------------------------------------
-	// 	Is this really the most elegant and efficient way to solve 
-	// 	the problem of a zombie thread?		- Anderas, est. 1999
-	// --------------------------------------------------------------
-    // ------------------ANSWER--------------------------------------
-    // No, this is not the place to solve zombie threads. There cannot be
-    // any "zombie" threads anyways. Unsynchronized threads are only handled in destroy()
-    // This is just for synchronizing all main engine threads each frame.
-    // Instead of using ONE mutex condition. The new OE Task Manager
-    // uses at minimum 2 and a 3rd one for the physics engine, which would allow you
-    // to do all sorts of things with the objects without having to worry about
-    // other people accessing them (the synchronization with the renderer happens
-    // exactly after this condition on THIS MAIN THREAD in this->renderer->updateData())
-    // - Filippos, est. 2056
-    // --------------------------------------------------------------
-    
+	
     if(completed_threads > getReadyThreads()){
         /// if this is the last motheyacking thread
         /// that slows down the game, signal all other threads
