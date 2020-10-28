@@ -39,6 +39,8 @@ struct NRE_MeshRenderData{
     unsigned int    bones{0};
     
     std::size_t     vbo{0};
+    std::size_t     vao{0};
+    std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
 };
