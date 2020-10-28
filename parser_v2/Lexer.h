@@ -6,7 +6,7 @@
  *
  * 1. Always accessing memory is probably pretty time consuming. Try loading a bunch of the file
  * contents into the CPU cache, by copying them a few Bytes / kBytes at a time into a string
- * or character array.
+ * or character array, from the heap.
  *
  * 2. Rethink the whole whitespace-skipping idea: Use memchr in order to very efficiently find
  * a pointer to the next whitespace character. The memory between the previous pointer and the
@@ -29,9 +29,16 @@
  * If a function has to be called and an argument passed for every character, that would be an
  * incredibly large amount of function calls and memory copied))
  *
+ * 6. Maybe use the boost library for cross compatibility? Another idea would be to skip the
+ * memory-mapped files idea completely and go for a more standard and platform-independent
+ * approach. Is there even that much benefit to be had by going to such a low level?
+ *
+ *
  * -------- IMPLEMENTATION PLAN --------
  *
  * 1. Probably don't use a wrapper for memmap, but make use of smart pointers nonetheless.
+ * Actually - Is it possible to write a wrapper with no overhead at runtime? something like
+ * unique_ptr
  *
  * 2. Think about exactly what data the Lexer will pass on to the Parser, and the Parser
  * on to the Interpreter. The data probably has to be copied a few times, but let's
