@@ -68,6 +68,7 @@ OE_TaskManager::OE_TaskManager()
     done = false;
     started_threads = 0;
     countar = 0;
+    world = nullptr;
 }
 
 OE_TaskManager::~OE_TaskManager()
@@ -359,8 +360,11 @@ int OE_TaskManager::getReadyThreads(){
 
 void OE_TaskManager::updateWorld(){
     lockMutex();
-    if (this->pending_world != nullptr)
+    if (this->pending_world != nullptr){
+        if (this->world != nullptr)
+            delete this->world;
         this->world = this->pending_world;
+    }
     this->pending_world = nullptr;
     unlockMutex();
 }

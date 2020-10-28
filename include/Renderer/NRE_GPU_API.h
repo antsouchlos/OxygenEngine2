@@ -17,6 +17,9 @@ struct NRE_GPU_VertexLayoutInput{
     std::size_t offset;
     unsigned int amount;
     unsigned int stride;
+    
+    NRE_GPU_VertexLayoutInput();
+    NRE_GPU_VertexLayoutInput(std::size_t, std::size_t, unsigned int, unsigned int);
 };
 
 enum NRE_GPU_BUFFER_USAGE{
