@@ -18,6 +18,7 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     
     friend class OE_CSL_Writer;
     friend class OE_CSL_Interpreter;
+    friend class NRE_Renderer;
     
     public:
         

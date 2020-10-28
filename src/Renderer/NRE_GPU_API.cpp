@@ -1,5 +1,17 @@
 #include <Renderer/NRE_GPU_API.h>
 
+NRE_GPU_VertexLayoutInput::NRE_GPU_VertexLayoutInput(){
+    
+}
+
+NRE_GPU_VertexLayoutInput::NRE_GPU_VertexLayoutInput(std::size_t vbo, std::size_t offseta, unsigned int amounta, unsigned int stridea){
+    this->vertex_buffer = vbo;
+    this->offset = offseta;
+    this->amount = amounta;
+    this->stride = stridea;
+}
+
+
 NRE_GPU_API::NRE_GPU_API(){
     
 }

@@ -16,13 +16,13 @@ int main(){
     //taskMgr.Init();
     OE_Init();
     OE_Pause(20);
-    OE_LoadWorld("challenge_car.csl", &OnLoadObject, nullptr);
+    OE_LoadWorld("challenge_car_copy.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("fe_export_test.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
     OE_Start();
     
-    CSL_Interpreter interpreter;
+    /*CSL_Interpreter interpreter;
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     

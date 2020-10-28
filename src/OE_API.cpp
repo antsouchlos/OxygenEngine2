@@ -111,6 +111,7 @@ void OE::OE_CreateNewThread(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->CreateNewThread(name);
 }
+
 void OE::OE_CreateUnsyncThread(std::string name, const OE_METHOD func, void* data){
     assert (OE_Main != nullptr);
     OE_Main->CreateUnsyncThread(name, func, data);

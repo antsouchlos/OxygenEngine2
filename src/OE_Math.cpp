@@ -1,5 +1,20 @@
 #include <OE_Math.h>
 
+using namespace std;
+
+std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4 matrix){
+    vector<float> output; output.reserve(16);
+    
+    float* mat = glm::value_ptr(matrix);
+    
+    for (int i=0; i < 4; i++){
+        for (int j=0; j<4; j++){
+            output.push_back(mat[4*i+j]);
+        }
+    }
+    return output;
+}
+
 
 
 int FE_Math::abs(int x){

@@ -125,6 +125,7 @@ bool OE_SDL_WindowSystem::update(){
     this->counter++;
     this->counter = this->counter % 100;
     
+    SDL_GL_SwapWindow(this->window);
     // Change viewport resolution if desired
     int x; int y;
     SDL_GetWindowSize(window, &x, &y);
@@ -134,7 +135,7 @@ bool OE_SDL_WindowSystem::update(){
         this->resolution_y = y;
     }
     
-    SDL_GL_SwapWindow(this->window);
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.01f * (float)this->counter, 0.0f, 1.0f);
     
