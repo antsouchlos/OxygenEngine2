@@ -15,7 +15,7 @@
 #include "LexerException.h"
 
 
-#define FOPEN_MALLOC_IF
+#define FOPEN_MALLOC_MEMCHR
 #define FSTREAM_IF
 
 int countSpacesMmap(std::string filename) {
@@ -33,10 +33,10 @@ int countSpacesMmap(std::string filename) {
 
 	size_t file_length = sb.st_size;
 
+	// Map file to memory
 	const char* addr = static_cast<const char*>(mmap(NULL, file_length, PROT_READ, MAP_PRIVATE, fd, 0u));
 	if (addr == MAP_FAILED)
 		throw LexerException("Failed to map file to memory");
-
 
 	close(fd);
 
@@ -73,7 +73,6 @@ int countSpacesFstream(std::string filename) {
 
 	fin.close();
 #endif
-
 #ifdef FSTREAM_COUNT
 	std::string line;
 
@@ -85,6 +84,7 @@ int countSpacesFstream(std::string filename) {
 
 	fin.close();
 #endif
+
 	return result;
 }
 
@@ -118,7 +118,6 @@ int countSpacesFopen(std::string filename) {
 
 	free(addr);
 #endif
-
 #ifdef FOPEN_MALLOC_IF
 	char* addr = static_cast<char*>(malloc(fileSize));
 
@@ -130,7 +129,6 @@ int countSpacesFopen(std::string filename) {
 
 	free(addr);
 #endif
-
 #ifdef FOPEN_FOR_MEMCHR
 	char addr[128];
 
@@ -147,7 +145,6 @@ int countSpacesFopen(std::string filename) {
 			}
 	}
 #endif
-
 #ifdef FOPEN_FOR_IF
 	char addr[128];
 
@@ -169,36 +166,25 @@ int main(int argc, char* argv[]) {
 	if (argc < 3)
 		throw LexerException("Not enough arguments provided");
 
-	int spaces = 0;
-	
+	int spaces = 0;	
 	double runtime = 0;
 
+	auto t_0 = std::chrono::high_resolution_clock::now();
+
 	if (strcmp(argv[1], "fstream") == 0) {
-		auto t_0 = std::chrono::high_resolution_clock::now();
-
 		spaces = countSpacesFstream(std::string(argv[2]));
-
-		auto t_1 = std::chrono::high_resolution_clock::now();
-		runtime = std::chrono::duration_cast<std::chrono::milliseconds>(t_1 - t_0).count();
 	} else if (strcmp(argv[1], "mmap") == 0) {	
-		auto t_0 = std::chrono::high_resolution_clock::now();
-
 		spaces = countSpacesMmap(std::string(argv[2]));
-		
-		auto t_1 = std::chrono::high_resolution_clock::now();
-		runtime = std::chrono::duration_cast<std::chrono::milliseconds>(t_1 - t_0).count();
 	} else if (strcmp(argv[1], "fopen") == 0) {	
-		auto t_0 = std::chrono::high_resolution_clock::now();
-
 		spaces = countSpacesFopen(std::string(argv[2]));
-		
-		auto t_1 = std::chrono::high_resolution_clock::now();		
-		runtime = std::chrono::duration_cast<std::chrono::milliseconds>(t_1 - t_0).count();
 	} else {
 		std::cout << "Unknown command '" << argv[1] << "'" << std::endl;
 
 		return 1;
 	}
+	
+	auto t_1 = std::chrono::high_resolution_clock::now();
+	runtime = std::chrono::duration_cast<std::chrono::milliseconds>(t_1 - t_0).count();
 
 	std::cout << "Number of spaces in file: " << spaces << std::endl;
 	std::cout << "Runtime: " << runtime << " ms" << std::endl;
