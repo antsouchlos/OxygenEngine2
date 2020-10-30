@@ -16,6 +16,27 @@ std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4 matrix){
 }
 
 
+OE_Mat4x4 OE_Perspective(float fov, float aspect, float near, float far){
+
+    //float fov_rad = FE_Math::radians(fov);
+	float fov_rad = fov;
+    float range = std::tan (fov_rad / 2.0f) * near;
+	//std::cout << "range: " << range << std::endl;
+	float sx = (2.0f * near) / (range * aspect + range * aspect);
+	float sy = near / range;
+	float sz = -(far + near) / (far - near);
+	float pz = -(2.0f * far * near) / (far - near);
+    OE_Mat4x4 output = OE_Mat4x4(0.0f);
+    output[0][0] = sx;
+	output[1][1] = sy;
+	output[2][2] = sz;
+	output[3][2] = pz;
+	output[2][3] = -1.0f;
+	//std::cout << output.print(false) << std::endl;
+	return output;
+
+}
+
 
 int FE_Math::abs(int x){
     return x ? x>=0 : -x;

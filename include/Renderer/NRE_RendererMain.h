@@ -24,7 +24,7 @@ public:
     std::map<std::size_t, NRE_VGroupRenderData> vgroups;
     std::map<std::size_t, NRE_MeshRenderData> meshes;
     std::map<std::size_t, NRE_LightRenderData> lights;
-    std::map<std::size_t, NRE_RenderGroup> render_groups;
+    std::vector<NRE_RenderGroup> render_groups;
 
 protected:
     
@@ -34,6 +34,11 @@ protected:
     void handleLightData(std::size_t, OE_Light*);
     void handleVGroupData(std::size_t, std::size_t, OE_Mesh32*);
     
+    void drawRenderGroup(NRE_RenderGroup*);
+    
+    std::string gl_shader_prefix;
+    
+    bool existsRenderGroup(NRE_RenderGroup);
 };
 
 
