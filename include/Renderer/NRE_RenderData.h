@@ -5,7 +5,7 @@
 //#include "FE_GPU_API.h"
 #include <OE_Math.h>
 
-#define NRE_GL32_Shader(src) "#version 150 \n" #src
+#define NRE_Shader(src) #src
 
 struct NRE_CameraRenderData{
     OE_Mat4x4       perspective_view_mat;
@@ -27,6 +27,7 @@ struct NRE_VGroupRenderData{
     std::size_t     id{0};
     std::size_t     ibo{0};
     std::size_t     material_id{0};
+    std::size_t     mesh_id{0};
     unsigned int    offset{0};
     unsigned int    size{0};
 };
@@ -59,6 +60,8 @@ struct NRE_RenderGroup{
     std::size_t     vgroup{0};
     std::size_t     mesh{0};
     
+    std::size_t     program{0};
+    bool isSetup{false};
     std::vector<std::size_t>     lights;
 };
 

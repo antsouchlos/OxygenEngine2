@@ -108,8 +108,8 @@ void OE_SDL_WindowSystem::finishInit(){
     glDepthFunc (GL_LESS);
 
     glEnable (GL_CULL_FACE);
-    glCullFace (GL_BACK); /// cull back face
-    glFrontFace (GL_CCW);
+    glCullFace (GL_FRONT); /// cull back face
+    //glFrontFace (GL_CCW);
     
     SDL_GetWindowSize(window, &this->resolution_x, &this->resolution_y);
     glViewport(0, 0, this->resolution_x, this->resolution_y);
@@ -137,7 +137,7 @@ bool OE_SDL_WindowSystem::update(){
     
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 0.01f * (float)this->counter, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     
     return true;
 }

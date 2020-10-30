@@ -200,6 +200,7 @@ void NRE_GL3_API::deleteUniformBuffer(std::size_t id){
 void NRE_GL3_API::setVertexLayoutFormat(std::size_t id, std::vector<NRE_GPU_VertexLayoutInput> inputs){ 
     assert (this->vaos.count(id) != 0);
     this->vaos[id].layout = inputs;
+    glBindVertexArray(this->vaos[id].handle);
     for(size_t x=0; x < inputs.size(); x++){
 
         assert (this->vbos.count(inputs[x].vertex_buffer) != 0);
@@ -219,6 +220,7 @@ void NRE_GL3_API::deleteVertexLayout(std::size_t id){
 
 void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
     
+    data = data + "";
     assert (this->progs.count(id) != 0);
     GLuint shader_id;
     if(! this->progs[id].vs_setup)
@@ -232,7 +234,9 @@ void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
     
     /// compile and attach shader
     const char* c_str = data.c_str();
-    glShaderSource(shader_id, 1, &c_str, NULL);
+    
+    GLint data_size = data.length();
+    glShaderSource(shader_id, 1, &c_str, &data_size);
     glCompileShader(shader_id);
 
     /// IMPORTANT: get shader compiler info
@@ -244,6 +248,7 @@ void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
         int actual_length = 0;
         char log[2048];
         glGetShaderInfoLog(shader_id, max_length, &actual_length, log);
+        cout << log << endl;
         OE_WriteToLog(log);
     }
 }
@@ -251,6 +256,7 @@ void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
 //void setProgramGS(std::size_t, FE_GPU_Shader){}
 void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
     
+    data = data + "";
     assert (this->progs.count(id) != 0);
     GLuint shader_id;
     if(! this->progs[id].fs_setup)
@@ -264,7 +270,8 @@ void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
     
     /// compile and attach shader
     const char* c_str = data.c_str();
-    glShaderSource(shader_id, 1, &c_str, NULL);
+    GLint data_size = data.length();
+    glShaderSource(shader_id, 1, &c_str, &data_size);
     glCompileShader(shader_id);
 
     /// IMPORTANT: get shader compiler info
@@ -276,7 +283,8 @@ void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
         int actual_length = 0;
         char log[2048];
         glGetShaderInfoLog(shader_id, max_length, &actual_length, log);
-        OE_WriteToLog(log);
+        cout << log << endl;
+        //OE_WriteToLog(log);
     }
 }
 
@@ -402,5 +410,5 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     glUseProgram(this->progs[prog_id].handle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
-    glDrawElements(GL_TRIANGLES, 1, GL_UNSIGNED_INT, (GLvoid*)NULL);
+    glDrawElements(GL_TRIANGLES, this->ibos[ibo_id].size, GL_UNSIGNED_INT, (GLvoid*)NULL);
 }
