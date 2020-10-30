@@ -14,9 +14,9 @@ int main(){
     //OE_TaskManager taskMgr = OE_TaskManager();
     
     //taskMgr.Init();
-    OE_Init();
+    OE_Init("Oxygen Engine Test", 1280, 720, false);
     OE_Pause(20);
-    OE_LoadWorld("challenge_car_copy.csl", &OnLoadObject, nullptr);
+    OE_LoadWorld("MOST_SIMPLE_OBJ.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("fe_export_test.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();

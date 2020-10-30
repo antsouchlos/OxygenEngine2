@@ -14,7 +14,7 @@ bl_info = {"name": "Export Oxygen Engine (.csl)",
 import bpy
 from bpy_extras.io_utils import ExportHelper
 #from bpy.props import *
-import sys, os
+import sys, os, math
 
 from bpy_extras.wm_utils.progress_report import (
     ProgressReport,

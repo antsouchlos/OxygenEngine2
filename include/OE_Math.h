@@ -44,7 +44,7 @@ typedef glm::quat OE_Quat;
 #define OE_Pow         glm::pow
 #define OE_Sqrt        glm::sqrt
 
-#define OE_Perspective  glm::perspective
+//#define OE_Perspective  glm::perspective
 #define OE_Rotate       glm::rotate
 #define OE_Normalize    glm::normalize
 #define OE_Cross        glm::cross
@@ -60,6 +60,8 @@ typedef glm::quat OE_Quat;
 #define OE_Lerp         glm::lerp
 
 std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4);
+OE_Mat4x4 OE_Perspective(float, float, float, float);
+
 
  class FMath
 {
