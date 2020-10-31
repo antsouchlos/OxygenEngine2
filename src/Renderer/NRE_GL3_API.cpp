@@ -397,8 +397,8 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     assert (this->ibos.count(ibo_id) != 0);
     this->setupProgram(prog_id);
     glUseProgram(this->progs[prog_id].handle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
     glDrawRangeElements(GL_TRIANGLES, offset, count, 1, GL_UNSIGNED_INT, (GLvoid*)NULL);
 }
 
@@ -408,7 +408,7 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     assert (this->ibos.count(ibo_id) != 0);
     this->setupProgram(prog_id);
     glUseProgram(this->progs[prog_id].handle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
     glDrawElements(GL_TRIANGLES, this->ibos[ibo_id].size, GL_UNSIGNED_INT, (GLvoid*)NULL);
 }

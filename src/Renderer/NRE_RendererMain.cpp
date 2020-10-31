@@ -52,9 +52,9 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
             };
             
             void main(){
-                normals = normalize(vec4(oe_normals, 1.0)*Model_Matrix);
+                normals = normalize(vec4(oe_normals, 1.0));
                 mat4 final_mat = PV_Matrix*Model_Matrix;
-                gl_Position = vec4(oe_position, 1.0) * final_mat;
+                gl_Position = final_mat*vec4(oe_position, 1.0);
             }
             
         ))));
