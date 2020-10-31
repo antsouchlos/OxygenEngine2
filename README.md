@@ -71,12 +71,19 @@ as our default math library, though this can be changed in the future if desired
 
 Now our Oxygen Engine can properly create and destroy a windowed/fullscreen OpenGL/OpenGL ES renderer without GLEW and with less fuss. 
 
-Next task: Renderer
+2020/10/31:
+
+Renderer now works! It can render the challenge car (in contrast to the 2016 version) and any other object.
+Currently uses mesh normals as vertex colors. In the Demo one can move the camera with WASD to see around the object meshes.
+
+Added several more .csl example files as a test for the renderer and parser/interpreter.
+
+Next task: Proper build system (meson) integration with unit tests.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
-- Proper cleanup of code from 2016. (mostly working, but muh legacy cruft + renaming of files and classes) (IN PROGRESS, 2020/10/15: only renderer + API missing)
+- ~~Proper cleanup of code from 2016. (mostly working, but muh legacy cruft + renaming of files and classes) (IN PROGRESS, 2020/10/15: only renderer + API missing)~~ (DONE)
 - Rewrite of the build system to use [Meson](https://mesonbuild.com/).
 - Get cross compilation done at least for Windows (and in the future Android\iOS\MacOS as well).
 - ~~Removal of outdated 'glew' dependency ([Glad](https://glad.dav1d.de/) should replace it, which is only a few auto-generated headers for OpenGL and not an external library).~~ (DONE)
