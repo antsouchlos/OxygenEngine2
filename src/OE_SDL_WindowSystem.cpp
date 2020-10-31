@@ -108,8 +108,8 @@ void OE_SDL_WindowSystem::finishInit(){
     glDepthFunc (GL_LESS);
 
     glEnable (GL_CULL_FACE);
-    glCullFace (GL_FRONT); /// cull back face
-    //glFrontFace (GL_CCW);
+    glCullFace (GL_BACK); /// cull back face
+    glFrontFace (GL_CCW);
     
     SDL_GetWindowSize(window, &this->resolution_x, &this->resolution_y);
     glViewport(0, 0, this->resolution_x, this->resolution_y);

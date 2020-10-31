@@ -34,7 +34,7 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         virtual std::string getType() const;
         virtual std::string to_str() const;
     
-    protected:
+    //protected:
         OE_ObjectData       current_state;
         
         std::size_t         parent{0};
