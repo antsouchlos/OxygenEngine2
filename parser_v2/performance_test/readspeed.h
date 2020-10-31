@@ -14,6 +14,93 @@
 #define FOPEN_MALLOC_MEMCHR
 #define FSTREAM_IF
 
+void getNextLine_globVar(std::string &line) {
+	FILE* f = fopen(filename.c_str(), "r");
+
+	if (f == NULL)
+		throw LexerException("Failed to open file '" + filename + "'");
+
+	// Determine the size of the file
+	fseek(f, 0, SEEK_END);
+	unsigned long int fileSize = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+ 	char* addr = static_cast<char*>(malloc(fileSize));
+
+	fread(addr, 1, fileSize, f);
+
+/*	char* charPtr = addr;
+	char* charMax = charPtr + fileSize;
+
+	while(charPtr)
+		if ( (charPtr = static_cast<char*>(memchr(charPtr, ' ', charMax - charPtr))) ) {
+		   	++charPtr;
+			++result;
+		}
+
+*/
+	free(addr);
+
+	close(f);
+}
+
+void getNextLine_globVar(const char *(&linePtr)) {
+
+}
+
+class FileWrapper {
+	public:
+		FileWrapper(std::string filename) {
+			fp = open(filename, "r");
+
+			if (fp == NULL)
+				throw LexerException("Failed to open file '" + filename + "'");
+
+			fseek(fp, 0, SEEK_END);
+			filesize = ftell(fp);
+			fseek(fp, 0, SEEK_SET);
+
+			// TODO: Other alternative for string-version: only read the contents of the new line from the file
+
+			addr = static_cast<const char *>(malloc(filesize));
+
+			fread(addr, 1, filesize, fp);
+
+		}
+
+		~FileWrapper(std::string filename) {
+			close(fp);
+			free(addr);
+		}
+
+		string getNextLine() {
+		
+		}
+
+		void getNextLine(std::string &line) {
+		
+		}
+
+		void getNextLine(const char *(&line)) {
+		
+		}
+	private:
+		FILE *fp = nullptr;
+
+		const char *addr = nullptr;
+
+		unsigned int long filesize;
+
+}
+
+int countSpacesLbLString() {
+
+}
+
+int countSpacesLbLPointer() {
+
+}
+
 
 int countSpacesMmap(std::string filename) {
 	int result = 0;
