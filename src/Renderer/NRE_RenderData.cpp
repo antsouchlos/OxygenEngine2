@@ -131,7 +131,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         
         OE_Mat4x4 model_mat(1.0f);
         OE_Quat rot_quat = OE_Quat(mesh->current_state.rot_w, mesh->current_state.rot_x, mesh->current_state.rot_y, mesh->current_state.rot_z);
-        OE_Vec3 translation_vec = OE_Vec3(mesh->current_state.pos_x, mesh->current_state.pos_y, mesh->current_state.pos_z);
+        OE_Vec3 translation_vec = OE_Vec3(mesh->current_state.pos_x, mesh->current_state.pos_y, -mesh->current_state.pos_z);
         model_mat = OE_Translate(model_mat, translation_vec) * OE_Quat2Mat4x4(rot_quat);
         
         this->api->setUniformBufferData(this->meshes[id].ubo, OE_Mat4x4ToSTDVector(model_mat),0);
@@ -173,11 +173,26 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
         OE_Mat4x4 model_mat(1.0f);
         OE_Quat rot_quat = OE_Quat(camera->current_state.rot_w, camera->current_state.rot_x, camera->current_state.rot_y, camera->current_state.rot_z);
         //cout << camera->current_state.rot_w << camera->current_state.rot_x << camera->current_state.rot_y << camera->current_state.rot_z << endl;
-        OE_Vec3 translation_vec = OE_Vec3(camera->current_state.pos_x, camera->current_state.pos_y, -camera->current_state.pos_z);
+        OE_Vec3 translation_vec = OE_Vec3(camera->current_state.pos_x, camera->current_state.pos_y, camera->current_state.pos_z);
         model_mat = OE_Translate(model_mat, translation_vec) * OE_Quat2Mat4x4(rot_quat);
         cout << camera->fov << " " << camera->aspect_ratio << " " << (float)camera->near+0.02f << " " << (float)camera->far*10.0f << endl;
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+1.0f, (float)camera->far*10.0f);
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far*10.0f);
         
+        
+        model_mat = glm::lookAt(translation_vec, OE_Vec3(0.0, 0.0, 0.0), glm::vec3(0,1,0));
+        this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*model_mat),0);
+    }
+    else {
+        OE_Mat4x4 model_mat(1.0f);
+        OE_Quat rot_quat = OE_Quat(camera->current_state.rot_w, camera->current_state.rot_x, camera->current_state.rot_y, camera->current_state.rot_z);
+        //cout << camera->current_state.rot_w << camera->current_state.rot_x << camera->current_state.rot_y << camera->current_state.rot_z << endl;
+        OE_Vec3 translation_vec = OE_Vec3(camera->current_state.pos_x, camera->current_state.pos_y, camera->current_state.pos_z);
+        model_mat = OE_Translate(model_mat, translation_vec) * OE_Quat2Mat4x4(rot_quat);
+        //cout << camera->fov << " " << camera->aspect_ratio << " " << (float)camera->near+0.02f << " " << (float)camera->far*10.0f << endl;
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far);
+        
+        
+        model_mat = glm::lookAt(translation_vec, OE_Vec3(0.0, 0.0, 0.0), glm::vec3(0,1,0));
         this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*model_mat),0);
     }
 }
