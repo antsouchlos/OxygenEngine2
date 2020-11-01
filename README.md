@@ -12,6 +12,33 @@ Originally it was an ongoing project in 2015-16, but it is stagnated and now is 
 ## Installation
 This section will in the future describe how to install/compile/run on Linux and Windows.
 
+### Compile on Linux
+
+The CC and CXX environment variables are optional. Meson can use ccache if it exists as well.
+For the very first time setup run:
+
+```
+$ CC=gcc CXX=g++ meson builddir
+```
+
+Otherwise, just run:
+```
+$ meson compile -C builddir
+```
+
+
+### Run
+
+For executing the demos, just run:
+```
+$ ./builddir/CSL_Test
+```
+or:
+```
+$ ./builddir/OE_Test
+```
+
+
 ### Installing the blender plugin
 
 The blender plugin now works again!
@@ -78,13 +105,17 @@ Currently uses mesh normals as vertex colors. In the Demo one can move the camer
 
 Added several more .csl example files as a test for the renderer and parser/interpreter.
 
-Next task: Proper build system (meson) integration with unit tests.
+~~Next task: Proper build system (meson) integration with unit tests.~~
+
+2020/11/01:
+
+Added meson build system support, it was much easier than i thought. It took 30 mins.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
 - ~~Proper cleanup of code from 2016. (mostly working, but muh legacy cruft + renaming of files and classes) (IN PROGRESS, 2020/10/15: only renderer + API missing)~~ (DONE)
-- Rewrite of the build system to use [Meson](https://mesonbuild.com/).
+- ~~Rewrite of the build system to use [Meson](https://mesonbuild.com/).~~ (DONE: Easier than i thought)
 - Get cross compilation done at least for Windows (and in the future Android\iOS\MacOS as well).
 - ~~Removal of outdated 'glew' dependency ([Glad](https://glad.dav1d.de/) should replace it, which is only a few auto-generated headers for OpenGL and not an external library).~~ (DONE)
 - ~~Fix the blender plugin and update it for blender 2.8+.~~ (DONE)
@@ -110,10 +141,10 @@ My ideas:
 
 
 On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!
-Check with ```valgrind --leak-check=full ./CSL_Test```.
+Check with ```valgrind --leak-check=full ./builddir/CSL_Test```.
 
 ```
-$ ./CSL_test
+$ ./builddir/CSL_test
 CSL TEST BEGIN
 CSL TEST READ FILE: 0.015779
 CSL TEST PARSE: 0.235009
