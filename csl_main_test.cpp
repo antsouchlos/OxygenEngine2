@@ -9,6 +9,7 @@ int main(){
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     
+    
     OE_World* world = interpreter.interpretFile("challenge_car.csl");
     t = clock();
     auto a = (world->to_str());
