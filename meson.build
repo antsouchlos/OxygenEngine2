@@ -42,7 +42,7 @@ subpr_inc = include_directories('./subprojects')
 thread_dep = dependency('threads')
 sdl2_dep = dependency('sdl2')
 
-oe_lib = static_library('OxygenEngine', sources : src, dependencies : [thread_dep, sdl2_dep], include_directories : [internal_inc, subpr_inc])
+oe_lib = library('OxygenEngine', sources : src, dependencies : [thread_dep, sdl2_dep], include_directories : [internal_inc, subpr_inc])
 
 oe_dep = declare_dependency(link_with : oe_lib, include_directories : [internal_inc, subpr_inc])
 
