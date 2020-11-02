@@ -4,7 +4,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <memory>
 
 /*
  * Check if the overhead produced by copying a string is small enough to consider this as an option
@@ -18,7 +18,7 @@ class FileWrapper {
 
 		size_t getSize() const;
 		
-		unique_ptr<const char *> findNext(char c);
+		std::unique_ptr<const char *> findNext(char c);
 
 
 		inline FILE *get();

@@ -13,4 +13,4 @@ run: main.o FileWrapper.o
 	$(CXX) main.o FileWrapper.o -o run
 
 clean:
-	rm main.o run
+	rm main.o FileWrapper.o run
