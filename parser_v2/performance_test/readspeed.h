@@ -14,18 +14,22 @@
 #define FOPEN_MALLOC_MEMCHR
 #define FSTREAM_IF
 
+
+std::string filename_glob = "";
+
+
 void getNextLine_globVar(std::string &line) {
-	FILE* f = fopen(filename.c_str(), "r");
+	FILE *f = fopen(filename_glob.c_str(), "r");
 
 	if (f == NULL)
-		throw LexerException("Failed to open file '" + filename + "'");
+		throw LexerException("Failed to open file '" + filename_glob + "'");
 
 	// Determine the size of the file
 	fseek(f, 0, SEEK_END);
 	unsigned long int fileSize = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
- 	char* addr = static_cast<char*>(malloc(fileSize));
+ 	char *addr = static_cast<char *>(malloc(fileSize));
 
 	fread(addr, 1, fileSize, f);
 
@@ -41,7 +45,7 @@ void getNextLine_globVar(std::string &line) {
 */
 	free(addr);
 
-	close(f);
+	fclose(f);
 }
 
 void getNextLine_globVar(const char *(&linePtr)) {
@@ -51,47 +55,96 @@ void getNextLine_globVar(const char *(&linePtr)) {
 class FileWrapper {
 	public:
 		FileWrapper(std::string filename) {
-			fp = open(filename, "r");
+			fp = fopen(filename.c_str(), "r");
 
 			if (fp == NULL)
 				throw LexerException("Failed to open file '" + filename + "'");
 
 			fseek(fp, 0, SEEK_END);
-			filesize = ftell(fp);
+			fileSize = ftell(fp);
 			fseek(fp, 0, SEEK_SET);
 
 			// TODO: Other alternative for string-version: only read the contents of the new line from the file
 
-			addr = static_cast<const char *>(malloc(filesize));
+			addr = static_cast<const char *>(malloc(fileSize));
+			currAddr = addr;
+			prevAddr = addr;
 
-			fread(addr, 1, filesize, fp);
-
+			fread(const_cast<char *>(addr), 1, fileSize, fp);
 		}
 
-		~FileWrapper(std::string filename) {
-			close(fp);
-			free(addr);
+		~FileWrapper() {
+			fclose(fp);
+			free(const_cast<char *>(addr));
 		}
 
-		string getNextLine() {
+		std::string getNextLine() {
 		
 		}
 
-		void getNextLine(std::string &line) {
-		
+		int getNextLineCopy(char *buffer) {
+			int len = addr + fileSize - currAddr;
+
+			if (len > 128) {
+				len = 128;
+			} else if (len == 0) {
+				currAddr = nullptr;
+				return 0;
+			}
+
+			currAddr += len;
+			memcpy(buffer, currAddr, len);
+
+			return len;
+			
 		}
 
-		void getNextLine(const char *(&line)) {
+		bool getNextLinePointer(const char *(&line)) {
+			if (currAddr == nullptr)
+				return false;
+
+			int len = addr + fileSize - currAddr;
+
+			if (len > 128) {
+				currAddr += 128;
+				line = currAddr;
+			} else {
+				line = addr + fileSize;
+				currAddr = nullptr;
+			}
+
+			return true;
+		}
 		
+		const char *getNextLinePointer() {
+			if (currAddr == nullptr)
+				return nullptr;
+
+			int len = addr + fileSize - currAddr;
+
+			if (len > 128) {
+				currAddr += 128;
+
+				return currAddr;
+			} else {
+				currAddr = nullptr;
+
+				return (addr + fileSize);
+			}
+		}
+
+		const char *getAddr() const {
+			return addr;
 		}
 	private:
 		FILE *fp = nullptr;
 
 		const char *addr = nullptr;
+		const char *currAddr = nullptr;
+		const char *prevAddr = nullptr;
 
-		unsigned int long filesize;
-
-}
+		unsigned int long fileSize;
+};
 
 int countSpacesLbLString() {
 
@@ -129,7 +182,7 @@ int countSpacesMmap(std::string filename) {
 	const char* charMax = addr + file_length;
 
 	while(charPtr/* && charPtr!=1*/)
-		if ((charPtr = static_cast<const char*>(memchr(charPtr, ' ', charMax-charPtr)))) {
+		if ((charPtr = static_cast<const char *>(memchr(charPtr, ' ', charMax-charPtr)))) {
 			++result; ++charPtr;
 		}
 	
