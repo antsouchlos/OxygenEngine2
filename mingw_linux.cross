@@ -1,0 +1,12 @@
+[host_machine]
+system = 'windows'
+cpu_family = 'x86_64'
+endian = 'little'
+cpu = 'w64'
+
+[binaries]
+exe_wrapper = 'wine'
+c = 'x86_64-w64-mingw32-gcc'
+cpp = 'x86_64-w64-mingw32-g++'
+strip = 'x86_64-w64-mingw32-strip'
+

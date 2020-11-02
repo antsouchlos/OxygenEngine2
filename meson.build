@@ -1,4 +1,4 @@
-project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++14'])
+project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++14', 'buildtype=debugoptimized'])
 
 src = ['src/OE_SDL_WindowSystem.cpp',
        'src/Renderer/glad.c',
@@ -37,16 +37,14 @@ src = ['src/OE_SDL_WindowSystem.cpp',
 
     
 internal_inc = include_directories('./include')
+subpr_inc = include_directories('./subprojects')
+
 thread_dep = dependency('threads')
 sdl2_dep = dependency('sdl2')
 
-add_global_arguments('-Og', language : 'c')
-add_global_arguments('-Og', language : 'cpp')
+oe_lib = static_library('OxygenEngine', sources : src, dependencies : [thread_dep, sdl2_dep], include_directories : [internal_inc, subpr_inc])
 
+oe_dep = declare_dependency(link_with : oe_lib, include_directories : [internal_inc, subpr_inc])
 
-oe_lib = shared_library('OxygenEngine', sources : src, dependencies : [thread_dep, sdl2_dep], include_directories : internal_inc)
-
-oe_dep = declare_dependency(link_with : oe_lib, include_directories : internal_inc)
-
-executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : oe_dep)
-executable('OE_Test', sources : 'oe_main_test.cpp', dependencies : oe_dep)
+executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : oe_dep, win_subsystem: 'windows')
+executable('OE_Test', sources : 'oe_main_test.cpp', dependencies : [oe_dep, sdl2_dep, thread_dep], win_subsystem: 'windows')

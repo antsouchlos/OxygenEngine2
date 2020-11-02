@@ -11,7 +11,18 @@
 
 #include <SDL2/SDL.h>
 
+#else
+
+#define OE_PLATFORM_PC
+#define OE_PLATFORM_WINDOWS
+#define OE_RENDERER_OPENGL
+#define SDL_MAIN_HANDLED
+
+#include <subprojects/SDL2-2.0.12/include/SDL.h>
+
 #endif
+
+
 
 #include <cassert>
 #include <array>
