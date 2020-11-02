@@ -89,7 +89,20 @@ class FileWrapper {
 		}
 
 		std::string getNextLine() {
-		
+			char buffer[128];
+			int len = addr + fileSize - currAddr;
+
+			if (len > 128) {
+				len = 128;
+			} else if (len == 0) {
+				currAddr = nullptr;
+				return "";
+			}
+
+			currAddr += len;
+			memcpy(buffer, currAddr, len);
+
+			return std::string(buffer);
 		}
 
 		int getNextLineCopy(char *buffer) {
@@ -106,7 +119,6 @@ class FileWrapper {
 			memcpy(buffer, currAddr, len);
 
 			return len;
-			
 		}
 
 		bool getNextLinePointer(const char *(&line)) {
@@ -207,6 +219,15 @@ int countSpacesCopy(std::string filename) {
 #ifdef COPY_STR
 	FileWrapper fw(filename);
 	
+	std::string line;
+
+	while ( (line = fw.getNextLine()) != "" ) {
+		for (int i = 0; i < line.size(); i++) {
+			if (line[i] == ' ') ++result;
+		}
+	}
+/*	FileWrapper fw(filename);
+	
 	char buffer[128];
 
 	int len;
@@ -216,7 +237,7 @@ int countSpacesCopy(std::string filename) {
 		for (int i = 0; i < len; i++) {
 			if (buffer_str[i] == ' ') ++result;
 		}
-	}
+	}*/
 #endif
 
 	return result;
