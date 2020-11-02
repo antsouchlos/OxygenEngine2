@@ -13,6 +13,12 @@
 
 #define FOPEN_MALLOC_MEMCHR
 #define FSTREAM_IF
+#define POINTER_ARG
+#define COPY_STR
+
+
+
+// -------------------------------- C-Style API Global Function Wrapper Test --------------------------------
 
 
 std::string filename_glob = "";
@@ -51,6 +57,10 @@ void getNextLine_globVar(std::string &line) {
 void getNextLine_globVar(const char *(&linePtr)) {
 
 }
+
+
+// -------------------------------- Class Wrapper Tests --------------------------------
+
 
 class FileWrapper {
 	public:
@@ -146,13 +156,74 @@ class FileWrapper {
 		unsigned int long fileSize;
 };
 
-int countSpacesLbLString() {
 
+int countSpacesPointer(std::string filename) {
+	int result = 0;
+
+#ifdef POINTER_ARG
+	FileWrapper fw(filename);
+	const char *addr = fw.getAddr();
+	const char *lineEnd = nullptr;
+
+	while(fw.getNextLinePointer(lineEnd)) {
+		while (addr != lineEnd) {
+			if (*addr == ' ') ++result;
+			++addr;
+		} 
+	}
+#endif
+#ifdef POINTER_RETURN
+	FileWrapper fw(filename);
+	const char *addr = fw.getAddr();
+	const char *lineEnd = nullptr;
+
+	while( (lineEnd = fw.getNextLinePointer()) != nullptr ) {
+		while (addr != lineEnd) {
+			if (*addr == ' ') ++result;
+			++addr;
+		} 
+	}
+#endif
+
+	return result;	
+} 
+
+int countSpacesCopy(std::string filename) {
+	int result = 0;
+
+#ifdef COPY_CHAR
+	FileWrapper fw(filename);
+	
+	char buffer[128];
+
+	int len;
+
+	while ( (len = fw.getNextLineCopy(buffer)) ) {
+		for (int i = 0; i < len; i++) {
+			if (buffer[i] == ' ') ++result;
+		}
+	}
+#endif
+#ifdef COPY_STR
+	FileWrapper fw(filename);
+	
+	char buffer[128];
+
+	int len;
+
+	while ( (len = fw.getNextLineCopy(buffer)) ) {
+		std::string buffer_str(buffer);
+		for (int i = 0; i < len; i++) {
+			if (buffer_str[i] == ' ') ++result;
+		}
+	}
+#endif
+
+	return result;
 }
 
-int countSpacesLbLPointer() {
 
-}
+// -------------------------------- File Opening Mechanisms --------------------------------
 
 
 int countSpacesMmap(std::string filename) {
