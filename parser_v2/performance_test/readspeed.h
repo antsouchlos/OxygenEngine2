@@ -15,47 +15,106 @@
 #define FSTREAM_IF
 #define POINTER_ARG
 #define COPY_STR
-
+#define POINTERGLOB_GLOB
 
 
 // -------------------------------- C-Style API Global Function Wrapper Test --------------------------------
 
 
 std::string filename_glob = "";
+unsigned long int fileSize_glob = 0;
+char *addr_glob = nullptr;
+char *currAddr_glob = nullptr;
+FILE *fp_glob = nullptr;
+const char *linePtr_glob = nullptr;
 
 
-void getNextLine_globVar(std::string &line) {
-	FILE *f = fopen(filename_glob.c_str(), "r");
+void getNextLinePointerGlob() {
+	if (currAddr_glob == nullptr) {
+		linePtr_glob = nullptr;
+		return;
+	}
 
-	if (f == NULL)
-		throw LexerException("Failed to open file '" + filename_glob + "'");
+	int len = addr_glob + fileSize_glob - currAddr_glob;
 
-	// Determine the size of the file
-	fseek(f, 0, SEEK_END);
-	unsigned long int fileSize = ftell(f);
-	fseek(f, 0, SEEK_SET);
-
- 	char *addr = static_cast<char *>(malloc(fileSize));
-
-	fread(addr, 1, fileSize, f);
-
-/*	char* charPtr = addr;
-	char* charMax = charPtr + fileSize;
-
-	while(charPtr)
-		if ( (charPtr = static_cast<char*>(memchr(charPtr, ' ', charMax - charPtr))) ) {
-		   	++charPtr;
-			++result;
-		}
-
-*/
-	free(addr);
-
-	fclose(f);
+	if (len > 128) {
+		currAddr_glob += 128;
+		linePtr_glob = currAddr_glob;
+	} else {
+		linePtr_glob = addr_glob + fileSize_glob;
+		currAddr_glob = nullptr;
+	}
 }
 
-void getNextLine_globVar(const char *(&linePtr)) {
+void getNextLinePointerGlob(const char *(&linePtr)) {
+	if (currAddr_glob == nullptr) {
+		linePtr = nullptr;
+		return;
+	}
 
+	int len = addr_glob + fileSize_glob - currAddr_glob;
+
+	if (len > 128) {
+		currAddr_glob += 128;
+		linePtr = currAddr_glob;
+	} else {
+		linePtr = addr_glob + fileSize_glob;
+		currAddr_glob = nullptr;
+	}
+}
+
+int countSpacesPointerGlob(std::string filename) {
+	int result = 0;
+
+	fp_glob = fopen(filename.c_str(), "r");
+	
+	if (fp_glob == NULL)
+		throw LexerException("Failed to open file '" + filename + "'");
+
+	fseek(fp_glob, 0, SEEK_END);
+	fileSize_glob = ftell(fp_glob);
+	fseek(fp_glob, 0, SEEK_SET);
+
+	addr_glob = static_cast<char *>(malloc(fileSize_glob));
+	currAddr_glob = addr_glob;
+	
+	fread(addr_glob, 1, fileSize_glob, fp_glob);
+	
+	const char *currAddr = addr_glob;
+
+#ifdef POINTERGLOB_LOC
+	const char *lineEnd = nullptr;
+
+	getNextLinePointerGlob(lineEnd);
+
+	while(lineEnd != nullptr) {
+		while (currAddr != lineEnd) {
+			if (*currAddr == ' ') ++result;
+			++currAddr;
+		}
+		
+		getNextLinePointerGlob(lineEnd);
+	}
+#endif
+#ifdef POINTERGLOB_GLOB
+	linePtr_glob = nullptr;
+
+	getNextLinePointerGlob();
+
+	while(linePtr_glob != nullptr) {
+		while (currAddr != linePtr_glob) {
+			if (*currAddr == ' ') ++result;
+			++currAddr;
+		}
+		
+		getNextLinePointerGlob();
+	}
+#endif
+	free(addr_glob);
+
+	fclose(fp_glob);
+
+	return result;
 }
 
 

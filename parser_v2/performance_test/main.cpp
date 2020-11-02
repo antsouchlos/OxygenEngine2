@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
 		spaces = countSpacesCopy(argv[2]);
 	} else if (strcmp(argv[1], "pointer") == 0) {
 		spaces = countSpacesPointer(argv[2]);
+	} else if (strcmp(argv[1], "pointerglob") == 0) {
+		spaces = countSpacesPointerGlob(argv[2]);
 	} else {
 		std::cout << "Unknown command '" << argv[1] << "'" << std::endl;
 
