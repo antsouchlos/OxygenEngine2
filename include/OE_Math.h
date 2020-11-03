@@ -55,12 +55,14 @@ typedef glm::quat OE_Quat;
 #define OE_Transpose    glm::transpose
 #define OE_Quat2Mat4x4  glm::toMat4
 
-#define OE_2Euler       glm::eulerAngles
+#define OE_Mat2Euler       glm::eulerAngles
 #define OE_Slerp        glm::slerp
 #define OE_Lerp         glm::lerp
 
 std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4);
 OE_Mat4x4 OE_Perspective(float, float, float, float);
+
+OE_Quat OE_QuatFromAxisAngle(float, float, float, float);
 
 
  class FMath
