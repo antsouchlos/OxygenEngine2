@@ -50,4 +50,23 @@ string OE_Object::getType() const{
     return "OBJECT";
 }
 
+void OE_Object::SetRot(OE_Quat quat){
+    this->current_state.rot_x = quat.x;
+    this->current_state.rot_y = quat.y;
+    this->current_state.rot_z = quat.z;
+    this->current_state.rot_w = quat.w;
+}
+
+OE_Quat OE_Object::GetRot(){
+    return OE_Quat(current_state.rot_w, current_state.rot_x, current_state.rot_y, current_state.rot_z);
+}
+
+OE_Mat4x4 OE_Object::GetModelMatrix(){
+    
+    OE_Mat4x4 model_mat(1.0f);
+    OE_Quat rot_quat = OE_Quat(this->current_state.rot_w, this->current_state.rot_x, this->current_state.rot_y, this->current_state.rot_z);
+    OE_Vec3 translation_vec = OE_Vec3(this->current_state.pos_x, this->current_state.pos_y, -this->current_state.pos_z);
+    model_mat = OE_Quat2Mat4x4(rot_quat) * OE_Translate(model_mat, translation_vec);
+    return model_mat;
+}
 
