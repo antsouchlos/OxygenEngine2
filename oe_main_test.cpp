@@ -3,7 +3,7 @@
 using namespace std;
 using namespace OE;
 
-int update_camera_pos(void*, OE_Task*, string event_name){
+int update_monkey_rot(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
     for (auto scene : OE_Main->world->scenes){
@@ -16,7 +16,7 @@ int update_camera_pos(void*, OE_Task*, string event_name){
     return 0;
 }
 
-int update_camera_pos_neg(void*, OE_Task*, string event_name){
+int update_monkey_rot_neg(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
     for (auto scene : OE_Main->world->scenes){
@@ -29,26 +29,26 @@ int update_camera_pos_neg(void*, OE_Task*, string event_name){
     return 0;
 }
 
-int update_camera_pos_y(void*, OE_Task*, string event_name){
+int update_monkey_rot_y(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
     for (auto scene : OE_Main->world->scenes){
         for (auto object : scene.second->objects){
-            if (object.second->getType() == "CAMERA"){
-                object.second->current_state.pos_x = object.second->current_state.pos_x - 0.1f;
+            if (OE_Object::id2name[object.first] == "Suzanne.001"){
+                object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(0.03f, 1.0f, 0.0f, 0.0f));
             }
         }
     }
     return 0;
 }
 
-int update_camera_pos_neg_y(void*, OE_Task*, string event_name){
+int update_monkey_rot_neg_y(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
-    for (auto scene : OE_Main->world->scenes){
+     for (auto scene : OE_Main->world->scenes){
         for (auto object : scene.second->objects){
-            if (object.second->getType() == "CAMERA"){
-                object.second->current_state.pos_x = object.second->current_state.pos_x + 0.1f;
+            if (OE_Object::id2name[object.first] == "Suzanne.001"){
+                object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(-0.03f, 1.0f, 0.0f, 0.0f));
             }
         }
     }
@@ -57,10 +57,10 @@ int update_camera_pos_neg_y(void*, OE_Task*, string event_name){
 
 int OnLoadObject(void*, OE_Task* event_task, string event_name){
     cout << "SUCCESSFULLY loaded '" << event_name << "'" << endl;
-    OE_SetEventFunc("keyboard-w", &update_camera_pos, nullptr);
-    OE_SetEventFunc("keyboard-s", &update_camera_pos_neg, nullptr);
-    OE_SetEventFunc("keyboard-a", &update_camera_pos_y, nullptr);
-    OE_SetEventFunc("keyboard-d", &update_camera_pos_neg_y, nullptr);
+    OE_SetEventFunc("keyboard-w", &update_monkey_rot, nullptr);
+    OE_SetEventFunc("keyboard-s", &update_monkey_rot_neg, nullptr);
+    OE_SetEventFunc("keyboard-a", &update_monkey_rot_y, nullptr);
+    OE_SetEventFunc("keyboard-d", &update_monkey_rot_neg_y, nullptr);
     return 0;
 }
 

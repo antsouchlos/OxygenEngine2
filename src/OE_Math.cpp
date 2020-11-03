@@ -37,6 +37,11 @@ OE_Mat4x4 OE_Perspective(float fov, float aspect, float near, float far){
 
 }
 
+OE_Quat OE_QuatFromAxisAngle(float a, float xx, float yy, float zz){
+    float factor = std::sin( a / 2.0f );
+    return OE_Normalize(OE_Quat(std::cos (a / 2.0f), xx*factor, yy*factor, zz*factor));
+}
+
 
 int FE_Math::abs(int x){
     return x ? x>=0 : -x;

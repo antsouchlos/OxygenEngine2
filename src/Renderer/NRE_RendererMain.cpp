@@ -41,7 +41,8 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
             layout (location=0) in vec3 oe_position;
             layout (location=1) in vec3 oe_normals;
             
-            out vec4 normals;
+            out vec3 position;
+            out vec3 normals;
             
             layout(std140) uniform OE_Camera{
                 mat4 PV_Matrix;
@@ -52,20 +53,24 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
             };
             
             void main(){
-                normals = normalize(vec4(oe_normals, 1.0));
+                normals = mat3(Model_Matrix)*oe_normals;
                 mat4 final_mat = PV_Matrix*Model_Matrix;
+                
+                vec4 temp_position = Model_Matrix*vec4(oe_position, 1.0);
+                position = temp_position.xyz;
                 gl_Position = final_mat*vec4(oe_position, 1.0);
             }
             
         ))));
         this->api->setProgramFS(ren_group->program,  string(gl_shader_prefix +  string(NRE_Shader(
             
-            in vec4 normals;
+            in vec3 position;
+            in vec3 normals;
             
             out vec4 fragColor;
             
             void main(){
-                fragColor = abs(normals);
+                fragColor = vec4(abs(normals), 1.0);
             }
             
         ))));

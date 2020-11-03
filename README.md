@@ -14,7 +14,9 @@ This section will in the future describe how to install/compile/run on Linux and
 
 ### Compile on Linux
 
-The CC and CXX environment variables are optional. Meson can use ccache if it exists as well.
+Prerequisites: SDL2, meson and ninja.
+
+The CC and CXX environment variables are optional. Meson can use ```ccache``` automatically if it exists as well.
 For the very first time setup run:
 
 ```
@@ -25,11 +27,8 @@ Otherwise, just run:
 ```
 $ meson compile -C builddir
 ```
-
-
-### Run
-
-For executing the demos, just run:
+After compilation is finished,
+in order to executing the demos, just run:
 ```
 $ ./builddir/CSL_Test
 ```
@@ -38,11 +37,47 @@ or:
 $ ./builddir/OE_Test
 ```
 
+### Cross compile on Linux for Windows
+
+Prerequisites: MinGW-w64, wine, SDL2, meson, ninja.
+
+Run this script, which takes care of the dirty work for you automatically.
+Note that this will compile SDL2 together with the Oxygen Engine.
+```
+$ ./cross_linux2windows
+```
+
+It is also possible to use ```meson compile -C builddir```, but only AFTER the above script
+has been run at least ONCE to generate the ```builddir``` directory and apply the needed hacks.
+
+Then after compilation is finished, on Linux it is possible to test with:
+
+```
+$ wine builddir/OE_Test.exe
+```
+or
+```
+$ wine builddir/CSL_Test.exe
+```
+
+All required .dll files:
+
+```
+libOxygenEngine.dll
+libsdl2.dll
+libstdc++-6.dll
+libwinpthread-1.dll
+libgcc_s_seh-1.dll
+```
+
+are in the ```builddir``` directory and must be distributed together with the ```.exe``` files.
 
 ### Installing the blender plugin
 
+Prerequisites: Blender (duh!)
+
 The blender plugin now works again!
-Only for materials, meshes, lights and cameras as of 2020/10/02.
+Only for materials, meshes, lights and cameras as of 2020/11/03.
 But textures weren't working anyway in the engine itself, so whatever. They will be added later.
 
 From blender:
@@ -110,6 +145,11 @@ Added several more .csl example files as a test for the renderer and parser/inte
 2020/11/01:
 
 Added meson build system support, it was much easier than i thought. It took 30 mins.
+
+2020/11/03:
+
+Added cross compilation support. Some hacks were needed in order to get SDL2 to compile, but with Meson
+it was still straightforward. It will have to be updated when more libraries are added.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
