@@ -9,7 +9,8 @@ int update_monkey_rot(void*, OE_Task*, string event_name){
     for (auto scene : OE_Main->world->scenes){
         for (auto object : scene.second->objects){
             if (object.second->getType() == "CAMERA"){
-                object.second->current_state.pos_z = object.second->current_state.pos_z - 0.1f;
+                //object.second->current_state.pos_z = object.second->current_state.pos_z - 0.1f;
+                object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(0.05f, 1.0f, 0.0f, 0.0f));
             }
         }
     }
@@ -22,7 +23,8 @@ int update_monkey_rot_neg(void*, OE_Task*, string event_name){
     for (auto scene : OE_Main->world->scenes){
         for (auto object : scene.second->objects){
             if (object.second->getType() == "CAMERA"){
-                object.second->current_state.pos_z = object.second->current_state.pos_z + 0.1f;
+                //object.second->current_state.pos_z = object.second->current_state.pos_z + 0.1f;
+                object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(-0.05f, 1.0f, 0.0f, 0.0f));
             }
         }
     }
@@ -71,8 +73,8 @@ int main(){
     //taskMgr.Init();
     OE_Init("Oxygen Engine Demo", 1280, 720, false);
     OE_Pause(20);
-    OE_LoadWorld("monkeys.csl", &OnLoadObject, nullptr);
-    //OE_LoadWorld("fe_export_test.csl", &OnLoadObject, nullptr);
+    OE_LoadWorld("csl_2UVMAP_TEST.csl", &OnLoadObject, nullptr);
+    //OE_LoadWorld("monkeys.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
     OE_Start();

@@ -95,7 +95,7 @@ bool NRE_Renderer::updateData(){
 void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
     if (this->meshes.count(id) == 0){
         
-        auto t = clock();
+        //auto t = clock();
         // make sure all index and vertex buffers are generated
         // On loading objects from disk they are not generated here
         // But on objects created on the fly they ARE generated here
@@ -140,7 +140,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
             this->handleVGroupData(id, vgroup.first, mesh);
         }
         mesh->data.ibos.clear();
-        cout << "NRE DATA BENCHMARK MESH: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+        //cout << "NRE DATA BENCHMARK MESH: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
     else{
         this->api->setUniformBufferData(this->meshes[id].ubo, OE_Mat4x4ToSTDVector(mesh->GetModelMatrix()),0);
@@ -180,13 +180,7 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
     else {
 
         auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far);
-        auto view_mat = camera->GetModelMatrix();
-        
-        
-        //---------TEMPORARY fix until i reupload the .csl files--------//
-        OE_Vec3 translation_vec = OE_Vec3(camera->current_state.pos_x, camera->current_state.pos_y, camera->current_state.pos_z);
-        view_mat = glm::lookAt(translation_vec, OE_Vec3(0.0, 0.0, 0.0), glm::vec3(0,1,0));
-        //--------------------------------------------------------------//
+        auto view_mat = camera->GetViewMatrix();
         
         this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*view_mat),0);
     }

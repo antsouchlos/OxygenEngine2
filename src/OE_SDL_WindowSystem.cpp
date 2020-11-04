@@ -40,6 +40,7 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
         this->window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
     else
         this->window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_OPENGL );
+    
     this->context = SDL_GL_CreateContext(this->window);
     if (context == NULL){
          cout << "OE WARNING: Could not initialize OpenGL 3.2 Core Context, " << SDL_GetError() << endl;
@@ -49,7 +50,7 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
         return true;
     }
     
-    // Request an OpenGL 3.2 core context
+    // Request an OpenGL 3.1 context
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -70,7 +71,7 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
         return true;
     }
     
-    // Request an OpenGL 3.2 core context
+    // Request an OpenGL ES 3.0 context
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -97,9 +98,9 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
 
 void OE_SDL_WindowSystem::finishInit(){
     gladLoadGLLoader(SDL_GL_GetProcAddress);
-    //printf("Vendor:   %s\n", glGetString(GL_VENDOR));
-    //printf("Renderer: %s\n", glGetString(GL_RENDERER));
-    //printf("Version:  %s\n", glGetString(GL_VERSION));
+    printf("Vendor:   %s\n", glGetString(GL_VENDOR));
+    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+    printf("Version:  %s\n", glGetString(GL_VERSION));
     
     SDL_GL_SetSwapInterval(1);
     
