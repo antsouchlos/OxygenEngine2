@@ -63,11 +63,8 @@ $ wine builddir/CSL_Test.exe
 All required .dll files:
 
 ```
-libOxygenEngine.dll
-libsdl2.dll
-libstdc++-6.dll
 libwinpthread-1.dll
-libgcc_s_seh-1.dll
+
 ```
 
 are in the ```builddir``` directory and must be distributed together with the ```.exe``` files.
