@@ -95,7 +95,7 @@ bool NRE_Renderer::updateData(){
 void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
     if (this->meshes.count(id) == 0){
         
-        //auto t = clock();
+        auto t = clock();
         // make sure all index and vertex buffers are generated
         // On loading objects from disk they are not generated here
         // But on objects created on the fly they ARE generated here
@@ -108,8 +108,9 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         this->meshes[id].size = mesh->data.vbo.size();
         
         this->meshes[id].vbo = this->api->newVertexBuffer();
-        this->api->setVertexBufferMemory(this->meshes[id].vbo, this->meshes[id].size, NRE_GPU_STATIC);
-        this->api->setVertexBufferData(this->meshes[id].vbo, mesh->data.vbo, 0);
+        //this->api->setVertexBufferMemory(this->meshes[id].vbo, this->meshes[id].size, NRE_GPU_STATIC);
+        //this->api->setVertexBufferData(this->meshes[id].vbo, mesh->data.vbo, 0);
+        this->api->setVertexBufferMemoryData(this->meshes[id].vbo, mesh->data.vbo, NRE_GPU_STATIC);
         mesh->data.vbo.clear();
         
         // setup Vertex Layout Inputs
@@ -139,7 +140,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
             this->handleVGroupData(id, vgroup.first, mesh);
         }
         mesh->data.ibos.clear();
-        //cout << "NRE DATA BENCHMARK MESH: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+        cout << "NRE DATA BENCHMARK MESH: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
     else{
         this->api->setUniformBufferData(this->meshes[id].ubo, OE_Mat4x4ToSTDVector(mesh->GetModelMatrix()),0);
@@ -152,8 +153,9 @@ void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, OE_Mesh
         this->vgroups[id] = NRE_VGroupRenderData(); this->vgroups[id].id = id; this->vgroups[id].mesh_id = mesh_id;
         this->vgroups[id].bone_mat = OE_Mat4x4(1.0f);
         this->vgroups[id].ibo = this->api->newIndexBuffer();
-        this->api->setIndexBufferMemory(this->vgroups[id].ibo, mesh->data.ibos[id].data.size(), NRE_GPU_STATIC);
-        this->api->setIndexBufferData(this->vgroups[id].ibo, mesh->data.ibos[id].data, 0);
+        //this->api->setIndexBufferMemory(this->vgroups[id].ibo, mesh->data.ibos[id].data.size(), NRE_GPU_STATIC);
+        //this->api->setIndexBufferData(this->vgroups[id].ibo, mesh->data.ibos[id].data, 0);
+        this->api->setIndexBufferMemoryData(this->vgroups[id].ibo, mesh->data.ibos[id].data, NRE_GPU_STATIC);
         mesh->data.ibos[id].data.clear();
         
     }
@@ -179,6 +181,12 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
 
         auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far);
         auto view_mat = camera->GetModelMatrix();
+        
+        
+        //---------TEMPORARY fix until i reupload the .csl files--------//
+        OE_Vec3 translation_vec = OE_Vec3(camera->current_state.pos_x, camera->current_state.pos_y, camera->current_state.pos_z);
+        view_mat = glm::lookAt(translation_vec, OE_Vec3(0.0, 0.0, 0.0), glm::vec3(0,1,0));
+        //--------------------------------------------------------------//
         
         this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*view_mat),0);
     }

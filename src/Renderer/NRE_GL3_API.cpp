@@ -113,6 +113,14 @@ void NRE_GL3_API::setVertexBufferData(std::size_t id, const std::vector<float>& 
     glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLuint>(offset)*sizeof(float), v.size()*sizeof(float), &v[0]);
 }
 
+void NRE_GL3_API::setVertexBufferMemoryData(std::size_t id, const std::vector<float>& v, NRE_GPU_BUFFER_USAGE buf_usage){
+    assert (this->vbos.count(id) != 0);
+    this->vbos[id].size = v.size();
+    this->vbos[id].usage = buf_usage;
+    glBindBuffer(GL_ARRAY_BUFFER, this->vbos[id].handle);
+    glBufferData(GL_ARRAY_BUFFER, v.size()*sizeof(float), &v[0], NRE2GL_BufferUse(buf_usage));
+}
+
 void NRE_GL3_API::deleteVertexBuffer(std::size_t id){
     assert (this->vbos.count(id) != 0);
     glDeleteBuffers(1, &this->vbos[id].handle);
@@ -136,6 +144,14 @@ void NRE_GL3_API::setIndexBufferData(std::size_t id, const std::vector<uint32_t>
     assert ((offset + v.size() <= ibos[id].size));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[id].handle);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLuint>(offset)*sizeof(uint32_t), v.size()*sizeof(uint32_t), &v[0]);
+}
+
+void NRE_GL3_API::setIndexBufferMemoryData(std::size_t id, const std::vector<uint32_t>& v, NRE_GPU_BUFFER_USAGE buf_usage){
+    assert (this->ibos.count(id) != 0);
+    this->ibos[id].size = v.size();
+    this->ibos[id].usage = buf_usage;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[id].handle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, v.size()*sizeof(uint32_t), &v[0], NRE2GL_BufferUse(buf_usage));
 }
 
 void NRE_GL3_API::deleteIndexBuffer(std::size_t id){
