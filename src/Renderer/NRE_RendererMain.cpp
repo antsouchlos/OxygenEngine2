@@ -15,9 +15,18 @@ bool NRE_Renderer::init(){
         delete api;
     this->api = new NRE_GL3_API();
     if (!this->screen->isES){
-        this->gl_shader_prefix = string("#version 330 \n");//+ "#extension ARB_explicit_attrib_location​: require\n\n​";
+        if (this->screen->major == 3 && this->screen->minor == 1){
+            this->gl_shader_prefix = "#version 140 \n"
+                                 "#extension GL_ARB_explicit_attrib_location"
+                                 ": require\n";
+        } else{
+            this->gl_shader_prefix = "#version 150 \n"
+                                 "#extension GL_ARB_explicit_attrib_location"
+                                 ": require\n";
+        }
+        
     } else{
-        this->gl_shader_prefix = "#version 300 es \nprecision mediump float \n";
+        this->gl_shader_prefix = "#version 300 es \nprecision highp float; \n";
     }
     
     return true;

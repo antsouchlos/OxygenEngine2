@@ -39,6 +39,7 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         void SetRot(OE_Quat);
         
         OE_Mat4x4 GetModelMatrix();
+        OE_Mat4x4 GetViewMatrix();
         
     //protected:
         OE_ObjectData       current_state;
