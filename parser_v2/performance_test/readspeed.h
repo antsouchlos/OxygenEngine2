@@ -409,8 +409,6 @@ int countSpacesFopen(std::string filename) {
 #ifdef FOPEN_MALLOC_IF
 	char* addr = static_cast<char*>(malloc(fileSize));
 
-	fread(addr, 1, fileSize, f);
-
 	for (int i = 0; i < fileSize; i++) {
 		if (addr[i] == ' ') ++result;
 	}
