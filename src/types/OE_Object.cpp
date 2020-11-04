@@ -64,9 +64,23 @@ OE_Quat OE_Object::GetRot(){
 OE_Mat4x4 OE_Object::GetModelMatrix(){
     
     OE_Mat4x4 model_mat(1.0f);
-    OE_Quat rot_quat = OE_Quat(this->current_state.rot_w, this->current_state.rot_x, this->current_state.rot_y, this->current_state.rot_z);
-    OE_Vec3 translation_vec = OE_Vec3(this->current_state.pos_x, this->current_state.pos_y, -this->current_state.pos_z);
-    model_mat = OE_Quat2Mat4x4(rot_quat) * OE_Translate(model_mat, translation_vec);
+    OE_Vec4 nor_quat = OE_Normalize(OE_Vec4(this->current_state.rot_w, this->current_state.rot_x, this->current_state.rot_y, this->current_state.rot_z));
+    
+    OE_Quat rot_quat = OE_Quat(nor_quat[0], nor_quat[1], nor_quat[2], nor_quat[3]);
+    OE_Vec3 translation_vec = OE_Vec3(this->current_state.pos_x, this->current_state.pos_y, this->current_state.pos_z);
+    //model_mat = OE_Quat2Mat4x4(rot_quat) * OE_Translate(model_mat, translation_vec);
+    model_mat = OE_Translate(model_mat, translation_vec) * OE_Quat2Mat4x4(rot_quat);
     return model_mat;
+}
+
+OE_Mat4x4 OE_Object::GetViewMatrix(){
+    
+    OE_Mat4x4 view_mat(1.0f);
+    OE_Vec4 nor_quat = OE_Normalize(OE_Vec4(this->current_state.rot_w, -this->current_state.rot_x, -this->current_state.rot_y, -this->current_state.rot_z));
+    
+    OE_Quat rot_quat = OE_Quat(nor_quat[0], nor_quat[1], nor_quat[2], nor_quat[3]);
+    OE_Vec3 translation_vec = OE_Vec3(-this->current_state.pos_x, -this->current_state.pos_y, -this->current_state.pos_z);
+    view_mat = OE_Quat2Mat4x4(rot_quat) * OE_Translate(view_mat, translation_vec);
+    return view_mat;
 }
 
