@@ -35,10 +35,12 @@ std::size_t NRE_GPU_API::newUniformBuffer(){ return 0;}
 
 void NRE_GPU_API::setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE){}
 void NRE_GPU_API::setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t){}
+void NRE_GPU_API::setVertexBufferMemoryData(std::size_t, const std::vector<float>&, NRE_GPU_BUFFER_USAGE){}
 void NRE_GPU_API::deleteVertexBuffer(std::size_t){}
     
 void NRE_GPU_API::setIndexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE){}
 void NRE_GPU_API::setIndexBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t){}
+void NRE_GPU_API::setIndexBufferMemoryData(std::size_t, const std::vector<uint32_t>&, NRE_GPU_BUFFER_USAGE){}
 void NRE_GPU_API::deleteIndexBuffer(std::size_t){}
     
 void NRE_GPU_API::setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE){}

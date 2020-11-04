@@ -50,10 +50,12 @@ public:
     
     virtual void setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     virtual void setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t);
+    virtual void setVertexBufferMemoryData(std::size_t, const std::vector<float>&, NRE_GPU_BUFFER_USAGE);
     virtual void deleteVertexBuffer(std::size_t);
     
     virtual void setIndexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     virtual void setIndexBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
+    virtual void setIndexBufferMemoryData(std::size_t, const std::vector<uint32_t>&, NRE_GPU_BUFFER_USAGE);
     virtual void deleteIndexBuffer(std::size_t);
     
     virtual void setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
