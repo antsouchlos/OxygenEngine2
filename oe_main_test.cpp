@@ -79,7 +79,3 @@ int main(){
     
     return 0;
 }
-
-#ifdef OE_PLATFORM_WINDOWS
-int WInMain(){return 0;}
-#endif

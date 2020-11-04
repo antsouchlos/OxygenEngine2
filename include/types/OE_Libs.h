@@ -18,8 +18,7 @@
 #define OE_RENDERER_OPENGL
 #define SDL_MAIN_HANDLED
 
-#include <subprojects/SDL2-2.0.12/include/SDL.h>
-
+#include <SDL.h>
 
 #endif
 

@@ -2,7 +2,5 @@
 meson builddir --cross-file mingw_linux.cross
 cp cross_config/SDL_config_windows.h subprojects/SDL2-2.0.12/include/SDL_config_windows.h
 meson compile -C builddir
-cp /usr/x86_64-w64-mingw32/bin/libgcc_s_seh-1.dll builddir/libgcc_s_seh-1.dll
-cp /usr/x86_64-w64-mingw32/bin/libstdc++-6.dll builddir/libstdc++-6.dll
 cp /usr/x86_64-w64-mingw32/bin/libwinpthread-1.dll builddir/libwinpthread-1.dll
-cp builddir/subprojects/SDL2-2.0.12/libsdl2.dll builddir/libsdl2.dll
+
