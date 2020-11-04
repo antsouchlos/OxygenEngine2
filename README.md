@@ -28,7 +28,7 @@ Otherwise, just run:
 $ meson compile -C builddir
 ```
 After compilation is finished,
-in order to executing the demos, just run:
+in order to execute the demos, just run:
 ```
 $ ./builddir/CSL_Test
 ```
