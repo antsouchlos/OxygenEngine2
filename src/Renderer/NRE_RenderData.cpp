@@ -67,6 +67,7 @@ bool NRE_Renderer::updateData(){
                     render_data.camera = camera_id;
                     render_data.vgroup = vgroup.first;
                     render_data.mesh = mesh.first;
+                    render_data.material = vgroup.second.material_id;
                     if (!this->existsRenderGroup(render_data)){
                         this->render_groups.push_back(render_data);
                     }
@@ -153,6 +154,7 @@ void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, OE_Mesh
         this->vgroups[id] = NRE_VGroupRenderData(); this->vgroups[id].id = id; this->vgroups[id].mesh_id = mesh_id;
         this->vgroups[id].bone_mat = OE_Mat4x4(1.0f);
         this->vgroups[id].ibo = this->api->newIndexBuffer();
+        this->vgroups[id].material_id = mesh->data.triangle_groups[id]->material_id;
         //this->api->setIndexBufferMemory(this->vgroups[id].ibo, mesh->data.ibos[id].data.size(), NRE_GPU_STATIC);
         //this->api->setIndexBufferData(this->vgroups[id].ibo, mesh->data.ibos[id].data, 0);
         this->api->setIndexBufferMemoryData(this->vgroups[id].ibo, mesh->data.ibos[id].data, NRE_GPU_STATIC);

@@ -78,8 +78,35 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
             
             out vec4 fragColor;
             
+            layout (std140) uniform OE_Material{
+                vec4 mat_diffuse;
+                vec4 mat_specular;
+                float mat_specular_intensity;
+                float mat_specular_hardness;
+                float mat_translucency;
+                float mat_illuminosity;
+            };
+            
+            const vec3 light_pos = vec3( 13.37035561, -12.76134396, 10.10574818);
+            
             void main(){
-                fragColor = vec4(abs(normals), 1.0);
+                
+                vec3 s = normalize(light_pos-position);
+                vec3 v = normalize(-position);
+                
+                vec3 specular = vec3(0.0);
+                
+                float sDotN = max(dot(s, normals), 0.0);
+                
+                if (sDotN > 0.0){
+                    //specular = vec3(0.5);
+                    specular = vec3(pow(sDotN,1.0/ mat_specular_hardness));
+                }
+                
+                vec3 dif_output = clamp(mat_diffuse.rgb*sDotN+specular, 0.1, 1.0);
+                
+                //fragColor = vec4(abs(normals), 1.0);
+                fragColor = vec4(dif_output, 1.0);
             }
             
         ))));
@@ -87,10 +114,12 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
         this->api->setupProgram(ren_group->program);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Camera", 0);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Mesh32", 1);
+        this->api->setProgramUniformSlot(ren_group->program, "OE_Material", 2);
         
     }
     this->api->setUniformState(this->meshes[ren_group->mesh].ubo, 1, 0, 0);
     this->api->setUniformState(this->cameras[ren_group->camera].ubo, 0, 0, 0);
+    this->api->setUniformState(this->materials[ren_group->material].ubo, 2, 0, 0);
     this->api->draw(ren_group->program, this->meshes[ren_group->mesh].vao, this->vgroups[ren_group->vgroup].ibo);
 }
 
