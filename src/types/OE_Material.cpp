@@ -28,7 +28,30 @@ OE_Material::OE_Material(const string &name){
 OE_Material::~OE_Material(){
 
 }  
- 
+
+std::vector<float> OE_Material::GetRendererData(){
+    
+    vector<float> output;
+    output.reserve(12);
+    
+    output.push_back(this->dif_r);
+    output.push_back(this->dif_g);
+    output.push_back(this->dif_b);
+    output.push_back(this->dif_a);
+    
+    output.push_back(this->scol_r);
+    output.push_back(this->scol_g);
+    output.push_back(this->scol_b);
+    output.push_back(this->alpha);
+    
+    output.push_back(this->specular_intensity);
+    output.push_back(this->specular_hardness);
+    output.push_back(this->translucency);
+    output.push_back(this->illuminosity);
+    
+    return output;
+}
+
 string OE_Material::to_str(){
     string output = outputTypeTag("Material", {{"name", "\"" + id2name[this->id] + "\""}});
     output.append("\n");

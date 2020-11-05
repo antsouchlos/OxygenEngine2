@@ -6,6 +6,7 @@
 class OE_Material : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     
     friend class CSL_Interpreter;
+    friend class NRE_Renderer;
     
     public:
         static std::unordered_map<std::size_t, std::string> id2name;
@@ -29,6 +30,7 @@ class OE_Material : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         std::vector<std::size_t> textureCM_IDs;
         
+        std::vector<float> GetRendererData();
 };
 
 
