@@ -162,7 +162,15 @@ void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, OE_Mesh
 }
 
 void NRE_Renderer::handleMaterialData(std::size_t id, OE_Material* mat){
-    
+    if (this->materials.count(id) == 0){
+        this->materials[id] = NRE_MaterialRenderData(); this->materials[id].id = id;
+        this->materials[id].ubo = this->api->newUniformBuffer();
+        
+        this->api->setUniformBufferMemory(this->materials[id].ubo, 12, NRE_GPU_DYNAMIC);
+        this->api->setUniformBufferData(this->materials[id].ubo, mat->GetRendererData(), 0);
+    } else{
+        this->api->setUniformBufferData(this->materials[id].ubo, mat->GetRendererData(), 0);
+    }
 }
 
 void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
@@ -172,7 +180,7 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
         this->cameras[id].ubo = this->api->newUniformBuffer();
         this->api->setUniformBufferMemory(this->cameras[id].ubo, 16, NRE_GPU_STREAM);
 
-        auto view_mat = camera->GetModelMatrix();
+        auto view_mat = camera->GetViewMatrix();
         auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far*10.0f);
         
         this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*view_mat),0);

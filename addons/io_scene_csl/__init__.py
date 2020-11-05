@@ -250,18 +250,25 @@ def handle_camera(progress, cur_scene, obj):
 def handle_material(progress, cur_scene, material):
     mat = f.OE_Material(material.name)
     
-    mat.dif_r                   = material.diffuse_color[0]
-    mat.dif_g                   = material.diffuse_color[1]
-    mat.dif_b                   = material.diffuse_color[2]
-    mat.dif_a                   = material.diffuse_color[3]
+    nodes = material.node_tree.nodes
     
-    mat.scol_r                  = material.specular_color[0]
-    mat.scol_g                  = material.specular_color[1]
-    mat.scol_b                  = material.specular_color[2]
-    
-    mat.specular_intensity      = material.specular_intensity
-    mat.specular_hardness       = material.roughness
-    mat.alpha                   = material.alpha_threshold
+    for node in nodes:
+        if node.name == "Specular":
+            mat.dif_r = node.inputs['Base Color'].default_value[0]
+            mat.dif_g = node.inputs['Base Color'].default_value[1]
+            mat.dif_b = node.inputs['Base Color'].default_value[2]
+            
+            mat.scol_r = node.inputs['Specular'].default_value[0]
+            mat.scol_g = node.inputs['Specular'].default_value[1]
+            mat.scol_b = node.inputs['Specular'].default_value[2]
+            
+            mat.specular_hardness = node.inputs['Roughness'].default_value
+            mat.specular_intensity = 1.0
+            print(mat.dif_r)
+            print(mat.dif_g)
+            print(mat.dif_b)
+            
+            mat.alpha = 1.0
     
     return mat
 
