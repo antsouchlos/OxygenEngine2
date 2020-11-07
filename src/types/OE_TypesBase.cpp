@@ -19,7 +19,6 @@ void OE_THREAD_SAFETY_OBJECT::unlockMutex(){
     SDL_UnlockMutex(wmutex);
 }
 
-
 CSL_WriterBase::CSL_WriterBase(){}
 CSL_WriterBase::~CSL_WriterBase(){}
 
@@ -71,6 +70,9 @@ std::string CSL_WriterBase::outputTypeTag(const std::string& name, const std::ma
     return output;
 }
 
+OE_Name2ID::OE_Name2ID(){
+    
+}
 
 OE_Name2ID::OE_Name2ID(std::unordered_map<std::size_t, std::string>* arg){
     this->id2name = arg;

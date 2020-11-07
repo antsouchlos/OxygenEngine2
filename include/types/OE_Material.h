@@ -12,6 +12,7 @@ class OE_Material : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         static std::unordered_map<std::size_t, std::string> id2name;
         static std::size_t current_id;
         static OE_Name2ID name2id;
+        //static OE_SharedIndexMap<OE_Material> database;
         std::size_t id;
         
         
