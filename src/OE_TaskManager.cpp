@@ -83,6 +83,7 @@ OE_TaskManager::~OE_TaskManager()
 int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
     this->window = new OE_SDL_WindowSystem();
+    
     this->renderer = new NRE_Renderer();
     this->renderer->screen = this->window;
     this->physics = new OE_PhysicsEngineBase();
