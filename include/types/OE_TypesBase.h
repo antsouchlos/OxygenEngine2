@@ -265,7 +265,7 @@ public:
     OE_Name2ID                                      name2id;
     std::set<std::string>                           names;
     
-    /// This is for the renderer
+    /// This is for the renderer and the physics engine
     /// Every time a new object is being added or is being changed
     /// This map boolean should be set to true
     /// In case an object was deleted it should be added here as well
