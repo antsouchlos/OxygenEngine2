@@ -2,6 +2,12 @@
 
 using namespace std;
 
+OE_SharedIndexMap<OE_Scene>             OE_World::scenesList = OE_SharedIndexMap<OE_Scene>();
+OE_SharedIndexMap<OE_Object>            OE_World::objectsList = OE_SharedIndexMap<OE_Object>();
+OE_SharedIndexMap<OE_Material>          OE_World::materialsList = OE_SharedIndexMap<OE_Material>();
+OE_SharedIndexMap<OE_Texture>           OE_World::texturesList = OE_SharedIndexMap<OE_Texture>();
+OE_SharedIndexMap<OE_TCM>               OE_World::tcmsList = OE_SharedIndexMap<OE_TCM>();
+OE_SharedIndexMap<OE_ViewportConfig>    OE_World::viewportsList = OE_SharedIndexMap<OE_ViewportConfig>();
 
 OE_World::OE_World(){
     
