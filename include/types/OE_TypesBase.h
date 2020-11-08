@@ -150,8 +150,6 @@ public:
             
             this->names.insert(name);
             this->changed[current_id] = true;
-            
-            //element->id = current_id;
         }
     }
     void append(std::string name, std::shared_ptr<T> element){
@@ -170,9 +168,6 @@ public:
             
             this->names.insert(name);
             this->changed[current_id] = true;
-            
-            //element->id = current_id;
-            //this->current_id++;
         }
         else {
             auto current_id = element->id;
@@ -180,9 +175,6 @@ public:
             this->id2name[current_id] = name;
             
             this->changed[current_id] = true;
-            
-            //element->id = current_id;
-            //this->current_id++;
         }
     }
     
@@ -233,7 +225,7 @@ public:
     }
     
     // NOTE: read-only
-    std::shared_ptr<T> operator[](std::size_t id){
+    std::shared_ptr<T> operator()(std::size_t id){
         std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
         lockMutex();
         if (this->elements.count(id) == 1)
@@ -243,11 +235,35 @@ public:
     }
     
     // NOTE: read-only, slower
-    std::shared_ptr<T> operator[](std::string name){
+    std::shared_ptr<T> operator()(std::string name){
         std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
         lockMutex();
         if (this->names.count(name) == 1)
             output = this->elements[this->name2id[name]];
+        unlockMutex();
+        return output;
+    }
+    
+    // NOTE: for changing the object
+    std::shared_ptr<T> operator[](std::size_t id){
+        std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
+        lockMutex();
+        if (this->elements.count(id) == 1){
+            output = this->elements[id];
+            this->changed[id] = true;
+        }
+        unlockMutex();
+        return output;
+    }
+    
+    // NOTE: for changing the object, slower
+    std::shared_ptr<T> operator[](std::string name){
+        std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
+        lockMutex();
+        if (this->names.count(name) == 1){
+            output = this->elements[this->name2id[name]];
+            this->changed[this->name2id[name]] = true;
+        }
         unlockMutex();
         return output;
     }

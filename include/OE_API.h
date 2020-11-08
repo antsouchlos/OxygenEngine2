@@ -27,7 +27,7 @@ namespace OE{
     
     //------------------------BLOCK-------------------------//
     // The API functions inside this block are the only ones that are 
-    // safe to be called on an unsynchronized thread
+    // safe to be called on an unsynchronized thread together with all the OE_Get* functions
     
     void OE_AddTask(std::string, const OE_METHOD, void*);
     void OE_AddTask(std::string, const OE_METHOD, int, void*);
@@ -57,7 +57,35 @@ namespace OE{
     
     void OE_LoadWorld(std::string, const OE_EVENTFUNC, void*);
     
+    /** API functions for manipulating objects and basic types
+     * to be vastly extended when the physics engine comes
+     */
     
+    std::size_t             OE_GetObjectID(std::string);
+    std::string             OE_GetObjectName(std::size_t);
+    
+    std::set<std::size_t>   OE_GetSceneObjects(std::size_t);
+    OE_Vec3                 OE_GetObjectPos(std::size_t);
+    OE_Quat                 OE_GetObjectRot(std::size_t);
+    std::set<std::size_t>   OE_GetSceneObjects(std::string);
+    OE_Vec3                 OE_GetObjectPos(std::string);
+    OE_Quat                 OE_GetObjectRot(std::string);
+    
+    void OE_SetObjectPos(std::size_t, OE_Vec3);
+    void OE_SetObjectRot(std::size_t, OE_Quat);
+    void OE_SetObjectRot(std::size_t, OE_Vec4);
+    
+    void OE_ChangeObjectPos(std::size_t, OE_Vec3);
+    void OE_ChangeObjectRot(std::size_t, OE_Quat);
+    void OE_ChangeObjectRot(std::size_t, OE_Vec4);
+    
+    void OE_SetObjectPos(std::string, OE_Vec3);
+    void OE_SetObjectRot(std::string, OE_Quat);
+    void OE_SetObjectRot(std::string, OE_Vec4);
+    
+    void OE_ChangeObjectPos(std::string, OE_Vec3);
+    void OE_ChangeObjectRot(std::string, OE_Quat);
+    void OE_ChangeObjectRot(std::string, OE_Vec4);
 };
 
 

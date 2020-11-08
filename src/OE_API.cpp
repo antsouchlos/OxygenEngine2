@@ -128,3 +128,228 @@ void OE::OE_LoadWorld(std::string filename, const OE_EVENTFUNC func, void* data)
     *argument = filename;
     OE_CreateUnsyncThread("loading-" + filename, &OE_API_Helpers::load_world, (void*)argument);
 }
+
+/** API functions for manipulating objects and basic types
+     * to be vastly extended when the physics engine comes
+     */
+    
+std::size_t OE::OE_GetObjectID(std::string name){
+    OE_World::objectsList.lockMutex();
+    std::size_t output = OE_World::objectsList.name2id[name];
+    OE_World::objectsList.unlockMutex();
+    return output;
+}
+
+std::string OE::OE_GetObjectName(std::size_t id){
+    OE_World::objectsList.lockMutex();
+    std::string output;
+    if (OE_World::objectsList.id2name.count(id)){
+        output = OE_World::objectsList.id2name[id];
+    }
+    OE_World::objectsList.unlockMutex();
+    return output;
+}
+    
+std::set<std::size_t>   OE::OE_GetSceneObjects(std::size_t id){
+    
+    std::set<std::size_t> output;
+    
+    auto scene = OE_World::scenesList(id);
+    if (scene != nullptr){
+        scene->lockMutex();
+        output = scene->objects;
+        scene->unlockMutex();
+    }
+    else {
+        //TODO output a warning
+    }
+    return output;
+}
+
+OE_Vec3 OE::OE_GetObjectPos(std::size_t id){
+    
+    OE_Vec3 output;
+    
+    auto object = OE_World::objectsList(id);
+    if (object != nullptr){
+        object->lockMutex();
+        output[0] = object->current_state.pos_x;
+        output[1] = object->current_state.pos_y;
+        output[2] = object->current_state.pos_z;
+        object->unlockMutex();
+    }
+    return output;
+}
+
+OE_Quat OE::OE_GetObjectRot(std::size_t id){
+    
+    OE_Quat output = OE_Quat();
+    
+    auto object = OE_World::objectsList(id);
+    if (object != nullptr){
+        object->lockMutex();
+        output = object->GetRot();
+        object->unlockMutex();
+    }
+    return output;
+}
+
+std::set<std::size_t>   OE::OE_GetSceneObjects(std::string name){
+    
+    std::set<std::size_t> output;
+    
+    auto scene = OE_World::scenesList(name);
+    if (scene != nullptr){
+        scene->lockMutex();
+        output = scene->objects;
+        scene->unlockMutex();
+    }
+    else {
+        //TODO output a warning
+    }
+    return output;
+}
+
+OE_Vec3 OE::OE_GetObjectPos(std::string name){
+    
+    OE_Vec3 output;
+    
+    auto object = OE_World::objectsList(name);
+    if (object != nullptr){
+        object->lockMutex();
+        output[0] = object->current_state.pos_x;
+        output[1] = object->current_state.pos_y;
+        output[2] = object->current_state.pos_z;
+        object->unlockMutex();
+    }
+    return output;
+}
+
+OE_Quat OE::OE_GetObjectRot(std::string name){
+    
+    OE_Quat output;
+    
+    auto object = OE_World::objectsList(name);
+    if (object != nullptr){
+        object->lockMutex();
+        output = object->GetRot();
+        object->unlockMutex();
+    }
+    return output;
+}
+    
+void OE::OE_SetObjectPos(std::size_t id, OE_Vec3 pos){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.pos_x = pos.x;
+        object->current_state.pos_y = pos.y;
+        object->current_state.pos_z = pos.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_SetObjectRot(std::size_t id, OE_Quat rot){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(rot);
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_SetObjectRot(std::size_t id, OE_Vec4 rot){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(OE_QuatFromAxisAngle(rot[0], rot[1], rot[2], rot[3]));
+        object->unlockMutex();
+    }
+}
+    
+void OE::OE_ChangeObjectPos(std::size_t id, OE_Vec3 pos){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.pos_x = object->current_state.pos_x + pos.x;
+        object->current_state.pos_y = object->current_state.pos_y + pos.y;
+        object->current_state.pos_z = object->current_state.pos_z + pos.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectRot(std::size_t id, OE_Quat rot){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(object->GetRot()*rot);
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectRot(std::size_t id, OE_Vec4 rot){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(object->GetRot()*OE_QuatFromAxisAngle(rot[0], rot[1], rot[2], rot[3]));
+        object->unlockMutex();
+    }
+}
+    
+void OE::OE_SetObjectPos(std::string name, OE_Vec3 pos){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.pos_x = pos.x;
+        object->current_state.pos_y = pos.y;
+        object->current_state.pos_z = pos.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_SetObjectRot(std::string name, OE_Quat rot){    
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(rot);
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_SetObjectRot(std::string name, OE_Vec4 rot){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(OE_QuatFromAxisAngle(rot[0], rot[1], rot[2], rot[3]));
+        object->unlockMutex();
+    }
+}
+    
+void OE::OE_ChangeObjectPos(std::string name, OE_Vec3 pos){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.pos_x = object->current_state.pos_x + pos.x;
+        object->current_state.pos_y = object->current_state.pos_y + pos.y;
+        object->current_state.pos_z = object->current_state.pos_z + pos.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectRot(std::string name, OE_Quat rot){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(object->GetRot()*rot);
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectRot(std::string name, OE_Vec4 rot){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(object->GetRot()*OE_QuatFromAxisAngle(rot[0], rot[1], rot[2], rot[3]));
+        object->unlockMutex();
+    }
+}
