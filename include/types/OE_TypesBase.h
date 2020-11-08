@@ -46,6 +46,7 @@ class CSL_WriterBase{
         virtual std::string to_str();
         
         static std::string outputVar(const std::string&, const std::string&);
+        static std::string outputTypeVar(const std::string&, const std::string&);
         
         template <typename T>
         static std::string convert(T item) {
@@ -86,6 +87,8 @@ class CSL_WriterBase{
  * It is only supposed to be static.
  */ 
 class OE_Name2ID : public OE_THREAD_SAFETY_OBJECT{
+    
+    friend class CSL_Interpreter;
     public:
         
         OE_Name2ID();
@@ -106,21 +109,49 @@ class OE_SharedIndexMap : public OE_THREAD_SAFETY_OBJECT{
 public:
     OE_SharedIndexMap(){
         this->name2id = OE_Name2ID(&this->id2name);
-        this->current_id = 1;
     }
     ~OE_SharedIndexMap(){}
+    
+    OE_SharedIndexMap copy(){
+        OE_SharedIndexMap output;
+        lockMutex();
+        for (auto x: elements){
+            output.changed[x.first] = this->changed[x.first];
+            output.elements[x.first] = x.second;
+            output.id2name[x.first] = this->id2name[x.first];
+            output.names = this->names;
+        }
+        unlockMutex();
+        return output;
+    }
+    
+    std::string to_str(){
+        lockMutex();
+        std::string output = "[\n";
+        for (auto x : elements){
+            output.append(std::to_string(x.first));
+            output.append(" ");
+            output.append(this->id2name[x.first]);
+            output.append("\n");
+        }
+        
+        output.append("]");
+        unlockMutex();
+        return output;
+    }
+    
     
     void appendUNSAFE(std::string name, std::shared_ptr<T> element){
         if (this->names.count(name) == 0){
             
+            auto current_id = element->id;
             this->elements[current_id] = element;
             this->id2name[current_id] = name;
             
             this->names.insert(name);
             this->changed[current_id] = true;
             
-            element->id = current_id;
-            this->current_id++;
+            //element->id = current_id;
         }
     }
     void append(std::string name, std::shared_ptr<T> element){
@@ -133,24 +164,25 @@ public:
     void force_appendUNSAFE(std::string name, std::shared_ptr<T> element){
         if (this->names.count(name) == 0){
             
+            auto current_id = element->id;
             this->elements[current_id] = element;
             this->id2name[current_id] = name;
             
             this->names.insert(name);
             this->changed[current_id] = true;
             
-            element->id = current_id;
-            this->current_id++;
+            //element->id = current_id;
+            //this->current_id++;
         }
         else {
-            
+            auto current_id = element->id;
             this->elements[current_id] = element;
             this->id2name[current_id] = name;
             
             this->changed[current_id] = true;
             
-            element->id = current_id;
-            this->current_id++;
+            //element->id = current_id;
+            //this->current_id++;
         }
     }
     
@@ -226,13 +258,13 @@ public:
         lockMutex();
         output.reserve(this->elements.size());
         for (auto x : this->elements){
-            output.push_back(elements);
+            output.push_back(x.first);
         }
         unlockMutex();
         return output;
     }
     
-    void extend(const OE_SharedIndexMap<T>& other, bool override_names){
+    void extend(OE_SharedIndexMap<T>& other, bool override_names){
         lockMutex();
         if (!override_names){
             for (auto x: other.getKeys()){
@@ -257,8 +289,6 @@ public:
         unlockMutex();
     }
     
-    
-    std::size_t                                     current_id;
     std::map<std::size_t, std::shared_ptr<T>>       elements;
     
     std::unordered_map<std::size_t, std::string>    id2name;

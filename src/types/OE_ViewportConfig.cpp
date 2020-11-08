@@ -1,18 +1,16 @@
 #include <types/OE_ViewportConfig.h>
 #include <types/OE_Camera.h>
+#include <types/OE_World.h>
 
 using namespace std;
 
 size_t              OE_ViewportConfig::current_id = 0;
-unordered_map<size_t, string> OE_ViewportConfig::id2name;
-OE_Name2ID          OE_ViewportConfig::name2id = OE_Name2ID(&OE_ViewportConfig::id2name);
 
 OE_ViewportConfig::OE_ViewportConfig(){
     
     OE_ViewportConfig::current_id++;
     
     this->id                                = OE_ViewportConfig::current_id;
-    OE_ViewportConfig::id2name[this->id]    = "noname_" + to_string(this->id);
     
 }
 
@@ -21,9 +19,7 @@ OE_ViewportConfig::OE_ViewportConfig(const string &name){
     
     OE_ViewportConfig::current_id++;
     
-    this->id                                = OE_ViewportConfig::current_id;
-    OE_ViewportConfig::id2name[this->id]    = name;
-    
+    this->id                                = OE_ViewportConfig::current_id;    
 }
 
 OE_ViewportConfig::~OE_ViewportConfig(){
@@ -32,7 +28,7 @@ OE_ViewportConfig::~OE_ViewportConfig(){
  
 std::string OE_ViewportConfig::to_str() const{
     
-    string output = outputTypeTag("ViewportConfig", {{"name", "\"" + id2name[this->id] + "\""}});
+    string output = outputTypeTag("ViewportConfig", {{"name", "\"" + OE_World::viewportsList.id2name[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
@@ -41,7 +37,7 @@ std::string OE_ViewportConfig::to_str() const{
     
     vector<string> camera_strs;
     for(const auto &x: this->cameras){
-        camera_strs.push_back("\"" + OE_Camera::id2name[x] + "\"");
+        camera_strs.push_back("\"" + OE_World::objectsList.id2name[x] + "\"");
     }
     output.append(outputList("cameras", camera_strs));
     output.append("\n");

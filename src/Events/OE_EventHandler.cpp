@@ -17,7 +17,7 @@ OE_EventHandler::~OE_EventHandler(){
     this->internal_events.clear();
 }
 
-// THIS IS TOTALLY USELESS
+// THIS IS VERY USEFUL
 std::shared_ptr<OE_Event> OE_EventHandler::getIEvent(string a_name){
    /// wraps getIEventUNSAFE in a mutex, (now in 2020: like... seriously????)
    lockMutex();
@@ -113,20 +113,20 @@ void OE_EventHandler::broadcastIEvent(string a_name, void* data){
     	this->broadcastIEvent(x, nullptr);
 }
 
-// TOTALLY USELESS
+// TODO
 void OE_EventHandler::broadcastIEventWait(string a_name, int milliseconds){}
 
 /// so simple
 int OE_EventHandler::callIEvent(string a_name, OE_Task* task, void* data){
 
     /// generic event management
-    
-    if (getIEventUNSAFE(a_name) != nullptr){
+    auto event = getIEvent(a_name);
+    if (event != nullptr){
         
-        getIEventUNSAFE(a_name)->lockMutex();
-        getIEventUNSAFE(a_name)->times_invoked++;
-        getIEventUNSAFE(a_name)->call(task, data);
-        getIEventUNSAFE(a_name)->unlockMutex();
+        event->lockMutex();
+        event->times_invoked++;
+        event->call(task, data);
+        event->unlockMutex();
     } 
     else{
         // TODO: handle error
