@@ -21,7 +21,7 @@ public:
     void setIEventFunc(std::string, const OE_EVENTFUNC, void*);
     void broadcastIEvent(std::string, void*);
     
-    void broadcastIEventWait(std::string, int); // TOTALLY USELESS
+    void broadcastIEventWait(std::string, int); // TODO
     void mapIEvent(std::string, std::string);
     void unmapIEvent(std::string, std::string);
     int callIEvent(std::string, OE_Task*, void*);

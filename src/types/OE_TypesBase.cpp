@@ -44,6 +44,17 @@ std::string CSL_WriterBase::outputVar(const std::string& name, const std::string
     return output;
 }
 
+std::string CSL_WriterBase::outputTypeVar(const std::string& name, const std::string& variable){
+    std::string output = "";
+    std::string temp = convert(variable);
+    
+    output.reserve(name.size() + 1 + temp.size());
+    output.append(name);
+    output.append("=");
+    output.append(temp);
+    return output;
+}
+
 std::string CSL_WriterBase::outputClosingTag(const std::string& name){  
     std::string output = "";
     output.reserve(CSL_WriterBase::indent + 2 + name.size() + 1);
@@ -59,9 +70,18 @@ std::string CSL_WriterBase::outputTypeTag(const std::string& name, const std::ma
     std::string output = genIndent() + "<" + name;
     if (args.size() != 0){
         output.append(" ");
+         for (const auto& x: args){
+            if (x.first == "name"){
+                output.append(outputTypeVar(x.first, x.second));
+                output.append(" ");
+                break;
+            }
+        }
         for (const auto& x: args){
-            output.append(outputVar(x.first, x.second));
-            output.append(" ");
+            if (x.first != "name"){
+                output.append(outputTypeVar(x.first, x.second));
+                output.append(" ");
+            }
         }
         output = output.substr(0, output.size()-1);
     }

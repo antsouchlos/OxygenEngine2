@@ -5,12 +5,21 @@ using namespace OE;
 
 int main(){
         
-    CSL_Interpreter interpreter;
+    CSL_Interpreter* interpreter = new CSL_Interpreter();
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     
     
-    std::shared_ptr<OE_World> world = interpreter.interpretFile("challenge_car.csl");
+    // These boilerplate lines of code are absolutely necessary for proper testing in
+    // the new format
+    std::shared_ptr<OE_World> world = interpreter->interpretFile("challenge_car.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
     t = clock();
     auto a = (world->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
@@ -24,25 +33,20 @@ int main(){
     
     t = clock();
     cout << "CSL TEST BEGIN 2" << endl;
-    std::shared_ptr<OE_World> world2 = interpreter.interpretFile("challenge_car_copy.csl");
+    delete interpreter;
+    interpreter = new CSL_Interpreter();
+    std::shared_ptr<OE_World> world2 = interpreter->interpretFile("challenge_car_copy.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
     t = clock();
     auto b = (world2->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    t = clock();
-    std::vector<float> vertex_buf;
-    std::vector<uint32_t> index_buf;
-    for (const auto& scene : world2->scenes){
-        for (const auto& obj : scene.second->objects){
-            if (obj.second->getType() == "MESH32"){
-                OE_Mesh32* mesh = (OE_Mesh32*)obj.second;
-                vertex_buf = mesh->data.genVertexBuffer();
-                for(const auto& vgroup : mesh->data.triangle_groups){
-                    index_buf = mesh->data.genIndexBuffer(vgroup.first);
-                }
-            }
-        }
-    }
-    cout << "NRE VERTEX/INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    
     world2 = nullptr;
     
     ofstream myfile2;
@@ -52,58 +56,40 @@ int main(){
     
     t = clock();
     cout << "CSL TEST BEGIN 3" << endl;
-    std::shared_ptr<OE_World> world3 = interpreter.interpretFile("csl_very_large_object_test.csl");
+    delete interpreter;
+    interpreter = new CSL_Interpreter();
+    std::shared_ptr<OE_World> world3 = interpreter->interpretFile("csl_very_large_object_test.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
     t = clock();
     auto c = (world3->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    //SDL_Delay(1000);
-    
-    t = clock();
-    std::vector<float> vertex_buf2;
-    std::vector<uint32_t> index_buf2;
-    for (const auto& scene : world3->scenes){
-        for (const auto& obj : scene.second->objects){
-            if (obj.second->getType() == "MESH32"){
-                OE_Mesh32* mesh = (OE_Mesh32*)obj.second;
-                
-                t = clock();
-                vertex_buf2 = mesh->data.genVertexBuffer();
-                cout << "NRE VERTEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-                t = clock();
-                for(const auto& vgroup : mesh->data.triangle_groups){
-                    index_buf2 = mesh->data.genIndexBuffer(vgroup.first);
-                }
-                cout << "NRE INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-            }
-        }
-    }
     
     world3 = nullptr;
-    
+    delete interpreter;
     /*t = clock();
     cout << "CSL TEST BEGIN 4" << endl;
-    world3 = interpreter.interpretFile("csl_2UVMAP_TEST.csl");
+    interpreter = new CSL_Interpreter();
+    world3 = interpreter->interpretFile("csl_2UVMAP_TEST.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
     t = clock();
     auto d = (world3->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     //SDL_Delay(1000);
     
-    t = clock();
-    std::vector<float> vertex_buf3;
-    std::vector<uint32_t> index_buf3;
-    for (const auto& scene : world3->scenes){
-        for (const auto& obj : scene.second->objects){
-            if (obj.second->getType() == "MESH32"){
-                OE_Mesh32* mesh = (OE_Mesh32*)obj.second;
-                vertex_buf3 = mesh->data.genVertexBuffer();
-                for(const auto& vgroup : mesh->data.triangle_groups){
-                    index_buf3 = mesh->data.genIndexBuffer(vgroup.first);
-                }
-            }
-        }
-    }
     cout << "NRE VERTEX/INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    delete world3;//*/
+    world3 = nullptr;//*/
     
     //ofstream myfile3;
     //myfile3.open ("csl_very_large_object_test_copy.csl");

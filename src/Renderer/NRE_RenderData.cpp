@@ -1,6 +1,8 @@
 #include <Renderer/NRE_RendererMain.h>
+#include <OE_API.h>
 
 using namespace std;
+using namespace OE;
 
 bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
     for (auto x: this->render_groups){
@@ -15,38 +17,44 @@ bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
 bool NRE_Renderer::updateData(){
     assert (this->world != nullptr);
     
-    
     // add/change any missing world data
+    OE_Main->lockMutex();
+    auto temp_scenes = OE_World::scenesList.copy();
+    auto temp_objects = OE_World::objectsList.copy();
+    auto temp_materials = OE_World::materialsList.copy();
+    
+    OE_Main->unlockMutex();
+    
     
     // PRELIMINARY WORK
     // only handle the first scene for now with 1 camera and no materials
     bool scene_done = false;
-    for (auto scene: this->world->scenes){
+    for (auto scene: temp_scenes.getKeys()){
         
         vector<size_t> obj_ids;
         
         vector<size_t> camera_ids;
         
-        for (auto material : scene.second->materials){
-            this->handleMaterialData(material.first, material.second);
+        for (auto material : temp_scenes[scene]->materials){
+            this->handleMaterialData(material, temp_materials[material].get());
         }
         
         // first handle objects and lights
-        for (auto obj : scene.second->objects){
-            if (obj.second->getType() == "MESH32"){
-                this->handleMeshData(obj.first, static_cast<OE_Mesh32*>(obj.second));
-                obj_ids.push_back(obj.first);
+        for (auto obj : temp_scenes[scene]->objects){
+            if (temp_objects[obj]->getType() == "MESH32"){
+                this->handleMeshData(obj, static_cast<OE_Mesh32*>(temp_objects[obj].get()));
+                obj_ids.push_back(obj);
             }
-            else if (obj.second->getType() == "LIGHT"){
-                this->handleLightData(obj.first, static_cast<OE_Light*>(obj.second));
+            else if (temp_objects[obj]->getType() == "LIGHT"){
+                this->handleLightData(obj, static_cast<OE_Light*>(temp_objects[obj].get()));
             }
             else{}
         }
         // THEN handle cameras
-        for (auto obj : scene.second->objects){
-            if (obj.second->getType() == "CAMERA"){
-                this->handleCameraData(obj.first, static_cast<OE_Camera*>(obj.second));
-                camera_ids.push_back(obj.first);
+        for (auto obj : temp_scenes[scene]->objects){
+            if (temp_objects[obj]->getType() == "CAMERA"){
+                this->handleCameraData(obj, static_cast<OE_Camera*>(temp_objects[obj].get()));
+                camera_ids.push_back(obj);
             }
             else{}
         }
@@ -81,14 +89,12 @@ bool NRE_Renderer::updateData(){
     
     // remove any obsolete world data
     
-    for (auto obj : this->meshes){
+   /* for (auto obj : this->meshes){
         if (OE_Object::id2name.count(obj.first) == 0){
             this->api->deleteVertexBuffer(this->meshes[obj.first].vbo);
             this->meshes.erase(obj.first);
         }
-    }
-    
-    
+    }*/
     
     return true;
 }

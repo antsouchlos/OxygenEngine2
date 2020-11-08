@@ -6,54 +6,47 @@ using namespace OE;
 int update_monkey_rot(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
-    for (auto scene : OE_Main->world->scenes){
-        for (auto object : scene.second->objects){
-            if (object.second->getType() == "CAMERA"){
-                object.second->current_state.pos_z = object.second->current_state.pos_z - 0.1f;
+    
+        for (auto obj : OE_World::objectsList.getKeys()){
+            if (OE_World::objectsList[obj]->getType() == "CAMERA"){
+                OE_World::objectsList[obj]->current_state.pos_z = OE_World::objectsList[obj]->current_state.pos_z - 0.1f;
                 //object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(0.05f, 1.0f, 0.0f, 0.0f));
             }
         }
-    }
     return 0;
 }
 
 int update_monkey_rot_neg(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
-    for (auto scene : OE_Main->world->scenes){
-        for (auto object : scene.second->objects){
-            if (object.second->getType() == "CAMERA"){
-                object.second->current_state.pos_z = object.second->current_state.pos_z + 0.1f;
+        for (auto obj : OE_World::objectsList.getKeys()){
+            if (OE_World::objectsList[obj]->getType() == "CAMERA"){
+                OE_World::objectsList[obj]->current_state.pos_z = OE_World::objectsList[obj]->current_state.pos_z + 0.1f;
                 //object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(-0.05f, 1.0f, 0.0f, 0.0f));
             }
         }
-    }
     return 0;
 }
 
 int update_monkey_rot_y(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
-    for (auto scene : OE_Main->world->scenes){
-        for (auto object : scene.second->objects){
-            if (OE_Object::id2name[object.first] == "Plane"){
-                object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(0.03f, 1.0f, 0.0f, 0.0f));
+        for (auto obj : OE_World::objectsList.getKeys()){
+            if (OE_World::objectsList.id2name[obj] == "Plane"){
+                OE_World::objectsList[obj]->SetRot(OE_World::objectsList[obj]->GetRot()* OE_QuatFromAxisAngle(0.03f, 1.0f, 0.0f, 0.0f));
             }
         }
-    }
     return 0;
 }
 
 int update_monkey_rot_neg_y(void*, OE_Task*, string event_name){
     //cout << "PRESSED W" << endl;
     // HACK
-     for (auto scene : OE_Main->world->scenes){
-        for (auto object : scene.second->objects){
-            if (OE_Object::id2name[object.first] == "Plane"){
-                object.second->SetRot(object.second->GetRot()* OE_QuatFromAxisAngle(-0.03f, 1.0f, 0.0f, 0.0f));
+        for (auto obj : OE_World::objectsList.getKeys()){
+            if (OE_World::objectsList.id2name[obj] == "Plane"){
+                OE_World::objectsList[obj]->SetRot(OE_World::objectsList[obj]->GetRot()* OE_QuatFromAxisAngle(-0.03f, 1.0f, 0.0f, 0.0f));
             }
         }
-    }
     return 0;
 }
 

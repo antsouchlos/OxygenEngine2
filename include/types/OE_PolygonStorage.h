@@ -122,7 +122,7 @@ class OE_PolygonStorage32 {
         OE_VertexStorage                            vertices;
         bool                                        isDynamic{true};
         std::vector<OE_Triangle32>                  triangles;
-        std::unordered_map<std::size_t, OE_VertexGroup*>      triangle_groups;
+        std::map<std::size_t, OE_VertexGroup*>      triangle_groups;
         
         
         bool changed{false};
