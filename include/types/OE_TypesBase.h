@@ -132,6 +132,8 @@ public:
             output.append(std::to_string(x.first));
             output.append(" ");
             output.append(this->id2name[x.first]);
+            output.append(" ");
+            output.append(std::to_string(this->changed[x.first]));
             output.append("\n");
         }
         
@@ -224,6 +226,16 @@ public:
         return output;
     }
     
+    bool hasChanged(std::size_t id){
+        lockMutex();
+        bool output = false;
+        if (this->changed.count(id) == 1){
+            output = this->changed[id];
+        }
+        unlockMutex();
+        return output;
+    }
+    
     // NOTE: read-only
     std::shared_ptr<T> operator()(std::size_t id){
         std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
@@ -301,6 +313,20 @@ public:
         this->elements.clear();
         this->names.clear();
         this->changed.clear();
+        this->deleted.clear();
+        unlockMutex();
+    }
+    
+    void reset(){
+        lockMutex();
+        for (auto x : this->changed){
+            this->changed[x.first] = false;
+        }
+        unlockMutex();
+    }
+    
+    void clearDeleted(){
+        lockMutex();
         this->deleted.clear();
         unlockMutex();
     }

@@ -47,7 +47,7 @@ void NRE_GPU_API::setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFE
 void NRE_GPU_API::setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t){}
 void NRE_GPU_API::setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t){}
 void NRE_GPU_API::setProgramUniformSlot(std::size_t, std::string, int){}
-void NRE_GPU_API::setUniformState(std::size_t, int, std::size_t, std::size_t){}
+void NRE_GPU_API::setUniformState(std::size_t, std::size_t, int, std::size_t, std::size_t){}
 void NRE_GPU_API::deleteUniformBuffer(std::size_t){}
     
 void NRE_GPU_API::setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>){}

@@ -79,7 +79,7 @@ public:
     void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
     void setProgramUniformSlot(std::size_t, std::string, int);
-    void setUniformState(std::size_t, int, std::size_t, std::size_t);
+    void setUniformState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     void deleteUniformBuffer(std::size_t);
     
     void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);

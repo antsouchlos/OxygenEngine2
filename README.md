@@ -163,7 +163,7 @@ This should get the project started again with the basics working, so as to be a
 Finally the initial TODO list is ready and done! Now i can start working on the renderer properly!
 
 - Basic Material and Lighting support.
-- Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)
+- ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
 - Integration of the ```SDL2_image``` library and basic Texture streaming support with diffuse maps.
 - Integration of the ```SDL2_ttf``` + ```'freetype``` libraries and basic font loading and text-rendering support.
 
