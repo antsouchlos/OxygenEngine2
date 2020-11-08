@@ -23,8 +23,39 @@ bool NRE_Renderer::updateData(){
     auto temp_objects = OE_World::objectsList.copy();
     auto temp_materials = OE_World::materialsList.copy();
     
+    // DONT copy these clearDeleted() and reset() functions to the physics engine, because it will wreak havoc
+    // Copy only those above (of course inside a OE_Main mutex)
+    // The renderer is supposed to handle those deletions
+    OE_World::scenesList.reset();
+    OE_World::objectsList.reset();
+    OE_World::materialsList.reset();
+    
+    OE_World::scenesList.clearDeleted();
+    OE_World::objectsList.clearDeleted();
+    OE_World::materialsList.clearDeleted();
+    
     OE_Main->unlockMutex();
     
+    // remove any obsolete draw commands
+    std::set<std::size_t, std::greater<std::size_t>> to_be_removed;
+    for (size_t i=0; i < this->render_groups.size(); i++){
+        if (!temp_materials.existsID(this->render_groups[i].material)){
+            to_be_removed.insert(i);
+        }
+        if (!temp_objects.existsID(this->render_groups[i].camera)){
+            to_be_removed.insert(i);
+        }
+        if (!temp_objects.existsID(this->render_groups[i].mesh)){
+            to_be_removed.insert(i);
+        }
+    }
+    for (auto x: to_be_removed){
+        this->render_groups.erase(this->render_groups.begin() + x);
+    }
+    //TODO: remove any obsolete objects themselves
+    //for (auto x : std::exchange(temp_objects.deleted, {})){
+    //    
+    //}    
     
     // PRELIMINARY WORK
     // only handle the first scene for now with 1 camera and no materials
@@ -35,26 +66,32 @@ bool NRE_Renderer::updateData(){
         
         vector<size_t> camera_ids;
         
-        for (auto material : temp_scenes[scene]->materials){
-            this->handleMaterialData(material, temp_materials[material].get());
+        for (auto material : temp_scenes(scene)->materials){
+            if (temp_materials.hasChanged(material))
+                this->handleMaterialData(material, temp_materials(material).get());
         }
         
         // first handle objects and lights
-        for (auto obj : temp_scenes[scene]->objects){
-            if (temp_objects[obj]->getType() == "MESH32"){
-                this->handleMeshData(obj, static_cast<OE_Mesh32*>(temp_objects[obj].get()));
-                obj_ids.push_back(obj);
+        for (auto obj : temp_scenes(scene)->objects){
+            if (temp_objects(obj)->getType() == "MESH32"){
+                if (temp_objects.hasChanged(obj)){
+                    this->handleMeshData(obj, static_cast<OE_Mesh32*>(temp_objects(obj).get()));
+                    obj_ids.push_back(obj);
+                }
             }
-            else if (temp_objects[obj]->getType() == "LIGHT"){
-                this->handleLightData(obj, static_cast<OE_Light*>(temp_objects[obj].get()));
+            else if (temp_objects(obj)->getType() == "LIGHT"){
+                if (temp_objects.hasChanged(obj))
+                    this->handleLightData(obj, static_cast<OE_Light*>(temp_objects(obj).get()));
             }
             else{}
         }
         // THEN handle cameras
-        for (auto obj : temp_scenes[scene]->objects){
-            if (temp_objects[obj]->getType() == "CAMERA"){
-                this->handleCameraData(obj, static_cast<OE_Camera*>(temp_objects[obj].get()));
-                camera_ids.push_back(obj);
+        for (auto obj : temp_scenes(scene)->objects){
+            if (temp_objects(obj)->getType() == "CAMERA"){
+                if(temp_objects.hasChanged(obj)){
+                    this->handleCameraData(obj, static_cast<OE_Camera*>(temp_objects(obj).get()));
+                    camera_ids.push_back(obj);
+                }
             }
             else{}
         }
@@ -85,16 +122,6 @@ bool NRE_Renderer::updateData(){
         scene_done = true;
         
     }
-    
-    
-    // remove any obsolete world data
-    
-   /* for (auto obj : this->meshes){
-        if (OE_Object::id2name.count(obj.first) == 0){
-            this->api->deleteVertexBuffer(this->meshes[obj.first].vbo);
-            this->meshes.erase(obj.first);
-        }
-    }*/
     
     return true;
 }

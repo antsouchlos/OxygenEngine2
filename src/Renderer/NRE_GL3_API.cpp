@@ -194,10 +194,13 @@ void NRE_GL3_API::setProgramUniformSlot(std::size_t id, std::string name, int sl
     glUniformBlockBinding(this->progs[id].handle, this->progs[id].hasUniform(name), slot);
 }
 
-void NRE_GL3_API::setUniformState(std::size_t id, int slot, std::size_t offset, std::size_t length){
+void NRE_GL3_API::setUniformState(std::size_t id, std::size_t program, int slot, std::size_t offset, std::size_t length){
     
     assert (this->ubos.count(id) != 0);
     assert ((offset + length <= ubos[id].size));
+    assert (this->progs.count(program) != 0);
+    
+    //glUseProgram(this->progs[program].handle);
     if(length == 0)
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, this->ubos[id].handle);
     else
