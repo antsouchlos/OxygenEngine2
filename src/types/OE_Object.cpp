@@ -1,4 +1,5 @@
 #include <types/OE_Object.h>
+#include <types/OE_World.h>
 
 using namespace std;
 
@@ -8,8 +9,6 @@ std::vector<float> OE_ObjectData::to_arr() const{
 
 
 size_t              OE_Object::current_id = 0;
-unordered_map<size_t, string> OE_Object::id2name;
-OE_Name2ID          OE_Object::name2id = OE_Name2ID(&OE_Object::id2name);
 
 OE_Object::OE_Object(){
     
@@ -20,8 +19,6 @@ OE_Object::OE_Object(){
     this->visible                   = true;
     
     this->id                        = OE_Object::current_id;
-    OE_Object::id2name[this->id]    = "noname_" + to_string(this->id);
-    
 }
 
 
@@ -34,8 +31,6 @@ OE_Object::OE_Object(const string &name){
     this->visible                   = true;
     
     this->id                        = OE_Object::current_id;
-    OE_Object::id2name[this->id]       = name;
-    
 }
 
 OE_Object::~OE_Object(){

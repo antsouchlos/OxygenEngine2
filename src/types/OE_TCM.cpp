@@ -1,4 +1,5 @@
 #include <types/OE_TCM.h>
+#include <types/OE_World.h>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ std::string OE_TCM_Texture::to_str() const{
     string output = outputTypeTag("TCM_Texture", {});
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
-    output.append(outputVar("textureID", "\"" + OE_Texture::id2name[this->textureID] + "\""));
+    output.append(outputVar("textureID", "\"" + OE_World::texturesList.id2name[this->textureID] + "\""));
     output.append("\n");
     
     output.append(outputVar("mode", convert(this->mode)));
@@ -29,8 +30,6 @@ std::string OE_TCM_Texture::to_str() const{
 
 
 size_t OE_TCM::current_id = 0;
-unordered_map<size_t, string> OE_TCM::id2name;
-OE_Name2ID          OE_TCM::name2id = OE_Name2ID(&OE_TCM::id2name);
 
 OE_TCM::OE_TCM(){
     
@@ -42,8 +41,6 @@ OE_TCM::OE_TCM(){
     this->combine_mode              = 0;
     
     this->id                        = OE_TCM::current_id;
-    OE_TCM::id2name[this->id]       = "noname_" + to_string(this->id);
-    
 }
 
 
@@ -56,8 +53,6 @@ OE_TCM::OE_TCM(const string &name){
     this->combine_mode              = 0;
     
     this->id                        = OE_TCM::current_id;
-    OE_TCM::id2name[this->id]       = name;
-    
 }
 
 OE_TCM::~OE_TCM(){
@@ -65,7 +60,7 @@ OE_TCM::~OE_TCM(){
 } 
  
 string OE_TCM::to_str() const{
-    string output = outputTypeTag("TextureCombineMode", {{"name", "\"" + id2name[this->id] + "\""}});
+    string output = outputTypeTag("TextureCombineMode", {{"name", "\"" + OE_World::tcmsList.id2name[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     

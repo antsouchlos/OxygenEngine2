@@ -33,6 +33,13 @@ std::shared_ptr<OE_World> CSL_Interpreter::interpret(string sourceCode) {
     //interpret the Abstract Syntax Tree obtained by parsing "sourceCode"
     auto world = processWorld();
     cout << "CSL TEST INTERPRET: " << (float)(clock()-t1)/CLOCKS_PER_SEC << endl;
+    
+    /*cout << scenesList.to_str() << endl;
+    cout << objectsList.to_str() << endl;
+    cout << materialsList.to_str() << endl;
+    cout << tcmsList.to_str() << endl;
+    cout << texturesList.to_str() << endl;
+    cout << viewportsList.to_str() << endl;//*/
     return world;
 }
 
@@ -63,11 +70,11 @@ std::shared_ptr<OE_World> CSL_Interpreter::processWorld() {
         if (type == "tag") {
             if (id == "Scene") {
                 auto scene = processScene();
-                world->scenes[scene->id] = scene;
+                world->scenes.insert(scene->id);
             } 
             else if (id == "ViewportConfig") {
                 auto vconf = processViewportConfig();
-                world->viewports[vconf->id] = vconf;
+                world->viewports.insert(vconf->id);
             }
             else {
                 throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"World\"");
@@ -78,10 +85,10 @@ std::shared_ptr<OE_World> CSL_Interpreter::processWorld() {
         } 
         else if (type == "assignment") {
              if (id == "loaded_viewport") {
-                world->loaded_viewport = OE_ViewportConfig::name2id[child->args[0]]; 
+                world->loaded_viewport = this->viewportsList.name2id[child->args[0]]; 
             } 
             else if (id == "loaded_scene") {
-                world->loaded_scene = OE_Scene::name2id[child->args[0]];
+                world->loaded_scene = this->scenesList.name2id[child->args[0]];
             } 
             else {
                 throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"World\"");
@@ -99,8 +106,8 @@ std::shared_ptr<OE_World> CSL_Interpreter::processWorld() {
     return world;
 }
 
-OE_Scene* CSL_Interpreter::processScene() {
-    OE_Scene* scene = nullptr;
+std::shared_ptr<OE_Scene> CSL_Interpreter::processScene() {
+    std::shared_ptr<OE_Scene> scene = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -110,28 +117,28 @@ OE_Scene* CSL_Interpreter::processScene() {
         if (type == "tag") {
             assert (scene != nullptr);
             if (id == "Camera") {
-                OE_Camera* camera = processCamera();
-                scene->objects[camera->id] = camera;
+                auto camera = processCamera();
+                scene->objects.insert(camera->id);
             } 
             else if (id == "Light") {
-                OE_Light *light = processLight();
-                scene->objects[light->id] = light;
+                auto light = processLight();
+                scene->objects.insert(light->id);
             } 
             else if (id == "Mesh") {
-                OE_Mesh32 *mesh = processMesh();
-                scene->objects[mesh->id] = mesh;
+                auto mesh = processMesh();
+                scene->objects.insert(mesh->id);
             } 
             else if (id == "Texture") {
-                OE_Texture *texture = processTexture();
-                scene->textures[texture->id] = texture;
+                auto texture = processTexture();
+                scene->textures.insert(texture->id);
             } 
             else if (id == "Material") {
-                OE_Material *material = processMaterial();
-                scene->materials[material->id] = material;
+                auto material = processMaterial();
+                scene->materials.insert(material->id);
             } 
             else if (id == "TextureCombineMode") {
-                OE_TCM *tcm = processTCM();
-                scene->texture_CMs[tcm->id] = tcm;
+                auto tcm = processTCM();
+                scene->texture_CMs.insert(tcm->id);
             } 
             else {
                 throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"" + id + "\" is not an accepted tag-ID in \"Scene\"");
@@ -150,7 +157,8 @@ OE_Scene* CSL_Interpreter::processScene() {
         }
         else if (type == "tagassignment") {
             if (id == "name") {
-                scene = new OE_Scene(child->args[0]);
+                scene = std::make_shared<OE_Scene>(child->args[0]);
+                this->scenesList.append(child->args[0], scene);
             } 
             else {
                 throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID\"" + id + "\" in \"Scene\"");
@@ -161,9 +169,9 @@ OE_Scene* CSL_Interpreter::processScene() {
     return scene;
 }
 
-OE_Camera * CSL_Interpreter::processCamera() {
+std::shared_ptr<OE_Camera> CSL_Interpreter::processCamera() {
     
-    OE_Camera* camera = nullptr;
+    std::shared_ptr<OE_Camera> camera = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -191,7 +199,7 @@ OE_Camera * CSL_Interpreter::processCamera() {
                 camera->far = stof(child->args[0]);
             }
             else if (id == "parent") {
-                camera->parent = OE_Object::name2id[child->args[0]];
+                camera->parent = this->objectsList.name2id[child->args[0]];
             }
             else if (id == "parent_type") {
                 camera->far = stoi(child->args[0]);
@@ -221,7 +229,8 @@ OE_Camera * CSL_Interpreter::processCamera() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                camera = new OE_Camera(child->args[0]);
+                camera = std::make_shared<OE_Camera>(child->args[0]);
+                this->objectsList.append(child->args[0], camera);
             }
             else if (id == "visible"){
                 assert(camera != nullptr);
@@ -236,8 +245,8 @@ OE_Camera * CSL_Interpreter::processCamera() {
     return camera;
 }
 
-OE_Light * CSL_Interpreter::processLight() {
-    OE_Light* light = nullptr;
+std::shared_ptr<OE_Light> CSL_Interpreter::processLight() {
+    std::shared_ptr<OE_Light> light = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -265,7 +274,7 @@ OE_Light * CSL_Interpreter::processLight() {
                 light->fov = stof(child->args[0]);
             }
             else if (id == "parent") {
-                light->parent = OE_Object::name2id[child->args[0]];
+                light->parent = this->objectsList.name2id[child->args[0]];
             }
             else if (id == "parent_type") {
                 light->parent_type = stoi(child->args[0]);
@@ -296,7 +305,7 @@ OE_Light * CSL_Interpreter::processLight() {
             }
             else if (id == "objects"){
                 for (auto& x: child->args){
-                    light->objects.push_back(OE_Object::name2id[x]);
+                    light->objects.push_back(this->objectsList.name2id[x]);
                 } 
             }
             else {
@@ -305,7 +314,8 @@ OE_Light * CSL_Interpreter::processLight() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                light = new OE_Light(child->args[0]);
+                light = std::make_shared<OE_Light>(child->args[0]);
+                this->objectsList.append(child->args[0], light);
             }
             else if (id == "visible"){
                 assert(light != nullptr);
@@ -320,7 +330,7 @@ OE_Light * CSL_Interpreter::processLight() {
     return light;
 }
 
-OE_Mesh32* CSL_Interpreter::processMesh() {
+std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
     
     bool vertices_reserved = false; 
     bool normals_reserved = false;
@@ -335,7 +345,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
     size_t num_of_uvmaps = 0;
     size_t num_of_triangles = 0;
     
-    OE_Mesh32* mesh = nullptr;
+    std::shared_ptr<OE_Mesh32> mesh = nullptr;
     
     for (auto& child : curNode->children) {
         string type = child->type;
@@ -362,7 +372,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
                 assert(uvs_set == true);
                 assert(uvs_set == true);
                 assert(map_chosen == true);
-                processTriangle(mesh, mesh->data.num_of_uvs);
+                processTriangle(mesh.get(), mesh->data.num_of_uvs);
                 
             }
             else if (id == "UVMapData"){
@@ -382,7 +392,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
         else if (type == "assignment") {
             assert (mesh != nullptr);
             if (id == "parent") {
-                mesh->parent = OE_Object::name2id[child->args[0]];
+                mesh->parent = this->objectsList.name2id[child->args[0]];
             }
             else if (id == "parent_type") {
                 mesh->parent_type = stoi(child->args[0]);
@@ -429,7 +439,7 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
             } 
             else if (id == "textureCM_IDs"){
                 for (const auto& x: child->args){
-                    mesh->textureCM_IDs.push_back(OE_TCM::name2id[x]); 
+                    mesh->textureCM_IDs.push_back(OE_World::tcmsList.name2id[x]); 
                 } 
             }
             else if (id == "vertices") {
@@ -450,7 +460,8 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                mesh = new OE_Mesh32(child->args[0]);
+                mesh = std::make_shared<OE_Mesh32>(child->args[0]);
+                this->objectsList.append(child->args[0], mesh);
             } 
             else if (id == "visible"){
                 assert(mesh != nullptr);
@@ -483,13 +494,13 @@ OE_Mesh32* CSL_Interpreter::processMesh() {
             // But ordered map O(logn) is faster on larger objects especially with several uv maps 
             
             if (vnum <= 65536 && nnum <= 65536 && uvnum <= 65536 && tnum*3 <= 65536 && num_of_uvmaps <= 2){
-                mesh->data.initUnorderedIB(mesh);
+                mesh->data.initUnorderedIB(mesh.get());
             } 
             else if (num_of_uvmaps == 0){
-                mesh->data.initUnorderedIB(mesh);
+                mesh->data.initUnorderedIB(mesh.get());
             }
             else{
-                mesh->data.initOrderedIB(mesh);
+                mesh->data.initOrderedIB(mesh.get());
             }
             
             map_chosen = true;
@@ -572,7 +583,7 @@ OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
         else if (type == "assignment") {
             assert(vgroup != nullptr);
             if (id == "material_id") {
-                vgroup->material_id = OE_Material::name2id[child->args[0]];
+                vgroup->material_id = this->materialsList.name2id[child->args[0]]; 
             } 
             else if (id == "bone_id") {
                 vgroup->bone_id = 0;
@@ -689,9 +700,9 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
 }
 
 
-OE_Texture * CSL_Interpreter::processTexture() {
+std::shared_ptr<OE_Texture> CSL_Interpreter::processTexture() {
     
-    OE_Texture* texture = nullptr;
+    std::shared_ptr<OE_Texture> texture = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -709,7 +720,7 @@ OE_Texture * CSL_Interpreter::processTexture() {
                 texture->path = child->args[0];
             } 
             else if (id == "camera") {
-                texture->camera = OE_Camera::name2id[child->args[0]];
+                texture->camera = this->objectsList.name2id[child->args[0]];
             } 
             else {
                 throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"Texture\"");
@@ -720,7 +731,8 @@ OE_Texture * CSL_Interpreter::processTexture() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                texture = new OE_Texture(child->args[0]);
+                texture = std::make_shared<OE_Texture>(child->args[0]);
+                this->texturesList.append(child->args[0], texture);
             } 
             else {
                 throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Texture\"");
@@ -731,9 +743,9 @@ OE_Texture * CSL_Interpreter::processTexture() {
     return texture;
 }
 
-OE_Material * CSL_Interpreter::processMaterial() {
+std::shared_ptr<OE_Material> CSL_Interpreter::processMaterial() {
     
-    OE_Material* material = nullptr;
+    std::shared_ptr<OE_Material> material = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -791,7 +803,7 @@ OE_Material * CSL_Interpreter::processMaterial() {
             assert(material != nullptr);
             if  (id == "textureCM_IDs") {
                 for (const auto& x : child->args)
-                    material->textureCM_IDs.push_back(OE_TCM::name2id[x]);
+                    material->textureCM_IDs.push_back(this->tcmsList.name2id[x]);
             } 
             else {
                 throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"Material\"");
@@ -799,7 +811,8 @@ OE_Material * CSL_Interpreter::processMaterial() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                material = new OE_Material(child->args[0]);
+                material = std::make_shared<OE_Material>(child->args[0]);
+                this->materialsList.append(child->args[0], material);
             } 
             else {
                 throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Material\"");
@@ -810,8 +823,8 @@ OE_Material * CSL_Interpreter::processMaterial() {
     return material;
 }
 
-OE_TCM * CSL_Interpreter::processTCM() {
-    OE_TCM* tcm = nullptr;
+std::shared_ptr<OE_TCM> CSL_Interpreter::processTCM() {
+    std::shared_ptr<OE_TCM> tcm = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -860,7 +873,8 @@ OE_TCM * CSL_Interpreter::processTCM() {
         }
         else if (type == "tagassignment") {
             if (id == "name") {
-                tcm = new OE_TCM(child->args[0]);
+                tcm = std::make_shared<OE_TCM>(child->args[0]);
+                this->tcmsList.append(child->args[0], tcm);
             }
             else {
                 throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
@@ -885,7 +899,7 @@ void CSL_Interpreter::processTCM_Texture(OE_TCM_Texture &tcm_tex) {
         }
         else if (type == "assignment") {
             if (id == "textureID") {
-                tcm_tex.textureID = OE_Texture::name2id(child->args[0]);
+                tcm_tex.textureID = this->texturesList.name2id(child->args[0]);
             }
             else if (id == "mode"){
                 tcm_tex.mode = stoi(child->args[0]);
@@ -910,9 +924,9 @@ void CSL_Interpreter::processTCM_Texture(OE_TCM_Texture &tcm_tex) {
     }
 }
 
-OE_ViewportConfig* CSL_Interpreter::processViewportConfig() {
+std::shared_ptr<OE_ViewportConfig> CSL_Interpreter::processViewportConfig() {
     
-    OE_ViewportConfig* vconf = nullptr;
+    std::shared_ptr<OE_ViewportConfig> vconf = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -931,7 +945,7 @@ OE_ViewportConfig* CSL_Interpreter::processViewportConfig() {
             assert(vconf != nullptr);
             if (id == "cameras") {
                 for (const auto& x: child->args){
-                    vconf->cameras.push_back(OE_Camera::name2id[x]);
+                    vconf->cameras.push_back(this->objectsList.name2id[x]);
                 } 
             } 
             else if (id == "split_screen_positions"){
@@ -955,7 +969,8 @@ OE_ViewportConfig* CSL_Interpreter::processViewportConfig() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                vconf = new OE_ViewportConfig( child->args[0]);
+                vconf = std::make_shared<OE_ViewportConfig>(child->args[0]);
+                this->viewportsList.append(child->args[0], vconf);
             } 
             else {
                 throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"UVMapData\"");
