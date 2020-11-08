@@ -255,9 +255,9 @@ void OE_TaskManager::Destroy(){
     delete this->window;
     
     if (this->world != nullptr)
-        delete this->world;
+        this->world = nullptr;
     if (this->pending_world != nullptr)
-        delete this->pending_world;
+        this->pending_world = nullptr;
     
     this->destroy(); // from OE_MutexCondition
 }
@@ -363,7 +363,7 @@ void OE_TaskManager::updateWorld(){
     lockMutex();
     if (this->pending_world != nullptr){
         if (this->world != nullptr)
-            delete this->world;
+            this->world = nullptr;
         this->world = this->pending_world;
     }
     this->pending_world = nullptr;

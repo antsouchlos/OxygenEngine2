@@ -62,7 +62,7 @@ class OE_RendererBase : public OE_THREAD_SAFETY_OBJECT {
     virtual void destroy();
     
     bool                    isMultiThreaded{false};
-    OE_World*               world{nullptr};
+    std::shared_ptr<OE_World>   world{nullptr};
     OE_WindowSystemBase*    screen{nullptr};
     std::string             name{"default"};
 };
@@ -81,7 +81,7 @@ class OE_PhysicsEngineBase : public OE_THREAD_SAFETY_OBJECT {
     virtual void destroy();
     
     bool                isMultiThreaded{false};
-    OE_World*           world{nullptr};   
+    std::shared_ptr<OE_World>   world{nullptr};
     // You do not actually need this since you can use API functions directly in your 
     // Physics engine .cpp :))
     //OE_EventHandler*    handler{nullptr};
