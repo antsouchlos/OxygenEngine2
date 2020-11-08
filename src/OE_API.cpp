@@ -353,3 +353,40 @@ void OE::OE_ChangeObjectRot(std::string name, OE_Vec4 rot){
         object->unlockMutex();
     }
 }
+
+void OE::OE_ChangeObjectGlobalRot(std::size_t id, OE_Quat rot){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(rot*object->GetRot());
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectGlobalRot(std::size_t id, OE_Vec4 rot){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(OE_QuatFromAxisAngle(rot[0], rot[1], rot[2], rot[3])*object->GetRot());
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Quat rot){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(rot*object->GetRot());
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Vec4 rot){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->SetRot(OE_QuatFromAxisAngle(rot[0], rot[1], rot[2], rot[3])*object->GetRot());
+        object->unlockMutex();
+    }
+}
+

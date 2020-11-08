@@ -117,9 +117,10 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
         this->api->setProgramUniformSlot(ren_group->program, "OE_Material", 2);
         
     }
-    this->api->setUniformState(this->meshes[ren_group->mesh].ubo, 1, 0, 0);
-    this->api->setUniformState(this->cameras[ren_group->camera].ubo, 0, 0, 0);
-    this->api->setUniformState(this->materials[ren_group->material].ubo, 2, 0, 0);
+    
+    this->api->setUniformState(this->meshes[ren_group->mesh].ubo, ren_group->program, 1, 0, 0);
+    this->api->setUniformState(this->cameras[ren_group->camera].ubo, ren_group->program, 0, 0, 0);
+    this->api->setUniformState(this->materials[ren_group->material].ubo, ren_group->program, 2, 0, 0);
     this->api->draw(ren_group->program, this->meshes[ren_group->mesh].vao, this->vgroups[ren_group->vgroup].ibo);
 }
 
