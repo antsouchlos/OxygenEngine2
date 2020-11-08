@@ -9,28 +9,28 @@ OE_InputEventHandler::OE_InputEventHandler(){
 }
 OE_InputEventHandler::~OE_InputEventHandler(){}
 
-void OE_InputEventHandler::createEvents(std::map<std::string, OE_Event*>* event_list){
+void OE_InputEventHandler::createEvents(std::map<std::string, std::shared_ptr<OE_Event>>* event_list){
 
 
     ///generate keyboard events
     for(auto x: this->keyList){
         
         //event for just pressed (sent once per tap)
-        OE_KeyboardEvent* event = new OE_KeyboardEvent();
+        shared_ptr<OE_KeyboardEvent> event = std::make_shared<OE_KeyboardEvent>();
         event->name = "keyboard-" + x.second + "+";
         event->key = x.second;
         event->setFunc(&template_event_func, nullptr);
         event_list[0][event->name] =event;
         
         //event for just release (sent once per release)
-        OE_KeyboardEvent* event1 = new OE_KeyboardEvent();
+        shared_ptr<OE_KeyboardEvent> event1 = std::make_shared<OE_KeyboardEvent>();
         event1->name = "keyboard-" + x.second + "-";
         event1->key = x.second;
         event1->setFunc(&template_event_func, nullptr);
         event_list[0][event1->name] =event1;
         
         //event for hold (sent every frame the key is being held)
-        OE_KeyboardEvent* event2 = new OE_KeyboardEvent();
+        shared_ptr<OE_KeyboardEvent> event2 = std::make_shared<OE_KeyboardEvent>();
         event2->name = "keyboard-" + x.second + "";
         event2->key = x.second;
         event2->setFunc(&template_event_func, nullptr);
@@ -40,21 +40,21 @@ void OE_InputEventHandler::createEvents(std::map<std::string, OE_Event*>* event_
     ///generate mouse events
     for(auto x: this->mouseList){
         //event for just pressed (sent once per tap)
-        OE_MouseEvent* event = new OE_MouseEvent();
+        shared_ptr<OE_MouseEvent> event = std::make_shared<OE_MouseEvent>();
         event->name = "mouse-" + x.second + "+";
         event->key = x.second;
         event->setFunc(&template_event_func, nullptr);
         event_list[0][event->name] =event;
         
         //event for just release (sent once per release)
-        OE_MouseEvent* event1 = new OE_MouseEvent();
+        shared_ptr<OE_MouseEvent> event1 = std::make_shared<OE_MouseEvent>();
         event1->name = "mouse-" + x.second + "-";
         event1->key = x.second;
         event1->setFunc(&template_event_func, nullptr);
         event_list[0][event1->name] =event1;
         
         //event for hold (sent every frame the key is being held)
-        OE_MouseEvent* event2 = new OE_MouseEvent();
+        shared_ptr<OE_MouseEvent> event2 = std::make_shared<OE_MouseEvent>();
         event2->name = "mouse-" + x.second + "";
         event2->key = x.second;
         event2->setFunc(&template_event_func, nullptr);
@@ -62,14 +62,14 @@ void OE_InputEventHandler::createEvents(std::map<std::string, OE_Event*>* event_
     
     }
     ///generate mouse motion event
-    OE_MouseEvent* event3 = new OE_MouseEvent();
+    shared_ptr<OE_MouseEvent> event3 = std::make_shared<OE_MouseEvent>();
     event3->name = "mouse-motion";
     event3->key = "";
     event3->setFunc(&template_event_func, nullptr);
     event_list[0][event3->name] =event3;
 
     ///generate mouse wheel event
-    OE_MouseEvent* event4 = new OE_MouseEvent();
+    shared_ptr<OE_MouseEvent> event4 = std::make_shared<OE_MouseEvent>();
     event4->name = "mouse-wheel";
     event4->key = "";
     event4->setFunc(&template_event_func, nullptr);
@@ -97,9 +97,9 @@ void OE_EventHandler::updateInput(){
 
     for(auto key: this->input_handler.keyList){
     
-        OE_KeyboardEvent* just_pressed = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "+"));
-        OE_KeyboardEvent* just_released = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "-"));
-        OE_KeyboardEvent* held = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + ""));
+        OE_KeyboardEvent* just_pressed = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "+").get());
+        OE_KeyboardEvent* just_released = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "-").get());
+        OE_KeyboardEvent* held = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "").get());
         
         // if button is already pressed once, make it register continuous events
         if(just_pressed->keystate == OE_BUTTON::JUST_PRESS){
@@ -124,9 +124,9 @@ void OE_EventHandler::updateInput(){
     
     for(auto key: this->input_handler.mouseList){
     
-        OE_MouseEvent* just_pressed = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "+"));
-        OE_MouseEvent* just_released = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "-"));
-        OE_MouseEvent* held = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + ""));
+        OE_MouseEvent* just_pressed = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "+").get());
+        OE_MouseEvent* just_released = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "-").get());
+        OE_MouseEvent* held = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "").get());
         
         // if button is already pressed once, make it register continuous events
         if(just_pressed->keystate == OE_BUTTON::JUST_PRESS){
@@ -161,9 +161,9 @@ void OE_EventHandler::updateInputEvents(){
 
                 if (this->event.key.keysym.sym == key.first){
 
-                    OE_KeyboardEvent* just_pressed = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "+"));
-                    OE_KeyboardEvent* just_released = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "-"));
-                    OE_KeyboardEvent* held = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + ""));
+                    OE_KeyboardEvent* just_pressed = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "+").get());
+                    OE_KeyboardEvent* just_released = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "-").get());
+                    OE_KeyboardEvent* held = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "").get());
 
 
                     if(just_pressed->keystate < OE_BUTTON::JUST_PRESS){
@@ -185,9 +185,9 @@ void OE_EventHandler::updateInputEvents(){
 
 				if (this->event.key.keysym.sym == key.first){
 					
-					OE_KeyboardEvent* just_pressed = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "+"));
-					OE_KeyboardEvent* just_released = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "-"));
-					OE_KeyboardEvent* held = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + ""));
+					OE_KeyboardEvent* just_pressed = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "+").get());
+					OE_KeyboardEvent* just_released = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "-").get());
+					OE_KeyboardEvent* held = static_cast<OE_KeyboardEvent*>(getIEvent("keyboard-" + key.second + "").get());
 		
 					
 				    while(just_pressed->keystate < OE_BUTTON::JUST_RELEASE){
@@ -220,9 +220,9 @@ void OE_EventHandler::updateInputEvents(){
         	
         		if (this->event.button.button == key.first){
         		
-        			OE_MouseEvent* just_pressed = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "+"));
-					OE_MouseEvent* just_released = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "-"));
-					OE_MouseEvent* held = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + ""));
+        			OE_MouseEvent* just_pressed = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "+").get());
+					OE_MouseEvent* just_released = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "-").get());
+					OE_MouseEvent* held = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "").get());
 
 
 					if(just_pressed->keystate < OE_BUTTON::PRESS){
@@ -248,9 +248,9 @@ void OE_EventHandler::updateInputEvents(){
             
                 if (this->event.button.button == key.first){
                 
-                    OE_MouseEvent* just_pressed = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "+"));
-                    OE_MouseEvent* just_released = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "-"));
-                    OE_MouseEvent* held = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + ""));
+                    OE_MouseEvent* just_pressed = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "+").get());
+                    OE_MouseEvent* just_released = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "-").get());
+                    OE_MouseEvent* held = static_cast<OE_MouseEvent*>(getIEvent("mouse-" + key.second + "").get());
 
 
                     if(just_pressed->keystate < OE_BUTTON::JUST_RELEASE){

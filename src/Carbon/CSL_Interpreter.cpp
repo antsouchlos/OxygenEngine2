@@ -19,7 +19,7 @@ CSL_Interpreter::~CSL_Interpreter(){
     //    delete this->curNode; // IS THIS ALSO NECESSARY!?
 }
 
-OE_World *CSL_Interpreter::interpret(string sourceCode) {
+std::shared_ptr<OE_World> CSL_Interpreter::interpret(string sourceCode) {
     //parse "sourcecode"
     if (parser != nullptr)
         delete parser;
@@ -31,12 +31,12 @@ OE_World *CSL_Interpreter::interpret(string sourceCode) {
     auto t1 = clock();
     cout << "CSL TEST PARSE: " << (float)(t1 -t)/CLOCKS_PER_SEC << endl;
     //interpret the Abstract Syntax Tree obtained by parsing "sourceCode"
-    OE_World *world = processWorld();
+    auto world = processWorld();
     cout << "CSL TEST INTERPRET: " << (float)(clock()-t1)/CLOCKS_PER_SEC << endl;
     return world;
 }
 
-OE_World *CSL_Interpreter::interpretFile(string pathToFile) {
+std::shared_ptr<OE_World> CSL_Interpreter::interpretFile(string pathToFile) {
 	string sourceCode = "";
 	string line;
     
@@ -50,10 +50,10 @@ OE_World *CSL_Interpreter::interpretFile(string pathToFile) {
 	return interpret(sourceCode);
 }
 
-OE_World* CSL_Interpreter::processWorld() {
+std::shared_ptr<OE_World> CSL_Interpreter::processWorld() {
     
     
-    OE_World* world = new OE_World();
+    std::shared_ptr<OE_World> world = std::make_shared<OE_World>(OE_World());
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
