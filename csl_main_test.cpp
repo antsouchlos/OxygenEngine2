@@ -10,11 +10,11 @@ int main(){
     cout << "CSL TEST BEGIN" << endl;
     
     
-    OE_World* world = interpreter.interpretFile("challenge_car.csl");
+    std::shared_ptr<OE_World> world = interpreter.interpretFile("challenge_car.csl");
     t = clock();
     auto a = (world->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    delete world;
+    world = nullptr;
     
     //OE_WriteToLog(a);
     ofstream myfile;
@@ -24,7 +24,7 @@ int main(){
     
     t = clock();
     cout << "CSL TEST BEGIN 2" << endl;
-    OE_World* world2 = interpreter.interpretFile("challenge_car_copy.csl");
+    std::shared_ptr<OE_World> world2 = interpreter.interpretFile("challenge_car_copy.csl");
     t = clock();
     auto b = (world2->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
@@ -43,7 +43,7 @@ int main(){
         }
     }
     cout << "NRE VERTEX/INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    delete world2;
+    world2 = nullptr;
     
     ofstream myfile2;
     myfile2.open ("challenge_car_copy2.csl");
@@ -52,7 +52,7 @@ int main(){
     
     t = clock();
     cout << "CSL TEST BEGIN 3" << endl;
-    OE_World* world3 = interpreter.interpretFile("csl_very_large_object_test.csl");
+    std::shared_ptr<OE_World> world3 = interpreter.interpretFile("csl_very_large_object_test.csl");
     t = clock();
     auto c = (world3->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
@@ -78,7 +78,7 @@ int main(){
         }
     }
     
-    delete world3;
+    world3 = nullptr;
     
     /*t = clock();
     cout << "CSL TEST BEGIN 4" << endl;

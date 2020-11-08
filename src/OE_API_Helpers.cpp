@@ -11,7 +11,7 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
     delete static_cast<string*>(file);
     
     CSL_Interpreter interpreter;
-    OE_World* loaded_world = interpreter.interpretFile(filename);
+    shared_ptr<OE_World> loaded_world = interpreter.interpretFile(filename);
     
     OE_Main->lockMutex();
     OE_Main->pending_world = loaded_world;

@@ -11,8 +11,8 @@ void OE_ReverseBitset(std::bitset<64>&);
 
 class CSL_Interpreter {
 public:
-	OE_World *interpret(std::string sourceCode);
-	OE_World *interpretFile(std::string pathToFile);
+	std::shared_ptr<OE_World> interpret(std::string sourceCode);
+	std::shared_ptr<OE_World> interpretFile(std::string pathToFile);
     
     ~CSL_Interpreter();
     
@@ -29,7 +29,7 @@ private:
 
 	//a function for each type
 	//the functions are called recursively (processWorld()->processScene()->processCamera->...)
-	OE_World*          processWorld();
+	std::shared_ptr<OE_World>          processWorld();
 	OE_Scene*          processScene();
     OE_Camera*          processCamera();
     OE_Light*           processLight();

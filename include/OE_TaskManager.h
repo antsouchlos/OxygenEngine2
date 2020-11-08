@@ -99,9 +99,9 @@ class OE_TaskManager: public OE_MutexCondition
         OE_PhysicsEngineBase*               physics{nullptr};
         OE_WindowSystemBase*                window{nullptr};
         
-        OE_World*                           world{nullptr};
+        std::shared_ptr<OE_World>   world{nullptr};
         
-        OE_World*                           pending_world{nullptr}; // for loading a world
+        std::shared_ptr<OE_World>   pending_world{nullptr}; // for loading a world
         
         OE_Task                             events_task;
         

@@ -14,8 +14,8 @@ public:
     
     // internal event functions
     void init();
-    OE_Event* getIEvent(std::string); // THIS IS TOTALLY USELESS! WTF WAS I EVEN THINKING??!
-    OE_Event* getIEventUNSAFE(std::string);
+    std::shared_ptr<OE_Event> getIEvent(std::string); // THIS IS TOTALLY USELESS! WTF WAS I EVEN THINKING??!
+    std::shared_ptr<OE_Event> getIEventUNSAFE(std::string);
     
     void createUserEvent(std::string);
     void setIEventFunc(std::string, const OE_EVENTFUNC, void*);
@@ -41,7 +41,7 @@ protected:
 
     OE_InputEventHandler input_handler;
     
-    std::map<std::string, OE_Event*> internal_events;
+    std::map<std::string, std::shared_ptr<OE_Event>> internal_events;
     std::vector<std::string> obsolete_events;
     std::vector<std::string> pending_events;
     

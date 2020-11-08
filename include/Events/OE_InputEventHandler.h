@@ -13,7 +13,7 @@ class OE_InputEventHandler{
 	OE_InputEventHandler();
 	~OE_InputEventHandler();
 	
-	void createEvents(std::map<std::string, OE_Event*>*);
+	void createEvents(std::map<std::string, std::shared_ptr<OE_Event>>*);
 	
 protected:
 	std::vector<std::string> active_events;

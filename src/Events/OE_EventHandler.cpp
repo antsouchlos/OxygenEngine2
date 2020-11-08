@@ -14,23 +14,20 @@ void OE_EventHandler::init(){
 }
 
 OE_EventHandler::~OE_EventHandler(){
-
-	for(auto x: this->internal_events) delete x.second;
     this->internal_events.clear();
-
 }
 
 // THIS IS TOTALLY USELESS
-OE_Event* OE_EventHandler::getIEvent(string a_name){
+std::shared_ptr<OE_Event> OE_EventHandler::getIEvent(string a_name){
    /// wraps getIEventUNSAFE in a mutex, (now in 2020: like... seriously????)
    lockMutex();
 
-   OE_Event* output = getIEventUNSAFE(a_name);
+   std::shared_ptr<OE_Event> output = getIEventUNSAFE(a_name);
    unlockMutex();
    return output;
 }
 
-OE_Event* OE_EventHandler::getIEventUNSAFE(string a_name){
+std::shared_ptr<OE_Event> OE_EventHandler::getIEventUNSAFE(string a_name){
 	/// function to simplify fetching an event by name 
 	/// WARNING: DO NOT USE THE FUNCTION OUTSIDE OF MUTEXES
    
@@ -42,7 +39,7 @@ OE_Event* OE_EventHandler::getIEventUNSAFE(string a_name){
 
 void OE_EventHandler::createUserEvent(string a_name){
 
-	OE_CustomEvent* event = new OE_CustomEvent();
+	std::shared_ptr<OE_CustomEvent> event = std::make_shared<OE_CustomEvent>();
 	event->name = a_name;
 	event->setFunc(&template_event_func, nullptr);
 	
@@ -179,7 +176,6 @@ void OE_EventHandler::cleanup(){
     
     for(auto &a_name: obsolete_events){
         if (getIEventUNSAFE(a_name) != nullptr){
-            delete internal_events[a_name];
             internal_events.erase(a_name);
         }
     }
