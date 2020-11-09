@@ -207,6 +207,7 @@ void OE_EventHandler::updateInputEvents(){
         	
         	//fetch mouse position, since this IS needed
         	SDL_GetMouseState(&OE_MouseEvent::x, &OE_MouseEvent::y);
+
         	SDL_GetRelativeMouseState(&OE_MouseEvent::delta_x, &OE_MouseEvent::delta_y);
         	//cout << "MOUSE_MOTION EVENt" << endl;
         	this->broadcastIEvent("mouse-motion", nullptr);

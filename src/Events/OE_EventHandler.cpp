@@ -44,7 +44,9 @@ void OE_EventHandler::createUserEvent(string a_name){
 	event->setFunc(&template_event_func, nullptr);
 	
 	lockMutex();
-	internal_events[a_name] = event;
+    if (internal_events.count(a_name) == 0){
+        internal_events[a_name] = event;
+    }
 	unlockMutex();
 }
 

@@ -5,14 +5,6 @@ using namespace std;
 
 OE_TaskManager* OE_ThreadData::taskMgr = nullptr;
 
-/*int test_unsync_thread(void* data, OE_Task task){
-    
-    SDL_Delay(6000);
-    cout << "THIS THREAD IS FINISHED" << endl;
-    
-    return 0;
-}*/
-
 
 extern "C" int oxygen_engine_update_thread(void* data){
 
