@@ -29,30 +29,25 @@ std::string OE_TCM_Texture::to_str() const{
 }
 
 
-size_t OE_TCM::current_id = 0;
+std::atomic<std::size_t> OE_TCM::current_id(0);
 
 OE_TCM::OE_TCM(){
-    
-    OE_TCM::current_id++;
-    
     
     this->r                         = 0.0f; this->g = 0.0f; this->b = 0.0f; this->a = 0.0f;
     this->texture_array             = false;
     this->combine_mode              = 0;
     
-    this->id                        = OE_TCM::current_id;
+    this->id                        = ++OE_TCM::current_id;
 }
 
 
 OE_TCM::OE_TCM(const string &name){
-    
-    OE_TCM::current_id++;
-    
+
     this->r                         = 0.0f; this->g = 0.0f; this->b = 0.0f; this->a = 0.0f;
     this->texture_array             = false;
     this->combine_mode              = 0;
     
-    this->id                        = OE_TCM::current_id;
+    this->id                        = ++OE_TCM::current_id;
 }
 
 OE_TCM::~OE_TCM(){
