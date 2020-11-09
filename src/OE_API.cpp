@@ -100,6 +100,23 @@ void OE::OE_Pause(int x){
     OE_Main->pause(x);
 }
 
+bool OE::OE_IsMouseLocked(){
+    return OE_Main->window->getMouseLockedState();
+}
+
+void OE::OE_MouseLock(){
+    
+    OE_CreateEvent("mouse-lock");
+    OE_SetEventFunc("mouse-lock", &OE_API_Helpers::manage_mouse, nullptr);
+    OE_BroadcastEvent("mouse-lock", nullptr);
+    
+}
+void OE::OE_MouseUnlock(){
+    OE_CreateEvent("mouse-unlock");
+    OE_SetEventFunc("mouse-unlock", &OE_API_Helpers::manage_mouse, nullptr);
+    OE_BroadcastEvent("mouse-unlock", nullptr);
+}
+
 //------------------------BLOCK-------------------------//
 
 OE_Task OE::OE_GetTaskInfo(std::string thread, std::string task){

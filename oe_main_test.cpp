@@ -39,6 +39,16 @@ int update_monkey_rot_neg_z(void*, OE_Task*, string event_name){
     return 0;
 }
 
+int toggle_mouse_locked_state(void*, OE_Task*, string event_name){
+    
+    if (OE_IsMouseLocked()){
+        OE_MouseUnlock();
+    } else {
+        OE_MouseLock();
+    }
+    return 0;
+}
+
 int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     cout << "SUCCESSFULLY loaded '" << event_name << "'" << endl;
     OE_SetEventFunc("keyboard-w", &update_monkey_rot, nullptr);
@@ -54,6 +64,8 @@ int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     OE_SetEventFunc("keyboard-d+", &update_monkey_rot_neg_x, nullptr);
     OE_SetEventFunc("keyboard-q+", &update_monkey_rot_z, nullptr);
     OE_SetEventFunc("keyboard-e+", &update_monkey_rot_neg_z, nullptr);
+    OE_SetEventFunc("keyboard-space+", &toggle_mouse_locked_state, nullptr);
+    
     
     return 0;
 }

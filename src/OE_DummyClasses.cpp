@@ -18,6 +18,10 @@ bool OE_WindowSystemBase::init(int x, int y, string titlea, bool isFullscreen, v
     return true;
 }
 
+bool OE_WindowSystemBase::getMouseLockedState(){return mouse_locked;}
+void OE_WindowSystemBase::lockMouse(){}
+void OE_WindowSystemBase::unlockMouse(){}
+
 bool OE_WindowSystemBase::update(){
     return true;
 }

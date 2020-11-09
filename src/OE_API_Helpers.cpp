@@ -25,3 +25,14 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
     OE_BroadcastEvent("loaded-" + filename, nullptr);
     return 0;
 }
+
+int OE_API_Helpers::manage_mouse(void* data, OE_Task* task, std::string event_name){
+    
+    if (event_name == "mouse-lock"){
+        OE_Main->window->lockMouse();
+    }
+    else if (event_name == "mouse-unlock"){
+        OE_Main->window->unlockMouse();
+    }
+    return 0;
+}
