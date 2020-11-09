@@ -8,29 +8,25 @@ std::vector<float> OE_ObjectData::to_arr() const{
 }
 
 
-size_t              OE_Object::current_id = 0;
+std::atomic<size_t> OE_Object::current_id(0);
 
 OE_Object::OE_Object(){
-    
-    OE_Object::current_id++;
     
     this->parent                    = 0;
     this->parent_type               = 0;
     this->visible                   = true;
     
-    this->id                        = OE_Object::current_id;
+    this->id                        = ++OE_Object::current_id;
 }
 
 
 OE_Object::OE_Object(const string &name){
     
-    OE_Object::current_id++;
-    
     this->parent                    = 0;
     this->parent_type               = 0;
     this->visible                   = true;
     
-    this->id                        = OE_Object::current_id;
+    this->id                        = ++OE_Object::current_id;
 }
 
 OE_Object::~OE_Object(){

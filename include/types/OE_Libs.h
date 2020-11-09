@@ -48,5 +48,6 @@
 #include <ctime>
 #include <bitset>
 #include <memory>
+#include <atomic>
 
 #endif // OE_LIBS_H_INCLUDED

@@ -4,22 +4,18 @@
 
 using namespace std;
 
-size_t              OE_ViewportConfig::current_id = 0;
+std::atomic<std::size_t> OE_ViewportConfig::current_id(0);
 
 OE_ViewportConfig::OE_ViewportConfig(){
     
-    OE_ViewportConfig::current_id++;
-    
-    this->id                                = OE_ViewportConfig::current_id;
+    this->id                                = ++OE_ViewportConfig::current_id;
     
 }
 
 
 OE_ViewportConfig::OE_ViewportConfig(const string &name){
-    
-    OE_ViewportConfig::current_id++;
-    
-    this->id                                = OE_ViewportConfig::current_id;    
+
+    this->id                                = ++OE_ViewportConfig::current_id;    
 }
 
 OE_ViewportConfig::~OE_ViewportConfig(){

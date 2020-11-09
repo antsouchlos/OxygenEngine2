@@ -5,31 +5,27 @@
 using namespace std;
 
 
-size_t              OE_Texture::current_id = 0;
+std::atomic<std::size_t> OE_Texture::current_id(0);
 
 OE_Texture::OE_Texture(){
-    
-    OE_Texture::current_id++;
     
     this->source                    = 0;
     this->path                      = "";
     this->camera                    = 0;
     this->custom_data               = nullptr;
     
-    this->id                        = OE_Texture::current_id;
+    this->id                        = ++OE_Texture::current_id;
 }
 
 
 OE_Texture::OE_Texture(const string &name){
     
-    OE_Texture::current_id++;
-    
     this->source                    = 0;
     this->path                      = "";
     this->camera                    = 0;
     this->custom_data               = nullptr;
     
-    this->id                        = OE_Texture::current_id;
+    this->id                        = ++OE_Texture::current_id;
 }
 
 OE_Texture::~OE_Texture(){

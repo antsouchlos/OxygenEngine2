@@ -9,7 +9,7 @@ class OE_Material : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     friend class NRE_Renderer;
     
     public:
-        static std::size_t current_id;
+        static std::atomic<std::size_t> current_id;
         std::size_t id;
         
         
