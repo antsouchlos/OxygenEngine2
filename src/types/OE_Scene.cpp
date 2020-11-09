@@ -3,21 +3,17 @@
 
 using namespace std;
 
-size_t OE_Scene::current_id = 0;
+std::atomic<std::size_t> OE_Scene::current_id(0);
 
 OE_Scene::OE_Scene(){
     
-    OE_Scene::current_id++;
-    
-    this->id                        = OE_Scene::current_id;
+    this->id                        = ++OE_Scene::current_id;
 }
 
 
 OE_Scene::OE_Scene(const string &name){
-    
-    OE_Scene::current_id++;
-    
-    this->id                        = OE_Scene::current_id;
+
+    this->id                        = ++OE_Scene::current_id;
 }
 
 OE_Scene::~OE_Scene(){

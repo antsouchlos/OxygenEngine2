@@ -47,6 +47,14 @@ int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     OE_SetEventFunc("keyboard-d", &update_monkey_rot_neg_x, nullptr);
     OE_SetEventFunc("keyboard-q", &update_monkey_rot_z, nullptr);
     OE_SetEventFunc("keyboard-e", &update_monkey_rot_neg_z, nullptr);
+    
+    OE_SetEventFunc("keyboard-w+", &update_monkey_rot, nullptr);
+    OE_SetEventFunc("keyboard-s+", &update_monkey_rot_neg, nullptr);
+    OE_SetEventFunc("keyboard-a+", &update_monkey_rot_x, nullptr);
+    OE_SetEventFunc("keyboard-d+", &update_monkey_rot_neg_x, nullptr);
+    OE_SetEventFunc("keyboard-q+", &update_monkey_rot_z, nullptr);
+    OE_SetEventFunc("keyboard-e+", &update_monkey_rot_neg_z, nullptr);
+    
     return 0;
 }
 
@@ -55,6 +63,7 @@ int main(){
     OE_Init("Oxygen Engine Demo", 1280, 720, false);
     OE_Pause(20);
     OE_LoadWorld("OE_Mat_light_test.csl", &OnLoadObject, nullptr);
+    //OE_LoadWorld("challenge_car.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("monkeys.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
