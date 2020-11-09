@@ -390,3 +390,29 @@ void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Vec4 rot){
     }
 }
 
+void OE::OE_ChangeObjectLocalPos(std::size_t id, OE_Vec3 pos){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        OE_Mat3x3 rot_matrix = object->GetModelMatrix();
+        auto local_pos = rot_matrix * pos;
+        object->current_state.pos_x = object->current_state.pos_x + local_pos.x;
+        object->current_state.pos_y = object->current_state.pos_y + local_pos.y;
+        object->current_state.pos_z = object->current_state.pos_z + local_pos.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectLocalPos(std::string name, OE_Vec3 pos){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        OE_Mat3x3 rot_matrix = object->GetModelMatrix();
+        auto local_pos = rot_matrix * pos;
+        object->current_state.pos_x = object->current_state.pos_x + local_pos.x;
+        object->current_state.pos_y = object->current_state.pos_y + local_pos.y;
+        object->current_state.pos_z = object->current_state.pos_z + local_pos.z;
+        object->unlockMutex();
+    }
+}
+
