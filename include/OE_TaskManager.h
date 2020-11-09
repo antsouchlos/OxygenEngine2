@@ -30,6 +30,8 @@ struct OE_ThreadData{
 struct OE_UnsyncThreadData{
     OE_METHOD func;
     void* data;
+    OE_TaskManager* taskMgr;
+    std::string name;
 };
 
 struct OE_ThreadStruct {
@@ -80,12 +82,13 @@ class OE_TaskManager: public OE_MutexCondition
         ~OE_TaskManager();
 
         // stores threads by their name
-        std::map<std::string, struct OE_ThreadStruct>     threads = {};
+        std::map<std::string, struct OE_ThreadStruct>   threads = {};
         std::map<std::string,    SDL_Thread*>           threadIDs = {};
 
         // stores threads which should not be synchronized
         //std::map<std::string, struct OE_ThreadStruct>  unsync_threads = {};
-        std::map<std::string,    SDL_Thread*>        unsync_threadIDs = {};
+        std::map<std::string,    SDL_Thread*>       unsync_threadIDs = {};
+        std::set<std::string>                       finished_unsync_threadIDs = {};
         
         std::map<std::string, std::string> active_tasks = {};
         
@@ -141,6 +144,7 @@ class OE_TaskManager: public OE_MutexCondition
 
         void updateThread(const std::string);
         
+        void removeFinishedUnsyncThreads();
 
     protected:
         int getReadyThreads();

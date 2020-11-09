@@ -35,6 +35,9 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     // execute detached threads
     OE_UnsyncThreadData* actual_data = static_cast<OE_UnsyncThreadData*>(data);
     int output = actual_data->func(actual_data->data, OE_Task());
+    actual_data->taskMgr->lockMutex();
+    actual_data->taskMgr->finished_unsync_threadIDs.insert(actual_data->name);
+    actual_data->taskMgr->unlockMutex();
     delete actual_data;
     return output;
 }
@@ -113,8 +116,11 @@ void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func
     OE_UnsyncThreadData* threaddata = new OE_UnsyncThreadData();
     threaddata->func = func;
     threaddata->data = params;
+    threaddata->name = thread_name;
+    threaddata->taskMgr = this;
+    lockMutex();
     this->unsync_threadIDs[thread_name] = SDL_CreateThread(oxygen_engine_update_unsync_thread, thread_name.c_str(), (void*)threaddata);
-    
+    unlockMutex();
 }
 
 void OE_TaskManager::CreateNewThread(string thread_name){
@@ -137,6 +143,18 @@ void OE_TaskManager::CreateNewThread(string thread_name){
     else //USELESS
         this->unsync_threadIDs[thread_name] = SDL_CreateThread(oxygen_engine_update_thread, thread_name.c_str(), (void*)data);
     
+    unlockMutex();
+}
+
+// This is for removing finished unsynchronized threads
+// Otherwise they will pile up and waste memory on longer gaming sessions
+void OE_TaskManager::removeFinishedUnsyncThreads(){
+    lockMutex();
+    for (const auto &x: this->finished_unsync_threadIDs){
+        SDL_DetachThread(this->unsync_threadIDs[x]);
+        this->unsync_threadIDs.erase(x);
+    }
+    this->finished_unsync_threadIDs.clear();
     unlockMutex();
 }
 
@@ -163,7 +181,10 @@ void OE_TaskManager::Step(){
     this->window->update();
     // count how many times the step function has been called
     countar++;
-
+    
+    // THIS is where obsolete unsync threads are cleaned up
+    this->removeFinishedUnsyncThreads();
+    
     lockMutex();
     completed_threads++;
 

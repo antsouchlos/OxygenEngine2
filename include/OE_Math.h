@@ -36,6 +36,7 @@
 typedef glm::vec4 OE_Vec4;
 typedef glm::vec3 OE_Vec3;
 typedef glm::mat4 OE_Mat4x4;
+typedef glm::mat3 OE_Mat3x3;
 typedef glm::quat OE_Quat;
 
 #define OE_Pi2         glm::half_pi

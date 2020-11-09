@@ -91,6 +91,9 @@ namespace OE{
     void OE_ChangeObjectGlobalRot(std::size_t, OE_Vec4);
     void OE_ChangeObjectGlobalRot(std::string, OE_Quat);
     void OE_ChangeObjectGlobalRot(std::string, OE_Vec4);
+    
+    void OE_ChangeObjectLocalPos(std::size_t, OE_Vec3);
+    void OE_ChangeObjectLocalPos(std::string, OE_Vec3);
 };
 
 
