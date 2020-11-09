@@ -45,6 +45,10 @@ namespace OE{
     
     void OE_Pause(int);
     
+    bool OE_IsMouseLocked();
+    void OE_MouseLock();
+    void OE_MouseUnlock();
+    
     //------------------------BLOCK-------------------------//
     
     OE_Task OE_GetTaskInfo(std::string, std::string);

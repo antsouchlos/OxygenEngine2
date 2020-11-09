@@ -30,6 +30,10 @@ public:
     virtual bool init(int, int, std::string, bool, void*);
     virtual bool update();
     
+    virtual bool getMouseLockedState();
+    virtual void lockMouse();
+    virtual void unlockMouse();
+    
     virtual bool updateEvents();
     virtual void destroy();
     
@@ -44,6 +48,8 @@ public:
     std::string title;
     bool fullscreen{false};
     int major{0}; int minor{0}; bool isES{false};
+    
+    bool mouse_locked{false};
 };
 
 /** This is a dummy class aimed to be a base class for

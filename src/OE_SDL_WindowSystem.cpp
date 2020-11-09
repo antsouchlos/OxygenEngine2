@@ -121,6 +121,27 @@ void OE_SDL_WindowSystem::finishInit(){
     
 }
 
+bool OE_SDL_WindowSystem::getMouseLockedState(){
+    lockMutex();
+    bool output = mouse_locked;
+    unlockMutex();
+    return output;
+}
+
+void OE_SDL_WindowSystem::lockMouse(){
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+    lockMutex();
+    this->mouse_locked = true;
+    unlockMutex();
+}
+
+void OE_SDL_WindowSystem::unlockMouse(){
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    lockMutex();
+    this->mouse_locked = false;
+    unlockMutex();
+}
+
 bool OE_SDL_WindowSystem::update(){
     
     this->counter++;
