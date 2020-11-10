@@ -4,7 +4,7 @@
 
 #include <Events/OE_InputEventHandler.h>
 
-class OE_EventHandler: OE_THREAD_SAFETY_OBJECT{
+class OE_EventHandler: public OE_THREAD_SAFETY_OBJECT{
 public:
     
     friend class OE_TaskManager;
@@ -27,6 +27,9 @@ public:
     int callIEvent(std::string, OE_Task*, void*);
     void destroyIEvent(std::string);
     
+    std::size_t getEventActivations(std::string);
+    std::size_t getEventCounter(std::string);
+    
     void updateInput();
     bool update();
     void cleanup();
@@ -46,6 +49,8 @@ protected:
     std::vector<std::string> pending_events;
     
     std::vector<std::string> happened_events;
+    std::unordered_map<std::string, std::size_t> happened_events_counter;
+    
     uint8_t index = -1;
     
     bool mouse_moved{false};

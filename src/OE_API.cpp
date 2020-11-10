@@ -89,7 +89,73 @@ void OE::OE_SetEventFunc(std::string name, const OE_EVENTFUNC func, void* data){
     assert (OE_Main != nullptr);
     OE_Main->event_handler.setIEventFunc(name, func, data);
 }
+
+size_t OE::OE_GetEventActivations(std::string name){
+    assert (OE_Main != nullptr);
+    return OE_Main->event_handler.getEventActivations(name);
+}
+
+size_t OE::OE_GetEventCounter(std::string name){
+    assert (OE_Main != nullptr);
+    return OE_Main->event_handler.getEventCounter(name);
+}
+
+bool OE::OE_IsKeyJustPressed(std::string key){
+    assert (OE_Main != nullptr);
+    return OE_GetEventActivations(key+"+") > 0;
+}
+
+bool OE::OE_IsKeyJustReleased(std::string key){
+    assert (OE_Main != nullptr);
+    return OE_GetEventActivations(key+"-") > 0;
+}
     
+bool OE::OE_IsKeyHeld(std::string key){
+    assert (OE_Main != nullptr);
+    return OE_GetEventActivations(key) > 0;
+}
+
+bool OE::OE_IsKeyPressed(std::string key){
+    assert (OE_Main != nullptr);
+    return (OE_GetEventActivations(key) > 0) || (OE_GetEventActivations(key+"+") > 0);
+}
+
+bool OE::OE_IsMouseMoved(){
+    return OE_GetEventActivations("mouse-motion") > 0;
+}
+
+int OE::OE_GetDeltaMouseX(){
+    assert (OE_Main != nullptr);
+    OE_Main->event_handler.lockMutex();
+    int output = OE_MouseEvent::delta_x;
+    OE_Main->event_handler.unlockMutex();
+    return output;
+}
+
+int OE::OE_GetDeltaMouseY(){
+    assert (OE_Main != nullptr);
+    OE_Main->event_handler.lockMutex();
+    int output = OE_MouseEvent::delta_y;
+    OE_Main->event_handler.unlockMutex();
+    return output;
+}
+    
+int OE::OE_GetMouseX(){
+    assert (OE_Main != nullptr);
+    OE_Main->event_handler.lockMutex();
+    int output = OE_MouseEvent::x;
+    OE_Main->event_handler.unlockMutex();
+    return output;
+}
+
+int OE::OE_GetMouseY(){
+    assert (OE_Main != nullptr);
+    OE_Main->event_handler.lockMutex();
+    int output = OE_MouseEvent::y;
+    OE_Main->event_handler.unlockMutex();
+    return output;
+}
+
 void OE::OE_DestroyEvent(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->event_handler.destroyIEvent(name);

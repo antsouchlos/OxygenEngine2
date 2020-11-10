@@ -91,8 +91,10 @@ bool OE_EventHandler::update(){
     }
     if(this->mouse_moved){
         //fetch mouse position, since this IS needed
+        lockMutex();
         SDL_GetMouseState(&OE_MouseEvent::x, &OE_MouseEvent::y);
         SDL_GetRelativeMouseState(&OE_MouseEvent::delta_x, &OE_MouseEvent::delta_y);
+        unlockMutex();
         this->broadcastIEvent("mouse-motion", nullptr);
     }
     // This is needed to support things like OE_Finish()
