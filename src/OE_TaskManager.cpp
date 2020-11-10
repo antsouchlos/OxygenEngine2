@@ -5,6 +5,13 @@ using namespace std;
 
 OE_TaskManager* OE_ThreadData::taskMgr = nullptr;
 
+OE_ThreadStruct::OE_ThreadStruct(){
+    
+}
+
+OE_ThreadStruct::~OE_ThreadStruct(){
+    
+}
 
 extern "C" int oxygen_engine_update_thread(void* data){
 
@@ -118,14 +125,16 @@ void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func
 void OE_TaskManager::CreateNewThread(string thread_name){
     
     bool synchro = true;
-    OE_ThreadStruct defaultThread = OE_ThreadStruct();
-    defaultThread.synchronize = synchro;
-    defaultThread.changed = true;
+    //OE_ThreadStruct defaultThread = OE_ThreadStruct();
+    //defaultThread.synchronize = synchro;
+    //defaultThread.changed = true;
     
     lockMutex();
     
-    this->threads[thread_name] = defaultThread;
-
+    this->threads[thread_name] = OE_ThreadStruct();
+    this->threads[thread_name].synchronize = true;
+    this->threads[thread_name].changed = true;
+    
     OE_ThreadData::taskMgr = this;
     OE_ThreadData* data = new OE_ThreadData();
     data->name = thread_name;
@@ -360,11 +369,13 @@ void OE_TaskManager::updateThread(const string name){
 int OE_TaskManager::getReadyThreads(){
     /// count ALL (i repeat) AAALLLLL threads that are set to be synchronized together
     unsigned int number_of_threads=0;
-    for(auto thread: threads){
+    // WARNING: For some reason this causes a segmentation fault sometimes and i have no idea why
+    /*for(auto thread: threads){
         if(thread.second.synchronize){
             number_of_threads+=1;
         }
-    }
+    }*/
+    number_of_threads = this->threads.size();
     return number_of_threads;
 }
 
@@ -474,14 +485,16 @@ OE_Task OE_TaskManager::GetTaskInfo(string threadname, string name){
 
 void OE_TaskManager::runThreadTasks(const std::string& name){
     unsigned int tasks_size = this->threads[name].functions.size();
+    
 	//this->event_handler.updateEventThreads(nullptr);
     // after updating the task queue start executing the functions
     if( tasks_size != 0){
         
         vector<unsigned int> obsolete_tasks;
         for(unsigned int task= 0; task< this->threads[name].task_queue.size(); task++){
-
-            OE_ThreadStruct temp = this->threads[name];
+            
+            auto temp = this->threads[name];
+            //OE_ThreadStruct temp = this->threads[name];
             // store active task
             this->active_tasks[name] = this->threads[name].tasks[task].GetName();
             this->threads[name].tasks[task].update();
@@ -489,7 +502,8 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             int output = 0;
             #ifdef FE_DEBUG
             try{
-                output =  temp.functions[task](temp.task_data[task], temp.tasks[task]);
+                if (this->threads[name].functions[task] != nullptr)
+                    output =  this->threads[name].functions[task](this->threads[name].task_data[task], this->threads[name].tasks[task]);
             } 
             catch(runtime_error& exc){
                 /// universal error handling. will catch any error inherited from std::runtime_error
@@ -499,7 +513,8 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
                 output = 1;
             }
             #else
-            output = temp.functions[task](temp.task_data[task], temp.tasks[task]);
+            if (this->threads[name].functions[task] != nullptr)
+                output = this->threads[name].functions[task](this->threads[name].task_data[task], this->threads[name].tasks[task]);
             #endif
             //cout << name << endl;
             switch(output){
@@ -507,6 +522,8 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             }
             //this->event_handler.updateEventThreads(nullptr);
         }
+        
+        
         
         for(auto task : obsolete_tasks){
             this->threads[name].functions.erase(this->threads[name].functions.begin()+task);
