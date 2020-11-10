@@ -48,7 +48,7 @@ protected:
     std::vector<std::string> happened_events;
     uint8_t index = -1;
     
-    
+    bool mouse_moved{false};
     //SDL specific
     SDL_Event event;
     
