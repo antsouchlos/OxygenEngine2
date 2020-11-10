@@ -23,13 +23,13 @@ class OE_Task
         void update();
 
     protected:
-        int counter;
-        int priority;
-        int delay;
-        long long delta_ticks;
+        int counter{0};
+        int priority{0};
+        int delay{0};
+        long long delta_ticks{0};
         std::string name;
-        int init_ticks;
-        int ticks;
+        int init_ticks{0};
+        int ticks{0};
 };
 
 #endif

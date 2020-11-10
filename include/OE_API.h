@@ -45,6 +45,25 @@ namespace OE{
     
     void OE_Pause(int);
     
+    // for events in general
+    size_t OE_GetEventActivations(std::string);
+    size_t OE_GetEventCounter(std::string);
+    
+    // for keyboard and mouse events
+    bool OE_IsKeyJustPressed(std::string);
+    bool OE_IsKeyJustReleased(std::string);
+    
+    bool OE_IsKeyHeld(std::string);
+    bool OE_IsKeyPressed(std::string);
+    
+    bool OE_IsMouseMoved();
+
+    int OE_GetDeltaMouseX();
+    int OE_GetDeltaMouseY();
+    
+    int OE_GetMouseX();
+    int OE_GetMouseY();
+    
     bool OE_IsMouseLocked();
     void OE_MouseLock();
     void OE_MouseUnlock();
@@ -70,9 +89,12 @@ namespace OE{
     
     std::set<std::size_t>   OE_GetSceneObjects(std::size_t);
     OE_Vec3                 OE_GetObjectPos(std::size_t);
+    OE_Vec3                 OE_GetObjectModelMatrix(std::size_t);
     OE_Quat                 OE_GetObjectRot(std::size_t);
+    
     std::set<std::size_t>   OE_GetSceneObjects(std::string);
     OE_Vec3                 OE_GetObjectPos(std::string);
+    OE_Vec3                 OE_GetObjectModelMatrix(std::string);
     OE_Quat                 OE_GetObjectRot(std::string);
     
     void OE_SetObjectPos(std::size_t, OE_Vec3);

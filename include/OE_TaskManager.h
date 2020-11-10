@@ -41,6 +41,9 @@ struct OE_ThreadStruct {
      * - the pointer methods to execute which represent an FTask
      * - a boolean to make the thread asynchronous
      */
+    
+    OE_ThreadStruct();
+    virtual ~OE_ThreadStruct();
 
     std::vector<OE_Task>        tasks;
     std::vector<OE_METHOD>      functions;
