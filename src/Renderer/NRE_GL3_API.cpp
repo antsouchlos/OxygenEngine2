@@ -372,7 +372,6 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         glGetActiveUniformBlockName(this->progs[id].handle, ida, name_length, NULL, &ubo_name[0]);
 
         string actual_name = string(ubo_name);
-        OE_WriteToLog(actual_name);
         auto ubo_state = NRE_GL3_ProgramUniformState();
         ubo_state.name = actual_name;
         ubo_state.slot = -1;
