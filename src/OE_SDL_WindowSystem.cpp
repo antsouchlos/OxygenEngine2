@@ -102,6 +102,9 @@ void OE_SDL_WindowSystem::finishInit(){
     printf("Renderer: %s\n", glGetString(GL_RENDERER));
     printf("Version:  %s\n", glGetString(GL_VERSION));
     
+    OE_WriteToLog(string("Vendor:   ") + string((const char*)glGetString(GL_VENDOR)) + "\n");
+    OE_WriteToLog(string("Renderer: ") + string((const char*)glGetString(GL_RENDERER)) + "\n");
+    OE_WriteToLog(string("Version:  ") + string((const char*)glGetString(GL_VERSION)) + "\n");
     SDL_GL_SetSwapInterval(1);
     
     glEnable( GL_BLEND );
