@@ -248,7 +248,7 @@ Run ```diff challenge_car_copy.csl challenge_car_copy2.csl``` to verify correctn
 The rendere, types and engine itself are now ready for the introduction of the physics engine. :)
 Now all work into physics, renderer, the engine itself and the interpreter/parser can happen independently of one another.
 
-To do this you should first subclass ```OE_PhysicsEngineBase``` found in ```OE_TypesBase.h``` and implement the virtual functions.
+To do this you should first subclass ```OE_PhysicsEngineBase``` found in ```OE_DummyClasses.h``` and implement the virtual functions.
 You will have access to all objects through the API if you wish, which is in ```OE_API.h```. (You can include that in your .cpp files.)
 To get and idea how you can do it you can take a look at ```Renderer/NRE_RenderData.cpp```.
 
