@@ -33,6 +33,54 @@ bool NRE_Renderer::init(){
 }
 
 bool NRE_Renderer::updateSingleThread(){
+    
+    // upload mesh data to the GPU
+    for (auto mesh: this->meshes){
+        if (!this->meshes[mesh.first].vao_initialized){
+            this->api->setVertexLayoutFormat(this->meshes[mesh.first].vao, this->meshes[mesh.first].vao_input);
+            this->meshes[mesh.first].vao_initialized = true;
+        }
+        if (this->meshes[mesh.first].changed){
+            
+            if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
+                this->meshes[mesh.first].size = this->meshes[mesh.first].data.size();
+                this->api->setUniformBufferMemory(this->meshes[mesh.first].ubo, this->meshes[mesh.first].size, NRE_GPU_STREAM);
+            }
+            
+            this->api->setUniformBufferData(this->meshes[mesh.first].ubo, this->meshes[mesh.first].data, 0);
+            this->meshes[mesh.first].changed = false;
+        }
+    }
+    
+    //upload material data to the GPU
+     for (auto mat: this->materials){
+        if (this->materials[mat.first].changed){
+            
+            if (this->materials[mat.first].size != this->materials[mat.first].data.size()){
+                this->materials[mat.first].size = this->materials[mat.first].data.size();
+                this->api->setUniformBufferMemory(this->materials[mat.first].ubo, this->materials[mat.first].size, NRE_GPU_DYNAMIC);
+            }
+            
+            this->api->setUniformBufferData(this->materials[mat.first].ubo, this->materials[mat.first].data, 0);
+            this->materials[mat.first].changed = false;
+        }
+    }
+    
+    //upload camera data to the GPU
+     for (auto cam: this->cameras){
+        if (this->cameras[cam.first].changed){
+            
+            if (this->cameras[cam.first].size != this->cameras[cam.first].data.size()){
+                this->cameras[cam.first].size = this->cameras[cam.first].data.size();
+                this->api->setUniformBufferMemory(this->cameras[cam.first].ubo, this->cameras[cam.first].size, NRE_GPU_STREAM);
+            }
+            
+            this->api->setUniformBufferData(this->cameras[cam.first].ubo, this->cameras[cam.first].data, 0);
+            this->cameras[cam.first].changed = false;
+        }
+    }
+    
+    // draw everything
     for (auto &x: this->render_groups){
         this->drawRenderGroup(&x);
     }

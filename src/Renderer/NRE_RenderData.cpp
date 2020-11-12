@@ -129,7 +129,6 @@ bool NRE_Renderer::updateData(){
 void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
     if (this->meshes.count(id) == 0){
         
-        //auto t = clock();
         // make sure all index and vertex buffers are generated
         // On loading objects from disk they are not generated here
         // But on objects created on the fly they ARE generated here
@@ -148,36 +147,40 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         mesh->data.vbo.clear();
         
         // setup Vertex Layout Inputs
+        // but offload the actual OpenGL commands for later, since this runs in a performance
+        // critical section
         this->meshes[id].vao = this->api->newVertexLayout();
         typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
-        vector<VLI> vao_arg;
         
-        vao_arg.push_back(VLI(this->meshes[id].vbo, 0, 3, 6+this->meshes[id].uvmaps*2));
-        vao_arg.push_back(VLI(this->meshes[id].vbo, 3, 3, 6+this->meshes[id].uvmaps*2));
+        this->meshes[id].vao_input.clear();
+        
+        this->meshes[id].vao_input.push_back(VLI(this->meshes[id].vbo, 0, 3, 6+this->meshes[id].uvmaps*2));
+        this->meshes[id].vao_input.push_back(VLI(this->meshes[id].vbo, 3, 3, 6+this->meshes[id].uvmaps*2));
         
         for (size_t i=0; i < this->meshes[id].uvmaps; i++){
-            vao_arg.push_back(VLI(this->meshes[id].vbo, 6+2*i, 2, 6+this->meshes[id].uvmaps*2));
+            this->meshes[id].vao_input.push_back(VLI(this->meshes[id].vbo, 6+2*i, 2, 6+this->meshes[id].uvmaps*2));
         }
-        this->api->setVertexLayoutFormat(this->meshes[id].vao, vao_arg);
         
         //setup the Uniform buffer holding the model matrix
+        // but offload the actual OpenGL commands for later, since this runs in a performance
+        // critical section
         this->meshes[id].ubo = this->api->newUniformBuffer();
-        this->api->setUniformBufferMemory(this->meshes[id].ubo, 16, NRE_GPU_STREAM);
         
         auto model_mat = mesh->GetModelMatrix();
         
-        this->api->setUniformBufferData(this->meshes[id].ubo, OE_Mat4x4ToSTDVector(model_mat),0);
-        
+        this->meshes[id].data = OE_Mat4x4ToSTDVector(model_mat);
+        this->meshes[id].changed = true;
         
         // handle Vertex (Triangle) groups
         for (auto vgroup : mesh->data.triangle_groups){
             this->handleVGroupData(id, vgroup.first, mesh);
         }
         mesh->data.ibos.clear();
-        //cout << "NRE DATA BENCHMARK MESH: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+        
     }
     else{
-        this->api->setUniformBufferData(this->meshes[id].ubo, OE_Mat4x4ToSTDVector(mesh->GetModelMatrix()),0);
+        this->meshes[id].data = OE_Mat4x4ToSTDVector(mesh->GetModelMatrix());
+        this->meshes[id].changed = true;
     }
 }
 
@@ -200,11 +203,12 @@ void NRE_Renderer::handleMaterialData(std::size_t id, OE_Material* mat){
     if (this->materials.count(id) == 0){
         this->materials[id] = NRE_MaterialRenderData(); this->materials[id].id = id;
         this->materials[id].ubo = this->api->newUniformBuffer();
-        
-        this->api->setUniformBufferMemory(this->materials[id].ubo, 12, NRE_GPU_DYNAMIC);
-        this->api->setUniformBufferData(this->materials[id].ubo, mat->GetRendererData(), 0);
-    } else{
-        this->api->setUniformBufferData(this->materials[id].ubo, mat->GetRendererData(), 0);
+        this->materials[id].data = mat->GetRendererData();
+        this->materials[id].changed = true;
+    } 
+    else{
+        this->materials[id].data = mat->GetRendererData();
+        this->materials[id].changed = true;
     }
 }
 
@@ -212,20 +216,25 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
     if (this->cameras.count(id) == 0){
         
         //setup the Uniform buffer holding the perspective/view matrix
+        // but offload the actual OpenGL commands for later, since this runs in a performance
+        // critical section
         this->cameras[id].ubo = this->api->newUniformBuffer();
-        this->api->setUniformBufferMemory(this->cameras[id].ubo, 16, NRE_GPU_STREAM);
 
         auto view_mat = camera->GetViewMatrix();
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far*10.0f);
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+1.0f, (float)camera->far);
         
-        this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*view_mat),0);
+        this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
+        this->cameras[id].changed = true;
+        
     }
     else {
 
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.1f, (float)camera->far);
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.4f, (float)camera->far);
         auto view_mat = camera->GetViewMatrix();
         
-        this->api->setUniformBufferData(this->cameras[id].ubo, OE_Mat4x4ToSTDVector(perspective_mat*view_mat),0);
+        this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
+        this->cameras[id].changed = true;
+        
     }
 }
 
