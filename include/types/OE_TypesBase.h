@@ -119,8 +119,10 @@ public:
             output.changed[x.first] = this->changed[x.first];
             output.elements[x.first] = x.second;
             output.id2name[x.first] = this->id2name[x.first];
-            output.names = this->names;
+            
         }
+        output.names = this->names;
+        output.deleted = this->deleted;
         unlockMutex();
         return output;
     }

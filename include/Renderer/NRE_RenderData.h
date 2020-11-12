@@ -4,10 +4,16 @@
 #include <types/OE_World.h>
 //#include "FE_GPU_API.h"
 #include <OE_Math.h>
+#include <Renderer/NRE_GPU_API.h>
 
 #define NRE_Shader(src) #src
 
-struct NRE_CameraRenderData{
+struct NRE_BaseObject{
+    bool changed{false};
+    std::vector<float> data;
+};
+
+struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
     std::size_t     id{0};
     std::size_t     ubo{0};
@@ -15,7 +21,7 @@ struct NRE_CameraRenderData{
     unsigned int    size{0};
 };
 
-struct NRE_MaterialRenderData{
+struct NRE_MaterialRenderData : public NRE_BaseObject{
     std::size_t     id{0};
     std::size_t     ubo{0};
     unsigned int    offset{0};
@@ -32,7 +38,7 @@ struct NRE_VGroupRenderData{
     unsigned int    size{0};
 };
 
-struct NRE_MeshRenderData{
+struct NRE_MeshRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
     std::size_t     id{0};
     
@@ -44,9 +50,13 @@ struct NRE_MeshRenderData{
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
+    
+    bool vao_initialized{false};
+    
+    std::vector<NRE_GPU_VertexLayoutInput> vao_input;
 };
 
-struct NRE_LightRenderData{
+struct NRE_LightRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
     std::size_t     id{0};
     std::size_t     ubo{0};

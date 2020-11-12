@@ -228,7 +228,9 @@ void OE_TaskManager::Step(){
         
         this->physics->world = this->world;
         this->renderer->world = this->world;
+        //auto t=clock();
         this->renderer->updateData();
+        //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
 }
 
