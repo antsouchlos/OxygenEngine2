@@ -15,6 +15,7 @@ bool NRE_Renderer::init(){
         delete api;
     this->api = new NRE_GL3_API();
     if (!this->screen->isES){
+        NRE_GPU_ShaderBase::init(NRE_GPU_GL, this->screen->major, this->screen->minor);
         if (this->screen->major == 3 && this->screen->minor == 1){
             this->gl_shader_prefix = "#version 140 \n"
                                  "#extension GL_ARB_explicit_attrib_location"
@@ -26,6 +27,7 @@ bool NRE_Renderer::init(){
         }
         
     } else{
+        NRE_GPU_ShaderBase::init(NRE_GPU_GLES, this->screen->major, this->screen->minor);
         this->gl_shader_prefix = "#version 300 es \nprecision highp float; \n";
     }
     
@@ -93,7 +95,7 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
        //cout << "Setting up Render group" << ren_group->camera << " " << ren_group->vgroup << " " << ren_group->mesh << endl;
         ren_group->program = this->api->newProgram();
         ren_group->isSetup = true;
-        this->api->setProgramVS(ren_group->program, string(gl_shader_prefix + string(NRE_Shader(
+        /*this->api->setProgramVS(ren_group->program, string(gl_shader_prefix + string(NRE_Shader(
             
             layout (location=0) in vec3 oe_position;
             layout (location=1) in vec3 oe_normals;
@@ -144,20 +146,30 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
                 
                 vec3 specular = vec3(0.0);
                 
-                float sDotN = max(dot(s, normals), 0.0);
+                float sDotN = abs(dot(s, normals));
                 
                 if (sDotN > 0.0){
                     //specular = vec3(0.5);
-                    specular = vec3(pow(sDotN,1.0/ mat_specular_hardness));
+                    specular = vec3(pow(sDotN,2.0/ mat_specular_hardness));
                 }
                 
-                vec3 dif_output = clamp(mat_diffuse.rgb*sDotN+specular, 0.1, 1.0);
+                vec3 dif_output = clamp(mat_diffuse.rgb*max(sDotN, 0.2), 0.01, 1.0);
                 
                 //fragColor = vec4(abs(normals), 1.0);
                 fragColor = vec4(dif_output, 1.0);
             }
             
-        ))));
+        ))));*/
+        ren_group->vs = NRE_GPU_VertexShader();
+        ren_group->vs.type = NRE_GPU_VS_REGULAR;
+        ren_group->vs.num_of_uvs = this->meshes[ren_group->mesh].uvmaps;
+        
+        ren_group->fs = NRE_GPU_PixelShader();
+        ren_group->fs.type = NRE_GPU_FS_MATERIAL;
+        ren_group->fs.num_of_uvs = this->meshes[ren_group->mesh].uvmaps;
+        
+        this->api->setProgramVS(ren_group->program, ren_group->vs.genShader());
+        this->api->setProgramFS(ren_group->program, ren_group->fs.genShader());
         
         this->api->setupProgram(ren_group->program);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Camera", 0);

@@ -3,7 +3,7 @@
 
 #include <types/OE_TypesBase.h>
 #include <OE_Math.h>
-
+#include <Renderer/NRE_GPU_Shaders.h>
 
 /** platform-specific namespaces
   * -OpenGL ES 3.0/ OpenGL 3.2
