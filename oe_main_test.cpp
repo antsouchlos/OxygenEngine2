@@ -54,11 +54,9 @@ int test_task1(void*, OE_Task task){
     if (OE_IsMouseMoved() && OE_IsMouseLocked()){
         float x = (float)OE_GetDeltaMouseX()/160.0f;
         float y = (float)OE_GetDeltaMouseY()/160.0f;
-        //auto z = OE_Sqrt(OE_Pow(x, 2) + OE_Pow(y, 2));
-        //OE_ChangeObjectRot("Camera", OE_Vec4(-z, y/z, x/z, 0.0f));
        
-       OE_ChangeObjectGlobalRot("Camera", OE_Vec4(-x, 0.0f, 0.0f, 1.0f));
-       OE_ChangeObjectRot("Camera", OE_Vec4(-y, 1.0f, 0.0f, 0.0f));
+        OE_ChangeObjectGlobalRot("Camera", OE_Vec4(-x, 0.0f, 0.0f, 1.0f));
+        OE_ChangeObjectRot("Camera", OE_Vec4(-y, 1.0f, 0.0f, 0.0f));
     }
     return task.CONTINUE();
 }

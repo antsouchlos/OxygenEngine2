@@ -6,8 +6,6 @@
 #include <OE_Math.h>
 #include <Renderer/NRE_GPU_API.h>
 
-#define NRE_Shader(src) #src
-
 struct NRE_BaseObject{
     bool changed{false};
     std::vector<float> data;
@@ -34,6 +32,7 @@ struct NRE_VGroupRenderData{
     std::size_t     ibo{0};
     std::size_t     material_id{0};
     std::size_t     mesh_id{0};
+    
     unsigned int    offset{0};
     unsigned int    size{0};
 };
@@ -65,6 +64,13 @@ struct NRE_LightRenderData : public NRE_BaseObject{
 };
 
 struct NRE_RenderGroup{
+    
+    static std::vector<NRE_GPU_VertexShader> vertex_shaders;
+    static std::vector<NRE_GPU_PixelShader> pixel_shaders;
+    
+    NRE_GPU_VertexShader vs;
+    NRE_GPU_PixelShader fs;    
+    
     std::size_t     camera{0};
     std::size_t     material{0};
     std::size_t     vgroup{0};
