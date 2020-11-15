@@ -4,6 +4,9 @@
 using namespace std;
 using namespace OE;
 
+std::vector<NRE_GPU_VertexShader> NRE_RenderGroup::vertex_shaders = {};
+std::vector<NRE_GPU_PixelShader> NRE_RenderGroup::pixel_shaders = {};
+
 bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
     for (auto x: this->render_groups){
         if ((x.camera == ren_group.camera) && (x.material == ren_group.material) && (x.vgroup == ren_group.vgroup) && (x.mesh == ren_group.mesh)){
