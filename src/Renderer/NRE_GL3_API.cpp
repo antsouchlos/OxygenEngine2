@@ -467,8 +467,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
     for(int ida=0; ida< numBlocks; ida++){
 
-        GLint name_length=0;
-
+        GLint name_length=10;
         glGetActiveUniformBlockiv(this->progs[id].handle, ida, GL_UNIFORM_BLOCK_NAME_LENGTH, &name_length);
 
         GLchar ubo_name[name_length];
