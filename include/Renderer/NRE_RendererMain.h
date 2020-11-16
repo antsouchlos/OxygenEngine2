@@ -34,9 +34,14 @@ protected:
     void handleLightData(std::size_t, OE_Light*);
     void handleVGroupData(std::size_t, std::size_t, OE_Mesh32*);
     
-    void drawRenderGroup(NRE_RenderGroup*);
     
-    std::string gl_shader_prefix;
+    void updateMeshGPUData();
+    void updateMaterialGPUData();
+    void updateCameraGPUData();
+    
+    
+    void drawRenderGroup(NRE_RenderGroup*);
+    void drawRenderGroupZPrePass(NRE_RenderGroup*);
     
     bool existsRenderGroup(NRE_RenderGroup);
 };

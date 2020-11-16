@@ -28,6 +28,13 @@ enum NRE_GPU_BUFFER_USAGE{
     NRE_GPU_STREAM
 };
 
+enum NRE_GPU_RENDERMODE{
+    NRE_GPU_REGULAR_BACKFACE,
+    NRE_GPU_Z_PREPASS_BACKFACE,
+    NRE_GPU_AFTERPREPASS_BACKFACE,
+    NRE_GPU_TRANSPARENT_BACKFACE
+};
+
 
 /** NRE_GPU_API provides a platform-independent
   * interface for accessing the GPU on differing
@@ -86,6 +93,8 @@ public:
     
     virtual void draw(std::size_t, std::size_t, std::size_t, int, int);
     virtual void draw(std::size_t, std::size_t, std::size_t);
+    
+    virtual void setRenderMode(NRE_GPU_RENDERMODE);
 };
 
 #endif 

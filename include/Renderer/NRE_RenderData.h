@@ -65,17 +65,27 @@ struct NRE_LightRenderData : public NRE_BaseObject{
 
 struct NRE_RenderGroup{
     
+    // data for the z prepass
+    NRE_GPU_VertexShader vs_z_prepass;
+    std::size_t     z_prepass_program{0};
+    bool isZPrePassSetup{false};
+    
+    // data for normal render
     NRE_GPU_VertexShader vs;
     NRE_GPU_PixelShader fs;    
+    std::size_t     program{0};
+    bool isSetup{false};
     
+    // draw call data
     std::size_t     camera{0};
     std::size_t     material{0};
     std::size_t     vgroup{0};
-    std::size_t     mesh{0};
+    std::size_t     mesh{0};  
     
-    std::size_t     program{0};
-    bool isSetup{false};
     std::vector<std::size_t>     lights;
+    
+    // for sorting draw calls
+    bool operator < (const NRE_RenderGroup&) const;
 };
 
 #endif // FE_MESHRENDERDATA_H

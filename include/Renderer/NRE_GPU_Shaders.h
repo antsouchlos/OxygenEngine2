@@ -57,7 +57,7 @@ public:
     
     bool fullscreenQuad{false};
     std::size_t num_of_uvs{0};
-    NRE_GPU_VS_TYPE type;
+    NRE_GPU_VS_TYPE type{NRE_GPU_VS_UNDEFINED};
     
     
 };
@@ -73,7 +73,7 @@ public:
     std::string genShader();
     
     std::size_t num_of_uvs{0};
-    NRE_GPU_FS_TYPE type;
+    NRE_GPU_FS_TYPE type{NRE_GPU_FS_UNDEFINED};
 };
 
 #endif

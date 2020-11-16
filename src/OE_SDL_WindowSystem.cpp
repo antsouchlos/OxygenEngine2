@@ -107,16 +107,9 @@ void OE_SDL_WindowSystem::finishInit(){
     OE_WriteToLog(string("Version:  ") + string((const char*)glGetString(GL_VERSION)) + "\n");
     SDL_GL_SetSwapInterval(1);
     
-    glEnable( GL_BLEND );
-    glEnable (GL_DEPTH_TEST); // enable depth-testing
-    glDepthFunc (GL_LESS);
-
-    glEnable (GL_CULL_FACE);
-    glCullFace (GL_BACK); /// cull back face
-    glFrontFace (GL_CCW);
-    
     SDL_GetWindowSize(window, &this->resolution_x, &this->resolution_y);
     glViewport(0, 0, this->resolution_x, this->resolution_y);
+    glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     
@@ -160,7 +153,7 @@ bool OE_SDL_WindowSystem::update(){
         this->resolution_y = y;
     }
     
-    
+    glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     

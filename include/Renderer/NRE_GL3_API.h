@@ -111,6 +111,8 @@ public:
     void draw(std::size_t, std::size_t, std::size_t, int, int);
     void draw(std::size_t, std::size_t, std::size_t);
     
+    void setRenderMode(NRE_GPU_RENDERMODE);
+    
 protected:
     
     std::size_t cur_vbo{0};

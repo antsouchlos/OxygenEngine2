@@ -65,8 +65,6 @@ NRE_GL3_API::~NRE_GL3_API(){
     for (auto x: std::exchange(ubos, {}))
         glDeleteBuffers(1, &x.second.handle);
     for (auto x: std::exchange(prog_db, {})){
-        //glDeleteShader(x.second.vs_handle);
-        //glDeleteShader(x.second.fs_handle);
         glDeleteProgram(x.second);
     }
     for (auto x: std::exchange(vs_db, {})){
@@ -105,7 +103,6 @@ std::size_t NRE_GL3_API::newIndexBuffer(){
 std::size_t NRE_GL3_API::newProgram(){
     cur_prog++;
     this->progs[cur_prog] = NRE_GL3_Program();
-    //this->progs[cur_prog].handle = glCreateProgram();
     return cur_prog;
 }
 
@@ -339,7 +336,7 @@ void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
         char log[2048];
         glGetShaderInfoLog(shader_id, max_length, &actual_length, log);
         cout << log << endl;
-        //OE_WriteToLog(log);
+        OE_WriteToLog(log);
     }
 }
 
@@ -359,7 +356,6 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         if (this->vs_db.count(this->progs[id].vs) == 0){
             
             // vertex shader does not exist, make a new entry
-            
             this->setProgramVS(id, this->progs[id].vs.genShader());
             this->vs_db[this->progs[id].vs] = this->progs[id].vs_handle;
             
@@ -377,10 +373,12 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         if (this->fs_db.count(this->progs[id].fs) == 0){
             
             // pixel (fragment) shader does not exist, make a new entry
+            if (this->progs[id].fs.type != NRE_GPU_FS_UNDEFINED){
+                this->setProgramFS(id, this->progs[id].fs.genShader());
+            }
             
-            this->setProgramFS(id, this->progs[id].fs.genShader());
             this->fs_db[this->progs[id].fs] = this->progs[id].fs_handle;
-            
+            this->progs[id].fs_setup = true;
         }
         else {
             
@@ -398,7 +396,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         this->progs[id].handle = this->prog_db[this->progs[id]];
         this->progs[id].uniforms.clear();
         
-        /// get all active uniform blocks (again)        
+        /// get all active uniform blocks (again)
         GLint numBlocks=0;
         glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
         for(int ida=0; ida< numBlocks; ida++){
@@ -429,11 +427,11 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     assert (this->progs[id].vs_setup && this->progs[id].fs_setup);
     
     glAttachShader(this->progs[id].handle, this->progs[id].vs_handle);
-    glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
-
-    //glBindAttribLocation(this->progs[id].handle, 0, "oe_position");
-    //glBindAttribLocation(this->progs[id].handle, 1, "oe_normals");
-    //glBindAttribLocation(this->progs[id].handle, 2, "oe_uvs");
+    
+    // Technically a fragment/pixel shader is optional
+    // This should be the case sometimes (for example in teh Z_PREPASS program)
+    if (this->progs[id].fs.type != NRE_GPU_FS_UNDEFINED)
+        glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
 
     glLinkProgram(this->progs[id].handle);
 
@@ -490,9 +488,6 @@ void NRE_GL3_API::setupProgram(std::size_t id){
 
 void NRE_GL3_API::deleteProgram(std::size_t id){
     assert (this->progs.count(id) != 0);
-    //glDeleteShader(this->progs[id].vs_handle);
-    //glDeleteShader(this->progs[id].fs_handle);
-    //glDeleteProgram(this->progs[id].handle);
     this->progs.erase(id);
 }
 
@@ -537,4 +532,47 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     glBindVertexArray(this->vaos[vao_id].handle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
     glDrawElements(GL_TRIANGLES, this->ibos[ibo_id].size, GL_UNSIGNED_INT, (GLvoid*)NULL);
+}
+
+void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
+    
+    if (rendermode == NRE_GPU_Z_PREPASS_BACKFACE){
+        glDisable(GL_BLEND);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_BACK); /// cull back face
+        glFrontFace (GL_CCW);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glColorMask(0, 0, 0, 0);
+        glDepthMask(GL_TRUE);
+    }
+    else if (rendermode == NRE_GPU_REGULAR_BACKFACE){
+        glDisable(GL_BLEND);
+        
+        glEnable (GL_DEPTH_TEST); // enable depth-testing
+        glDepthFunc (GL_LESS);
+        glColorMask(1, 1, 1, 1);
+        glDepthMask(GL_TRUE);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_BACK); /// cull back face
+        glFrontFace (GL_CCW);
+    }
+    else if (rendermode == NRE_GPU_AFTERPREPASS_BACKFACE){
+        glDisable(GL_BLEND);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glColorMask(1, 1, 1, 1);
+        glDepthMask(GL_FALSE);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_BACK); /// cull back face
+        glFrontFace (GL_CCW);
+    }
+    else {
+        // TODO
+    }
 }
