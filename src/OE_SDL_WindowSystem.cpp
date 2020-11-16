@@ -72,6 +72,10 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
     }//*/
     
     // Request an OpenGL ES 3.0 context
+    
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+
+    
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -97,7 +101,12 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
 }
 
 void OE_SDL_WindowSystem::finishInit(){
-    gladLoadGLLoader(SDL_GL_GetProcAddress);
+    
+    if (!this->isES)
+        gladLoadGLLoader(SDL_GL_GetProcAddress);
+    else
+        gladLoadGLES2Loader(SDL_GL_GetProcAddress);
+    
     printf("Vendor:   %s\n", glGetString(GL_VENDOR));
     printf("Renderer: %s\n", glGetString(GL_RENDERER));
     printf("Version:  %s\n", glGetString(GL_VERSION));
