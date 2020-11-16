@@ -55,6 +55,32 @@ NRE_GPU_VertexShader::~NRE_GPU_VertexShader(){
     
 }
 
+bool NRE_GPU_VertexShader::operator< (const NRE_GPU_VertexShader& other) const{
+    if (this->num_of_uvs < other.num_of_uvs){
+        return true;
+    }
+    else if (this->num_of_uvs > other.num_of_uvs){
+        return false;
+    }
+    else {
+        //both are equal
+        if (this->type < other.type){
+            return true;
+        } 
+        else if (this->type > other.type){
+            return false;
+        }
+        else {
+            return this->fullscreenQuad < other.fullscreenQuad;
+        }
+    }
+    return false;
+}
+
+bool NRE_GPU_VertexShader::operator == (const NRE_GPU_VertexShader& other) const{
+    return (this->fullscreenQuad == other.fullscreenQuad) && (this->type == other.type) && (this->num_of_uvs == other.num_of_uvs);
+}
+
 std::string NRE_GPU_VertexShader::genShader(){
     if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL || NRE_GPU_ShaderBase::backend == NRE_GPU_GLES)
         return NRE_GenGL3VertexShader(*this);
@@ -69,6 +95,20 @@ NRE_GPU_PixelShader::NRE_GPU_PixelShader(){
 
 NRE_GPU_PixelShader::~NRE_GPU_PixelShader(){
     
+}
+
+bool NRE_GPU_PixelShader::operator< (const NRE_GPU_PixelShader& other) const{
+    if (this->num_of_uvs < other.num_of_uvs){
+        return true;
+    }
+    else if (this->num_of_uvs > other.num_of_uvs){
+        return false;
+    }
+    else {
+        //both are equal
+        return this->type < other.type;
+    }
+    return false;
 }
 
 std::string NRE_GPU_PixelShader::genShader(){

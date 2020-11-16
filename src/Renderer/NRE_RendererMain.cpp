@@ -93,7 +93,7 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
     
     if (!ren_group->isSetup){
        //cout << "Setting up Render group" << ren_group->camera << " " << ren_group->vgroup << " " << ren_group->mesh << endl;
-        ren_group->program = this->api->newProgram();
+        
         ren_group->isSetup = true;
         /*this->api->setProgramVS(ren_group->program, string(gl_shader_prefix + string(NRE_Shader(
             
@@ -168,8 +168,9 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
         ren_group->fs.type = NRE_GPU_FS_MATERIAL;
         ren_group->fs.num_of_uvs = this->meshes[ren_group->mesh].uvmaps;
         
-        this->api->setProgramVS(ren_group->program, ren_group->vs.genShader());
-        this->api->setProgramFS(ren_group->program, ren_group->fs.genShader());
+        ren_group->program = this->api->newProgram();
+        this->api->setProgramVS(ren_group->program, ren_group->vs);
+        this->api->setProgramFS(ren_group->program, ren_group->fs);
         
         this->api->setupProgram(ren_group->program);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Camera", 0);

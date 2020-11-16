@@ -65,9 +65,6 @@ struct NRE_LightRenderData : public NRE_BaseObject{
 
 struct NRE_RenderGroup{
     
-    static std::vector<NRE_GPU_VertexShader> vertex_shaders;
-    static std::vector<NRE_GPU_PixelShader> pixel_shaders;
-    
     NRE_GPU_VertexShader vs;
     NRE_GPU_PixelShader fs;    
     

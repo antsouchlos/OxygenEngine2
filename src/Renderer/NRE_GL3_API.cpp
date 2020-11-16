@@ -29,6 +29,21 @@ std::size_t NRE_GL3_Program::hasUniform(std::string name){
     return this->uniforms.size();
 }
 
+bool NRE_GL3_Program::operator< (const NRE_GL3_Program& other) const{
+    if (this->vs < other.vs){
+        return true;
+    }
+    else if (this->vs == other.vs){
+        return this->fs < other.fs;
+    }
+    else {
+        return false;
+    }
+    return false;
+}
+
+// ------------------------ API ---------------------- //
+
 std::size_t NRE_GL3_API::getVAOSize(std::size_t id){
     assert (this->vaos.count(id) != 0);
     assert (this->vaos[id].layout.size() > 0);
@@ -49,10 +64,16 @@ NRE_GL3_API::~NRE_GL3_API(){
         glDeleteBuffers(1, &x.second.handle);
     for (auto x: std::exchange(ubos, {}))
         glDeleteBuffers(1, &x.second.handle);
-    for (auto x: std::exchange(progs, {})){
-        glDeleteShader(x.second.vs_handle);
-        glDeleteShader(x.second.fs_handle);
-        glDeleteProgram(x.second.handle);
+    for (auto x: std::exchange(prog_db, {})){
+        //glDeleteShader(x.second.vs_handle);
+        //glDeleteShader(x.second.fs_handle);
+        glDeleteProgram(x.second);
+    }
+    for (auto x: std::exchange(vs_db, {})){
+        glDeleteShader(x.second);
+    }
+    for (auto x: std::exchange(fs_db, {})){
+        glDeleteShader(x.second);
     }
 }
 
@@ -84,7 +105,7 @@ std::size_t NRE_GL3_API::newIndexBuffer(){
 std::size_t NRE_GL3_API::newProgram(){
     cur_prog++;
     this->progs[cur_prog] = NRE_GL3_Program();
-    this->progs[cur_prog].handle = glCreateProgram();
+    //this->progs[cur_prog].handle = glCreateProgram();
     return cur_prog;
 }
 
@@ -237,6 +258,21 @@ void NRE_GL3_API::deleteVertexLayout(std::size_t id){
 
 //---------------------Shader Programs-----------------------------//
 
+void NRE_GL3_API::setProgramVS(std::size_t id, NRE_GPU_VertexShader vs){
+    assert (this->progs.count(id) != 0);
+    
+    this->progs[id].vs_setup = false;
+    this->progs[id].setup = false;
+    this->progs[id].vs = vs;
+}
+void NRE_GL3_API::setProgramFS(std::size_t id, NRE_GPU_PixelShader fs){
+    assert (this->progs.count(id) != 0);
+    
+    this->progs[id].fs_setup = false;
+    this->progs[id].setup = false;
+    this->progs[id].fs = fs;
+}
+
 void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
     
     data = data + "";
@@ -316,8 +352,80 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     
     // ignore if the program is already setup
     if (this->progs[id].setup) return;
+    
+    
+    // setup vertex shader
+    if (!this->progs[id].vs_setup){
+        if (this->vs_db.count(this->progs[id].vs) == 0){
+            
+            // vertex shader does not exist, make a new entry
+            
+            this->setProgramVS(id, this->progs[id].vs.genShader());
+            this->vs_db[this->progs[id].vs] = this->progs[id].vs_handle;
+            
+        }
+        else {
+            
+            // vertex shader already exists, reuse that
+            this->progs[id].vs_handle = this->vs_db[this->progs[id].vs];
+            this->progs[id].vs_setup = true;
+        }
+    }
+    
+    // setup pixel (fragment) shader
+    if (!this->progs[id].fs_setup){
+        if (this->fs_db.count(this->progs[id].fs) == 0){
+            
+            // pixel (fragment) shader does not exist, make a new entry
+            
+            this->setProgramFS(id, this->progs[id].fs.genShader());
+            this->fs_db[this->progs[id].fs] = this->progs[id].fs_handle;
+            
+        }
+        else {
+            
+            // pixel (fragment) shader already exists, reuse that
+            this->progs[id].fs_handle = this->fs_db[this->progs[id].fs];
+            this->progs[id].fs_setup = true;
+        }
+    }
+    
     this->progs[id].setup = true;
     
+    // check if program already exists
+    if (this->prog_db.count(this->progs[id]) > 0){
+        
+        this->progs[id].handle = this->prog_db[this->progs[id]];
+        this->progs[id].uniforms.clear();
+        
+        /// get all active uniform blocks (again)        
+        GLint numBlocks=0;
+        glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
+        for(int ida=0; ida< numBlocks; ida++){
+
+            GLint name_length=0;
+
+            glGetActiveUniformBlockiv(this->progs[id].handle, ida, GL_UNIFORM_BLOCK_NAME_LENGTH, &name_length);
+
+            GLchar ubo_name[name_length];
+            glGetActiveUniformBlockName(this->progs[id].handle, ida, name_length, NULL, &ubo_name[0]);
+
+            string actual_name = string(ubo_name);
+            auto ubo_state = NRE_GL3_ProgramUniformState();
+            ubo_state.name = actual_name;
+            ubo_state.slot = -1;
+            this->progs[id].uniforms.push_back(ubo_state);
+        }
+        
+        return;
+    }
+    else {
+        this->progs[id].handle = glCreateProgram();
+        this->prog_db[this->progs[id]] = this->progs[id].handle;
+    }
+    
+    // make sure that the vertex and fragment shaders actually compile
+    // in case the program does not already exist
     assert (this->progs[id].vs_setup && this->progs[id].fs_setup);
     
     glAttachShader(this->progs[id].handle, this->progs[id].vs_handle);
@@ -382,9 +490,9 @@ void NRE_GL3_API::setupProgram(std::size_t id){
 
 void NRE_GL3_API::deleteProgram(std::size_t id){
     assert (this->progs.count(id) != 0);
-    glDeleteShader(this->progs[id].vs_handle);
-    glDeleteShader(this->progs[id].fs_handle);
-    glDeleteProgram(this->progs[id].handle);
+    //glDeleteShader(this->progs[id].vs_handle);
+    //glDeleteShader(this->progs[id].fs_handle);
+    //glDeleteProgram(this->progs[id].handle);
     this->progs.erase(id);
 }
 
