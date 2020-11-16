@@ -69,7 +69,7 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
     else {
         this->finishInit();
         return true;
-    }
+    }//*/
     
     // Request an OpenGL ES 3.0 context
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
