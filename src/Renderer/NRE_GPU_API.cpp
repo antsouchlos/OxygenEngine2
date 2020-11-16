@@ -53,6 +53,9 @@ void NRE_GPU_API::deleteUniformBuffer(std::size_t){}
 void NRE_GPU_API::setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>){}
 void NRE_GPU_API::deleteVertexLayout(std::size_t){}
 
+
+void NRE_GPU_API::setProgramVS(std::size_t, NRE_GPU_VertexShader){}
+void NRE_GPU_API::setProgramFS(std::size_t, NRE_GPU_PixelShader){}
 void NRE_GPU_API::setProgramVS(std::size_t, std::string){}
 //void setProgramGS(std::size_t, FE_GPU_Shader){}
 void NRE_GPU_API::setProgramFS(std::size_t, std::string){}

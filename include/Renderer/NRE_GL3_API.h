@@ -36,10 +36,12 @@ struct NRE_GL3_ProgramUniformState{
 };
 
 struct NRE_GL3_Program{
-    std::string vs;
+    
+    NRE_GPU_VertexShader vs;
     GLuint vs_handle{0};
     bool vs_setup{false};
-    std::string fs;
+    
+    NRE_GPU_PixelShader fs;
     GLuint fs_handle{0};
     bool fs_setup{false};
     
@@ -50,12 +52,18 @@ struct NRE_GL3_Program{
     std::vector<NRE_GL3_ProgramUniformState> uniforms;
     
     std::size_t hasUniform(std::string);
+    
+    // this is needed for it to be in an std::set
+    bool operator< (const NRE_GL3_Program&) const;
 };
 
 GLenum NRE2GL_BufferUse(NRE_GPU_BUFFER_USAGE);
 
 class NRE_GL3_API : public NRE_GPU_API{
 public:
+    
+    
+    
     NRE_GL3_API();
     ~NRE_GL3_API();
     std::string getRenderingAPI();
@@ -86,6 +94,9 @@ public:
     void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
     void deleteVertexLayout(std::size_t);
     
+    void setProgramVS(std::size_t, NRE_GPU_VertexShader);
+    void setProgramFS(std::size_t, NRE_GPU_PixelShader);
+    
     void setProgramVS(std::size_t, std::string);
     //void setProgramGS(std::size_t, FE_GPU_Shader);
     void setProgramFS(std::size_t, std::string);
@@ -115,6 +126,10 @@ protected:
     std::unordered_map<std::size_t, NRE_GL3_Program>          progs;
     
     std::size_t getVAOSize(std::size_t);
+    
+    std::map<NRE_GPU_VertexShader,  GLuint> vs_db;
+    std::map<NRE_GPU_PixelShader,   GLuint> fs_db;
+    std::map<NRE_GL3_Program,       GLuint> prog_db;
 };
 
 

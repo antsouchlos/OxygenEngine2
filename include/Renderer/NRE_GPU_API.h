@@ -68,6 +68,11 @@ public:
     virtual void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
     virtual void deleteVertexLayout(std::size_t);
     
+    
+    virtual void setProgramVS(std::size_t, NRE_GPU_VertexShader);
+    virtual void setProgramFS(std::size_t, NRE_GPU_PixelShader);
+    
+    // WARNING: Do not use the setProgram*S with string argument directly
     virtual void setProgramVS(std::size_t, std::string);
     //void setProgramGS(std::size_t, FE_GPU_Shader);
     virtual void setProgramFS(std::size_t, std::string);

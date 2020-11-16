@@ -41,6 +41,7 @@ public:
     
     
     
+    
 };
 
 class NRE_GPU_VertexShader : public NRE_GPU_ShaderBase{
@@ -49,6 +50,8 @@ public:
     NRE_GPU_VertexShader();
     ~NRE_GPU_VertexShader();
     
+    bool operator< (const NRE_GPU_VertexShader&) const;
+    bool operator == (const NRE_GPU_VertexShader&) const;
     
     std::string genShader();
     
@@ -64,6 +67,8 @@ public:
     
     NRE_GPU_PixelShader();
     ~NRE_GPU_PixelShader();
+    
+    bool operator< (const NRE_GPU_PixelShader&) const;
     
     std::string genShader();
     
