@@ -373,9 +373,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         if (this->fs_db.count(this->progs[id].fs) == 0){
             
             // pixel (fragment) shader does not exist, make a new entry
-            if (this->progs[id].fs.type != NRE_GPU_FS_UNDEFINED){
-                this->setProgramFS(id, this->progs[id].fs.genShader());
-            }
+            this->setProgramFS(id, this->progs[id].fs.genShader());
             
             this->fs_db[this->progs[id].fs] = this->progs[id].fs_handle;
             this->progs[id].fs_setup = true;
@@ -428,10 +426,9 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     
     glAttachShader(this->progs[id].handle, this->progs[id].vs_handle);
     
-    // Technically a fragment/pixel shader is optional
-    // This should be the case sometimes (for example in teh Z_PREPASS program)
-    if (this->progs[id].fs.type != NRE_GPU_FS_UNDEFINED)
-        glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
+    // Technically a fragment/pixel shader is optional, but it is a must in OpenGL ES
+    // This should be the case sometimes (for example in the Z_PREPASS program)
+    glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
 
     glLinkProgram(this->progs[id].handle);
 
