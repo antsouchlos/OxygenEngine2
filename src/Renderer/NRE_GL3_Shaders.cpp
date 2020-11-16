@@ -96,6 +96,17 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
     
     std::string output = "\n";
     
+    if (fs.type == NRE_GPU_FS_UNDEFINED){
+        output.append(NRE_Shader(
+            out vec4 fragColor;
+            
+            void main(){
+                fragColor = vec4(1.0);
+            }
+        ));
+        return NRE_GPU_ShaderBase::shader_prefix + output;
+    }
+    
     output.append(NRE_Shader(
         in vec3 position;
         in vec3 normals;
