@@ -69,3 +69,5 @@ void NRE_GPU_API::draw(std::size_t, std::size_t){}
     
 void NRE_GPU_API::draw(std::size_t, std::size_t, std::size_t, int, int){}
 void NRE_GPU_API::draw(std::size_t, std::size_t, std::size_t){}
+
+void NRE_GPU_API::setRenderMode(NRE_GPU_RENDERMODE){}
