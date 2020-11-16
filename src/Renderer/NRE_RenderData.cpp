@@ -4,7 +4,46 @@
 using namespace std;
 using namespace OE;
 
-
+bool NRE_RenderGroup::operator < (const NRE_RenderGroup& other) const{
+    
+    // sort by camera
+    if (this->camera < other.camera){
+        return true;
+    }
+    else if (this->camera > other.camera){
+        return false;
+    }
+    else{
+        // sort by material (program) since pipeline/texture changes
+        // are expensive
+        if (this->material < other.material){
+            return true;
+        }
+        else if (this->material > other.material){
+            return false;
+        }
+        else{
+            // sort by mesh, to minimize changing VAO
+            // and Mesh Buffers
+            if (this->mesh < other.mesh){
+                return true;
+            }
+            else if (this->mesh > other.mesh){
+                return false;
+            }
+            else{
+                // finally sort by vgroup since changing Index Buffers should be cheap
+                if (this->vgroup < other.vgroup){
+                    return true;
+                }
+                else if (this->vgroup >= other.vgroup){
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
     for (auto x: this->render_groups){
@@ -40,7 +79,7 @@ bool NRE_Renderer::updateData(){
     
     // remove any obsolete draw commands
     std::set<std::size_t, std::greater<std::size_t>> to_be_removed;
-    for (size_t i=0; i < this->render_groups.size(); i++){
+    for (size_t i=0; i<this->render_groups.size(); i++){
         if (!temp_materials.existsID(this->render_groups[i].material)){
             to_be_removed.insert(i);
         }
@@ -52,7 +91,7 @@ bool NRE_Renderer::updateData(){
         }
     }
     for (auto x: to_be_removed){
-        this->render_groups.erase(this->render_groups.begin() + x);
+        this->render_groups.erase(render_groups.begin() + x);
     }
     //TODO: remove any obsolete objects themselves
     //for (auto x : std::exchange(temp_objects.deleted, {})){
@@ -127,6 +166,8 @@ bool NRE_Renderer::updateData(){
     
     return true;
 }
+
+//-----------------------------------Pass individual element changes synchronously as fast as possible--------//
 
 void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
     if (this->meshes.count(id) == 0){
@@ -243,3 +284,55 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
 void NRE_Renderer::handleLightData(std::size_t id, OE_Light* light){
     
 }
+
+//---------------------------------Update actual GPU data------------------------------//
+
+void NRE_Renderer::updateMeshGPUData(){
+    for (auto mesh: this->meshes){
+        if (!this->meshes[mesh.first].vao_initialized){
+            this->api->setVertexLayoutFormat(this->meshes[mesh.first].vao, this->meshes[mesh.first].vao_input);
+            this->meshes[mesh.first].vao_initialized = true;
+        }
+        if (this->meshes[mesh.first].changed){
+            
+            if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
+                this->meshes[mesh.first].size = this->meshes[mesh.first].data.size();
+                this->api->setUniformBufferMemory(this->meshes[mesh.first].ubo, this->meshes[mesh.first].size, NRE_GPU_STREAM);
+            }
+            
+            this->api->setUniformBufferData(this->meshes[mesh.first].ubo, this->meshes[mesh.first].data, 0);
+            this->meshes[mesh.first].changed = false;
+        }
+    }
+}
+
+void NRE_Renderer::updateMaterialGPUData(){
+    for (auto mat: this->materials){
+        if (this->materials[mat.first].changed){
+            
+            if (this->materials[mat.first].size != this->materials[mat.first].data.size()){
+                this->materials[mat.first].size = this->materials[mat.first].data.size();
+                this->api->setUniformBufferMemory(this->materials[mat.first].ubo, this->materials[mat.first].size, NRE_GPU_DYNAMIC);
+            }
+            
+            this->api->setUniformBufferData(this->materials[mat.first].ubo, this->materials[mat.first].data, 0);
+            this->materials[mat.first].changed = false;
+        }
+    }
+}
+
+void NRE_Renderer::updateCameraGPUData(){
+    for (auto cam: this->cameras){
+        if (this->cameras[cam.first].changed){
+            
+            if (this->cameras[cam.first].size != this->cameras[cam.first].data.size()){
+                this->cameras[cam.first].size = this->cameras[cam.first].data.size();
+                this->api->setUniformBufferMemory(this->cameras[cam.first].ubo, this->cameras[cam.first].size, NRE_GPU_STREAM);
+            }
+            
+            this->api->setUniformBufferData(this->cameras[cam.first].ubo, this->cameras[cam.first].data, 0);
+            this->cameras[cam.first].changed = false;
+        }
+    }
+}
+
