@@ -111,6 +111,8 @@ bool NRE_Renderer::updateMultiThread(OE_Task*, int){
 }
 
 void NRE_Renderer::destroy(){
-    if (api != nullptr)
+    if (api != nullptr){
+        api->destroy();
         delete api;
+    }
 }    

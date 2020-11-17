@@ -7,6 +7,9 @@
 \________/  |_______|   |________| |_______| |________| |_______|     
 ```
 The Oxygen Engine (OE) is a hobbyist modular 3D game engine written in C++ in development for learning purposes.
+
+It currently implements a custom file format with asynchronous loading (.csl), a multithreaded pipeline with game logic and renderer running in separate threads, an event handler and an OpenGL 3.1+/ES 3.0+ Renderer using SDL2, GLad and GLM. This means at least a Shader Model 4.0/DX10-capable GPU is required to run OE.
+
 Originally it was an ongoing project in 2015-16, but it is stagnated and now is (hopefully) being finally restarted in 2020.
 
 ## Installation

@@ -14,7 +14,7 @@ public:
     
     // internal event functions
     void init();
-    std::shared_ptr<OE_Event> getIEvent(std::string); // THIS IS TOTALLY USELESS! WTF WAS I EVEN THINKING??!
+    std::shared_ptr<OE_Event> getIEvent(std::string);
     std::shared_ptr<OE_Event> getIEventUNSAFE(std::string);
     
     void createUserEvent(std::string);
@@ -31,18 +31,28 @@ public:
     std::size_t getEventCounter(std::string);
     
     void updateInput();
-    bool update();
     void cleanup();
-    void updateInputEvents();
     int handleAllEvents(OE_Task*);
     
+    
+    void updatePostInputLoop();
+    
+    // The methods starting with internal* are only supposed to be usede
+    // in subclasses of OE_WindowSystemBase
+    // the key strings must exist
+    
+    void internalBroadcastKeyDownEvent(const std::string&);
+    void internalBroadcastKeyUpEvent(const std::string&);
+    
     bool done;
+    
+    OE_InputEventHandler input_handler;
     
 protected:
 	
 	bool havePendingEvents();
 
-    OE_InputEventHandler input_handler;
+    
     
     std::map<std::string, std::shared_ptr<OE_Event>> internal_events;
     std::vector<std::string> obsolete_events;
@@ -51,12 +61,7 @@ protected:
     std::vector<std::string> happened_events;
     std::unordered_map<std::string, std::size_t> happened_events_counter;
     
-    uint8_t index = -1;
-    
-    bool mouse_moved{false};
-    //SDL specific
-    SDL_Event event;
-    
+    uint8_t index = -1;    
 };
 
 #endif //OE_EVENT_HANDLER_H

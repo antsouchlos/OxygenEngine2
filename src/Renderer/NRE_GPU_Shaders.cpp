@@ -26,7 +26,7 @@ void NRE_GPU_ShaderBase::init(NRE_GPU_SHADER_BACKEND backend, int major, int min
                                  ": require\n";
         } 
         else if (major == 3 && minor >= 2){
-            NRE_GPU_ShaderBase::shader_prefix = "#version 150 \n"
+            NRE_GPU_ShaderBase::shader_prefix = "#version 150 core \n"
                                  "#extension GL_ARB_explicit_attrib_location"
                                  ": require\n";
         } 
