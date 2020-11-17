@@ -38,7 +38,7 @@ bool OE::OE_IsDone(){
 // ?? Where do i even need this ??? UPDATE: Now I remember
 void OE::OE_Finish(){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.done = true;
+    OE_Main->window->event_handler.done = true;
 } 
 
 //size_t OE_InitFromFile(std::string); //TODO
@@ -79,25 +79,25 @@ void OE::OE_RemoveTask(std::string task, std::string thread){
     
 void OE::OE_BroadcastEvent(std::string name, void* data){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.broadcastIEvent(name, data);
+    OE_Main->window->event_handler.broadcastIEvent(name, data);
 }
 void OE::OE_CreateEvent(std::string name){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.createUserEvent(name);
+    OE_Main->window->event_handler.createUserEvent(name);
 }
 void OE::OE_SetEventFunc(std::string name, const OE_EVENTFUNC func, void* data){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.setIEventFunc(name, func, data);
+    OE_Main->window->event_handler.setIEventFunc(name, func, data);
 }
 
 size_t OE::OE_GetEventActivations(std::string name){
     assert (OE_Main != nullptr);
-    return OE_Main->event_handler.getEventActivations(name);
+    return OE_Main->window->event_handler.getEventActivations(name);
 }
 
 size_t OE::OE_GetEventCounter(std::string name){
     assert (OE_Main != nullptr);
-    return OE_Main->event_handler.getEventCounter(name);
+    return OE_Main->window->event_handler.getEventCounter(name);
 }
 
 bool OE::OE_IsKeyJustPressed(std::string key){
@@ -126,39 +126,39 @@ bool OE::OE_IsMouseMoved(){
 
 int OE::OE_GetDeltaMouseX(){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.lockMutex();
+    OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::delta_x;
-    OE_Main->event_handler.unlockMutex();
+    OE_Main->window->event_handler.unlockMutex();
     return output;
 }
 
 int OE::OE_GetDeltaMouseY(){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.lockMutex();
+    OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::delta_y;
-    OE_Main->event_handler.unlockMutex();
+    OE_Main->window->event_handler.unlockMutex();
     return output;
 }
     
 int OE::OE_GetMouseX(){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.lockMutex();
+    OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::x;
-    OE_Main->event_handler.unlockMutex();
+    OE_Main->window->event_handler.unlockMutex();
     return output;
 }
 
 int OE::OE_GetMouseY(){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.lockMutex();
+    OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::y;
-    OE_Main->event_handler.unlockMutex();
+    OE_Main->window->event_handler.unlockMutex();
     return output;
 }
 
 void OE::OE_DestroyEvent(std::string name){
     assert (OE_Main != nullptr);
-    OE_Main->event_handler.destroyIEvent(name);
+    OE_Main->window->event_handler.destroyIEvent(name);
 }
 
 void OE::OE_Pause(int x){

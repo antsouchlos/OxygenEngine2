@@ -47,6 +47,8 @@ public:
     NRE_GPU_API();
     virtual ~NRE_GPU_API();
     
+    virtual void destroy();
+    
     virtual std::string getRenderingAPI();
     
     virtual std::size_t newVertexBuffer();

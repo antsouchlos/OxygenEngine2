@@ -7,6 +7,7 @@
   *
   */
 class OE_InputEventHandler{
+public:
 	friend class OE_EventHandler;
     friend class OE_TaskManager;
     
@@ -15,7 +16,7 @@ class OE_InputEventHandler{
 	
 	void createEvents(std::map<std::string, std::shared_ptr<OE_Event>>*);
 	
-protected:
+//protected:
 	std::vector<std::string> active_events;
 	const std::unordered_map<Uint8, std::string> mouseList = {{SDL_BUTTON_LEFT, "1"}, {SDL_BUTTON_RIGHT, "2"}, {SDL_BUTTON_MIDDLE, "3"},
 										  {SDL_BUTTON_X1, "4"}, {SDL_BUTTON_X2, "5"}};

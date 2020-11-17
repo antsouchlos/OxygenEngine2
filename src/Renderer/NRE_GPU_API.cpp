@@ -20,6 +20,8 @@ NRE_GPU_API::~NRE_GPU_API(){
 
 }
 
+void NRE_GPU_API::destroy(){}
+
 std::string NRE_GPU_API::getRenderingAPI(){
     return "undefined";
 }

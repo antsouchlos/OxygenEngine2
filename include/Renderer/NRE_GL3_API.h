@@ -66,6 +66,9 @@ public:
     
     NRE_GL3_API();
     ~NRE_GL3_API();
+    
+    void destroy();
+    
     std::string getRenderingAPI();
     
     std::size_t newVertexBuffer();
