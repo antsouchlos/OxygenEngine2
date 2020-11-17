@@ -56,6 +56,10 @@ NRE_GL3_API::NRE_GL3_API(){
 }
 
 NRE_GL3_API::~NRE_GL3_API(){
+    
+}
+
+void NRE_GL3_API::destroy(){
     for (auto x: std::exchange(vbos, {}))
         glDeleteBuffers(1, &x.second.handle);
     for (auto x: std::exchange(vaos, {}))

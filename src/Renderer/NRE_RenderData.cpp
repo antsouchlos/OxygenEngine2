@@ -99,7 +99,7 @@ bool NRE_Renderer::updateData(){
     //}    
     
     // PRELIMINARY WORK
-    // only handle the first scene for now with 1 camera and no materials
+    // only handle the first scene for now with 1 camera and materials
     bool scene_done = false;
     for (auto scene: temp_scenes.getKeys()){
         

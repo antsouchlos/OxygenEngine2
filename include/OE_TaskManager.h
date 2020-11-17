@@ -100,7 +100,7 @@ class OE_TaskManager: public OE_MutexCondition
         bool                                done;
         
         
-        OE_EventHandler                     event_handler;
+        //OE_EventHandler                     event_handler;
         OE_RendererBase*                    renderer{nullptr};
         OE_PhysicsEngineBase*               physics{nullptr};
         OE_WindowSystemBase*                window{nullptr};

@@ -24,7 +24,6 @@ extern "C" int oxygen_engine_update_thread(void* data){
     OE_ThreadData::taskMgr->threads[actual_data->name].physics_task = OE_Task("OE_Physics", 0, 0, OE_ThreadData::taskMgr->getTicks());
     
     OE_ThreadData::taskMgr->updateThread(actual_data->name);
-    //cout << actual_data->name;
     delete actual_data;
     return 0;
 }
@@ -100,7 +99,6 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
     this->events_task = OE_Task("OE_Physics", 0, 0, this->getTicks());
     
-    this->event_handler.init();
     this->SetFrameRate(200);
     this->done = false;
     
@@ -125,9 +123,6 @@ void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func
 void OE_TaskManager::CreateNewThread(string thread_name){
     
     bool synchro = true;
-    //OE_ThreadStruct defaultThread = OE_ThreadStruct();
-    //defaultThread.synchronize = synchro;
-    //defaultThread.changed = true;
     
     lockMutex();
     
@@ -176,10 +171,9 @@ void OE_TaskManager::Step(){
         condWait(1);
     }
     unlockMutex();
-    done = this->event_handler.update();
 
     this->renderer->updateSingleThread();
-    this->window->update();
+    done = this->window->update();
     // count how many times the step function has been called
     countar++;
     
@@ -220,9 +214,9 @@ void OE_TaskManager::Step(){
     }
     unlockMutex();
     
-    this->updateWorld();
-    this->events_task.update();
-    this->event_handler.handleAllEvents(&events_task);
+    //this->updateWorld();
+    //this->events_task.update();
+    //this->window->event_handler.handleAllEvents(&events_task);
     
     if (this->world != nullptr){
         
@@ -232,6 +226,10 @@ void OE_TaskManager::Step(){
         this->renderer->updateData();
         //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
+    
+    this->updateWorld();
+    this->events_task.update();
+    this->window->event_handler.handleAllEvents(&events_task);
 }
 
 void OE_TaskManager::Start(){
@@ -270,8 +268,7 @@ void OE_TaskManager::Destroy(){
     this->renderer->destroy();
     this->physics->destroy();
     
-    this->event_handler.cleanup();
-    
+    this->window->event_handler.cleanup();
     this->window->destroy();
     
     delete this->renderer;

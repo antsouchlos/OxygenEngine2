@@ -24,7 +24,15 @@ public:
     SDL_Window* window;
     SDL_GLContext context;
     
+    SDL_Event event;
+    
     int counter{0};
+    
+    bool mouse_moved{false};
+    
+protected:
+    
+    void updateWindowEvents();
 };
 
 
