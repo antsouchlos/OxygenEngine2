@@ -11,8 +11,23 @@ NRE_Renderer::~NRE_Renderer(){
 }
     
 bool NRE_Renderer::init(){
-    if (api != nullptr)
+    
+    
+    // make sure there are no stored objects
+    this->cameras.clear();
+    this->materials.clear();
+    this->vgroups.clear();
+    this->meshes.clear();
+    this->lights.clear();
+    this->render_groups.clear();
+    
+    // reset all GPU data
+    if (api != nullptr){
+        api->destroy();
         delete api;
+    }
+    
+    // make sure we use the right API
     this->api = new NRE_GL3_API();
     if (!this->screen->isES){
         NRE_GPU_ShaderBase::init(NRE_GPU_GL, this->screen->major, this->screen->minor);
@@ -41,7 +56,7 @@ bool NRE_Renderer::updateSingleThread(){
         this->drawRenderGroupZPrePass(&x);
     }
     
-    // draw everything
+    // draw everything normally
     this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
     for (auto &x: this->render_groups){
         this->drawRenderGroup(&x);

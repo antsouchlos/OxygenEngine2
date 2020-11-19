@@ -77,6 +77,40 @@ bool NRE_Renderer::updateData(){
     
     OE_Main->unlockMutex();
     
+    if (this->screen->restart_renderer){
+        
+        // this also resets the GPU API resources
+        this->init();
+        
+        
+        // all objects must be gone through one time
+        // regardless if they have been changed or not
+        // in order to initialize GPU resources again
+        for (auto x: temp_scenes.getKeys()){
+            temp_scenes.changed[x] = true;
+        }
+        
+        for (auto x: temp_materials.getKeys()){
+            temp_materials.changed[x] = true;
+        }
+        
+        for (auto x: temp_objects.getKeys()){
+            temp_objects.changed[x] = true;
+            if (temp_objects[x]->getType() == "MESH32"){
+                
+                // vbos/ibos must be regenerated
+                auto mesh = static_cast<OE_Mesh32*>(temp_objects[x].get());
+                mesh->data.vbo_exists = false;
+                mesh->data.ibos_exist = false;
+            }
+        }
+        
+        
+        this->screen->restart_renderer = false;
+    }
+    
+    
+    
     // remove any obsolete draw commands
     std::set<std::size_t, std::greater<std::size_t>> to_be_removed;
     for (size_t i=0; i<this->render_groups.size(); i++){
@@ -99,7 +133,7 @@ bool NRE_Renderer::updateData(){
     //}    
     
     // PRELIMINARY WORK
-    // only handle the first scene for now with 1 camera and materials
+    // only handle the first scene for now with 1 camera and -materials
     bool scene_done = false;
     for (auto scene: temp_scenes.getKeys()){
         
