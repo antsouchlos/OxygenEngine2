@@ -499,3 +499,15 @@ void OE::OE_ChangeObjectLocalPos(std::string name, OE_Vec3 pos){
     }
 }
 
+/** API functions to control the renderer
+     *  These should work for ANY renderer
+     */
+    
+void OE::OE_RestartRenderer(){
+    assert (OE_Main != nullptr);
+    OE_Main->lockMutex();
+    if (OE_Main->window != nullptr)
+        OE_Main->window->restart_renderer = true;
+    OE_Main->unlockMutex();
+}
+
