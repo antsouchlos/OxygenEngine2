@@ -49,6 +49,12 @@ int toggle_mouse_locked_state(void*, OE_Task*, string event_name){
     return 0;
 }
 
+int toggle_restart_renderer(void*, OE_Task*, string event_name){
+    
+    OE_RestartRenderer();
+    return 0;
+}
+
 int test_task1(void*, OE_Task task){
     
     if (OE_IsMouseMoved() && OE_IsMouseLocked()){
@@ -76,7 +82,11 @@ int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     OE_SetEventFunc("keyboard-e+", &update_monkey_rot_neg_x, nullptr);
     OE_SetEventFunc("keyboard-a+", &update_monkey_rot_z, nullptr);
     OE_SetEventFunc("keyboard-d+", &update_monkey_rot_neg_z, nullptr);
+    
     OE_SetEventFunc("keyboard-space+", &toggle_mouse_locked_state, nullptr);
+    
+    OE_SetEventFunc("mouse-1+", &toggle_restart_renderer, nullptr);
+    
     OE_AddTask("test_task1", test_task1, nullptr);
     
     return 0;
