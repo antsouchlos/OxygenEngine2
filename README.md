@@ -168,6 +168,19 @@ because I just couldn't be bothered to write a lexical analyzer). With all it's 
 a recursive-decent implementation, one is quite literaly able to input a grammar, recompile (although with a bit of effort, even recompiling isn't necessary;
 the grammar could be loaded from a configuration file) and run the parser.
 
+2020/11/24 - philsegeler
+
+Primarily renderer stuff:
+- Added NRE_GPU_Shader classes enabling the use of different shaders for different objects and modes.  Shaders are also reusable for different objects to prevent unnecessary pipeline changes.
+- Two shading modes are supported: ```regular``` and ```normals```. 
+- Fixed some bugs regarding the window system and OpenGL ES.
+- Added a Z-pre-pass to the renderer for optimization and in preparation for implementing a Light-Indexed-Deferred Renderer.
+- Draw calls are now sorted.
+- The renderer can now be restarted on the fly at runtime.
+- Overhauled the event handler and pushed (almost) all SDL2-specific event handling code in ```OE_SDL_WindowSystem.h/cpp```. Now it is more maintenable.
+- Added possibility to change shading mode and restart the renderer in the demo using left/right mouse click.
+
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -185,9 +198,11 @@ UPDATE 2020/11/12: It was enhanced.
 
 - ~~Basic Material and Lighting support.~~(DONE)
 - ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
-- Support multiple shaders
+- ~~Support multiple shaders~~
+- Implement Directional Light rendering pass.
+- Implement Point+Area Light-Indexed rendering pass.
 - Support multiple render targets and framebuffers in the Renderer API
-- Implement Clustered Forward Renderer or Deferred Renderer or Tiled renderer etc, but probably the clustered one.
+- Implement Light Indexed Deferred Renderer.
 - Integration of the ```SDL2_image``` library and basic Texture streaming support with diffuse maps.
 - Integration of the ```SDL2_ttf``` + ```'freetype``` libraries and basic font loading and text-rendering support.
 
