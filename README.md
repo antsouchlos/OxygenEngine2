@@ -159,7 +159,7 @@ This will take a while, so the code will be touched sparingly for some time.
 
 CAUTION: The following does not constitute any real progress on the parser that will be used by the OxygenEngine. Nevertheless, it is a substantial part of my process for building an understanding about parsing algorithms.
 
-Added an implementation of a general directional top-down parser for context-free languages (with some restrictions). It is a very naive implementation,
+Added a breadth-first implementation of a general directional top-down parser for context-free languages (with some restrictions). It is a very naive implementation,
 lacking in MANY departments (frankly, at some points poorly implemented out of boredom - input tokens have to be separated by spaces for example,
 because I just couldn't be bothered to write a lexical analyzer). With all it's faults, this implementation has one really nice feature: Since it is not 
 a recursive-decent implementation, one is quite literaly able to input a grammar, recompile (although with a bit of effort, even recompiling isn't necessary;
