@@ -11,7 +11,7 @@
 class OE_THREAD_SAFETY_OBJECT{
     public:
         OE_THREAD_SAFETY_OBJECT();
-        virtual ~OE_THREAD_SAFETY_OBJECT() = 0;
+        virtual ~OE_THREAD_SAFETY_OBJECT();
         
         void lockMutex();
         void unlockMutex();

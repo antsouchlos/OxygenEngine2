@@ -44,7 +44,7 @@ public:
     void internalBroadcastKeyDownEvent(const std::string&);
     void internalBroadcastKeyUpEvent(const std::string&);
     
-    bool done;
+    std::atomic<bool> done;
     
     OE_InputEventHandler input_handler;
     

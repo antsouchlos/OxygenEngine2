@@ -8,7 +8,9 @@ OE_SDL_WindowSystem::OE_SDL_WindowSystem(){
 }
 
 OE_SDL_WindowSystem::~OE_SDL_WindowSystem(){
-
+    
+    SDL_Quit();
+    
 }
 
 bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, void* data){
@@ -351,6 +353,4 @@ void OE_SDL_WindowSystem::destroy(){
     
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
-    
-    SDL_Quit();
 }
