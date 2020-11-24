@@ -18,6 +18,15 @@ enum OE_WINSYS : int{
     OE_SOMETHING_ELSE=2
 };
 
+enum OE_RENDERER_SHADING_MODE {
+    OE_RENDERER_NORMALS_SHADING,
+    OE_RENDERER_NO_LIGHTS_SHADING,
+    OE_RENDERER_DIR_LIGHTS_SHADING,
+    OE_RENDERER_INDEXED_LIGHTS_SHADING,
+    OE_RENDERER_WIREFRAME_SHADING,
+    OE_RENDERER_REGULAR_SHADING
+};
+
 /** This a dummy class aimed to be used as a base class for windowing systems
   * It 
   */
@@ -77,6 +86,8 @@ class OE_RendererBase : public OE_THREAD_SAFETY_OBJECT {
     std::shared_ptr<OE_World>   world{nullptr};
     OE_WindowSystemBase*    screen{nullptr};
     std::string             name{"default"};
+    
+    OE_RENDERER_SHADING_MODE shading_mode{OE_RENDERER_REGULAR_SHADING};
 };
 
 /** This is a dummy class aimed to be a base class for
