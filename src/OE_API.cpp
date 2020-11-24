@@ -511,3 +511,24 @@ void OE::OE_RestartRenderer(){
     OE_Main->unlockMutex();
 }
 
+void OE::OE_SetShadingMode(OE_RENDERER_SHADING_MODE shading_mode){
+    assert (OE_Main != nullptr);
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->lockMutex();
+        OE_Main->renderer->shading_mode = shading_mode;
+        OE_Main->renderer->unlockMutex();
+    }
+    OE_RestartRenderer();
+}
+
+OE_RENDERER_SHADING_MODE OE_GetShadingMode(){
+    assert (OE_Main != nullptr);
+    OE_RENDERER_SHADING_MODE output = OE_RENDERER_REGULAR_SHADING;
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->lockMutex();
+        output = OE_Main->renderer->shading_mode;
+        OE_Main->renderer->unlockMutex();
+    }
+    return output;
+}
+

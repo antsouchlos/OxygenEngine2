@@ -75,8 +75,31 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
         ren_group->vs.type = NRE_GPU_VS_REGULAR;
         ren_group->vs.num_of_uvs = this->meshes[ren_group->mesh].uvmaps;
         
+        
+        // choose shading mode
         ren_group->fs = NRE_GPU_PixelShader();
-        ren_group->fs.type = NRE_GPU_FS_MATERIAL;
+        lockMutex();
+        switch (this->shading_mode){
+            case OE_RENDERER_NORMALS_SHADING:
+                ren_group->fs.type = NRE_GPU_FS_NORMALS;
+                break;
+            case OE_RENDERER_NO_LIGHTS_SHADING:
+                
+                break;
+            case OE_RENDERER_DIR_LIGHTS_SHADING:
+                
+                break;
+            case OE_RENDERER_INDEXED_LIGHTS_SHADING:
+                
+                break;
+            case OE_RENDERER_WIREFRAME_SHADING:
+                
+                break;
+            case OE_RENDERER_REGULAR_SHADING:
+                ren_group->fs.type = NRE_GPU_FS_MATERIAL;
+                break;
+        }
+        unlockMutex();
         ren_group->fs.num_of_uvs = this->meshes[ren_group->mesh].uvmaps;
         
         ren_group->program = this->api->newProgram();
