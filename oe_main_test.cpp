@@ -49,9 +49,15 @@ int toggle_mouse_locked_state(void*, OE_Task*, string event_name){
     return 0;
 }
 
-int toggle_restart_renderer(void*, OE_Task*, string event_name){
+int set_renderer_mode_normals(void*, OE_Task*, string event_name){
     
-    OE_RestartRenderer();
+    OE_SetShadingMode(OE_RENDERER_NORMALS_SHADING);
+    return 0;
+}
+
+int set_renderer_mode_regular(void*, OE_Task*, string event_name){
+    
+    OE_SetShadingMode(OE_RENDERER_REGULAR_SHADING);
     return 0;
 }
 
@@ -85,7 +91,8 @@ int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     
     OE_SetEventFunc("keyboard-space+", &toggle_mouse_locked_state, nullptr);
     
-    OE_SetEventFunc("mouse-1+", &toggle_restart_renderer, nullptr);
+    OE_SetEventFunc("mouse-1+", &set_renderer_mode_normals, nullptr);
+    OE_SetEventFunc("mouse-2+", &set_renderer_mode_regular, nullptr);
     
     OE_AddTask("test_task1", test_task1, nullptr);
     
