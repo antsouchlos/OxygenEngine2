@@ -51,8 +51,8 @@ public:
     
     bool mouse_locked{false};
     
-    bool reset_renderer{false};
-    bool restart_renderer{false};
+    std::atomic<bool> reset_renderer{false};
+    std::atomic<bool> restart_renderer{false};
     
     // The global event handler is here and must be initialized in all sub classes
     OE_EventHandler event_handler;
