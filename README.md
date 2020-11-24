@@ -162,7 +162,7 @@ CAUTION: The following does not constitute any real progress on the parser that 
 Added an implementation of a general directional top-down parser for context-free languages (with some restrictions). It is a very naive implementation,
 lacking in MANY departments (frankly, at some points poorly implemented out of boredom - input tokens have to be separated by spaces for example,
 because I just couldn't be bothered to write a lexical analyzer). With all it's faults, this implementation has one really nice feature: Since it is not 
-recursive-decent implementation, one is quite literaly able to input a grammar, recompile (although with a bit of effort, even recompiling isn't necessary;
+a recursive-decent implementation, one is quite literaly able to input a grammar, recompile (although with a bit of effort, even recompiling isn't necessary;
 the grammar could be loaded from a configuration file) and run the parser.
 
 ## Initial TODO list for philsegeler
