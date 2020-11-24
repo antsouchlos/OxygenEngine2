@@ -97,7 +97,7 @@ class OE_TaskManager: public OE_MutexCondition
         
         //SDL_sem*                           global_semaphore;
         //very important variable
-        bool                                done;
+        std::atomic<bool>                                done;
         
         
         //OE_EventHandler                     event_handler;
