@@ -1,0 +1,218 @@
+[
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o -MF libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o.d -o libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o -c ../src/OE_SDL_WindowSystem.cpp",
+    "file": "../src/OE_SDL_WindowSystem.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "cc -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Renderer_glad.c.o -MF libOxygenEngine.a.p/src_Renderer_glad.c.o.d -o libOxygenEngine.a.p/src_Renderer_glad.c.o -c ../src/Renderer/glad.c",
+    "file": "../src/Renderer/glad.c",
+    "output": "libOxygenEngine.a.p/src_Renderer_glad.c.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o -MF libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o.d -o libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o -c ../src/Renderer/NRE_GL3_API.cpp",
+    "file": "../src/Renderer/NRE_GL3_API.cpp",
+    "output": "libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o -MF libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o.d -o libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o -c ../src/Renderer/NRE_GPU_API.cpp",
+    "file": "../src/Renderer/NRE_GPU_API.cpp",
+    "output": "libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o -MF libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o.d -o libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o -c ../src/Renderer/NRE_RendererMain.cpp",
+    "file": "../src/Renderer/NRE_RendererMain.cpp",
+    "output": "libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o -MF libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o.d -o libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o -c ../src/Renderer/NRE_RenderData.cpp",
+    "file": "../src/Renderer/NRE_RenderData.cpp",
+    "output": "libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o -MF libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o.d -o libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o -c ../src/Events/OE_MutexCondition.cpp",
+    "file": "../src/Events/OE_MutexCondition.cpp",
+    "output": "libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o -MF libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o.d -o libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o -c ../src/OE_API_Helpers.cpp",
+    "file": "../src/OE_API_Helpers.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_API.cpp.o -MF libOxygenEngine.a.p/src_OE_API.cpp.o.d -o libOxygenEngine.a.p/src_OE_API.cpp.o -c ../src/OE_API.cpp",
+    "file": "../src/OE_API.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_API.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_Math.cpp.o -MF libOxygenEngine.a.p/src_OE_Math.cpp.o.d -o libOxygenEngine.a.p/src_OE_Math.cpp.o -c ../src/OE_Math.cpp",
+    "file": "../src/OE_Math.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_Math.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o -MF libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o.d -o libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o -c ../src/OE_DummyClasses.cpp",
+    "file": "../src/OE_DummyClasses.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_TaskManager.cpp.o -MF libOxygenEngine.a.p/src_OE_TaskManager.cpp.o.d -o libOxygenEngine.a.p/src_OE_TaskManager.cpp.o -c ../src/OE_TaskManager.cpp",
+    "file": "../src/OE_TaskManager.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_TaskManager.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_OE_Task.cpp.o -MF libOxygenEngine.a.p/src_OE_Task.cpp.o.d -o libOxygenEngine.a.p/src_OE_Task.cpp.o -c ../src/OE_Task.cpp",
+    "file": "../src/OE_Task.cpp",
+    "output": "libOxygenEngine.a.p/src_OE_Task.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o -MF libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o.d -o libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o -c ../src/Events/OE_EventHandler.cpp",
+    "file": "../src/Events/OE_EventHandler.cpp",
+    "output": "libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o -MF libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o.d -o libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o -c ../src/Events/OE_InputEventHandler.cpp",
+    "file": "../src/Events/OE_InputEventHandler.cpp",
+    "output": "libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o -MF libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o.d -o libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o -c ../src/Events/OE_EventParser.cpp",
+    "file": "../src/Events/OE_EventParser.cpp",
+    "output": "libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Events_OE_Event.cpp.o -MF libOxygenEngine.a.p/src_Events_OE_Event.cpp.o.d -o libOxygenEngine.a.p/src_Events_OE_Event.cpp.o -c ../src/Events/OE_Event.cpp",
+    "file": "../src/Events/OE_Event.cpp",
+    "output": "libOxygenEngine.a.p/src_Events_OE_Event.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o -MF libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o.d -o libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o -c ../src/Carbon/CSL_Interpreter.cpp",
+    "file": "../src/Carbon/CSL_Interpreter.cpp",
+    "output": "libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o -MF libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o.d -o libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o -c ../src/Carbon/CSL_Parser.cpp",
+    "file": "../src/Carbon/CSL_Parser.cpp",
+    "output": "libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o -MF libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o.d -o libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o -c ../src/Carbon/CSL_Lexer.cpp",
+    "file": "../src/Carbon/CSL_Lexer.cpp",
+    "output": "libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o -MF libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o -c ../src/types/OE_TypesBase.cpp",
+    "file": "../src/types/OE_TypesBase.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Camera.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Camera.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Camera.cpp.o -c ../src/types/OE_Camera.cpp",
+    "file": "../src/types/OE_Camera.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Camera.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Light.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Light.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Light.cpp.o -c ../src/types/OE_Light.cpp",
+    "file": "../src/types/OE_Light.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Light.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Material.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Material.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Material.cpp.o -c ../src/types/OE_Material.cpp",
+    "file": "../src/types/OE_Material.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Material.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o -c ../src/types/OE_Mesh.cpp",
+    "file": "../src/types/OE_Mesh.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Object.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Object.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Object.cpp.o -c ../src/types/OE_Object.cpp",
+    "file": "../src/types/OE_Object.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Object.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o -MF libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o -c ../src/types/OE_PolygonStorage.cpp",
+    "file": "../src/types/OE_PolygonStorage.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Scene.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Scene.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Scene.cpp.o -c ../src/types/OE_Scene.cpp",
+    "file": "../src/types/OE_Scene.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Scene.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_TCM.cpp.o -MF libOxygenEngine.a.p/src_types_OE_TCM.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_TCM.cpp.o -c ../src/types/OE_TCM.cpp",
+    "file": "../src/types/OE_TCM.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_TCM.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_Texture.cpp.o -MF libOxygenEngine.a.p/src_types_OE_Texture.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_Texture.cpp.o -c ../src/types/OE_Texture.cpp",
+    "file": "../src/types/OE_Texture.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_Texture.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o -MF libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o -c ../src/types/OE_VertexGroup.cpp",
+    "file": "../src/types/OE_VertexGroup.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o -MF libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o -c ../src/types/OE_ViewportConfig.cpp",
+    "file": "../src/types/OE_ViewportConfig.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o -MF libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o -c ../src/types/OE_VertexStorage.cpp",
+    "file": "../src/types/OE_VertexStorage.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_types_OE_World.cpp.o -MF libOxygenEngine.a.p/src_types_OE_World.cpp.o.d -o libOxygenEngine.a.p/src_types_OE_World.cpp.o -c ../src/types/OE_World.cpp",
+    "file": "../src/types/OE_World.cpp",
+    "output": "libOxygenEngine.a.p/src_types_OE_World.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -ICSL_Test.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -D_REENTRANT -MD -MQ CSL_Test.p/csl_main_test.cpp.o -MF CSL_Test.p/csl_main_test.cpp.o.d -o CSL_Test.p/csl_main_test.cpp.o -c ../csl_main_test.cpp",
+    "file": "../csl_main_test.cpp",
+    "output": "CSL_Test.p/csl_main_test.cpp.o"
+  },
+  {
+    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
+    "command": "c++ -IOE_Test.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -D_REENTRANT -MD -MQ OE_Test.p/oe_main_test.cpp.o -MF OE_Test.p/oe_main_test.cpp.o.d -o OE_Test.p/oe_main_test.cpp.o -c ../oe_main_test.cpp",
+    "file": "../oe_main_test.cpp",
+    "output": "OE_Test.p/oe_main_test.cpp.o"
+  }
+]
