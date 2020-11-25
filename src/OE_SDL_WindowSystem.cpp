@@ -126,6 +126,9 @@ void OE_SDL_WindowSystem::finishInit(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     
+    if (!this->isES)
+        glEnable(GL_FRAMEBUFFER_SRGB);
+    
     SDL_GL_SwapWindow(this->window);
     
     this->event_handler.init();
