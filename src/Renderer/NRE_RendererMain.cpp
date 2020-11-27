@@ -50,6 +50,8 @@ bool NRE_Renderer::updateSingleThread(){
     auto comp_lambda = [] (const NRE_RenderGroup& r1, const NRE_RenderGroup& r2) -> bool { return r1 < r2; };
     std::sort(this->render_groups.begin(), this->render_groups.end(), comp_lambda);
     
+    this->api->use_wireframe = this->use_wireframe.load(std::memory_order_relaxed);
+    
     // draw everything required for the z prepass, which also populates the depth buffer
     this->api->setRenderMode(NRE_GPU_Z_PREPASS_BACKFACE);
     for (auto &x: this->render_groups){
@@ -90,9 +92,6 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
                 
                 break;
             case OE_RENDERER_INDEXED_LIGHTS_SHADING:
-                
-                break;
-            case OE_RENDERER_WIREFRAME_SHADING:
                 
                 break;
             case OE_RENDERER_REGULAR_SHADING:

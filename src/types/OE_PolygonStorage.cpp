@@ -226,19 +226,27 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
 
 std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgroup_id){
     
-    auto vgroup = this->triangle_groups[vgroup_id];
+    auto vgroup = this->triangle_groups[vgroup_id];    
     std::vector<uint32_t> output;
+    
+    // sort optimizing for vertex cache 
+    /*uint32_t vertex_count = this->index_buffer->size();
+    std::vector<float> vertex_score; vertex_score.reserve(vertex_count);
+    
+    vertex_score.push_back(0.75);
+    vertex_score.push_back(0.75);
+    vertex_score.push_back(0.75);
+    
+    for (size_t i=3; i< vertex_score.size(); i++){
+        
+    }*/
+    
     
     // do the expensive allocation at the start
     output.reserve(vgroup->polygons.size()*3);
     
     for (const auto& tri : vgroup->polygons){
         
-        /*cout << this->triangles[tri].to_str(2+this->num_of_uvs) << endl;
-        size_t id = std::find(this->vertex_buffer.begin(), this->vertex_buffer.end(), this->triangles[tri].v1)-this->vertex_buffer.begin();
-        cout << this->triangles[tri].v1 <<  " " << this->vertex_buffer[id] << endl;*/
-        //cout << "IS THIS DONE 2" << endl;
-        //break;
         output.push_back(this->index_buffer[0][this->triangles[tri].v1]);
         output.push_back(this->index_buffer[0][this->triangles[tri].v2]);
         output.push_back(this->index_buffer[0][this->triangles[tri].v3]);

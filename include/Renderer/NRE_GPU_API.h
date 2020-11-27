@@ -97,6 +97,8 @@ public:
     virtual void draw(std::size_t, std::size_t, std::size_t);
     
     virtual void setRenderMode(NRE_GPU_RENDERMODE);
+    
+    std::atomic<bool>           use_wireframe{false};
 };
 
 #endif 

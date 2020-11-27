@@ -61,6 +61,12 @@ int set_renderer_mode_regular(void*, OE_Task*, string event_name){
     return 0;
 }
 
+int renderer_toggle_wireframe(void*, OE_Task*, string event_name){
+    
+    OE_ToggleWireframe();
+    return 0;
+}
+
 int test_task1(void*, OE_Task task){
     
     if (OE_IsMouseMoved() && OE_IsMouseLocked()){
@@ -91,8 +97,10 @@ int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     
     OE_SetEventFunc("keyboard-space+", &toggle_mouse_locked_state, nullptr);
     
-    OE_SetEventFunc("mouse-1+", &set_renderer_mode_normals, nullptr);
-    OE_SetEventFunc("mouse-2+", &set_renderer_mode_regular, nullptr);
+    // Useful for debugging
+    OE_SetEventFunc("keyboard-f5+", &set_renderer_mode_normals, nullptr);
+    OE_SetEventFunc("keyboard-f6+", &set_renderer_mode_regular, nullptr);
+    OE_SetEventFunc("keyboard-f7+", &renderer_toggle_wireframe, nullptr);
     
     OE_AddTask("test_task1", test_task1, nullptr);
     
