@@ -94,15 +94,18 @@ class OE_TaskManager: public OE_MutexCondition
         std::set<std::string>                       finished_unsync_threadIDs = {};
         
         std::map<std::string, std::string> active_tasks = {};
-        
-        //SDL_sem*                           global_semaphore;
+
         //very important variable
         std::atomic<bool>                                done;
         
         
-        //OE_EventHandler                     event_handler;
+        OE_THREAD_SAFETY_OBJECT             renderer_mutex;
         OE_RendererBase*                    renderer{nullptr};
+        
+        OE_THREAD_SAFETY_OBJECT             physics_mutex;
         OE_PhysicsEngineBase*               physics{nullptr};
+        
+        OE_THREAD_SAFETY_OBJECT             window_mutex;
         OE_WindowSystemBase*                window{nullptr};
         
         std::shared_ptr<OE_World>   world{nullptr};

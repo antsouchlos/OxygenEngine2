@@ -129,6 +129,9 @@ namespace OE{
     void OE_RestartRenderer();
     void OE_SetShadingMode(OE_RENDERER_SHADING_MODE);
     OE_RENDERER_SHADING_MODE OE_GetShadingMode();
+    
+    void OE_RenderWireframe(bool);
+    void OE_ToggleWireframe();
 };
 
 

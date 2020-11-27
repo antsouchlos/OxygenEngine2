@@ -83,11 +83,21 @@ OE_TaskManager::~OE_TaskManager()
 
 int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
+    
     this->window = new OE_SDL_WindowSystem();
     
+    // the lock and unlockMutexes are for making sure the mutexes are initialized
+    this->window_mutex.lockMutex();
+    this->window_mutex.unlockMutex();
+    
+    this->renderer_mutex.lockMutex();
     this->renderer = new NRE_Renderer();
     this->renderer->screen = this->window;
+    this->renderer_mutex.unlockMutex();
+    
+    this->physics_mutex.lockMutex();
     this->physics = new OE_PhysicsEngineBase();
+    this->physics_mutex.unlockMutex();
     
     this->window->init(x, y, titlea, fullscreen, nullptr);
     this->renderer->init();

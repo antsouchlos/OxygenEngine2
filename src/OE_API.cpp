@@ -505,30 +505,56 @@ void OE::OE_ChangeObjectLocalPos(std::string name, OE_Vec3 pos){
     
 void OE::OE_RestartRenderer(){
     assert (OE_Main != nullptr);
-    OE_Main->lockMutex();
+    OE_Main->window_mutex.lockMutex();
     if (OE_Main->window != nullptr)
         OE_Main->window->restart_renderer = true;
-    OE_Main->unlockMutex();
+    OE_Main->window_mutex.unlockMutex();
 }
 
 void OE::OE_SetShadingMode(OE_RENDERER_SHADING_MODE shading_mode){
     assert (OE_Main != nullptr);
+    OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->lockMutex();
         OE_Main->renderer->shading_mode = shading_mode;
         OE_Main->renderer->unlockMutex();
     }
+    OE_Main->renderer_mutex.unlockMutex();
     OE_RestartRenderer();
 }
 
 OE_RENDERER_SHADING_MODE OE_GetShadingMode(){
     assert (OE_Main != nullptr);
     OE_RENDERER_SHADING_MODE output = OE_RENDERER_REGULAR_SHADING;
+    OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->lockMutex();
         output = OE_Main->renderer->shading_mode;
         OE_Main->renderer->unlockMutex();
     }
+    OE_Main->renderer_mutex.unlockMutex();
     return output;
 }
 
+void OE::OE_RenderWireframe(bool value){
+    assert (OE_Main != nullptr);
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->use_wireframe = value;
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
+
+void OE::OE_ToggleWireframe(){
+    assert (OE_Main != nullptr);
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->lockMutex();
+        if (OE_Main->renderer->use_wireframe)
+            OE_Main->renderer->use_wireframe = false;
+        else
+            OE_Main->renderer->use_wireframe = true;
+        OE_Main->renderer->unlockMutex();
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
