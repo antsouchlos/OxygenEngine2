@@ -531,6 +531,10 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     glUseProgram(this->progs[prog_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
+    
+    //glDisable (GL_CULL_FACE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
     glDrawElements(GL_TRIANGLES, this->ibos[ibo_id].size, GL_UNSIGNED_INT, (GLvoid*)NULL);
 }
 
@@ -574,5 +578,12 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     }
     else {
         // TODO
+    }
+    
+    if (use_wireframe){
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else{
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
