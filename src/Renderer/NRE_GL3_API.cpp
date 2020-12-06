@@ -580,10 +580,12 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         // TODO
     }
     
-    if (use_wireframe){
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-    else{
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (NRE_GPU_ShaderBase::backend != NRE_GPU_GLES){
+        if (use_wireframe){
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else{
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
     }
 }
