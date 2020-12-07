@@ -25,7 +25,13 @@ public:
     std::map<std::size_t, NRE_MeshRenderData> meshes;
     std::map<std::size_t, NRE_LightRenderData> lights;
     std::vector<NRE_RenderGroup> render_groups;
-
+    
+    
+    // bounding box data
+    std::size_t prog_bbox;
+    bool setup_bbox_prog{false};
+    
+    
 protected:
     
     void handleMeshData(std::size_t, OE_Mesh32*);
@@ -44,6 +50,8 @@ protected:
     void drawRenderGroupZPrePass(NRE_RenderGroup*);
     
     bool existsRenderGroup(NRE_RenderGroup);
+    
+    void setupBoundingBoxProgram();
 };
 
 

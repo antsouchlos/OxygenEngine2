@@ -221,6 +221,8 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
             output.push_back(this->vertices.uvmaps[i].elements[vertex[2+i]*2+1]);
         }
     } 
+    
+    this->vertices.calculateNaiveBoundingBox();
     return output;
 }
 
@@ -254,7 +256,9 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
     
     return output;
 }
-
+        
+/*********************************************/
+        
 void OE_PolygonStorage32::initUnorderedIB(OE_Mesh32* mesh){
     this->index_buffer = new OE_IndexBufferUnorderedMap(mesh);
 }

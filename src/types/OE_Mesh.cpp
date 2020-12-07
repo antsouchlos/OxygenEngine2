@@ -18,6 +18,62 @@ OE_Mesh32::~OE_Mesh32(){
     
 }
 
+// This takes into account rotation as well
+
+void OE_Mesh32::calculateProperBoundingBox(){
+    
+    OE_Mat3x3 rot_matrix = OE_Mat3x3(this->GetModelMatrix());
+    
+    assert((this->data.vertices.positions.size() >= 3) && (this->data.vertices.positions.size() % 3 == 0));
+    
+    
+    
+    // find min/max position on each axis
+    // apply the inverse rotation to find the proper bounding box again
+    OE_Vec3 rotated_initial_pos = rot_matrix * OE_Vec3(this->data.vertices.positions[0], this->data.vertices.positions[1], this->data.vertices.positions[2]);
+    
+    this->data.vertices.max_x = rotated_initial_pos[0];
+    this->data.vertices.max_y = rotated_initial_pos[1];
+    this->data.vertices.max_z = rotated_initial_pos[2];
+    
+    this->data.vertices.min_x = rotated_initial_pos[0];
+    this->data.vertices.min_y = rotated_initial_pos[1];
+    this->data.vertices.min_z = rotated_initial_pos[2];
+    
+    for (size_t i=0; i < this->data.vertices.positions.size(); i+=3){
+            
+            OE_Vec3 rotated_pos = rot_matrix * OE_Vec3(this->data.vertices.positions[i], this->data.vertices.positions[i+1], this->data.vertices.positions[i+2]);
+            
+            if (rotated_pos[0] < this->data.vertices.min_x){
+                this->data.vertices.min_x = rotated_pos[0];
+                
+            }
+            if (rotated_pos[0] > this->data.vertices.max_x){
+                this->data.vertices.max_x = rotated_pos[0];
+               
+            }
+       
+            if (rotated_pos[1] < this->data.vertices.min_y){
+                this->data.vertices.min_y = rotated_pos[1];
+                
+            }
+            if (rotated_pos[1] > this->data.vertices.max_y){
+                this->data.vertices.max_y = rotated_pos[1];
+               
+            }
+       
+            if (rotated_pos[2] < this->data.vertices.min_z){
+                this->data.vertices.min_z = rotated_pos[2];
+                
+            }
+            if (rotated_pos[2] > this->data.vertices.max_z){
+                this->data.vertices.max_z = rotated_pos[2];
+               
+            }
+    }
+}
+
+
 string OE_Mesh32::getType() const{
     return "MESH32";
 }
