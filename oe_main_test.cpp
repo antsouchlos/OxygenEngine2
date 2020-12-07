@@ -63,7 +63,13 @@ int set_renderer_mode_regular(void*, OE_Task*, string event_name){
 
 int renderer_toggle_wireframe(void*, OE_Task*, string event_name){
     
-    OE_ToggleWireframe();
+    OE_ToggleWireframeRendering();
+    return 0;
+}
+
+int renderer_toggle_bounding_boxes(void*, OE_Task*, string event_name){
+    
+    OE_ToggleBoundingBoxesRendering();
     return 0;
 }
 
@@ -101,6 +107,7 @@ int OnLoadObject(void* data, OE_Task* event_task, string event_name){
     OE_SetEventFunc("keyboard-f5+", &set_renderer_mode_normals, nullptr);
     OE_SetEventFunc("keyboard-f6+", &set_renderer_mode_regular, nullptr);
     OE_SetEventFunc("keyboard-f7+", &renderer_toggle_wireframe, nullptr);
+    OE_SetEventFunc("keyboard-f8+", &renderer_toggle_bounding_boxes, nullptr);
     
     OE_AddTask("test_task1", test_task1, nullptr);
     

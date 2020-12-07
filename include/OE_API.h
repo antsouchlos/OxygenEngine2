@@ -131,7 +131,10 @@ namespace OE{
     OE_RENDERER_SHADING_MODE OE_GetShadingMode();
     
     void OE_RenderWireframe(bool);
-    void OE_ToggleWireframe();
+    void OE_ToggleWireframeRendering();
+    
+    void OE_RenderBoundingBoxes(bool);
+    void OE_ToggleBoundingBoxesRendering();
 };
 
 

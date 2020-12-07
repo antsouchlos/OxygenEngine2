@@ -576,6 +576,16 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         glCullFace (GL_BACK); /// cull back face
         glFrontFace (GL_CCW);
     }
+    else if (rendermode == NRE_GPU_REGULAR_BOTH){
+        glDisable(GL_BLEND);
+        
+        glEnable (GL_DEPTH_TEST); // enable depth-testing
+        glDepthFunc (GL_LESS);
+        glColorMask(1, 1, 1, 1);
+        glDepthMask(GL_TRUE);
+        
+        glDisable(GL_CULL_FACE);
+    }
     else {
         // TODO
     }

@@ -545,7 +545,7 @@ void OE::OE_RenderWireframe(bool value){
     OE_Main->renderer_mutex.unlockMutex();
 }
 
-void OE::OE_ToggleWireframe(){
+void OE::OE_ToggleWireframeRendering(){
     assert (OE_Main != nullptr);
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
@@ -554,6 +554,28 @@ void OE::OE_ToggleWireframe(){
             OE_Main->renderer->use_wireframe = false;
         else
             OE_Main->renderer->use_wireframe = true;
+        OE_Main->renderer->unlockMutex();
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
+
+void OE::OE_RenderBoundingBoxes(bool value){
+    assert (OE_Main != nullptr);
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->render_bounding_boxes = value;
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
+void OE::OE_ToggleBoundingBoxesRendering(){
+    assert (OE_Main != nullptr);
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->lockMutex();
+        if (OE_Main->renderer->render_bounding_boxes)
+            OE_Main->renderer->render_bounding_boxes = false;
+        else
+            OE_Main->renderer->render_bounding_boxes = true;
         OE_Main->renderer->unlockMutex();
     }
     OE_Main->renderer_mutex.unlockMutex();

@@ -88,6 +88,7 @@ class OE_RendererBase : public OE_THREAD_SAFETY_OBJECT {
     
     OE_RENDERER_SHADING_MODE    shading_mode{OE_RENDERER_REGULAR_SHADING};
     std::atomic<bool>           use_wireframe{false};
+    std::atomic<bool>           render_bounding_boxes{false};
 };
 
 /** This is a dummy class aimed to be a base class for

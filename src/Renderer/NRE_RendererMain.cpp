@@ -63,6 +63,28 @@ bool NRE_Renderer::updateSingleThread(){
     for (auto &x: this->render_groups){
         this->drawRenderGroup(&x);
     }
+    
+    // optionally draw a bounding box for each object (in wireframe mode)
+    bool temp = this->api->use_wireframe;
+    bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
+    this->api->use_wireframe = true;
+    
+    if (render_bboxes){
+        this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
+        if (!this->setup_bbox_prog){
+        
+            this->setupBoundingBoxProgram();
+            this->setup_bbox_prog = true;
+        }
+        for (auto &x: this->meshes){
+        
+            this->api->setUniformState(x.second.ubo, this->prog_bbox, 1, 0, 0);
+            this->api->setUniformState(this->cameras[this->render_groups[0].camera].ubo, this->prog_bbox, 0, 0, 0);        
+            this->api->draw(this->prog_bbox, x.second.vao_bbox);
+        }
+    }
+    this->api->use_wireframe = temp;
+    
     return true;
 }
 
@@ -142,6 +164,28 @@ void NRE_Renderer::drawRenderGroupZPrePass(NRE_RenderGroup* ren_group){
     this->api->draw(ren_group->z_prepass_program, this->meshes[ren_group->mesh].vao, this->vgroups[ren_group->vgroup].ibo);
     
 }
+
+void NRE_Renderer::setupBoundingBoxProgram(){
+    this->prog_bbox = this->api->newProgram();
+        
+    NRE_GPU_VertexShader vs_bbox;
+    NRE_GPU_PixelShader fs_bbox;
+        
+    vs_bbox.type = NRE_GPU_VS_REGULAR;
+    vs_bbox.num_of_uvs = 0;
+        
+    fs_bbox.type = NRE_GPU_FS_NORMALS;
+    fs_bbox.num_of_uvs = 0;
+        
+    this->api->setProgramVS(this->prog_bbox, vs_bbox);
+    this->api->setProgramFS(this->prog_bbox, fs_bbox);
+        
+    this->api->setupProgram(this->prog_bbox);
+    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Camera", 0);
+    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Mesh32", 1);
+    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+}
+
 
 bool NRE_Renderer::updateMultiThread(OE_Task*, int){
     return false;
