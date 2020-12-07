@@ -126,6 +126,7 @@ class OE_PolygonStorage32 {
         
         
         bool changed{false};
+        
     protected:
         
         // Internal but IMPORTANT stuff

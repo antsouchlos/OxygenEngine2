@@ -53,6 +53,10 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
     bool vao_initialized{false};
     
     std::vector<NRE_GPU_VertexLayoutInput> vao_input;
+    
+    std::size_t vbo_bbox;
+    std::size_t vao_bbox;
+    
 };
 
 struct NRE_LightRenderData : public NRE_BaseObject{

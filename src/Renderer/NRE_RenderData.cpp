@@ -107,6 +107,7 @@ bool NRE_Renderer::updateData(){
         
         
         this->screen->restart_renderer = false;
+        this->setup_bbox_prog = false;
     }
     
     
@@ -253,6 +254,18 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
             this->handleVGroupData(id, vgroup.first, mesh);
         }
         mesh->data.ibos.clear();
+        
+        
+        // store bounding box
+        this->meshes[id].vbo_bbox = this->api->newVertexBuffer();
+        this->api->setVertexBufferMemoryData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), NRE_GPU_STATIC);
+        
+        this->meshes[id].vao_bbox = this->api->newVertexLayout();
+        std::vector<VLI> vao_bbox_data;
+        vao_bbox_data.push_back(VLI(this->meshes[id].vbo_bbox, 0, 3, 6));
+        vao_bbox_data.push_back(VLI(this->meshes[id].vbo_bbox, 3, 3, 6));
+        
+        this->api->setVertexLayoutFormat(this->meshes[id].vao_bbox, vao_bbox_data);
         
     }
     else{

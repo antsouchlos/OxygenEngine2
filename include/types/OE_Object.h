@@ -31,7 +31,7 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         virtual ~OE_Object();
         
         virtual std::string getType() const;
-        virtual std::string to_str() const;
+        virtual std::string to_str() const;        
         
         OE_Quat GetRot();
         void SetRot(OE_Quat);
