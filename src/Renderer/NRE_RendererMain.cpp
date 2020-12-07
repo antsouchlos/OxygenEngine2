@@ -171,7 +171,7 @@ void NRE_Renderer::setupBoundingBoxProgram(){
     NRE_GPU_VertexShader vs_bbox;
     NRE_GPU_PixelShader fs_bbox;
         
-    vs_bbox.type = NRE_GPU_VS_REGULAR;
+    vs_bbox.type = NRE_GPU_VS_BOUNDING_BOX;
     vs_bbox.num_of_uvs = 0;
         
     fs_bbox.type = NRE_GPU_FS_NORMALS;

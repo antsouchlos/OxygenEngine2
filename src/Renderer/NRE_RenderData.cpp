@@ -257,8 +257,14 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         
         
         // store bounding box
+        
+        //---- <TEMPORARY> ----//
+        // This should not be done here but in the physics engine
+        mesh->calculateProperBoundingBox();
+        //---- </TEMPORARY> ---//
+        
         this->meshes[id].vbo_bbox = this->api->newVertexBuffer();
-        this->api->setVertexBufferMemoryData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), NRE_GPU_STATIC);
+        this->api->setVertexBufferMemoryData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), NRE_GPU_STREAM);
         
         this->meshes[id].vao_bbox = this->api->newVertexLayout();
         std::vector<VLI> vao_bbox_data;
@@ -270,6 +276,17 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
     }
     else{
         this->meshes[id].data = OE_Mat4x4ToSTDVector(mesh->GetModelMatrix());
+        
+        bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
+        if (render_bboxes){
+            //---- <TEMPORARY> ----//
+            // This should not be done here but in the physics engine
+            mesh->calculateProperBoundingBox();
+            //---- </TEMPORARY> ---//
+        
+            this->api->setVertexBufferData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), 0);
+        }
+        
         this->meshes[id].changed = true;
     }
 }

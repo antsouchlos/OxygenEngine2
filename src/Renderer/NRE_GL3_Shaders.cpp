@@ -37,7 +37,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 }
             );
         } 
-        else if (vs.type == NRE_GPU_VS_REGULAR){
+        else if ((vs.type == NRE_GPU_VS_REGULAR) || (vs.type == NRE_GPU_VS_BOUNDING_BOX)){
             
             // setup inputs
             output = NRE_Shader(
@@ -73,18 +73,39 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
             ));
             
             // setup final logic
-            
-            output.append(NRE_Shader(
-                void main(){
-                    normals = mat3(Model_Matrix)*oe_normals;
-                    mat4 final_mat = PV_Matrix*Model_Matrix;
+            if (vs.type == NRE_GPU_VS_REGULAR){
                 
-                    vec4 temp_position = Model_Matrix*vec4(oe_position, 1.0);
-                    position = temp_position.xyz;
-                    gl_Position = final_mat*vec4(oe_position, 1.0);
-                }
-            ));
+                // handle regular case
+                output.append(NRE_Shader(
+                    void main(){
+                        normals = mat3(Model_Matrix)*oe_normals;
+                        mat4 final_mat = PV_Matrix*Model_Matrix;
+                
+                        vec4 temp_position = Model_Matrix*vec4(oe_position, 1.0);
+                        position = temp_position.xyz;
+                        gl_Position = final_mat*vec4(oe_position, 1.0);
+                    }
+                ));
+            }
+            else {
+                
+                // handle bounding box case
+                // here one does not need to consider rotation, since the (non-naive) bounding box
+                // already accounts for rotation
+                output.append(NRE_Shader(
+                    void main(){
+                        normals = oe_normals;
+                        mat4 final_mat = PV_Matrix;
+                        
+                        vec3 delta_pos = vec3(Model_Matrix[3][0], Model_Matrix[3][1], Model_Matrix[3][2]);
+                        vec4 temp_position = vec4(oe_position+delta_pos, 1.0);
+                        position = temp_position.xyz;
+                        gl_Position = final_mat*vec4(oe_position+delta_pos, 1.0);
+                    }
+                ));
+            }
         }
+        
     }
 
     
