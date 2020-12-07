@@ -180,6 +180,13 @@ Primarily renderer stuff:
 - Overhauled the event handler and pushed (almost) all SDL2-specific event handling code in ```OE_SDL_WindowSystem.h/cpp```. Now it is more maintenable.
 - Added possibility to change shading mode and restart the renderer in the demo using left/right mouse click.
 
+2020/12/07 - philsegeler
+
+Renderer stuff
+- Added basic gamma correction to both OpenGL and OpenGL ES. Colors now look correct.
+- Added wireframe rendering (only on desktop OpenGL and for debugging purposes)
+- Added Bounding Box calculation and rendering
+- Use F5/F6/F7/F8 to change render modes in the demo.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.

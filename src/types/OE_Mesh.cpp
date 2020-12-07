@@ -22,11 +22,12 @@ OE_Mesh32::~OE_Mesh32(){
 
 void OE_Mesh32::calculateProperBoundingBox(){
     
+    
+    //auto t = clock();
+    
     OE_Mat3x3 rot_matrix = OE_Mat3x3(this->GetModelMatrix());
     
     assert((this->data.vertices.positions.size() >= 3) && (this->data.vertices.positions.size() % 3 == 0));
-    
-    
     
     // find min/max position on each axis
     // apply the inverse rotation to find the proper bounding box again
@@ -71,6 +72,8 @@ void OE_Mesh32::calculateProperBoundingBox(){
                
             }
     }
+    
+    //cout << "BOUNDING BOX UPDATE IN " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
 }
 
 
