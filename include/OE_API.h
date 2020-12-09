@@ -121,6 +121,12 @@ namespace OE{
     void OE_ChangeObjectLocalPos(std::size_t, OE_Vec3);
     void OE_ChangeObjectLocalPos(std::string, OE_Vec3);
     
+    void OE_SetObjectScale(std::size_t, OE_Vec3);
+    void OE_SetObjectScale(std::string, OE_Vec3);
+    
+    void OE_ChangeObjectScale(std::size_t, OE_Vec3);
+    void OE_ChangeObjectScale(std::string, OE_Vec3);
+    
     /** API functions to control the renderer
      *  These should work for ANY renderer
      * All those parameters require a call to OE_RestartRenderer to take effect
