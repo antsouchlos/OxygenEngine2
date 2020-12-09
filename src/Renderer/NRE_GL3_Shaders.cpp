@@ -13,7 +13,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
             out vec4 position;
             
             void main(){
-                position = vec4(oe_position, 1.0, 1.0);
+                position = vec4(oe_position, 0.0, 1.0);
             }
         );
     }
@@ -25,6 +25,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 
                 layout(std140) uniform OE_Camera{
                     mat4 PV_Matrix;
+                    vec4 camera_pos;
                 };
             
                 layout(std140) uniform OE_Mesh32{
@@ -65,6 +66,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
             output.append(NRE_Shader(
                 layout(std140) uniform OE_Camera{
                     mat4 PV_Matrix;
+                    vec4 camera_pos;
                 };
             
                 layout(std140) uniform OE_Mesh32{
@@ -156,13 +158,25 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
     
     if (fs.type == NRE_GPU_FS_MATERIAL){
         if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
+             // setup uniforms
+            output.append(NRE_Shader(
+                layout(std140) uniform OE_Camera{
+                    mat4 PV_Matrix;
+                    vec4 camera_pos;
+                };
+            
+                layout(std140) uniform OE_Mesh32{
+                    mat4 Model_Matrix;
+                };
+            ));
+            output.append("\n");
             output.append(NRE_Shader(
             
             out vec4 fragColor;
             
-            const vec3 light_pos = vec3( 13.37035561, -12.76134396, 10.10574818);
-            
             void main(){
+                
+                vec3 light_pos = vec3( camera_pos);
                 
                 vec3 s = normalize(light_pos-position);
                 vec3 v = normalize(-position);
@@ -183,13 +197,26 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             }
             ));
         } else {
+            
+            // setup uniforms
+            output.append(NRE_Shader(
+                layout(std140) uniform OE_Camera{
+                    mat4 PV_Matrix;
+                    vec4 camera_pos;
+                };
+            
+                layout(std140) uniform OE_Mesh32{
+                    mat4 Model_Matrix;
+                };
+            ));
+            output.append("\n");
             output.append(NRE_Shader(
             
-            out vec4 fragColor;
-            
-            const vec3 light_pos = vec3( 13.37035561, -12.76134396, 10.10574818);
+            out vec4 fragColor;            
             
             void main(){
+                
+                vec3 light_pos = vec3( camera_pos);
                 
                 vec3 s = normalize(light_pos-position);
                 vec3 v = normalize(-position);
