@@ -331,6 +331,10 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
         auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+1.0f, (float)camera->far);
         
         this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
+        this->cameras[id].data.push_back(camera->current_state.pos_x);
+        this->cameras[id].data.push_back(camera->current_state.pos_y);
+        this->cameras[id].data.push_back(camera->current_state.pos_z);
+        this->cameras[id].data.push_back(1.0f);
         this->cameras[id].changed = true;
         
     }
@@ -340,6 +344,10 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
         auto view_mat = camera->GetViewMatrix();
         
         this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
+        this->cameras[id].data.push_back(camera->current_state.pos_x);
+        this->cameras[id].data.push_back(camera->current_state.pos_y);
+        this->cameras[id].data.push_back(camera->current_state.pos_z);
+        this->cameras[id].data.push_back(1.0f);
         this->cameras[id].changed = true;
         
     }

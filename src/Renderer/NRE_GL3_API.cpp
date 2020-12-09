@@ -432,7 +432,11 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     
     // Technically a fragment/pixel shader is optional, but it is a must in OpenGL ES
     // This should be the case sometimes (for example in the Z_PREPASS program)
-    glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
+    bool isES = NRE_GPU_ShaderBase::backend == NRE_GPU_GLES;
+    bool isUndefinedFS = this->progs[id].fs.type == NRE_GPU_FS_UNDEFINED;
+    
+    if ( (isES) || (!isES && !isUndefinedFS))
+        glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
 
     glLinkProgram(this->progs[id].handle);
 
