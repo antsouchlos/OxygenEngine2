@@ -19,6 +19,7 @@ int update_monkey_rot_x(void*, OE_Task*, string event_name){
 
     OE_ChangeObjectLocalPos("Camera", OE_Vec3(0.0f, 0.1f, 0.0f));
     //OE_ChangeObjectRot("Suzanne", OE_Vec4(0.1f, 1.0f, 0.0f, 0.0f));
+    //OE_ChangeObjectScale("Suzanne", OE_Vec3(0.0f, 0.1f, 0.0f));
     return 0;
 }
 
@@ -26,6 +27,7 @@ int update_monkey_rot_neg_x(void*, OE_Task*, string event_name){
 
     OE_ChangeObjectLocalPos("Camera", OE_Vec3(0.0f, -0.1f, 0.0f));
     //OE_ChangeObjectRot("Suzanne", OE_Vec4(-0.1f, 1.0f, 0.0f, 0.0f));
+    //OE_ChangeObjectScale("Suzanne", OE_Vec3(0.0f, -0.1f, 0.0f));
     return 0;
 }
 

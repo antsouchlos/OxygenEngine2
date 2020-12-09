@@ -499,6 +499,51 @@ void OE::OE_ChangeObjectLocalPos(std::string name, OE_Vec3 pos){
     }
 }
 
+void OE::OE_SetObjectScale(std::size_t id , OE_Vec3 sca){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = sca.x;
+        object->current_state.sca_y = sca.y;
+        object->current_state.sca_z = sca.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_SetObjectScale(std::string name, OE_Vec3 sca){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = sca.x;
+        object->current_state.sca_y = sca.y;
+        object->current_state.sca_z = sca.z;
+        object->unlockMutex();
+    }
+}
+    
+void OE::OE_ChangeObjectScale(std::size_t id, OE_Vec3 sca){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = object->current_state.sca_x + sca.x;
+        object->current_state.sca_y = object->current_state.sca_y + sca.y;
+        object->current_state.sca_z = object->current_state.sca_z + sca.z;
+        object->unlockMutex();
+    }
+}
+
+void OE::OE_ChangeObjectScale(std::string name, OE_Vec3 sca){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = object->current_state.sca_x + sca.x;
+        object->current_state.sca_y = object->current_state.sca_y + sca.y;
+        object->current_state.sca_z = object->current_state.sca_z + sca.z;
+        object->unlockMutex();
+    }
+}
+
+
 /** API functions to control the renderer
      *  These should work for ANY renderer
      */
