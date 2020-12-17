@@ -16,7 +16,7 @@ void NRE_GPU_ShaderBase::init(NRE_GPU_SHADER_BACKEND backend, int major, int min
     NRE_GPU_ShaderBase::backend = backend;
     
     if (backend == NRE_GPU_GLES){
-        NRE_GPU_ShaderBase::shader_prefix = "#version 300 es \nprecision highp float; \n";
+        NRE_GPU_ShaderBase::shader_prefix = "#version 300 es \n";
     }
     else if (backend == NRE_GPU_GL){
         

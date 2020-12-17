@@ -6,6 +6,12 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
     
     std::string output = "\n";
     
+    if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
+        output.append("precision highp float; \n");
+    }
+    
+    output.append("invariant gl_Position;\n");
+    
     if (vs.fullscreenQuad){
         output = NRE_Shader(
             layout (location=0) in vec3 oe_position;
@@ -118,6 +124,10 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
 std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
     
     std::string output = "\n";
+    
+    if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
+        output.append("precision mediump float; \n");
+    }
     
     if (fs.type == NRE_GPU_FS_UNDEFINED){
         output.append(NRE_Shader(
