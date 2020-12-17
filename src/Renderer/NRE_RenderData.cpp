@@ -369,7 +369,7 @@ void NRE_Renderer::updateMeshGPUData(){
             
             if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
                 this->meshes[mesh.first].size = this->meshes[mesh.first].data.size();
-                this->api->setUniformBufferMemory(this->meshes[mesh.first].ubo, this->meshes[mesh.first].size, NRE_GPU_STREAM);
+                this->api->setUniformBufferMemory(this->meshes[mesh.first].ubo, this->meshes[mesh.first].size, NRE_GPU_DYNAMIC);
             }
             
             this->api->setUniformBufferData(this->meshes[mesh.first].ubo, this->meshes[mesh.first].data, 0);
@@ -399,7 +399,7 @@ void NRE_Renderer::updateCameraGPUData(){
             
             if (this->cameras[cam.first].size != this->cameras[cam.first].data.size()){
                 this->cameras[cam.first].size = this->cameras[cam.first].data.size();
-                this->api->setUniformBufferMemory(this->cameras[cam.first].ubo, this->cameras[cam.first].size, NRE_GPU_STREAM);
+                this->api->setUniformBufferMemory(this->cameras[cam.first].ubo, this->cameras[cam.first].size, NRE_GPU_DYNAMIC);
             }
             
             this->api->setUniformBufferData(this->cameras[cam.first].ubo, this->cameras[cam.first].data, 0);
