@@ -202,6 +202,8 @@ uint32_t* OE_PolygonStorage32::addTriangle(uint32_t* indices){
 
 std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
     
+    //auto t=clock();
+    
     vector<float> output;
     // do the expensive allocation at the start
     output.reserve(vertex_buffer.size()*(6+this->num_of_uvs*2));
@@ -223,6 +225,8 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
     } 
     
     this->vertices.calculateNaiveBoundingBox();
+    
+    //cout << "NRE VERTEX BUFFER: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     return output;
 }
 
@@ -275,11 +279,19 @@ void OE_PolygonStorage32::genVertexBufferInternally(){
 }
 
 void OE_PolygonStorage32::genIndexBuffersInternally(){
+    
+   
+    
     if (!ibos_exist){
+        
+        //auto t=clock();
+        
         for (auto vgroup : this->triangle_groups){
             this->ibos[vgroup.first] = OE_IndexBufferReady();
             this->ibos[vgroup.first].data = this->genIndexBuffer(vgroup.first);
         }
+        
+        //cout << "NRE INDEX BUFFER: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
     ibos_exist = true;
 }

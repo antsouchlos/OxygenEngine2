@@ -36,10 +36,4 @@ class OE_Mesh32 : public OE_Object{
 
 
 
-
-
-
-
-
-
 #endif
