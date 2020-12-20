@@ -188,6 +188,16 @@ Renderer stuff
 - Added Bounding Box calculation and rendering
 - Use F5/F6/F7/F8 to change render modes in the demo.
 
+2020/12/20 - antsouchlos
+
+Uploaded new Implementation of Lexer onto parser_v2 branch - I know I know, I should not just commit the whole thing when it's done.
+This wasn't that much work though
+
+Error Handling must be possible another way. Right now, essentially every time the char iterator is incremented, an extra if statement has to be
+written, to check the iterator against the length of the string. Maybe create a wrapper for the integer that is the iterator, that does this automatically?
+Does an Iterator like the wrapper just proposed already exist? Is there a way to automatically throw an exception, when one tries to access a character of
+a string outside of it's size()? I really don't fancy writing a wrapper for std::basic_string_view
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
