@@ -8,7 +8,7 @@
 Token Lexer::nextToken() {
 	skipWhitespace();
 
-	switch (input_[index_]) {
+	switch (input_.at(index_)) {
 		case '"':
 			value();
 			break;
@@ -49,7 +49,7 @@ Token Lexer::nextToken() {
 
 // TODO: Make this work with non-ascii files
 constexpr bool Lexer::isIdentifierHeadChar(int offset) const noexcept {
-	char c = input_[index_ + offset];
+	char c = input_.at(index_ + offset);
 
 	if ( ( (65 <= static_cast<int>(c)) && (static_cast<int>(c) <= 90) )
 			|| ( (97 <= static_cast<int>(c)) && (static_cast<int>(c)<= 122) )
@@ -64,7 +64,7 @@ constexpr bool Lexer::isIdentifierHeadChar(int offset) const noexcept {
 
 // TODO: Make this work with non-ascii files
 constexpr bool Lexer::isIdentifierTailChar(int offset) const noexcept {
-	char c = input_[index_ + offset];
+	char c = input_.at(index_ + offset);
 
 	if ( ( (65 <= static_cast<int>(c)) && (static_cast<int>(c) <= 90) )
 			|| ( (97 <= static_cast<int>(c)) && (static_cast<int>(c)<= 122) )
@@ -88,7 +88,7 @@ void Lexer::skipWhitespace() noexcept {
 	// TODO: Check performance without the string size check
 
 	while ( (index_ < input_.size())
-		 	&& (std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), input_[index_])
+		 	&& (std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), input_.at(index_))
 				!= std::end(whitespaceChars_)) ) {
 		
 		++index_;
@@ -116,7 +116,7 @@ void Lexer::value() noexcept {
 
 	unsigned int len = 0;
 	while( (index_ + len + 1< input_.size())
-			&&  (input_[index_ + len] != '"') ) {
+			&&  (input_.at(index_ + len) != '"') ) {
 
 		++len;
 	}
@@ -155,7 +155,7 @@ void Lexer::commentStartSlash() noexcept {
 	++index_;
 	
 	if ( (index_ < input_.size()) 
-			&& (input_[index_] == '*') ) {
+			&& (input_.at(index_) == '*') ) {
 
 		commentStart();
 	} else {
@@ -171,11 +171,11 @@ void Lexer::commentStart() noexcept {
 	long long len = 0;
 
 	while (index_ + len < input_.size()) {
-		if (input_[index_ + len] == '*') {
+		if (input_.at(index_ + len) == '*') {
 			++len;
 
 			if (index_ + len < input_.size()
-					&& input_[index_ + len] == '/') {
+					&& input_.at(index_ + len) == '/') {
 
 				break;
 			}
