@@ -14,6 +14,9 @@ std::string getTokenTypeStringRep(TokenType t) {
 		case TokenType::value:
 			return "Value";
 			break;
+		case TokenType::number:
+			return "Number";
+			break;
 		case TokenType::openTagB:
 			return "Opening Tag Bracket";
 			break;
@@ -57,10 +60,10 @@ int main() {
 		"<World name=\"world1\">"
 			"<Scene name=\"scene1\">"
 				"<Object name=\"object1\">"
-					"a = \"3\";"
-					"b = \"4\";"
-					"c = \"5\";"
-					"d = {\"12\", \"34\", \"56\"}"
+					"a = \"This is\";"
+					"b = \"some text\";"
+					"c = \"Numbers incoming:\";"
+					"d = {12, 34.56, 789.}"
 					"/* This is just some comment */"
 				"</Object>"
 			"</Scene>"

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 
-enum class TokenType {ident, value, openTagB, closeTagB, openListB, closeListB, eq,
+enum class TokenType {ident, value, number, openTagB, closeTagB, openListB, closeListB, eq,
 						semicolon, comma, comment, slash, eos, undef};
 
 struct Token {
@@ -39,7 +39,7 @@ class LexerException : std::exception {
  *
  * value				= "\"" * "\""
  * number				= [1-9]+
- * 						| [1-9]+ . [1-9]+
+ * 						| [1-9]+ . [1-9]*
  * openTagBracket		= "<"
  * closeTagBracket		= ">"
  * eq					= "="
@@ -93,6 +93,7 @@ class Lexer {
 
 		void identifier();
 		void value();
+		void number();
 
 		void openTagBracket();
 		void closeTagBracket();
