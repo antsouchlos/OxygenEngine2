@@ -8,7 +8,7 @@
 Token Lexer::nextToken() {
 	skipWhitespace();
 
-	switch (input_.at(index_)) {
+	switch (getChar()) {
 		case '"':
 			value();
 			break;
@@ -47,9 +47,19 @@ Token Lexer::nextToken() {
 	return newToken;
 }
 
+char Lexer::getChar() const {
+	return *iter_;
+}
+
+void Lexer::setNextTokenContent(std::string_view::iterator first,
+									std::string_view::iterator last) {
+
+	nextTokenContent_ = std::string_view(&*first, last - first);
+}
+
 // TODO: Make this work with non-ascii files
-constexpr bool Lexer::isIdentifierHeadChar(int offset) const noexcept {
-	char c = input_.at(index_ + offset);
+bool Lexer::isIdentifierHeadChar() const {
+	char c = getChar();
 
 	if ( ( (65 <= static_cast<int>(c)) && (static_cast<int>(c) <= 90) )
 			|| ( (97 <= static_cast<int>(c)) && (static_cast<int>(c)<= 122) )
@@ -63,8 +73,8 @@ constexpr bool Lexer::isIdentifierHeadChar(int offset) const noexcept {
 
 
 // TODO: Make this work with non-ascii files
-constexpr bool Lexer::isIdentifierTailChar(int offset) const noexcept {
-	char c = input_.at(index_ + offset);
+bool Lexer::isIdentifierTailChar() const {
+	char c = getChar();
 
 	if ( ( (65 <= static_cast<int>(c)) && (static_cast<int>(c) <= 90) )
 			|| ( (97 <= static_cast<int>(c)) && (static_cast<int>(c)<= 122) )
@@ -76,121 +86,115 @@ constexpr bool Lexer::isIdentifierTailChar(int offset) const noexcept {
 	}
 }
 
-constexpr bool Lexer::isEOS(int offset) const noexcept {
-	if (index_ + offset == input_.size()) {
-		return true;
-	} else {
-		return false;
-	}
+bool Lexer::isEOS() const {
+	return (iter_ == std::end(input_));
 }
 
-void Lexer::skipWhitespace() noexcept {
+void Lexer::skipWhitespace() {
 	// TODO: Check performance without the string size check
 
 	while ( std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), input_.at(index_))
 				!= std::end(whitespaceChars_) ) {
 		
-		++index_;
+		++iter_;
 	}
 }
 		
-void Lexer::identifier() noexcept {
+void Lexer::identifier() {
 	nextTokenType_ = TokenType::ident;
 
-	unsigned int len = 1;
-	while (isIdentifierTailChar(len)) {
+	auto temp = iter_;
 
-		++len;
+	while (isIdentifierTailChar()) {
+		++iter_;
 	}
 
-	nextTokenContent_ = input_.substr(index_, len);
-
-	index_ += len;
+	setNextTokenContent(temp, iter_);
 }
 
 // TODO: Check performance, if all prefix-increments are changed to postfix increments
-void Lexer::value() noexcept {
-	++index_;
+void Lexer::value() {
+	++iter_;
 
-	unsigned int len = 0;
-	while (input_.at(index_ + len) != '"') {
-		++len;
+	auto temp = iter_;
+
+	while (!isEOS()
+			&& getChar() != '"') {
+
+		++iter_;
 	}
 
 	nextTokenType_ = TokenType::value;
-	nextTokenContent_ = input_.substr(index_, len);
-
-	index_ += len + 1;
+	setNextTokenContent(iter_, iter_);
 }
 
-void Lexer::openBracket() noexcept {
-	++index_;
+void Lexer::openBracket() {
 	nextTokenType_ = TokenType::openB;
-	nextTokenContent_ = input_.substr(index_ - 1, 1);
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
 }
 
-void Lexer::closeBracket() noexcept {
-	++index_;
+void Lexer::closeBracket() {
 	nextTokenType_ = TokenType::closeB;
-	nextTokenContent_ = input_.substr(index_ - 1, 1);
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
 }
 
-void Lexer::eq() noexcept {
-	++index_;
+void Lexer::eq() {
 	nextTokenType_ = TokenType::eq;
-	nextTokenContent_ = input_.substr(index_ - 1, 1);
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
 }
 
-void Lexer::semicolon() noexcept {
-	++index_;
+void Lexer::semicolon() {
 	nextTokenType_ = TokenType::semicolon;
-	nextTokenContent_ = input_.substr(index_ - 1, 1);
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
 }
 
-void Lexer::commentStartSlash() noexcept {
-	++index_;
+void Lexer::commentStartSlash() {
+	++iter_;
 	
-	if (input_.at(index_) == '*') {
-
+	if (getChar() == '*') {
 		commentStart();
 	} else {
 		slash();
 	}
 }
 
-void Lexer::commentStart() noexcept {
+void Lexer::commentStart() {
 	// Only the second character has to be consumed, for the first one this already
 	// happened in commentStartSlash()
-	++index_;
+	++iter_;
 
-	long long len = 0;
+	auto temp = iter_;
 
-	while (index_ + len < input_.size()) {
-		if (input_.at(index_ + len) == '*') {
-			++len;
+	while (!isEOS()) {
+		if (getChar() == '*') {
+			++iter_;
 
-			if (input_.at(index_ + len) == '/') {
+			if (getChar() == '/') {
 				break;
 			}
 		} else {
-			++len;	
+			++iter_;	
 		}
 	}
 
+	// TODO: What if isEOS() is true the first time the while loop executes? In that case iter_ - 1
+	// will point to the element before temp
 	nextTokenType_ = TokenType::comment;
-	nextTokenContent_ = input_.substr(index_, len - 1);
-	
-	index_ += len;
+	setNextTokenContent(temp, iter_ - 1);
 }
 
-void Lexer::slash() noexcept {
-	// No character has to be consumed, that already happened in commentStartSlash()
+void Lexer::slash() {
+	// No character has to be consumed, that has already happened in commentStartSlash()
 	
 	nextTokenType_ = TokenType::slash;
-	nextTokenContent_ = input_.substr(index_ - 1, 1);
+	setNextTokenContent(iter_ - 1, iter_);
 }
 
-void Lexer::eos() noexcept {
+void Lexer::eos() {
 	nextTokenType_ = TokenType::eos;
-	nextTokenContent_ = input_.substr(index_, 0);
+	setNextTokenContent(iter_, iter_);
 }
