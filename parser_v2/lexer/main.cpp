@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string_view>
 
 #include <string>
@@ -55,19 +56,20 @@ std::string getTokenTypeStringRep(TokenType t) {
 	}
 }
 
-int main() {
-	std::string s =
-		"<World name=\"world1\">"
-			"<Scene name=\"scene1\">"
-				"<Object name=\"object1\">"
-					"a = \"This is\";"
-					"b = \"some text\";"
-					"c = \"Numbers incoming:\";"
-					"d = {12, 34.56, 789.}"
-					"/* This is just some comment */"
-				"</Object>"
-			"</Scene>"
-		"</World>";
+int main(int argc, char *argv[9]) {
+	if (argc < 2) {
+		std::cout << "Not enough arguments provided" << std::endl;
+		return 1;
+	}
+
+	std::string s = "";
+	std::ifstream f(argv[1]);
+
+	std::string line;
+	while(getline(f, line))
+		s += line;
+
+	f.close();
 
 	Lexer l(s);
 
@@ -77,7 +79,7 @@ int main() {
 	try {
 		while (t.type != TokenType::eos) {
 			t = l.nextToken();
-			std::cout << getTokenTypeStringRep(t.type) << ": \"" << t.content << "\"\n";
+			//std::cout << getTokenTypeStringRep(t.type) << ": \"" << t.content << "\"\n";
 		}
 	} catch(LexerException &e) {
 		std::cerr << "LexerException occurred. Message: " << e.what() << '\n';
