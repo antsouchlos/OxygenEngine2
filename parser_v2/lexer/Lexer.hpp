@@ -52,49 +52,52 @@ class LexerException : std::exception {
 
 class Lexer {
 	public:
-		Lexer(std::string_view input) : input_(input) {};
+		// A string is passed by reference and not a string_view, to make sure there
+		// is a terminating character, which this lexer depends on
+		Lexer(const std::string &input) : input_(input), currentChar_(input.at(0)),
+										iter_(std::begin(input_)) {
+
+			if (input.size() == 0)
+				throw LexerException("The input string length must be greater than 0");
+		}
 
 		Token nextToken();
 	private:
-		const std::string_view input_;
-
 		const std::array<char, 3> whitespaceChars_ = {{ ' ', '\t', '\n' }};
-		/*const std::array<char, 53> identHeadChars = {{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-			'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-			'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_' }};
-		const std::array<char, 63> identTailChars = {{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-			'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-			'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', '0', '1', '2', '3', '4', '5',
-			'6', '7', '8', '9' }};
-*/
-		long long index_ = 0;
 
+		const std::string_view input_;
+		std::size_t index_ = 0;
+
+		std::string_view::iterator iter_;
+		char currentChar_;
 
 		TokenType nextTokenType_;
 		std::string_view nextTokenContent_;
 
 
-		constexpr bool isIdentifierHeadChar(int offset = 0) const noexcept;
-		constexpr bool isIdentifierTailChar(int offset = 0) const noexcept;
+		char getChar() const;
+		
+		void setNextTokenContent(std::string_view::iterator it1, std::string_view::iterator t2);
 
-		constexpr bool isEOS(int offset = 0) const noexcept;
+		bool isIdentifierHeadChar() const;
+		bool isIdentifierTailChar() const;
 
-		void skipWhitespace() noexcept;
+		bool isEOS() const;
 
-		void identifier() noexcept;
+		void skipWhitespace();
 
-		void value() noexcept;
+		void identifier();
 
-		void openBracket() noexcept;
-		void closeBracket() noexcept;
-		void eq() noexcept;
-		void semicolon() noexcept;
+		void value();
 
-		void commentStartSlash() noexcept;
-		void commentStart() noexcept;
-		void slash() noexcept;
+		void openBracket();
+		void closeBracket();
+		void eq();
+		void semicolon();
 
-		void eos() noexcept;
+		void commentStartSlash();
+		void commentStart();
+		void slash();
+
+		void eos();
 };
