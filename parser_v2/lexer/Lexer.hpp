@@ -62,10 +62,13 @@ class Lexer {
 
 		Token nextToken();
 	private:
+		using iter_t = std::string_view::iterator;
+
+
 		const std::array<char, 3> whitespaceChars_ = {{ ' ', '\t', '\n' }};
 
 		const std::string_view input_;
-		std::string_view::iterator iter_;
+		iter_t iter_;
 
 		TokenType nextTokenType_;
 		std::string_view nextTokenContent_;
@@ -73,17 +76,15 @@ class Lexer {
 
 		char getChar() const;
 		
-		void setNextTokenContent(std::string_view::iterator it1, std::string_view::iterator t2);
+		void setNextTokenContent(iter_t it1, iter_t t2);
 
 		bool isIdentifierHeadChar() const;
 		bool isIdentifierTailChar() const;
-
 		bool isEOS() const;
 
 		void skipWhitespace();
 
 		void identifier();
-
 		void value();
 
 		void openBracket();

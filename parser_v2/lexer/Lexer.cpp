@@ -40,9 +40,6 @@ Token Lexer::nextToken() {
 	}
 
 	Token newToken = { nextTokenType_, nextTokenContent_ };
-	// TODO: Check performance if the following is used instead:
-	// Token newToken;
-	// newToken.type = nextTokenType_;
 
 	return newToken;
 }
@@ -51,8 +48,7 @@ char Lexer::getChar() const {
 	return *iter_;
 }
 
-void Lexer::setNextTokenContent(std::string_view::iterator first,
-									std::string_view::iterator last) {
+void Lexer::setNextTokenContent(iter_t first, iter_t last) {
 
 	nextTokenContent_ = std::string_view(&*first, last - first);
 }
