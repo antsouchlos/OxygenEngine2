@@ -54,9 +54,7 @@ int main() {
 			"</Scene>"
 		"</World>";
 
-	std::string_view sv = s;
-
-	Lexer l(sv);
+	Lexer l(s);
 
 /*	std::cout << "a: " << static_cast<int>('a') << std::endl;
 	std::cout << "b: " << static_cast<int>('z') << std::endl;
