@@ -93,7 +93,7 @@ bool Lexer::isEOS() const {
 void Lexer::skipWhitespace() {
 	// TODO: Check performance without the string size check
 
-	while ( std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), input_.at(index_))
+	while ( std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), getChar())
 				!= std::end(whitespaceChars_) ) {
 		
 		++iter_;
@@ -124,8 +124,10 @@ void Lexer::value() {
 		++iter_;
 	}
 
+	++iter_;
+
 	nextTokenType_ = TokenType::value;
-	setNextTokenContent(iter_, iter_);
+	setNextTokenContent(temp, iter_ - 1);
 }
 
 void Lexer::openBracket() {
