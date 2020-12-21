@@ -87,9 +87,8 @@ constexpr bool Lexer::isEOS(int offset) const noexcept {
 void Lexer::skipWhitespace() noexcept {
 	// TODO: Check performance without the string size check
 
-	while ( (index_ < input_.size())
-		 	&& (std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), input_.at(index_))
-				!= std::end(whitespaceChars_)) ) {
+	while ( std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), input_.at(index_))
+				!= std::end(whitespaceChars_) ) {
 		
 		++index_;
 	}
@@ -99,8 +98,7 @@ void Lexer::identifier() noexcept {
 	nextTokenType_ = TokenType::ident;
 
 	unsigned int len = 1;
-	while ( (index_ + len < input_.size())
-			&& isIdentifierTailChar(len) ) {
+	while (isIdentifierTailChar(len)) {
 
 		++len;
 	}
@@ -115,9 +113,7 @@ void Lexer::value() noexcept {
 	++index_;
 
 	unsigned int len = 0;
-	while( (index_ + len + 1< input_.size())
-			&&  (input_.at(index_ + len) != '"') ) {
-
+	while (input_.at(index_ + len) != '"') {
 		++len;
 	}
 
@@ -154,8 +150,7 @@ void Lexer::semicolon() noexcept {
 void Lexer::commentStartSlash() noexcept {
 	++index_;
 	
-	if ( (index_ < input_.size()) 
-			&& (input_.at(index_) == '*') ) {
+	if (input_.at(index_) == '*') {
 
 		commentStart();
 	} else {
@@ -174,9 +169,7 @@ void Lexer::commentStart() noexcept {
 		if (input_.at(index_ + len) == '*') {
 			++len;
 
-			if (index_ + len < input_.size()
-					&& input_.at(index_ + len) == '/') {
-
+			if (input_.at(index_ + len) == '/') {
 				break;
 			}
 		} else {
