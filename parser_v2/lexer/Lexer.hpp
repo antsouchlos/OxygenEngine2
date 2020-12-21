@@ -38,6 +38,8 @@ class LexerException : std::exception {
  * 						| [a-zA-Z_1-9] identifierTail
  *
  * value				= "\"" * "\""
+ * number				= [1-9]+
+ * 						| [1-9]+ . [1-9]+
  * openTagBracket		= "<"
  * closeTagBracket		= ">"
  * eq					= "="
@@ -84,6 +86,7 @@ class Lexer {
 
 		bool isIdentifierHeadChar() const;
 		bool isIdentifierTailChar() const;
+		bool isNumber() const;
 		bool isEOS() const;
 
 		void skipWhitespace();
