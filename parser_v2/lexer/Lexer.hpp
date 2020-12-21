@@ -54,8 +54,7 @@ class Lexer {
 	public:
 		// A string is passed by reference and not a string_view, to make sure there
 		// is a terminating character, which this lexer depends on
-		Lexer(const std::string &input) : input_(input), currentChar_(input.at(0)),
-										iter_(std::begin(input_)) {
+		Lexer(const std::string &input) : input_(input), iter_(std::begin(input_)) {
 
 			if (input.size() == 0)
 				throw LexerException("The input string length must be greater than 0");
@@ -66,10 +65,7 @@ class Lexer {
 		const std::array<char, 3> whitespaceChars_ = {{ ' ', '\t', '\n' }};
 
 		const std::string_view input_;
-		std::size_t index_ = 0;
-
 		std::string_view::iterator iter_;
-		char currentChar_;
 
 		TokenType nextTokenType_;
 		std::string_view nextTokenContent_;
