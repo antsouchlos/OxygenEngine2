@@ -7,7 +7,7 @@
 enum class TokenType {ident, value, openB, closeB, eq, semicolon, comment, slash, eos, undef};
 
 struct Token {
-	TokenType type;
+	TokenType type = TokenType::undef;
 	std::string_view content;
 
 //	TokenType type = TokenType::ident;	// TODO: Check performance improvement, if type is
@@ -54,7 +54,7 @@ class Lexer {
 	public:
 		// A string is passed by reference and not a string_view, to make sure there
 		// is a terminating character, which this lexer depends on
-		Lexer(const std::string &input) : input_(input), iter_(std::begin(input_)) {
+		Lexer(const std::string_view input) : input_(input), iter_(std::begin(input_)) {
 
 			if (input.size() == 0)
 				throw LexerException("The input string length must be greater than 0");
