@@ -47,6 +47,8 @@ std::string getTokenTypeStringRep(TokenType t) {
 		case TokenType::undef:
 			return "Undefined";
 			break;
+		default:
+			return "[Unknown Type]";
 	}
 }
 

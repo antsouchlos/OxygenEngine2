@@ -59,18 +59,16 @@ char Lexer::getChar() const {
 }
 
 void Lexer::setNextTokenContent(iter_t first, iter_t last) {
-
 	nextTokenContent_ = std::string_view(&*first, last - first);
 }
 
 // TODO: Make this work with non-ascii files
 bool Lexer::isIdentifierHeadChar() const {
-	char c = getChar();
+	int n = static_cast<int>(getChar());
 
-	if ( ( (65 <= static_cast<int>(c)) && (static_cast<int>(c) <= 90) )
-			|| ( (97 <= static_cast<int>(c)) && (static_cast<int>(c)<= 122) )
-	  		|| ( (48 <= static_cast<int>(c)) && (static_cast<int>(c)<= 57) )
-			|| (95 == static_cast<int>(c)) ) {
+	if (	(65 <= n) && (n <= 90)
+			|| (97 <= n) && (n <= 122)
+			|| (95 == n) ) {
 		return true;
 	} else {
 		return false;
@@ -80,13 +78,23 @@ bool Lexer::isIdentifierHeadChar() const {
 
 // TODO: Make this work with non-ascii files
 bool Lexer::isIdentifierTailChar() const {
-	char c = getChar();
+	int n = static_cast<int>(getChar());
 
-	if ( ( (65 <= static_cast<int>(c)) && (static_cast<int>(c) <= 90) )
-			|| ( (97 <= static_cast<int>(c)) && (static_cast<int>(c)<= 122) )
-	  		|| ( (48 <= static_cast<int>(c)) && (static_cast<int>(c)<= 57) )
-			|| (95 == static_cast<int>(c)) ) {
+	if (	(65 <= n) && (n <= 90)
+			|| (97 <= n) && (n <= 122)
+	  		|| (48 <= n) && (n <= 57)
+			|| (95 == n) ) {
 		return true;
+	} else {
+		return false;
+	}
+}
+
+bool Lexer::isNumber() const {
+	int n = static_cast<int>(getChar());
+
+	if ( (48 <= n) && (n <= 57) ) {
+		return true;	
 	} else {
 		return false;
 	}
