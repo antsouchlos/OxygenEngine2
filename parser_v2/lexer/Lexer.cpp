@@ -37,7 +37,7 @@ Token Lexer::nextToken() {
 			commentStartSlash();
 			break;
 		default:
-			if (isNumber()) {
+			if (getChar() == '-' || isDigit()) {
 				number();
 			} else if (isIdentifierHeadChar()) {
 				identifier();
@@ -46,7 +46,7 @@ Token Lexer::nextToken() {
 			} else {
 				std::string msg = "Unknown character: '";
 				//msg += getChar() + "'";
-				throw LexerException(msg.c_str());
+				throw LexerException("Unknown character");
 			}
 			
 			break;
@@ -93,7 +93,7 @@ bool Lexer::isIdentifierTailChar() const {
 	}
 }
 
-bool Lexer::isNumber() const {
+bool Lexer::isDigit() const {
 	int n = static_cast<int>(getChar());
 
 	if ( (48 <= n) && (n <= 57) ) {
@@ -108,9 +108,7 @@ bool Lexer::isEOS() const {
 }
 
 void Lexer::skipWhitespace() {
-	while ( std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), getChar())
-				!= std::end(whitespaceChars_) ) {
-		
+	while ( (getChar() == ' ') || (getChar() == '\t') || (getChar() == '\n') ) {
 		++iter_;
 	}
 }
@@ -147,14 +145,17 @@ void Lexer::value() {
 void Lexer::number() {
 	auto temp = iter_;
 
-	while (isNumber()) {
+	if (getChar() == '-')
+		++iter_;
+
+	while (isDigit()) {
 		++iter_;
 	}
 
 	if (getChar() == '.') {
 		++iter_;
 
-		while(isNumber()) {
+		while(isDigit()) {
 			++iter_;
 		}
 	}

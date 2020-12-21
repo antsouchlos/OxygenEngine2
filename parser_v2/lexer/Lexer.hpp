@@ -38,7 +38,9 @@ class LexerException : std::exception {
  * 						| [a-zA-Z_1-9] identifierTail
  *
  * value				= "\"" * "\""
- * number				= [1-9]+
+ * numberHead			= "-" numberTail
+ * 						| numberTail
+ * numberTail			= [1-9]+
  * 						| [1-9]+ . [1-9]*
  * openTagBracket		= "<"
  * closeTagBracket		= ">"
@@ -71,8 +73,6 @@ class Lexer {
 		using iter_t = std::string_view::iterator;
 
 
-		const std::array<char, 3> whitespaceChars_ = {{ ' ', '\t', '\n' }};
-
 		const std::string_view input_;
 		iter_t iter_;
 
@@ -86,7 +86,7 @@ class Lexer {
 
 		bool isIdentifierHeadChar() const;
 		bool isIdentifierTailChar() const;
-		bool isNumber() const;
+		bool isDigit() const;
 		bool isEOS() const;
 
 		void skipWhitespace();
