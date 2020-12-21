@@ -14,14 +14,23 @@ std::string getTokenTypeStringRep(TokenType t) {
 		case TokenType::value:
 			return "Value";
 			break;
-		case TokenType::openB:
-			return "Opening Bracket";
+		case TokenType::openTagB:
+			return "Opening Tag Bracket";
 			break;
-		case TokenType::closeB:
-			return "Closing Bracket";
+		case TokenType::closeTagB:
+			return "Closing Tag Bracket";
+			break;
+		case TokenType::openListB:
+			return "Opening List Bracket";
+			break;
+		case TokenType::closeListB:
+			return "Closing List Bracket";
 			break;
 		case TokenType::eq:
 			return "Equal Sign";
+			break;
+		case TokenType::comma:
+			return "Comma";
 			break;
 		case TokenType::semicolon:
 			return "Semicolon";
@@ -49,6 +58,7 @@ int main() {
 					"a = \"3\";"
 					"b = \"4\";"
 					"c = \"5\";"
+					"d = {\"12\", \"34\", \"56\"}"
 					"/* This is just some comment */"
 				"</Object>"
 			"</Scene>"

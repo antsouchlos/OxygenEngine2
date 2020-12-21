@@ -13,13 +13,22 @@ Token Lexer::nextToken() {
 			value();
 			break;
 		case '<':
-			openBracket();
+			openTagBracket();
 			break;
 		case '>':
-			closeBracket();
+			closeTagBracket();
+			break;
+		case '{':
+			openListBracket();
+			break;
+		case '}':
+			closeListBracket();
 			break;
 		case '=':
 			eq();
+			break;
+		case ',':
+			comma();
 			break;
 		case ';':
 			semicolon();
@@ -33,6 +42,7 @@ Token Lexer::nextToken() {
 			} else if (isEOS()) {
 				eos();
 			} else {
+				std::string msg = std::string("Unknown character: '") + getChar() + "'";
 				throw LexerException("Unknown character");
 			}
 			
@@ -87,8 +97,6 @@ bool Lexer::isEOS() const {
 }
 
 void Lexer::skipWhitespace() {
-	// TODO: Check performance without the string size check
-
 	while ( std::find(std::begin(whitespaceChars_), std::end(whitespaceChars_), getChar())
 				!= std::end(whitespaceChars_) ) {
 		
@@ -126,14 +134,26 @@ void Lexer::value() {
 	setNextTokenContent(temp, iter_ - 1);
 }
 
-void Lexer::openBracket() {
-	nextTokenType_ = TokenType::openB;
+void Lexer::openTagBracket() {
+	nextTokenType_ = TokenType::openTagB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void Lexer::closeBracket() {
-	nextTokenType_ = TokenType::closeB;
+void Lexer::closeTagBracket() {
+	nextTokenType_ = TokenType::closeTagB;
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
+}
+
+void Lexer::openListBracket() {
+	nextTokenType_ = TokenType::openListB;
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
+}
+
+void Lexer::closeListBracket() {
+	nextTokenType_ = TokenType::closeListB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
@@ -146,6 +166,12 @@ void Lexer::eq() {
 
 void Lexer::semicolon() {
 	nextTokenType_ = TokenType::semicolon;
+	setNextTokenContent(iter_, iter_ + 1);
+	++iter_;
+}
+
+void Lexer::comma() {
+	nextTokenType_ = TokenType::comma;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
