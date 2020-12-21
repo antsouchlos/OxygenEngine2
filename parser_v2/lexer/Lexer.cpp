@@ -37,13 +37,16 @@ Token Lexer::nextToken() {
 			commentStartSlash();
 			break;
 		default:
-			if (isIdentifierHeadChar()) {
+			if (isNumber()) {
+				number();
+			} else if (isIdentifierHeadChar()) {
 				identifier();
 			} else if (isEOS()) {
 				eos();
 			} else {
-				std::string msg = std::string("Unknown character: '") + getChar() + "'";
-				throw LexerException("Unknown character");
+				std::string msg = "Unknown character: '";
+				//msg += getChar() + "'";
+				throw LexerException(msg.c_str());
 			}
 			
 			break;
@@ -113,14 +116,13 @@ void Lexer::skipWhitespace() {
 }
 		
 void Lexer::identifier() {
-	nextTokenType_ = TokenType::ident;
-
 	auto temp = iter_;
 
 	while (isIdentifierTailChar()) {
 		++iter_;
 	}
 
+	nextTokenType_ = TokenType::ident;
 	setNextTokenContent(temp, iter_);
 }
 
@@ -140,6 +142,25 @@ void Lexer::value() {
 
 	nextTokenType_ = TokenType::value;
 	setNextTokenContent(temp, iter_ - 1);
+}
+
+void Lexer::number() {
+	auto temp = iter_;
+
+	while (isNumber()) {
+		++iter_;
+	}
+
+	if (getChar() == '.') {
+		++iter_;
+
+		while(isNumber()) {
+			++iter_;
+		}
+	}
+
+	nextTokenType_ = TokenType::number;
+	setNextTokenContent(temp, iter_);
 }
 
 void Lexer::openTagBracket() {
