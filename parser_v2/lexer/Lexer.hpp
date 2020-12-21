@@ -4,7 +4,8 @@
 #include <stdexcept>
 
 
-enum class TokenType {ident, value, openB, closeB, eq, semicolon, comment, slash, eos, undef};
+enum class TokenType {ident, value, openTagB, closeTagB, openListB, closeListB, eq,
+						semicolon, comma, comment, slash, eos, undef};
 
 struct Token {
 	TokenType type = TokenType::undef;
@@ -37,10 +38,13 @@ class LexerException : std::exception {
  * 						| [a-zA-Z_1-9] identifierTail
  *
  * value				= "\"" * "\""
- * openBracket			= "<"
- * closeBracket			= ">"
+ * openTagBracket		= "<"
+ * closeTagBracket		= ">"
  * eq					= "="
  * semicolon			= ";"
+ * comma				= ","
+ * openListBracket		= "{"
+ * closeListBracket		= "}"
  * commentStartSlash	= "/" commentStart
  * 						| "/" slash
  * commentStart 		= "*"
@@ -87,10 +91,13 @@ class Lexer {
 		void identifier();
 		void value();
 
-		void openBracket();
-		void closeBracket();
+		void openTagBracket();
+		void closeTagBracket();
+		void openListBracket();
+		void closeListBracket();
 		void eq();
 		void semicolon();
+		void comma();
 
 		void commentStartSlash();
 		void commentStart();
