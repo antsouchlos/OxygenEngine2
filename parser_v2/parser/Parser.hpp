@@ -5,9 +5,19 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <stdexcept>
 
 #include "Lexer.hpp"
 
+
+class ParserException : std::exception {
+	public:
+		ParserException(const char *msg) : msg_(msg) {};
+
+		const char *what() const throw() { return msg_; }; 
+	private:
+		const char *msg_; 
+};
 
 /*
 * -------------------------- Grammar ------------------------
@@ -19,12 +29,12 @@
 * 																	// and closeTag must be
 * 																	// identical
 *
-* elementContent		= element | assignment
+* elementContent		= element | genericAssignment
 *
-* openTag				= "<" IDENTIFIER assignment* ">" 
+* openTag				= "<" IDENTIFIER genericAssignment* ">" 
 * closeTag				= "</" IDENTIFIER ">"
 *
-* assignment			= IDENTIFIER "=" signleAssignmentTail
+* genericAssignment		= IDENTIFIER "=" signleAssignmentTail
 * 						| IDENTIFIER "=" listAssignmentTail
 *
 * singleAssignmentTail	= VALUE
@@ -68,9 +78,21 @@ class Parser {
 	public:
 		Parser(std::string &input) : lexer_(input) {};
 
-		
+		CSL_Element parse();	
 	private:
 		Lexer lexer_;
+
+		Token token_;
+
+		void nextToken(); 
+
+		void element();
+		std::string_view openTag();
+		void closeTag(std::string_view tagIdentifier);
+
+		void genericAssignment();
+		void singleAssignment();
+		void listAssignment();
 };
 
 
