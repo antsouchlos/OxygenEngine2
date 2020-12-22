@@ -1,13 +1,11 @@
-#include "Parser.hpp"
-
-
-CSL_Element Parser::parse() {
-	CSL_Element result;
+template<typename NumberType>
+CSL_Element<NumberType> Parser<NumberType>::parse() {
+	CSL_Element<NumberType> result;
 	
 	nextToken();
 
 	if (token_.type == TokenType::openTagB) {
-		element();
+		result = element();
 	} else {
 		throw ParserException("Unexpected Symbol. Expexted '<'");
 	}
@@ -15,60 +13,62 @@ CSL_Element Parser::parse() {
 	return result;
 }
 
-std::string Parser::getTokenTypeStringRep() const {
-	switch(token_.type) {
-		case TokenType::ident:
-			return "Identifier";
-			break;
-		case TokenType::string:
-			return "String";
-			break;
-		case TokenType::number:
-			return "Number";
-			break;
-		case TokenType::openTagB:
-			return "Opening Tag Bracket";
-			break;
-		case TokenType::closeTagB:
-			return "Closing Tag Bracket";
-			break;
-		case TokenType::openListB:
-			return "Opening List Bracket";
-			break;
-		case TokenType::closeListB:
-			return "Closing List Bracket";
-			break;
-		case TokenType::eq:
-			return "Equal Sign";
-			break;
-		case TokenType::comma:
-			return "Comma";
-			break;
-		case TokenType::semicolon:
-			return "Semicolon";
-			break;
-		case TokenType::comment:
-			return "Comment";
-			break;
-		case TokenType::slash:
-			return "Slash";
-			break;
-		case TokenType::eos:
-			return "EOS";
-			break;
-		case TokenType::undef:
-			return "Undefined";
-			break;
-		default:
-			return "[Unknown Type]";
-	}
-}
+//std::string Parser<NumberType>::getTokenTypeStringRep() const {
+//	switch(token_.type) {
+//		case TokenType::ident:
+//			return "Identifier";
+//			break;
+//		case TokenType::string:
+//			return "String";
+//			break;
+//		case TokenType::number:
+//			return "Number";
+//			break;
+//		case TokenType::openTagB:
+//			return "Opening Tag Bracket";
+//			break;
+//		case TokenType::closeTagB:
+//			return "Closing Tag Bracket";
+//			break;
+//		case TokenType::openListB:
+//			return "Opening List Bracket";
+//			break;
+//		case TokenType::closeListB:
+//			return "Closing List Bracket";
+//			break;
+//		case TokenType::eq:
+//			return "Equal Sign";
+//			break;
+//		case TokenType::comma:
+//			return "Comma";
+//			break;
+//		case TokenType::semicolon:
+//			return "Semicolon";
+//			break;
+//		case TokenType::comment:
+//			return "Comment";
+//			break;
+//		case TokenType::slash:
+//			return "Slash";
+//			break;
+//		case TokenType::eos:
+//			return "EOS";
+//			break;
+//		case TokenType::undef:
+//			return "Undefined";
+//			break;
+//		default:
+//			return "[Unknown Type]";
+//	}
+//}
 
-void Parser::nextToken() {
+template<typename NumberType>
+void Parser<NumberType>::nextToken() {
 	token_ = lexer_.nextToken();
 }
 
-void Parser::element() {
+template<typename NumberType>
+CSL_Element<NumberType> Parser<NumberType>::element() {
 	std::string_view tagIdentifier = openTag();
 
 //	if (token_.type == TokenType::openTagB) {
@@ -94,7 +94,8 @@ void Parser::element() {
 	}
 }
 
-std::string_view Parser::openTag() {
+template<typename NumberType>
+std::string_view Parser<NumberType>::openTag() {
 	std::string_view result;
 
 	nextToken();
@@ -121,7 +122,8 @@ std::string_view Parser::openTag() {
 	return result;
 }
 
-void Parser::closeTag(std::string_view tagIdentifier) {
+template<typename NumberType>
+void Parser<NumberType>::closeTag(std::string_view tagIdentifier) {
 	nextToken();
 
 	if (token_.type == TokenType::ident) {
@@ -141,7 +143,9 @@ void Parser::closeTag(std::string_view tagIdentifier) {
 	}
 }
 
-void Parser::genericAssignment() {
+template<typename NumberType>
+std::variant<CSL_Assignment, CSL_ListAssignment<NumberType>>
+Parser<NumberType>::genericAssignment() {
 	nextToken();
 
 	if (token_.type == TokenType::eq) {
@@ -163,11 +167,13 @@ void Parser::genericAssignment() {
 	}
 }
 
-void Parser::singleAssignment() {
+template<typename NumberType>
+CSL_Assignment Parser<NumberType>::singleAssignment() {
 	nextToken();
 }
 
-void Parser::listAssignment() {
+template<typename NumberType>
+CSL_ListAssignment<NumberType> Parser<NumberType>::listAssignment() {
 	nextToken();
 
 	if (token_.type == TokenType::number) {

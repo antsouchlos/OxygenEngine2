@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 #include <stdexcept>
+#include <variant>
 
 #include "Lexer.hpp"
 
@@ -46,18 +47,17 @@ class ParserException : std::exception {
 * value					= NUMBER | STRING
 */
 
-struct CSL_GenericAssignment {};
-
-template<typename T>
-struct CSL_Assignment : CSL_GenericAssignment {
+template<typename NumberType = float>
+struct CSL_ListAssignment {
 	std::string_view name;
-	T value;
+	std::vector<NumberType> elements;
 };
 
-template<typename T>
-struct CLS_ListAssignment : CSL_GenericAssignment {
+struct CSL_Assignment {
 	std::string_view name;
-	std::vector<T> elements;
+	std::string_view element;
+
+	bool listAssignment = false;
 };
 
 struct CSL_Attribute {
@@ -65,39 +65,43 @@ struct CSL_Attribute {
 	std::string_view value;
 };
 
+template<typename NumberType = float>
 struct CSL_Element {
 	std::vector<CSL_Attribute> attributes;
 
 	std::vector<CSL_Element> children;
 
-	std::vector<CSL_GenericAssignment> assignments;
+	std::vector<std::variant<CSL_Assignment, CSL_ListAssignment<NumberType>>> assignments;
 };
 
-
+template<typename NumberType = float>
 class Parser {
 	public:
 		Parser(std::string &input) : lexer_(input) {};
 
-		CSL_Element parse();	
+		CSL_Element<NumberType> parse();
 	private:
 		Lexer lexer_;
 
 		Token token_;
 
 
-		std::string getTokenTypeStringRep() const;
+//		std::string getTokenTypeStringRep() const;
 
 
 		void nextToken(); 
 
-		void element();
+		CSL_Element<NumberType> element();
 		std::string_view openTag();
 		void closeTag(std::string_view tagIdentifier);
 
-		void genericAssignment();
-		void singleAssignment();
-		void listAssignment();
+		std::variant<CSL_Assignment, CSL_ListAssignment<NumberType>> genericAssignment();
+		CSL_Assignment singleAssignment();
+		CSL_ListAssignment<NumberType> listAssignment();
 };
+
+
+#include "Parser.cpp"
 
 
 #endif
