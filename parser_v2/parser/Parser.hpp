@@ -84,6 +84,10 @@ class Parser {
 
 		Token token_;
 
+
+		std::string getTokenTypeStringRep() const;
+
+
 		void nextToken(); 
 
 		void element();

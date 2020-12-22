@@ -160,9 +160,17 @@ void Lexer::number() {
 }
 
 void Lexer::openTagBracket() {
-	nextTokenType_ = TokenType::openTagB;
-	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
+	
+	if (getChar() == '/') {
+		++iter_;
+
+		nextTokenType_ = TokenType::openClosingTagB;
+		setNextTokenContent(iter_ - 2, iter_);
+	} else {
+		nextTokenType_ = TokenType::openTagB;
+		setNextTokenContent(iter_ - 1, iter_);
+	}
 }
 
 void Lexer::closeTagBracket() {

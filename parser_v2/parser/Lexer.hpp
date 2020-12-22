@@ -8,8 +8,8 @@
 #include <stdexcept>
 
 
-enum class TokenType {ident, string, number, openTagB, closeTagB, openListB, closeListB, eq,
-						semicolon, comma, comment, slash, eos, undef};
+enum class TokenType {ident, string, number, openTagB, openClosingTagB, closeTagB, openListB,
+						closeListB, eq, semicolon, comma, comment, slash, eos, undef};
 
 struct Token {
 	TokenType type = TokenType::undef;
@@ -33,31 +33,36 @@ class LexerException : std::exception {
 
 /*
  *
- * identifier			= identifierhead
+ * identifier				= identifierhead
  *
- * identifierHead		= [a-zA-Z_]
- * 						| [a-zA-Z_] identifierTail
+ * identifierHead			= [a-zA-Z_]
+ * 							| [a-zA-Z_] identifierTail
  *
- * identifierTail		= [a-zA-Z_1-9]
- * 						| [a-zA-Z_1-9] identifierTail
+ * identifierTail			= [a-zA-Z_1-9]
+ * 							| [a-zA-Z_1-9] identifierTail
  *
- * string				= "\"" * "\""
- * numberHead			= "-" numberTail
- * 						| numberTail
- * numberTail			= [1-9]+
- * 						| [1-9]+ . [1-9]*
- * openTagBracket		= "<"
- * closeTagBracket		= ">"
- * eq					= "="
- * semicolon			= ";"
- * comma				= ","
- * openListBracket		= "{"
- * closeListBracket		= "}"
- * commentStartSlash	= "/" commentStart
- * 						| "/" slash
- * commentStart 		= "*"
- * (commentEnd			= "* /")	//Only aplies when inside a comment
- * slash				= eps	// Conditional epsilon, so to speak. Only takes effect,
+ * string					= "\"" * "\""
+ * numberHead				= "-" numberTail
+ * 							| numberTail
+ * numberTail				= [1-9]+
+ * 							| [1-9]+ . [1-9]*
+ *
+ * genericTagBracket		= "<" openCloseTagBracketTail
+ * 							|
+ * openCloseTagBracketTail	= "/"
+ *
+ * closeTagBracket			= ">"
+ * openClosingTagBracket	= "</"
+ * eq						= "="
+ * semicolon				= ";"
+ * comma					= ","
+ * openListBracket			= "{"
+ * closeListBracket			= "}"
+ * commentStartSlash		= "/" commentStart
+ * 							| "/" slash
+ * commentStart 			= "*"
+ * (commentEnd				= "* /")	//Only aplies when inside a comment
+ * slash					= eps	// Conditional epsilon, so to speak. Only takes effect,
  * 								// if the next char isn't *
  * */
 

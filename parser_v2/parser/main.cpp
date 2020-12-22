@@ -21,8 +21,15 @@ int main(int argc, char *argv[]) {
 
 	f.close();
 
-
 	Parser parser(content);
+
+	try {
+		CSL_Element el = parser.parse();
+	} catch(LexerException &e) {
+		std::cout << "LexerException occurred:\n\t" << e.what() << std::endl;
+	} catch(ParserException &e) {
+		std::cout << "ParserException occurred:\n\t" << e.what() << std::endl;
+	}
 
 
 	return 0;
