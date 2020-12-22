@@ -75,7 +75,6 @@ bool Lexer::isIdentifierHeadChar() const {
 	}
 }
 
-
 // TODO: Make this work with non-ascii files
 bool Lexer::isIdentifierTailChar() const {
 	int n = static_cast<int>(getChar());
