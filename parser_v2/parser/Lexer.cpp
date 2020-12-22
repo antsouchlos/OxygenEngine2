@@ -139,6 +139,7 @@ void Lexer::string() {
 
 void Lexer::number() {
 	auto temp = iter_;
+	nextTokenType_ = TokenType::integer;
 
 	if (getChar() == '-')
 		++iter_;
@@ -149,13 +150,13 @@ void Lexer::number() {
 
 	if (getChar() == '.') {
 		++iter_;
+		nextTokenType_ = TokenType::floatingPoint;
 
 		while(isDigit()) {
 			++iter_;
 		}
 	}
 
-	nextTokenType_ = TokenType::number;
 	setNextTokenContent(temp, iter_);
 }
 

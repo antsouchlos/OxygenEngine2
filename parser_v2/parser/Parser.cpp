@@ -65,6 +65,50 @@ void Parser::nextToken() {
 	token_ = lexer_.nextToken();
 }
 
+float Parser::parseFloat() const {
+	// Although the standard defines it for c++17, g++ does not implement
+	// std::from_chars(const char*, const char*, double), only
+	// std::from_chars(const char*, const char*, int), so we have to get a little bit
+	// hacky here. Floats are parsed in terms of two ints: One before and one after
+	// the dot
+
+	std::size_t i1, i2;
+
+	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i1);
+//	// TODO: Is this necessary or even desireable?
+//	if (ec1 == std::errc()) {
+//		throw ParserException("Unexpected character in number");
+//	}
+
+	std::size_t length1 = ceil( (i1 ? log10(i1) : 1) );
+
+	auto [c2, ec2]
+		= std::from_chars(std::begin(token_.content) + length1 + 1, std::end(token_.content), i2);
+//	// TODO: Is this necessary or even desireable?
+//	if (ec2 == std::errc()) {
+//		throw ParserException("Unexpected character in number");
+//	}
+	
+	std::size_t length2 = ceil( (i2 ? log10(i2) : 1) );
+
+	float f = i1 + i2 / static_cast<float>(length2);
+
+	return f;
+}
+
+std::size_t Parser::parseInt() const {
+	std::size_t i;
+
+	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i);
+
+//	// TODO: Is this necessary or even desireable?
+//	if (ec1 == std::errc()) {
+//		throw ParserException("Unexpected character in number");
+//	}
+	
+	return i;
+}
+
 CSL_Element Parser::element() {
 	CSL_Element result;
 
@@ -159,7 +203,8 @@ Parser::genericAssignment() {
 	if (token_.type == TokenType::eq) {
 		nextToken();
 
-		if (token_.type == TokenType::number) {
+		if ( (token_.type == TokenType::floatingPoint)
+				|| (token_.type == TokenType::integer)) {
 			return singleAssignment(name);
 		} else if (token_.type == TokenType::openListB) {
 			return listAssignment(name);
@@ -190,10 +235,11 @@ CSL_ListAssignment Parser::listAssignment(std::string_view name) {
 
 	nextToken();
 
-	if (token_.type == TokenType::number) {
-		double f;
-		std::from_chars(token_.content.data(), token_.content.data() + token_.content.size(), f);
-		result.elements.push_back(f);
+	if (token_.type == TokenType::integer) {
+		result.elements.push_back(parseInt());
+		nextToken();
+	} else if (token_.type == TokenType::floatingPoint) {
+		result.elements.push_back(parseFloat());
 		nextToken();
 	} else {
 		throw ParserException("Unexpected Symbol. Expected number");
@@ -201,11 +247,11 @@ CSL_ListAssignment Parser::listAssignment(std::string_view name) {
 
 	while (token_.type == TokenType::semicolon) {
 		nextToken();
-
-		if (token_.type == TokenType::number) {
-			double f;
-			std::from_chars(token_.content.data(), token_.content.data() + token_.content.size(), f);
-			result.elements.push_back(f);
+		if (token_.type == TokenType::integer) {
+			result.elements.push_back(parseInt());
+			nextToken();
+		} else if (token_.type == TokenType::floatingPoint) {
+			result.elements.push_back(parseFloat());
 			nextToken();
 		} else {
 			throw ParserException("Unexpected Symbol. Expected number");
