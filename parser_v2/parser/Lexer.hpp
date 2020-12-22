@@ -8,8 +8,8 @@
 #include <stdexcept>
 
 
-enum class TokenType {ident, string, number, openTagB, openClosingTagB, closeTagB, openListB,
-						closeListB, eq, semicolon, comma, comment, slash, eos, undef};
+enum class TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB, closeTagB,
+						openListB, closeListB, eq, semicolon, comma, comment, slash, eos, undef};
 
 struct Token {
 	TokenType type = TokenType::undef;
