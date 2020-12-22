@@ -66,13 +66,17 @@ void Parser::nextToken() {
 }
 
 float Parser::parseFloat() const {
+//	std::string s(token_.content);
+//	return std::stof(s);
+
 	// Although the standard defines it for c++17, g++ does not implement
 	// std::from_chars(const char*, const char*, double), only
 	// std::from_chars(const char*, const char*, int), so we have to get a little bit
 	// hacky here. Floats are parsed in terms of two ints: One before and one after
 	// the dot
 
-	std::size_t i1, i2;
+	std::size_t i1 = 0;
+	std::size_t i2 = 0;
 
 	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i1);
 //	// TODO: Is this necessary or even desireable?
@@ -106,6 +110,7 @@ std::size_t Parser::parseInt() const {
 //	if (ec1 == std::errc()) {
 //		throw ParserException("Unexpected character in number");
 //	}
+//
 	
 	return i;
 }

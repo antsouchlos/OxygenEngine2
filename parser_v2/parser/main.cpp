@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <type_traits>
+#include <iomanip>
 
 #include "Parser.hpp"
 
@@ -16,7 +17,7 @@ void printIndent() {
 
 void printAssignment(CSL_Assignment &a) {
 	printIndent();
-	std::cout << a.name << ": " << a.element << '\n';
+	std::cout << a.name << ": " << std::setprecision(50) << a.element << '\n';
 
 }
 
@@ -25,7 +26,7 @@ void printListAssignment(CSL_ListAssignment &a) {
 	std::cout << a.name << ": { ";
 
 	for (auto &as : a.elements)
-		std::cout << as << ", ";
+		std::cout << std::setprecision(50) << as << ", ";
 
 	std::cout << "}\n";
 
@@ -91,8 +92,13 @@ int main(int argc, char *argv[]) {
 
 	try {
 		CSL_Element el = parser.parse();
+//		Lexer lexer(content);
+//
+//		Token t;
+//		while (t.type != TokenType::eos)
+//			t = lexer.nextToken();
 
-		//printElement(el);
+//		printElement(el);
 	} catch(LexerException &e) {
 		std::cout << "LexerException occurred:\n\t" << e.what() << std::endl;
 	} catch(ParserException &e) {
