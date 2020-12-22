@@ -1,0 +1,6 @@
+<World name="world1">
+	<Object name="object1">
+		a = "list incoming"
+		l = { 123; 456; 789.0 }
+	</Object>
+</World>
