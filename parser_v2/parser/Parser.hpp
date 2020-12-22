@@ -58,8 +58,6 @@ struct CSL_ListAssignment {
 struct CSL_Assignment {
 	std::string_view name;
 	std::string_view element;
-
-	bool listAssignment = false;
 };
 
 struct CSL_Element {
