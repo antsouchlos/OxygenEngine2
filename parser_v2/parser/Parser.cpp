@@ -87,7 +87,7 @@ void Parser::element() {
 		}
 	}
 
-	if (token_.type == TokenType::closeTagB) {
+	if (token_.type == TokenType::openClosingTagB) {
 		closeTag(tagIdentifier);
 	} else {
 		throw ParserException("Unexpected Symbol. Expected \"</\"");	
@@ -133,6 +133,12 @@ void Parser::closeTag(std::string_view tagIdentifier) {
 	}
 
 	nextToken();
+
+	if (token_.type == TokenType::closeTagB) {
+		nextToken();
+	} else {
+		throw ParserException("Unexpected Symbol. Expected '>'");
+	}
 }
 
 void Parser::genericAssignment() {
@@ -165,7 +171,7 @@ void Parser::listAssignment() {
 	nextToken();
 
 	if (token_.type == TokenType::number) {
-	
+		nextToken();
 	} else {
 		throw ParserException("Unexpected Symbol. Expected number");
 	}
@@ -174,10 +180,16 @@ void Parser::listAssignment() {
 		nextToken();
 
 		if (token_.type == TokenType::number) {
-		
+			nextToken();
 		} else {
 			throw ParserException("Unexpected Symbol. Expected number");
 		}
+	}
+
+	if (token_.type == TokenType::closeListB) {
+		nextToken();
+	} else {
+		throw ParserException("Unexpected Symbol. Expected '}'");
 	}
 }
 
