@@ -61,6 +61,8 @@ class LexerException : std::exception {
  * 								// if the next char isn't *
  * */
 
+// TODO: Crazy Idea - Make the Lexer class work with iterators. Token Iterators. Instead of calling
+// nextToken(), the user could increment an iterator - OR DECREMENT IT
 
 class Lexer {
 	public:
