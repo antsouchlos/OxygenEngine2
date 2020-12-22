@@ -9,14 +9,11 @@ Token Lexer::nextToken() {
 	skipWhitespace();
 
 	switch (getChar()) {
-		case '"':
-			value();
+		case ';':
+			semicolon();
 			break;
-		case '<':
-			openTagBracket();
-			break;
-		case '>':
-			closeTagBracket();
+		case '=':
+			eq();
 			break;
 		case '{':
 			openListBracket();
@@ -24,20 +21,23 @@ Token Lexer::nextToken() {
 		case '}':
 			closeListBracket();
 			break;
-		case '=':
-			eq();
+		case '<':
+			openTagBracket();
 			break;
-		case ',':
-			comma();
-			break;
-		case ';':
-			semicolon();
+		case '>':
+			closeTagBracket();
 			break;
 		case '/':
 			commentStartSlash();
 			break;
+		case '"':
+			value();
+			break;
+		case ',':
+			comma();
+			break;
 		default:
-			if (getChar() == '-' || isDigit()) {
+			if (isDigit() || getChar() == '-') {
 				number();
 			} else if (isIdentifierHeadChar()) {
 				identifier();
