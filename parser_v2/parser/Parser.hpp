@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <variant>
 #include <charconv>
+#include <math.h>
+
 
 #include "Lexer.hpp"
 
@@ -83,9 +85,11 @@ class Parser {
 
 //		std::string getTokenTypeStringRep() const;
 
-
 		void nextToken(); 
 
+		float parseFloat() const;
+		std::size_t parseInt() const;
+		
 		CSL_Element element();
 		std::pair< std::string_view,
 			std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> > openTag();
