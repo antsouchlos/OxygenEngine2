@@ -1,7 +1,7 @@
 <World name="world1">
 	<Object name="object1" someAttribute_=69 >
 		a = "list incoming"
-		l = { 123; 456; 789.0 }
+		l = { 123; 456; 789.01 }
 
 		<Vertex id=1>
 			Polygons = {1; 456; 908; 234; 3}

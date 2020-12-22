@@ -80,7 +80,7 @@ float Parser::parseFloat() const {
 //		throw ParserException("Unexpected character in number");
 //	}
 
-	std::size_t length1 = ceil( (i1 ? log10(i1) : 1) );
+	std::size_t length1  = c1 - std::begin(token_.content);
 
 	auto [c2, ec2]
 		= std::from_chars(std::begin(token_.content) + length1 + 1, std::end(token_.content), i2);
@@ -89,9 +89,10 @@ float Parser::parseFloat() const {
 //		throw ParserException("Unexpected character in number");
 //	}
 	
-	std::size_t length2 = ceil( (i2 ? log10(i2) : 1) );
+	//std::size_t length2 = ceil( (i2 ? log10(i2) : 1) );
+	std::size_t length2  = c2 - (std::begin(token_.content) + length1 + 1);
 
-	float f = i1 + i2 / static_cast<float>(length2);
+	float f = i1 + i2 / static_cast<float>(pow(10, length2));
 
 	return f;
 }
@@ -118,12 +119,6 @@ CSL_Element Parser::element() {
 
 	result.name = openTagResult.first;
 	result.attributes = openTagResult.second;
-
-//	if (token_.type == TokenType::openTagB) {
-//		openTag();
-//	} else {
-//		throw ParserException("Unexpected Symbol. Expected '<' or identifier");	
-//	}
 
 	while (token_.type == TokenType::openTagB
 			|| token_.type == TokenType::ident) {
