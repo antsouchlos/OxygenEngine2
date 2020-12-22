@@ -77,7 +77,7 @@ class Lexer {
 		using iter_t = std::string_view::iterator;
 
 
-		const std::string_view input_;
+		std::string_view input_;
 		iter_t iter_;
 
 		TokenType nextTokenType_;
