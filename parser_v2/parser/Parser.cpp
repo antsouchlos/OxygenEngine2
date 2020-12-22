@@ -1,6 +1,5 @@
-template<typename NumberType>
-CSL_Element<NumberType> Parser<NumberType>::parse() {
-	CSL_Element<NumberType> result;
+CSL_Element Parser::parse() {
+	CSL_Element result;
 	
 	nextToken();
 
@@ -13,7 +12,7 @@ CSL_Element<NumberType> Parser<NumberType>::parse() {
 	return result;
 }
 
-//std::string Parser<NumberType>::getTokenTypeStringRep() const {
+//std::string Parser::getTokenTypeStringRep() const {
 //	switch(token_.type) {
 //		case TokenType::ident:
 //			return "Identifier";
@@ -62,14 +61,19 @@ CSL_Element<NumberType> Parser<NumberType>::parse() {
 //	}
 //}
 
-template<typename NumberType>
-void Parser<NumberType>::nextToken() {
+void Parser::nextToken() {
 	token_ = lexer_.nextToken();
 }
 
-template<typename NumberType>
-CSL_Element<NumberType> Parser<NumberType>::element() {
-	std::string_view tagIdentifier = openTag();
+CSL_Element Parser::element() {
+	CSL_Element result;
+
+	std::pair< std::string_view,
+		std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> >
+			openTagResult = openTag();
+
+	result.name = openTagResult.first;
+	result.attributes = openTagResult.second;
 
 //	if (token_.type == TokenType::openTagB) {
 //		openTag();
@@ -81,27 +85,32 @@ CSL_Element<NumberType> Parser<NumberType>::element() {
 			|| token_.type == TokenType::ident) {
 
 		if (token_.type == TokenType::openTagB) {
-			element();
+			result.elements.push_back(element());
 		} else if (token_.type == TokenType::ident) {
-			genericAssignment();
+			result.assignments.push_back(genericAssignment());
 		}
 	}
 
 	if (token_.type == TokenType::openClosingTagB) {
-		closeTag(tagIdentifier);
+		closeTag(result.name);
 	} else {
 		throw ParserException("Unexpected Symbol. Expected \"</\"");	
 	}
+
+	return result;
 }
 
-template<typename NumberType>
-std::string_view Parser<NumberType>::openTag() {
-	std::string_view result;
+std::pair<std::string_view,
+			std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>>
+				> Parser::openTag() {
+
+	std::pair< std::string_view,
+		std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> > result;
 
 	nextToken();
 
 	if (token_.type == TokenType::ident) {
-		result = token_.content;
+		result.first = token_.content;
 	} else {
 		throw ParserException("Unexpected Symbol. Expected identifier");
 	}
@@ -109,10 +118,9 @@ std::string_view Parser<NumberType>::openTag() {
 	nextToken();
 
 	while (token_.type == TokenType::ident) {
-		genericAssignment();
+		result.second.push_back(genericAssignment());
 	}
 
-	// TODO: Move the function call out of the if statement and look for performance changes
 	if (token_.type == TokenType::closeTagB) {
 		nextToken();
 	} else {
@@ -122,8 +130,7 @@ std::string_view Parser<NumberType>::openTag() {
 	return result;
 }
 
-template<typename NumberType>
-void Parser<NumberType>::closeTag(std::string_view tagIdentifier) {
+void Parser::closeTag(std::string_view tagIdentifier) {
 	nextToken();
 
 	if (token_.type == TokenType::ident) {
@@ -143,22 +150,21 @@ void Parser<NumberType>::closeTag(std::string_view tagIdentifier) {
 	}
 }
 
-template<typename NumberType>
-std::variant<CSL_Assignment, CSL_ListAssignment<NumberType>>
-Parser<NumberType>::genericAssignment() {
+std::variant<CSL_Assignment, CSL_ListAssignment>
+Parser::genericAssignment() {
+	std::string_view name = token_.content;
+
 	nextToken();
 
 	if (token_.type == TokenType::eq) {
 		nextToken();
 
-		// TODO: It may be possible to template the function singleAssignment, in order to know
-		// the template type of CSL_Assignment
 		if (token_.type == TokenType::number) {
-			singleAssignment();		
+			return singleAssignment(name);
 		} else if (token_.type == TokenType::openListB) {
-			listAssignment();
+			return listAssignment(name);
 		} else if (token_.type == TokenType::string) {
-			singleAssignment();
+			return singleAssignment(name);
 		} else {
 			throw ParserException("Unexpected Symbol. Expected '{', number or string");
 		}
@@ -167,16 +173,27 @@ Parser<NumberType>::genericAssignment() {
 	}
 }
 
-template<typename NumberType>
-CSL_Assignment Parser<NumberType>::singleAssignment() {
+CSL_Assignment Parser::singleAssignment(std::string_view name) {
+	CSL_Assignment result;
+
+	result.name = name;
+	result.element = token_.content;
+
 	nextToken();
+
+	return result;
 }
 
-template<typename NumberType>
-CSL_ListAssignment<NumberType> Parser<NumberType>::listAssignment() {
+CSL_ListAssignment Parser::listAssignment(std::string_view name) {
+	CSL_ListAssignment result;
+	result.name = name;
+
 	nextToken();
 
 	if (token_.type == TokenType::number) {
+		double f;
+		std::from_chars(token_.content.data(), token_.content.data() + token_.content.size(), f);
+		result.elements.push_back(f);
 		nextToken();
 	} else {
 		throw ParserException("Unexpected Symbol. Expected number");
@@ -186,6 +203,9 @@ CSL_ListAssignment<NumberType> Parser<NumberType>::listAssignment() {
 		nextToken();
 
 		if (token_.type == TokenType::number) {
+			double f;
+			std::from_chars(token_.content.data(), token_.content.data() + token_.content.size(), f);
+			result.elements.push_back(f);
 			nextToken();
 		} else {
 			throw ParserException("Unexpected Symbol. Expected number");
@@ -197,5 +217,7 @@ CSL_ListAssignment<NumberType> Parser<NumberType>::listAssignment() {
 	} else {
 		throw ParserException("Unexpected Symbol. Expected '}'");
 	}
+
+	return result;
 }
 
