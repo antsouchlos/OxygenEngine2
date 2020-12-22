@@ -1,9 +1,8 @@
 #include "Lexer.hpp"
 
-// TODO: Check performance, when function definitions are in WordParser.hpp
-// TODO: Check performance, when the WordParser is not compiled separetely to the Parser,
-// 			in order for the compiler to be able to optimize better
 
+// TODO: Check performance, when the Lexer is not compiled separetely to the Parser,
+// 			in order for the compiler to be able to inline functions better
 
 Token Lexer::nextToken() {
 	skipWhitespace();
@@ -44,8 +43,6 @@ Token Lexer::nextToken() {
 			} else if (isEOS()) {
 				eos();
 			} else {
-				std::string msg = "Unknown character: '";
-				//msg += getChar() + "'";
 				throw LexerException("Unknown character");
 			}
 			
@@ -124,7 +121,6 @@ void Lexer::identifier() {
 	setNextTokenContent(temp, iter_);
 }
 
-// TODO: Check performance, if all prefix-increments are changed to postfix increments
 void Lexer::value() {
 	++iter_;
 
@@ -217,8 +213,8 @@ void Lexer::commentStartSlash() {
 }
 
 void Lexer::commentStart() {
-	// Only the second character has to be consumed, for the first one this already
-	// happened in commentStartSlash()
+	// Only the second character has to be consumed, for the first one this happened already,
+	// in commentStartSlash()
 	++iter_;
 
 	auto temp = iter_;
@@ -235,10 +231,13 @@ void Lexer::commentStart() {
 		}
 	}
 
-	// TODO: What if isEOS() is true the first time the while loop executes? In that case iter_ - 1
-	// will point to the element before temp
 	nextTokenType_ = TokenType::comment;
-	setNextTokenContent(temp, iter_ - 1);
+
+	if (temp != std::end(input_)) {
+		setNextTokenContent(temp, iter_ - 1);
+	} else {
+		setNextTokenContent(temp - 1, temp - 1);
+	}
 }
 
 void Lexer::slash() {
