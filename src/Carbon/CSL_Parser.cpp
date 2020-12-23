@@ -1,262 +1,226 @@
-#include <Carbon/CSL_Parser.h>
+CSL_Element_ptr Parser::parse() {
+	CSL_Element_ptr result;
+	
+	nextToken();
 
-using namespace std;
+	if (token_.type == TokenType::openTagB) {
+		result = std::move(element());
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::openTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+	
+	return result;
+}
 
-CSL_Node::~CSL_Node(){
-    //for (auto& x: children)
-    //    delete x; //IS THIS CORRECT HERE? DO WE NEED TO DO THIS? MEMORY LEAK??????!!!!!
+void Parser::nextToken() {
+	token_ = lexer_.nextToken();
+}
+
+float Parser::parseFloat() const {
+	// Although the standard defines it for c++17, g++ does not implement
+	// std::from_chars(const char*, const char*, double), only
+	// std::from_chars(const char*, const char*, int), so we have to get a little bit
+	// hacky here. Floats are parsed in terms of two ints: One before and one after
+	// the dot
+
+	std::size_t i1 = 0;
+	std::size_t i2 = 0;
+
+	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i1);
+//	// TODO: Is this necessary or even desireable?
+//	if (ec1 == std::errc()) {
+//		throw UnexpectedSymbolError("Unexpected character in number");
+//	}
+
+	std::size_t length1  = c1 - std::begin(token_.content);
+
+	auto [c2, ec2]
+		= std::from_chars(std::begin(token_.content) + length1 + 1, std::end(token_.content), i2);
+//	// TODO: Is this necessary or even desireable?
+//	if (ec2 == std::errc()) {
+//		throw UnexpectedSymbolError("Unexpected character in number");
+//	}
+	
+	//std::size_t length2 = ceil( (i2 ? log10(i2) : 1) );
+	std::size_t length2  = c2 - (std::begin(token_.content) + length1 + 1);
+
+	float f = i1 + i2 / static_cast<float>(pow(10, length2));
+
+	return f;
+}
+
+std::size_t Parser::parseInt() const {
+	std::size_t i;
+
+	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i);
+
+//	// TODO: Is this necessary or even desireable?
+//	if (ec1 == std::errc()) {
+//		throw UnexpectedSymbolError("Unexpected character in number");
+//	}
+//
+	
+	return i;
+}
+
+CSL_Element_ptr Parser::element() {
+	CSL_Element_ptr result = std::make_unique<CSL_Element>();
+
+	auto [name, attributes] = openTag();
+
+	result->name = name;
+	std::move(attributes.begin(), attributes.end(), std::back_inserter(result->attributes));
+
+	while ( token_.type == TokenType::openTagB
+			|| token_.type == TokenType::ident ) {
+
+		if (token_.type == TokenType::openTagB) {
+			result->elements.push_back(element());
+		} else if (token_.type == TokenType::ident) {
+			result->assignments.push_back(genericAssignment());
+		}
+	}
+
+	if (token_.type == TokenType::openClosingTagB) {
+		closeTag(result->name);
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::openClosingTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+
+	return result;
+}
+
+CSL_OpenTagResult Parser::openTag() {
+	CSL_OpenTagResult result;
+
+	nextToken();
+
+	if (token_.type == TokenType::ident) {
+		result.first = token_.content;
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::ident,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+
+	nextToken();
+
+	while (token_.type == TokenType::ident) {
+		result.second.push_back(genericAssignment());
+	}
+
+	if (token_.type == TokenType::closeTagB) {
+		nextToken();
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::closeTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+
+	return result;
+}
+
+void Parser::closeTag(std::string_view tagIdentifier) {
+	nextToken();
+
+	if (token_.type == TokenType::ident) {
+		if (tagIdentifier != token_.content) {
+			throw SemanticError("Closing tag identifier does not match opening tag identifier");
+		}
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::ident,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+
+	nextToken();
+
+	if (token_.type == TokenType::closeTagB) {
+		nextToken();
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::closeTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+}
+
+CSL_GenericAssignment_ptr Parser::genericAssignment() {
+	std::string_view name = token_.content;
+
+	nextToken();
+
+	if (token_.type == TokenType::eq) {
+		nextToken();
+
+		if ( (token_.type == TokenType::floatingPoint)
+				|| (token_.type == TokenType::integer)) {
+			return singleAssignment(name);
+		} else if (token_.type == TokenType::openListB) {
+			return listAssignment(name);
+		} else if (token_.type == TokenType::string) {
+			return singleAssignment(name);
+		} else {
+//			throw UnexpectedSymbolError("Unexpected Symbol. Expected '{', number or string");
+			throw UnexpectedSymbolError(token_.content, TokenType::openListB,
+											lexer_.getLineNum(), lexer_.getColNum());
+		}
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::eq,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
+}
+
+CSL_Assignment_ptr Parser::singleAssignment(std::string_view name) {
+	CSL_Assignment_ptr result = std::make_unique<CSL_Assignment>();
+
+	result->name = name;
+	result->element = token_.content;
+
+	nextToken();
+
+	return result;
 }
 
 
-CSL_Node* CSL_Parser::parse(string str) {
-    lexer = new CSL_Lexer(str);
+CSL_ListAssignment_ptr Parser::listAssignment(std::string_view name) {
+	CSL_ListAssignment_ptr result = std::make_unique<CSL_ListAssignment>();
 
-	result = currentCNode;
+	result->name = name;
 
-    getNextCToken();
-    Block();
+	nextToken();
 
-	if (result->children.size() > 0) {
-        return result->children[0];
-    } else {
-        return result;
-    }
-}
+	if (token_.type == TokenType::integer) {
+		result->elements.push_back(parseInt());
+		nextToken();
+	} else if (token_.type == TokenType::floatingPoint) {
+		result->elements.push_back(parseFloat());
+		nextToken();
+	} else {
+//		throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
+		throw UnexpectedSymbolError(token_.content, TokenType::floatingPoint,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
 
-CSL_Parser::~CSL_Parser() {
-    delete currentCNode;
-    if(lexer != nullptr)
-        delete lexer;
-    for(unsigned int i = 0; i < previousCNode.size(); ++i)
-        delete previousCNode[i];
-}
+	while (token_.type == TokenType::semicolon) {
+		nextToken();
 
-bool CSL_Parser::isStringStartChar(char c) {
-    return lexer->isStringStartChar(c);
-}
+		if (token_.type == TokenType::integer) {
+			result->elements.push_back(parseInt());
+			nextToken();
+		} else if (token_.type == TokenType::floatingPoint) {
+			result->elements.push_back(parseFloat());
+			nextToken();
+		} else {
+//			throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
+			throw UnexpectedSymbolError(token_.content, TokenType::floatingPoint,
+											lexer_.getLineNum(), lexer_.getColNum());
+		}
+	}
 
-void CSL_Parser::parseInternal(string str) {
-    CSL_Lexer *saveCLexer = lexer;
-    lexer = new CSL_Lexer(str);
-    getNextCToken();
+	if (token_.type == TokenType::closeListB) {
+		nextToken();
+	} else {
+		throw UnexpectedSymbolError(token_.content, TokenType::closeListB,
+										lexer_.getLineNum(), lexer_.getColNum());
+	}
 
-    Block();
-    delete(lexer);
-    lexer = saveCLexer;
-
-    calledEOS = false;
-    getNextCToken();
-}
-
-void CSL_Parser::getNextCToken() {
-	token = lexer->getNextCToken();
-
-    if (token.type == COMMENT) {
-        getNextCToken();
-    } else if (token.type == "eos") {
-        if (calledEOS) {
-            throw CSL_UnexpectedTokenException("unexpected end of string");
-        }
-
-    calledEOS = true;
-    }
-}
-
- void CSL_Parser::expectCargo(string cargo) {
-    if (token.type== "eos")
-        getNextCToken();
-
-    if (!(token.cargo == cargo)) {
-        throw CSL_UnexpectedTokenException(errorMessage() + ", '" + cargo + "' expected");
-    }
-
-    getNextCToken();
-}
-
-void CSL_Parser::Block() {
-	if (token.type != "eos")
-        	tags();
-
-    if (token.type != "eos")
-        Block();
-}
-    
-void CSL_Parser::tags() {
-    expectCargo("<");
-    if (token.type != IDENTIFIER) {
-        throw CSL_UnexpectedTokenException(errorMessage());
-    }
-
-    if (token.cargo == "src") {
-        getNextCToken();
-
-        expectCargo("res");
-        expectCargo("=");
-
-        if (token.type != STRING)
-            throw CSL_UnexpectedTokenException(errorMessage() + ", string expected");
-
-        string exCode = "";
-        ifstream in((token.cargo).c_str());
-        string line;
-        while (getline(in, line))
-            exCode += line + "\n";
-        in.close();
-
-        getNextCToken();
-
-        expectCargo("/");
-        if (token.cargo != ">")
-            throw CSL_UnexpectedTokenException(errorMessage() + ", '" + ">" + "' expected");
-
-        parseInternal(exCode);
-    } else {
-        CSL_Node *newCNode = new CSL_Node;
-        newCNode->line = token.lineIndex;
-        newCNode->col = token.colIndex;
-        newCNode->ID = token.cargo;
-        currentCNode->children.push_back(newCNode);
-        previousCNode.push_back(currentCNode);
-        currentCNode = newCNode;
-
-        getNextCToken();
-        while (token.type == IDENTIFIER) {
-            CSL_Node *assignmentCNode = new CSL_Node;
-            assignmentCNode->line = token.lineIndex;
-            assignmentCNode->col = token.colIndex;
-            assignmentCNode->type = TAGASSIGNMENT;
-            assignmentCNode->ID = token.cargo;
-
-            currentCNode->children.push_back(assignmentCNode);
-
-            CSL_Node *saveCNode = currentCNode;
-            currentCNode = assignmentCNode;
-
-            getNextCToken();
-            
-            expectCargo("=");
-            factor();
-            getNextCToken();
-
-            currentCNode = saveCNode;
-        }
-
-        if (token.cargo == "/") {
-            getNextCToken();
-            newCNode->type = CLOSEDTAG;
-            expectCargo(">");
-
-            currentCNode = previousCNode[previousCNode.size()-1];
-            previousCNode.pop_back();
-        } else {
-            newCNode->type = TAG;
-            expectCargo(">");
-
-            tagscontent();
-            ctag();
-        }
-    }
-}
-
-void CSL_Parser::tagscontent() {
-    while (token.cargo != "</") {
-        if (token.type == IDENTIFIER) {
-            statement();
-        }
-
-        if (token.cargo == "<") {
-            tags();
-        }
-
-        if(token.cargo != "</") {
-            if (token.type != IDENTIFIER && token.cargo != "<" && token.type != "eos") throw CSL_UnexpectedTokenException(errorMessage());
-        }
-    }
-}
-
-void CSL_Parser::ctag() {
-    expectCargo("</");
-
-    if (token.type != IDENTIFIER)
-        throw CSL_UnexpectedTokenException(errorMessage());
-
-    if (token.cargo != currentCNode->ID) {
-        throw CSL_UnexpectedTokenException(errorMessage() + ", '" + currentCNode->ID + "' expected");
-    }
-
-    getNextCToken();
-    expectCargo(">");
-
-    currentCNode = previousCNode[previousCNode.size()-1];
-    previousCNode.pop_back();
-}
-
-void CSL_Parser::content() {
-    statement();
-    getNextCToken();
-    if (token.type == IDENTIFIER) {
-        content();
-    }
-}
-
-void CSL_Parser::statement() {
-    if (token.type != IDENTIFIER) {
-        throw CSL_UnexpectedTokenException(errorMessage());
-    }
-
-    CSL_Node *assignmentCNode = new CSL_Node;
-    assignmentCNode->line = token.lineIndex;
-	assignmentCNode->col = token.colIndex;
-    assignmentCNode->ID = token.cargo;
-    currentCNode->children.push_back(assignmentCNode);
-    
-    CSL_Node *saveCNode = currentCNode;
-    currentCNode = assignmentCNode;
-
-    getNextCToken();
-
-    expectCargo("=");
-
-    if (token.cargo == "{") {
-        assignmentCNode->type = LISTASSIGNMENT;
-
-        getNextCToken();
-        factor();
-        getNextCToken();
-
-        while (token.cargo == ";") {
-            getNextCToken();
-            factor();
-            getNextCToken();
-        }
-
-        expectCargo("}");
-    } else {
-        assignmentCNode->type = ASSIGNMENT;
-
-        factor();
-        getNextCToken();
-    }
-
-    currentCNode = saveCNode;
-}
-
-void CSL_Parser::factor() {
-    if (token.type == NUMBER) {
-        currentCNode->args.push_back(token.cargo);
-    } else if (token.type == STRING) {
-        currentCNode->args.push_back(token.cargo);
-    } else {
-        throw CSL_UnexpectedTokenException(errorMessage());
-    }
-}
-
-string CSL_Parser::errorMessage() {
-    return " at " + convert(token.lineIndex) + ":" + convert(token.colIndex) + " - '" + token.cargo + "'";
-}
-
-string CSL_Parser::convert(int num) {
-    ostringstream stream;
-    stream << num;
-    return stream.str();
+	return result;
 }
