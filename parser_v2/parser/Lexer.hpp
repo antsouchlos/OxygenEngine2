@@ -1,7 +1,7 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
-
+#include <sstream>
 #include <string_view>
 #include <array>
 #include <algorithm>
@@ -20,15 +20,41 @@ struct Token {
 //											identifier() function
 };
 
-
-class LexerException : std::exception {
+class LexerError {
 	public:
-		LexerException(const char *msg) : msg_(msg) {};
-
-		const char *what() const throw () { return msg_; }
-	private:
-		const char* msg_;
+		virtual std::string what() const throw() { return ""; };
 };
+
+class UnknownCharacterError : LexerError {
+	public:
+		UnknownCharacterError(char c, std::size_t lineNum, std::size_t colNum)
+			: c_(c), lineNum_(lineNum), colNum_(colNum) {};
+
+		std::string what() const throw () {
+			std::stringstream result_ss;
+
+			result_ss << "Unknown character '" << c_ << "' at line " << lineNum_ << ':' << colNum_;
+
+			return result_ss.str();
+		}
+	private:
+		const char c_;
+		const std::size_t lineNum_;
+		const std::size_t colNum_;
+};
+
+class InvalidInputError : LexerError {
+	public:
+		InvalidInputError(std::string msg) : msg_(msg) {};
+
+		std::string what() const throw() {
+			return msg_;
+		}
+	private:
+		const std::string msg_;
+};
+
+const char* getTokenTypeStringRep(TokenType t);
 
 
 /*
@@ -76,10 +102,14 @@ class Lexer {
 		Lexer(const std::string_view input) : input_(input), iter_(std::begin(input_)) {
 
 			if (input.size() == 0)
-				throw LexerException("The input string length must be greater than 0");
+				throw InvalidInputError("The input length must be greater than 0");
 		}
 
 		Token nextToken();
+
+		std::size_t getLineNum();
+		std::size_t getColNum();
+
 	private:
 		using iter_t = std::string_view::iterator;
 

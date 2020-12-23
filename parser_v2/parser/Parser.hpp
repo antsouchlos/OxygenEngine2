@@ -13,14 +13,45 @@
 
 #include "Lexer.hpp"
 
-
-class ParserException : std::exception {
+// Sadly, ParseError cannon inherit from std::exception, since that would not allow the return type
+// to be a string, which is necessary in this case in order to get a proper error message
+// (Returning "result_ss.str().c_str()" doesn't work, since it returns a pointer to an object that
+// gets destroyed a soon as the scope of "what()" is left, thereby basically returning garbage)
+class ParserError {
 	public:
-		ParserException(const char *msg) : msg_(msg) {};
+		virtual std::string what() const throw() { return ""; };
+};
 
-		const char *what() const throw() { return msg_; }; 
+class UnexpectedSymbolError : ParserError {
+	public:
+		UnexpectedSymbolError(std::string_view unexpected, TokenType expected,
+							const std::size_t lineNum, const std::size_t colNum)
+			: unexpected_(unexpected), expected_(expected), lineNum_(lineNum), colNum_(colNum) {};
+
+		std::string what() const throw() {
+			std::stringstream result_ss;
+			result_ss << "Unexpetcted Symbol \"" << unexpected_ << "\" ";
+		   	result_ss << "at line " << lineNum_ << ':' << (colNum_ - unexpected_.size()) << ": ";
+			result_ss << "Expected \"";
+			result_ss << getTokenTypeStringRep(expected_);
+			result_ss << "\"";
+
+			return result_ss.str().c_str();
+		}
 	private:
-		const char *msg_; 
+		std::string_view unexpected_;
+		TokenType expected_;
+		const std::size_t lineNum_;
+		const std::size_t colNum_;
+};
+
+class SemanticError : ParserError {
+	public:
+		SemanticError(const char* msg) : msg_(msg) {};
+
+		std::string what() const throw() { return msg_; };
+	private:
+		const char* msg_;
 };
 
 
@@ -64,16 +95,19 @@ using CSL_OpenTagResult			= std::pair< std::string_view,
 * value					= NUMBER | STRING
 */
 
+
 struct CSL_ListAssignment {
 	std::string_view name;
 	std::vector<float> elements;
 };
 
 struct CSL_Assignment {
+//	CSL_Assignment(std::string_view name_init, std::string_view element_init)
+//		: name(name_init), element(element_init) {};
+
 	std::string_view name;
 	std::string_view element;
 };
-
 
 struct CSL_Element {
 	std::string_view name;
@@ -95,7 +129,7 @@ class Parser {
 		Token token_;
 
 
-//		std::string getTokenTypeStringRep() const;
+
 
 		void nextToken(); 
 
