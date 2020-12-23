@@ -1,5 +1,5 @@
-#ifndef LEXER_HPP
-#define LEXER_HPP
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <sstream>
 #include <string_view>
@@ -8,11 +8,12 @@
 #include <stdexcept>
 
 
-enum class TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB, closeTagB,
-						openListB, closeListB, eq, semicolon, comma, comment, slash, eos, undef};
+enum class CSL_TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
+							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
+							slash, eos, undef};
 
-struct Token {
-	TokenType type = TokenType::undef;
+struct CSL_Token {
+	CSL_TokenType type = CSL_TokenType::undef;
 	std::string_view content;
 };
 
@@ -50,7 +51,7 @@ class InvalidInputError : LexerError {
 		const std::string msg_;
 };
 
-const char* getTokenTypeStringRep(TokenType t);
+const char* getTokenTypeStringRep(CSL_TokenType t);
 
 
 /*
@@ -91,17 +92,17 @@ const char* getTokenTypeStringRep(TokenType t);
 // TODO: Crazy Idea - Make the Lexer class work with iterators. Token Iterators. Instead of calling
 // nextToken(), the user could increment an iterator - OR DECREMENT IT
 
-class Lexer {
+class CSL_Lexer {
 	public:
 		// A string is passed by reference and not a string_view, to make sure there
 		// is a terminating character, which this lexer depends on
-		Lexer(const std::string_view input) : input_(input), iter_(std::begin(input_)) {
+		CSL_Lexer(const std::string_view input) : input_(input), iter_(std::begin(input_)) {
 
 			if (input.size() == 0)
 				throw InvalidInputError("The input length must be greater than 0");
 		}
 
-		Token nextToken();
+		CSL_Token nextToken();
 
 		std::size_t getLineNum();
 		std::size_t getColNum();
@@ -113,7 +114,7 @@ class Lexer {
 		std::string_view input_;
 		iter_t iter_;
 
-		TokenType nextTokenType_;
+		CSL_TokenType nextTokenType_;
 		std::string_view nextTokenContent_;
 
 
