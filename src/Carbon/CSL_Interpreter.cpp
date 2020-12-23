@@ -1,67 +1,95 @@
 #include <Carbon/CSL_Interpreter.h>
 
+
 using namespace std;
 
 // This is a helper function for the interpreter
-void OE_ReverseBitset(std::bitset<64>& bitseta){
+void OE_ReverseBitset(std::bitset<64>& b){
     std::bitset<64> temp;
+
     for (size_t i=0;i < 32; i++){
-        temp[i] = bitseta[31-i];
+        temp[i] = b[31-i];
     }
-    bitseta = temp;
-}
 
-
-CSL_Interpreter::~CSL_Interpreter(){
-    if (this->parser != nullptr)
-        delete this->parser;
-    //if (this->curNode != nullptr)
-    //    delete this->curNode; // IS THIS ALSO NECESSARY!?
+    b = temp;
 }
 
 std::shared_ptr<OE_World> CSL_Interpreter::interpret(string sourceCode) {
-    //parse "sourcecode"
-    if (parser != nullptr)
-        delete parser;
-    parser = new CSL_Parser();
+    CSL_Parser parser(sourceCode);
     
     auto t = clock();
     
-    curNode = parser->parse(sourceCode);
+    CSL_Element_ptr rootElement = parser.parse();
+
     auto t1 = clock();
     cout << "CSL TEST PARSE: " << (float)(t1 -t)/CLOCKS_PER_SEC << endl;
-    //interpret the Abstract Syntax Tree obtained by parsing "sourceCode"
-    auto world = processWorld();
+  
+	// TODO	
+//	auto world = processWorld(std::move(rootElement));
+	auto world = processWorld(std::move(rootElement));
+
     cout << "CSL TEST INTERPRET: " << (float)(clock()-t1)/CLOCKS_PER_SEC << endl;
     
-    /*cout << scenesList.to_str() << endl;
-    cout << objectsList.to_str() << endl;
-    cout << materialsList.to_str() << endl;
-    cout << tcmsList.to_str() << endl;
-    cout << texturesList.to_str() << endl;
-    cout << viewportsList.to_str() << endl;//*/
+//    cout << scenesList.to_str() << endl;
+//    cout << objectsList.to_str() << endl;
+//    cout << materialsList.to_str() << endl;
+//    cout << tcmsList.to_str() << endl;
+//    cout << texturesList.to_str() << endl;
+//    cout << viewportsList.to_str() << endl;
+
     return world;
 }
 
 std::shared_ptr<OE_World> CSL_Interpreter::interpretFile(string pathToFile) {
-	string sourceCode = "";
-	string line;
-    
-    auto t = clock();
-	//read all lines in "pathToFile"
+	auto t = clock();
+
+
+    string sourceCode = "";
 	ifstream in(pathToFile);
+
+	string line;
 	while (getline(in, line))
 		sourceCode += line;
+
 	in.close();
+
     cout << "CSL TEST READ FILE: " << (float)(clock() -t)/CLOCKS_PER_SEC << endl;
+
+
 	return interpret(sourceCode);
 }
 
-std::shared_ptr<OE_World> CSL_Interpreter::processWorld() {
-    
-    
-    std::shared_ptr<OE_World> world = std::make_shared<OE_World>(OE_World());
-    for (auto& child : curNode->children) {
+std::shared_ptr<OE_World> CSL_Interpreter::processWorld(CSL_Element_ptr element) {
+	std::shared_ptr<OE_World> world = std::make_shared<OE_World>();
+
+	if (element->name != "World"sv) {
+		// TODO
+		//throw InterpreterException("Element root must be \"World\"");
+	}
+
+	for (auto &e : element->elements) {
+		if (e->name == "Scene"sv) {
+//			auto scene = processScene();
+//			world->scenes.insert(scene->id);
+		} else if (e->name == "ViewportConfig"sv) {
+//			auto vconf = processViewportConfig();
+//			world->viewports.insert(vconf->id);
+		} else {
+			// TODO
+			// throw CSL_UnknownElementException("");
+		}
+	}
+
+	// TODO: Are attributes even necessary?
+	for (auto &a : element->attributes) {
+	
+	}
+
+	for (auto &a : element->assignments) {
+	
+	}
+
+/*	for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
         
@@ -102,10 +130,10 @@ std::shared_ptr<OE_World> CSL_Interpreter::processWorld() {
                         throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variables in \"World\"");
         }
         curNode = saveNode;
-    }
+    }*/
     return world;
 }
-
+/*
 std::shared_ptr<OE_Scene> CSL_Interpreter::processScene() {
     std::shared_ptr<OE_Scene> scene = nullptr;
     for (auto& child : curNode->children) {
@@ -979,4 +1007,4 @@ std::shared_ptr<OE_ViewportConfig> CSL_Interpreter::processViewportConfig() {
         curNode = saveNode;
     }
     return vconf;
-}
+}*/

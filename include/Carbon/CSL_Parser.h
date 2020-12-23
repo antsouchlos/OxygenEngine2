@@ -9,9 +9,10 @@
 #include <variant>
 #include <charconv>
 #include <math.h>
+#include <memory>
 
 
-#include <Carbon/Lexer.h>
+#include <Carbon/CSL_Lexer.h>
 
 // Sadly, ParseError cannon inherit from std::exception, since that would not allow the return type
 // to be a string, which is necessary in this case in order to get a proper error message
@@ -93,8 +94,12 @@ using CSL_OpenTagResult			= std::pair< std::string_view,
 * 						    		    							// will require a rewrite of
 *                                                                   // the blender plugin
 * value					= NUMBER | STRING
+*
+* // TODO: Clean up the grammar, and make it actually match the current state of the parser
+* //		(NUMBER has been split into FLOAT and INT)
 */
 
+// TODO: Change vector of CSL_*Assignments to map and remove std::string_view name
 
 struct CSL_ListAssignment {
 	std::string_view name;
@@ -102,9 +107,6 @@ struct CSL_ListAssignment {
 };
 
 struct CSL_Assignment {
-//	CSL_Assignment(std::string_view name_init, std::string_view element_init)
-//		: name(name_init), element(element_init) {};
-
 	std::string_view name;
 	std::string_view element;
 };

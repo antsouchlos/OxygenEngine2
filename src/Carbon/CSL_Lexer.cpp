@@ -1,4 +1,4 @@
-#include <Carbon/Lexer.h>
+#include <Carbon/CSL_Lexer.h>
 
 
 // TODO: Check performance, when the Lexer is not compiled separetely to the Parser,
@@ -227,7 +227,7 @@ void CSL_Lexer::string() {
 
 	++iter_;
 
-	nextTokenType_ = TokenType::string;
+	nextTokenType_ = CSL_TokenType::string;
 	setNextTokenContent(temp, iter_ - 1);
 }
 

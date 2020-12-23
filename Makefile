@@ -4,7 +4,7 @@ all: CSL_Test
 
 CXX = g++
 
-CXXFLAGS = -Wall -g -Og -std=c++14 -I/usr/include -Iinclude
+CXXFLAGS = -Wall -g -Og -std=c++17 -I/usr/include -Iinclude
 
 LDFLAGS = -lSDL2 -L/usr/lib -L/usr/local/lib
 
