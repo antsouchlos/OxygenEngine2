@@ -116,7 +116,7 @@ CSL_OpenTagResult CSL_Parser::openTag() {
 	if (token_.type == CSL_TokenType::closeTagB) {
 		nextToken();
 	} else {
-		throw UnexpectedSymbolError(token_.content, TokenType::closeTagB,
+		throw UnexpectedSymbolError(token_.content, CSL_TokenType::closeTagB,
 										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
@@ -137,7 +137,7 @@ void CSL_Parser::closeTag(std::string_view tagIdentifier) {
 
 	nextToken();
 
-	if (token_.type == TokenType::closeTagB) {
+	if (token_.type == CSL_TokenType::closeTagB) {
 		nextToken();
 	} else {
 		throw UnexpectedSymbolError(token_.content, CSL_TokenType::closeTagB,

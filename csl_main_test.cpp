@@ -16,7 +16,7 @@ int main(){
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     
-    OE_World* world = interpreter.interpretFile("challenge_car.csl");
+/*    OE_World* world = interpreter.interpretFile("challenge_car.csl");
     t = clock();
     auto a = (world->to_str());
     cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
