@@ -1,5 +1,5 @@
-std::unique_ptr<CSL_Element> Parser::parse() {
-	std::unique_ptr<CSL_Element> result;
+CSL_Element_ptr Parser::parse() {
+	CSL_Element_ptr result;
 	
 	nextToken();
 
@@ -66,9 +66,6 @@ void Parser::nextToken() {
 }
 
 float Parser::parseFloat() const {
-//	std::string s(token_.content);
-//	return std::stof(s);
-
 	// Although the standard defines it for c++17, g++ does not implement
 	// std::from_chars(const char*, const char*, double), only
 	// std::from_chars(const char*, const char*, int), so we have to get a little bit
@@ -114,19 +111,17 @@ std::size_t Parser::parseInt() const {
 	
 	return i;
 }
-/**/
-std::unique_ptr<CSL_Element> Parser::element() {
-	std::unique_ptr<CSL_Element> result = std::make_unique<CSL_Element>();
 
-	std::pair< std::string_view, std::vector<CSL_GenericAssignment> > openTagResult = openTag();
+CSL_Element_ptr Parser::element() {
+	CSL_Element_ptr result = std::make_unique<CSL_Element>();
 
-	result->name = openTagResult.first;
+	auto [name, attributes] = openTag();
 
-	std::move(openTagResult.second.begin(), openTagResult.second.end(),
-			std::back_inserter(result->attributes));
+	result->name = name;
+	std::move(attributes.begin(), attributes.end(), std::back_inserter(result->attributes));
 
-	while (token_.type == TokenType::openTagB
-			|| token_.type == TokenType::ident) {
+	while ( token_.type == TokenType::openTagB
+			|| token_.type == TokenType::ident ) {
 
 		if (token_.type == TokenType::openTagB) {
 			result->elements.push_back(element());
@@ -144,9 +139,8 @@ std::unique_ptr<CSL_Element> Parser::element() {
 	return result;
 }
 
-std::pair< std::string_view, std::vector<CSL_GenericAssignment> >
-Parser::openTag() {
-	std::pair< std::string_view, std::vector<CSL_GenericAssignment> > result;
+CSL_OpenTagResult Parser::openTag() {
+	CSL_OpenTagResult result;
 
 	nextToken();
 
@@ -191,7 +185,7 @@ void Parser::closeTag(std::string_view tagIdentifier) {
 	}
 }
 
-CSL_GenericAssignment Parser::genericAssignment() {
+CSL_GenericAssignment_ptr Parser::genericAssignment() {
 	std::string_view name = token_.content;
 
 	nextToken();
@@ -214,8 +208,8 @@ CSL_GenericAssignment Parser::genericAssignment() {
 	}
 }
 
-std::unique_ptr<CSL_Assignment> Parser::singleAssignment(std::string_view name) {
-	std::unique_ptr<CSL_Assignment> result = std::make_unique<CSL_Assignment>();
+CSL_Assignment_ptr Parser::singleAssignment(std::string_view name) {
+	CSL_Assignment_ptr result = std::make_unique<CSL_Assignment>();
 
 	// TODO: Do this with an initialization
 	result->name = name;
@@ -227,8 +221,8 @@ std::unique_ptr<CSL_Assignment> Parser::singleAssignment(std::string_view name) 
 }
 
 
-std::unique_ptr<CSL_ListAssignment> Parser::listAssignment(std::string_view name) {
-	std::unique_ptr<CSL_ListAssignment> result = std::make_unique<CSL_ListAssignment>();
+CSL_ListAssignment_ptr Parser::listAssignment(std::string_view name) {
+	CSL_ListAssignment_ptr result = std::make_unique<CSL_ListAssignment>();
 	// TODO: Do this with an initialization
 	result->name = name;
 
