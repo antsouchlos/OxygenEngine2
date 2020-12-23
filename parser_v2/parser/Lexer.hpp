@@ -14,10 +14,6 @@ enum class TokenType {ident, string, integer, floatingPoint, openTagB, openClosi
 struct Token {
 	TokenType type = TokenType::undef;
 	std::string_view content;
-
-//	TokenType type = TokenType::ident;	// TODO: Check performance improvement, if type is
-//											initialized to identifier, and not set in the
-//											identifier() function
 };
 
 class LexerError {

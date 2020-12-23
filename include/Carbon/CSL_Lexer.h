@@ -1,112 +1,151 @@
+#ifndef LEXER_HPP
+#define LEXER_HPP
+
+#include <sstream>
+#include <string_view>
+#include <array>
+#include <algorithm>
+#include <stdexcept>
+
+
+enum class TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB, closeTagB,
+						openListB, closeListB, eq, semicolon, comma, comment, slash, eos, undef};
+
+struct Token {
+	TokenType type = TokenType::undef;
+	std::string_view content;
+};
+
+class LexerError {
+	public:
+		virtual std::string what() const throw() { return ""; };
+};
+
+class UnknownCharacterError : LexerError {
+	public:
+		UnknownCharacterError(char c, std::size_t lineNum, std::size_t colNum)
+			: c_(c), lineNum_(lineNum), colNum_(colNum) {};
+
+		std::string what() const throw () {
+			std::stringstream result_ss;
+
+			result_ss << "Unknown character '" << c_ << "' at line " << lineNum_ << ':' << colNum_;
+
+			return result_ss.str();
+		}
+	private:
+		const char c_;
+		const std::size_t lineNum_;
+		const std::size_t colNum_;
+};
+
+class InvalidInputError : LexerError {
+	public:
+		InvalidInputError(std::string msg) : msg_(msg) {};
+
+		std::string what() const throw() {
+			return msg_;
+		}
+	private:
+		const std::string msg_;
+};
+
+const char* getTokenTypeStringRep(TokenType t);
+
+
 /*
- * Scanner_Lexer.h
  *
- *  Created on: Sep 23, 2015
- *      Author: andreas
- * 
- *  Updated on: Oct 04+, 2020
- */
+ * identifier				= identifierhead
+ *
+ * identifierHead			= [a-zA-Z_]
+ * 							| [a-zA-Z_] identifierTail
+ *
+ * identifierTail			= [a-zA-Z_1-9]
+ * 							| [a-zA-Z_1-9] identifierTail
+ *
+ * string					= "\"" * "\""
+ * numberHead				= "-" numberTail
+ * 							| numberTail
+ * numberTail				= [1-9]+
+ * 							| [1-9]+ . [1-9]*
+ *
+ * genericTagBracket		= "<" openCloseTagBracketTail
+ * 							|
+ * openCloseTagBracketTail	= "/"
+ *
+ * closeTagBracket			= ">"
+ * openClosingTagBracket	= "</"
+ * eq						= "="
+ * semicolon				= ";"
+ * comma					= ","
+ * openListBracket			= "{"
+ * closeListBracket			= "}"
+ * commentStartSlash		= "/" commentStart
+ * 							| "/" slash
+ * commentStart 			= "*"
+ * (commentEnd				= "* /")	//Only aplies when inside a comment
+ * slash					= eps	// Conditional epsilon, so to speak. Only takes effect,
+ * 								// if the next char isn't *
+ * */
 
-#ifndef CSL_LEXER_H_
-#define CSL_LEXER_H_
+// TODO: Crazy Idea - Make the Lexer class work with iterators. Token Iterators. Instead of calling
+// nextToken(), the user could increment an iterator - OR DECREMENT IT
 
-#include <types/OE_Libs.h>
-#include <Carbon/CSL_Exceptions.h>
+class Lexer {
+	public:
+		// A string is passed by reference and not a string_view, to make sure there
+		// is a terminating character, which this lexer depends on
+		Lexer(const std::string_view input) : input_(input), iter_(std::begin(input_)) {
 
-struct CSL_Char {
-		int lineIndex = -1;
-		int colIndex = 0;
-		char cargo = '?';
+			if (input.size() == 0)
+				throw InvalidInputError("The input length must be greater than 0");
+		}
+
+		Token nextToken();
+
+		std::size_t getLineNum();
+		std::size_t getColNum();
+
+	private:
+		using iter_t = std::string_view::iterator;
+
+
+		std::string_view input_;
+		iter_t iter_;
+
+		TokenType nextTokenType_;
+		std::string_view nextTokenContent_;
+
+
+		char getChar() const;
+		
+		void setNextTokenContent(iter_t it1, iter_t t2);
+
+		bool isIdentifierHeadChar() const;
+		bool isIdentifierTailChar() const;
+		bool isDigit() const;
+		bool isEOS() const;
+
+		void skipWhitespace();
+
+		void identifier();
+		void string();
+		void number();
+
+		void openTagBracket();
+		void closeTagBracket();
+		void openListBracket();
+		void closeListBracket();
+		void eq();
+		void semicolon();
+		void comma();
+
+		void commentStartSlash();
+		void commentStart();
+		void slash();
+
+		void eos();
 };
 
-struct CSL_Token {
-	int lineIndex;
-	int colIndex;
-	std::string type = "eos";
-	std::string cargo = "";
-};
 
-//--------------------------------------------------Scanner-------------------------------------------------
-class CSL_Scanner {
-    public:
-    
-        CSL_Scanner(std::string str);
-        CSL_Char getNextChar();
-    
-    private:
-        std::string sourceStr;
-
-        int strLen;
-
-        int lineIndex;
-        int absoluteColIndex;
-        int relativeColIndex;
-};
-
-//--------------------------------------------------Lexical Analyzer-------------------------------------------------
-
-class CSL_Lexer {
-    public:
-        CSL_Lexer(std::string str);
-        ~CSL_Lexer();
-        CSL_Token getNextCToken();
-    
-        //isStringStartChar is defined publicly to be able to be accessed by the function 'isStringStartChar()' of the class 'CSL_Parser'
-        bool isStringStartChar(char c);
-        
-    private:
-        CSL_Scanner *scanner{nullptr};
-        CSL_Char ch;
-
-        int absoluteColIndex = 0;
-        int maxLen;
-
-        //Character lists
-        std::string identifierStartChars;
-        std::string identifierChars;
-
-        std::string numberStartChars;
-        std::string numberChars;
-
-        std::string singleCharOperators;
-        std::string doubleCharOperators;
-
-        std::string stringStartChars;
-
-        std::string spaceChars;
-
-        //types
-        std::string IDENTIFIER = "identifier";
-        std::string STRING = "string";
-        std::string NUMBER = "number";
-        std::string OPERATOR = "operator";
-        std::string SPACE = "space";
-        std::string END = "eos";
-        std::string COMMENT = "comment";
-
-        std::vector<int> suspectedDOperatorIndex;
-
-        void getNextCChar();
-
-        bool isIdentStartChar(char c);
-        bool isIdentChar(char c);
-        bool isNumStartChar(char c);
-        bool isNumChar(char c);
-        bool isSingleCharOperator(char c);
-
-        //check if character is a first character of double char operator and save the indices of these operators in the
-        //list to make sure the right operators are checked when the function isDoubleCharOperator2Char() gets called
-        bool isDoubleCharOperator1Char(char c);
-
-        //check if character is a second character of double char operators that have previously been selected
-        bool isDoubleCharOperator2Char(char c);
-        bool isSpaceChar(char c);
-
-        std::string errorMessage();
-
-        //convert an integer into a string
-        std::string convert(int num);
-};
-
-#endif /* CSL_LEXER_H_ */
-
+#endif

@@ -1,96 +1,152 @@
+#ifndef PARSER_HPP
+#define PARSER_HPP
+
+
+#include <string>
+#include <string_view>
+#include <vector>
+#include <stdexcept>
+#include <variant>
+#include <charconv>
+#include <math.h>
+
+
+#include "Lexer.hpp"
+
+// Sadly, ParseError cannon inherit from std::exception, since that would not allow the return type
+// to be a string, which is necessary in this case in order to get a proper error message
+// (Returning "result_ss.str().c_str()" doesn't work, since it returns a pointer to an object that
+// gets destroyed a soon as the scope of "what()" is left, thereby basically returning garbage)
+class ParserError {
+	public:
+		virtual std::string what() const throw() { return ""; };
+};
+
+class UnexpectedSymbolError : ParserError {
+	public:
+		UnexpectedSymbolError(std::string_view unexpected, TokenType expected,
+							const std::size_t lineNum, const std::size_t colNum)
+			: unexpected_(unexpected), expected_(expected), lineNum_(lineNum), colNum_(colNum) {};
+
+		std::string what() const throw() {
+			std::stringstream result_ss;
+			result_ss << "Unexpetcted Symbol \"" << unexpected_ << "\" ";
+		   	result_ss << "at line " << lineNum_ << ':' << (colNum_ - unexpected_.size()) << ": ";
+			result_ss << "Expected \"";
+			result_ss << getTokenTypeStringRep(expected_);
+			result_ss << "\"";
+
+			return result_ss.str().c_str();
+		}
+	private:
+		std::string_view unexpected_;
+		TokenType expected_;
+		const std::size_t lineNum_;
+		const std::size_t colNum_;
+};
+
+class SemanticError : ParserError {
+	public:
+		SemanticError(const char* msg) : msg_(msg) {};
+
+		std::string what() const throw() { return msg_; };
+	private:
+		const char* msg_;
+};
+
+
+struct CSL_ListAssignment;
+struct CSL_Assignment;
+struct CSL_Element;
+
+using CSL_Element_ptr			= std::unique_ptr<CSL_Element>;
+using CSL_Assignment_ptr		= std::unique_ptr<CSL_Assignment>;
+using CSL_ListAssignment_ptr	= std::unique_ptr<CSL_ListAssignment>;
+
+using CSL_GenericAssignment_ptr	= std::variant<CSL_Assignment_ptr, CSL_ListAssignment_ptr>;
+
+using CSL_OpenTagResult			= std::pair< std::string_view,
+	  								std::vector<CSL_GenericAssignment_ptr> >;
+
 /*
- * CSL_Parser.h
- *
- *  Created on: Sep 23, 2015
- *      Author: andreas
- */
+* -------------------------- Grammar ------------------------
+*
+* S						= element
+*
+* element				= openTag (elementContent)* closeTag		// special requirement: first
+* 																	// identifiers of openTag
+* 																	// and closeTag must be
+* 																	// identical
+*
+* elementContent		= element | genericAssignment
+*
+* openTag				= "<" IDENTIFIER genericAssignment* ">" 
+* closeTag				= "</" IDENTIFIER ">"
+*
+* genericAssignment		= IDENTIFIER "=" signleAssignmentTail
+* 						| IDENTIFIER "=" listAssignmentTail
+*
+* singleAssignmentTail	= VALUE
+* 																	
+* listAssignmentTail	= "{" NUMBER "}"
+* 						| "{" NUMBER (";" NUMBER)* "}"	    		// TODO: Remove semicolon. This
+* 						    		    							// will require a rewrite of
+*                                                                   // the blender plugin
+* value					= NUMBER | STRING
+*/
 
-#ifndef CSL_PARSER_H_
-#define CSL_PARSER_H_
 
-#include <Carbon/CSL_Lexer.h>
-
-struct CSL_Node {
-    
-    ~CSL_Node();
-    std::string type;
-    std::string ID;
-
-    std::vector<CSL_Node*> children = {};
-    std::vector<std::string> args = {};
-
-    int line = 0;
-    int col = 0;
+struct CSL_ListAssignment {
+	std::string_view name;
+	std::vector<float> elements;
 };
 
-class CSL_Parser {
-public:
-    CSL_Node* parse(std::string str);
-    virtual ~CSL_Parser();
+struct CSL_Assignment {
+//	CSL_Assignment(std::string_view name_init, std::string_view element_init)
+//		: name(name_init), element(element_init) {};
 
-    bool isStringStartChar(char c);
-    
-private:
-    CSL_Lexer *lexer;
-    CSL_Token token;
-
-    bool definedLexer = false;
-
-    std::vector<std::string> open_tag;
-
-    std::string IDENTIFIER = "identifier";
-    std::string NUMBER = "number";
-    std::string STRING = "string";
-    std::string COMMENT = "comment";
-
-    CSL_Node *result;
-
-    CSL_Node* currentCNode = new CSL_Node;
-    std::vector<CSL_Node*> previousCNode;
-
-    //AST types
-    std::string TAG = "tag";
-    std::string CLOSEDTAG = "closedtag";
-    std::string ASSIGNMENT = "assignment";
-    std::string LISTASSIGNMENT = "listassignment";
-    std::string TAGASSIGNMENT = "tagassignment";
-
-    bool calledEOS = false;
-
-    void parseInternal(std::string str);
-    void getNextCToken();
-
-    /*
-    * --------------------------EBNF Grammar------------------------
-    * File = Block
-    * Block = tags [Block]
-    *
-    * tags = otag {tagsContent} ctag
-    *
-    * tagscontent = [tags][content][tagscontent]
-    *
-    * otag = "<" IDENTIFIER {IDENTIFIER "=" factor} ("/>" | ">")
-    *
-    * ctag = "</" IDENTIFIER ">"
-    *
-    * content = statement [content]
-    *
-    * statement = IDENTIFIER "=" factor | IDENTIFIER "=" "{" [factor] {";" factor} "}"
-    *
-    * factor = NUMBER | STRING
-    */
-
-    void expectCargo(std::string cargo);
-    void Block();
-    void tags();
-    void tagscontent();
-    void ctag();
-    void content();
-    void statement();
-    void factor();
-
-    std::string errorMessage();
-	std::string convert(int num);
+	std::string_view name;
+	std::string_view element;
 };
 
-#endif /* CSL_PARSER_H_ */
+struct CSL_Element {
+	std::string_view name;
+	std::vector<CSL_GenericAssignment_ptr> attributes;
+
+	std::vector<CSL_Element_ptr> elements;
+	std::vector<CSL_GenericAssignment_ptr> assignments;
+};
+
+
+class Parser {
+	public:
+		Parser(std::string &input) : lexer_(input) {};
+
+		CSL_Element_ptr parse();
+	private:
+		Lexer lexer_;
+
+		Token token_;
+
+
+
+
+		void nextToken(); 
+
+		float parseFloat() const;
+		std::size_t parseInt() const;
+		
+		CSL_Element_ptr element();
+		CSL_OpenTagResult openTag();
+		void closeTag(std::string_view tagIdentifier);
+
+		CSL_GenericAssignment_ptr genericAssignment();
+		CSL_Assignment_ptr singleAssignment(std::string_view name);
+		CSL_ListAssignment_ptr listAssignment(std::string_view name);
+};
+
+
+#include "Parser.cpp"
+
+
+#endif
