@@ -198,6 +198,12 @@ written, to check the iterator against the length of the string. Maybe create a 
 Does an Iterator like the wrapper just proposed already exist? Is there a way to automatically throw an exception, when one tries to access a character of
 a string outside of it's size()? I really don't fancy writing a wrapper for std::basic_string_view
 
+2020/12/23 - antsouchlos
+
+New Lexer and Parser are now done and reasonably optimized. No memory leaks and quite the performance impovement compared to the previous ones.
+We now embark on the great journey of actually integrating the new Lexer and Parser into OxygenEngine, i.e. rewriting the Interpreter while leaving
+it's interface unchanged
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
