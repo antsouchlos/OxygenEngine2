@@ -4,6 +4,62 @@
 // TODO: Check performance, when the Lexer is not compiled separetely to the Parser,
 // 			in order for the compiler to be able to inline functions better
 
+const char* getTokenTypeStringRep(TokenType t) {
+	switch(t) {
+		case TokenType::ident:
+			return "Identifier";
+			break;
+		case TokenType::string:
+			return "String";
+			break;
+		case TokenType::integer:
+			return "Integer";
+			break;
+		case TokenType::floatingPoint:
+			return "Float";
+			break;
+		case TokenType::openTagB:
+			return "<";
+			break;
+		case TokenType::closeTagB:
+			return ">";
+			break;
+		case TokenType::openClosingTagB:
+			return "</";
+			break;
+		case TokenType::openListB:
+			return "{";
+			break;
+		case TokenType::closeListB:
+			return "}";
+			break;
+		case TokenType::eq:
+			return "=";
+			break;
+		case TokenType::comma:
+			return ",";
+			break;
+		case TokenType::semicolon:
+			return ";";
+			break;
+		case TokenType::comment:
+			return "Comment";
+			break;
+		case TokenType::slash:
+			return "/";
+			break;
+		case TokenType::eos:
+			return "EOS";
+			break;
+		case TokenType::undef:
+			return "Undefined Token";
+			break;
+		default:
+			return "[Unknown Type]";
+	}
+}
+
+
 Token Lexer::nextToken() {
 	skipWhitespace();
 
@@ -43,7 +99,7 @@ Token Lexer::nextToken() {
 			} else if (isEOS()) {
 				eos();
 			} else {
-				throw LexerException("Unknown character");
+				throw UnknownCharacterError(getChar(), getLineNum(), getColNum());
 			}
 			
 			break;
@@ -53,6 +109,44 @@ Token Lexer::nextToken() {
 
 	return newToken;
 }
+
+std::size_t Lexer::getLineNum() {
+	auto it = input_.begin();
+
+	std::size_t lineNum = 1;
+
+	while (it != iter_) {
+		if (*it == '\n') {
+			++lineNum;
+		}
+
+		++it;
+	}
+
+	return lineNum;
+}
+
+std::size_t Lexer::getColNum() {
+	if (iter_ == input_.begin()) {
+		return 0;
+	}
+
+	auto it = iter_ - 1;
+
+	std::size_t colNum = 1;
+
+	while (it != input_.begin()) {
+		if (*it == '\n') {
+			break;
+		}
+
+		++colNum;
+		--it;
+	}
+
+	return colNum;
+}
+
 
 char Lexer::getChar() const {
 	return *iter_;

@@ -6,60 +6,12 @@ CSL_Element_ptr Parser::parse() {
 	if (token_.type == TokenType::openTagB) {
 		result = std::move(element());
 	} else {
-		throw ParserException("Unexpected Symbol. Expexted '<'");
+		throw UnexpectedSymbolError(token_.content, TokenType::openTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 	
 	return result;
 }
-
-//std::string Parser::getTokenTypeStringRep() const {
-//	switch(token_.type) {
-//		case TokenType::ident:
-//			return "Identifier";
-//			break;
-//		case TokenType::string:
-//			return "String";
-//			break;
-//		case TokenType::number:
-//			return "Number";
-//			break;
-//		case TokenType::openTagB:
-//			return "Opening Tag Bracket";
-//			break;
-//		case TokenType::closeTagB:
-//			return "Closing Tag Bracket";
-//			break;
-//		case TokenType::openListB:
-//			return "Opening List Bracket";
-//			break;
-//		case TokenType::closeListB:
-//			return "Closing List Bracket";
-//			break;
-//		case TokenType::eq:
-//			return "Equal Sign";
-//			break;
-//		case TokenType::comma:
-//			return "Comma";
-//			break;
-//		case TokenType::semicolon:
-//			return "Semicolon";
-//			break;
-//		case TokenType::comment:
-//			return "Comment";
-//			break;
-//		case TokenType::slash:
-//			return "Slash";
-//			break;
-//		case TokenType::eos:
-//			return "EOS";
-//			break;
-//		case TokenType::undef:
-//			return "Undefined";
-//			break;
-//		default:
-//			return "[Unknown Type]";
-//	}
-//}
 
 void Parser::nextToken() {
 	token_ = lexer_.nextToken();
@@ -78,7 +30,7 @@ float Parser::parseFloat() const {
 	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i1);
 //	// TODO: Is this necessary or even desireable?
 //	if (ec1 == std::errc()) {
-//		throw ParserException("Unexpected character in number");
+//		throw UnexpectedSymbolError("Unexpected character in number");
 //	}
 
 	std::size_t length1  = c1 - std::begin(token_.content);
@@ -87,7 +39,7 @@ float Parser::parseFloat() const {
 		= std::from_chars(std::begin(token_.content) + length1 + 1, std::end(token_.content), i2);
 //	// TODO: Is this necessary or even desireable?
 //	if (ec2 == std::errc()) {
-//		throw ParserException("Unexpected character in number");
+//		throw UnexpectedSymbolError("Unexpected character in number");
 //	}
 	
 	//std::size_t length2 = ceil( (i2 ? log10(i2) : 1) );
@@ -105,7 +57,7 @@ std::size_t Parser::parseInt() const {
 
 //	// TODO: Is this necessary or even desireable?
 //	if (ec1 == std::errc()) {
-//		throw ParserException("Unexpected character in number");
+//		throw UnexpectedSymbolError("Unexpected character in number");
 //	}
 //
 	
@@ -133,7 +85,8 @@ CSL_Element_ptr Parser::element() {
 	if (token_.type == TokenType::openClosingTagB) {
 		closeTag(result->name);
 	} else {
-		throw ParserException("Unexpected Symbol. Expected \"</\"");	
+		throw UnexpectedSymbolError(token_.content, TokenType::openClosingTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
 	return result;
@@ -147,7 +100,8 @@ CSL_OpenTagResult Parser::openTag() {
 	if (token_.type == TokenType::ident) {
 		result.first = token_.content;
 	} else {
-		throw ParserException("Unexpected Symbol. Expected identifier");
+		throw UnexpectedSymbolError(token_.content, TokenType::ident,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
 	nextToken();
@@ -159,7 +113,8 @@ CSL_OpenTagResult Parser::openTag() {
 	if (token_.type == TokenType::closeTagB) {
 		nextToken();
 	} else {
-		throw ParserException("Unexpected Symbol. Expected '>'");
+		throw UnexpectedSymbolError(token_.content, TokenType::closeTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
 	return result;
@@ -170,10 +125,11 @@ void Parser::closeTag(std::string_view tagIdentifier) {
 
 	if (token_.type == TokenType::ident) {
 		if (tagIdentifier != token_.content) {
-			throw ParserException("Closing tag identifier does not match opening tag identifier");
+			throw SemanticError("Closing tag identifier does not match opening tag identifier");
 		}
 	} else {
-		throw ParserException("Unexpected Symbol. Expected identifier");
+		throw UnexpectedSymbolError(token_.content, TokenType::ident,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
 	nextToken();
@@ -181,7 +137,8 @@ void Parser::closeTag(std::string_view tagIdentifier) {
 	if (token_.type == TokenType::closeTagB) {
 		nextToken();
 	} else {
-		throw ParserException("Unexpected Symbol. Expected '>'");
+		throw UnexpectedSymbolError(token_.content, TokenType::closeTagB,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 }
 
@@ -201,17 +158,19 @@ CSL_GenericAssignment_ptr Parser::genericAssignment() {
 		} else if (token_.type == TokenType::string) {
 			return singleAssignment(name);
 		} else {
-			throw ParserException("Unexpected Symbol. Expected '{', number or string");
+//			throw UnexpectedSymbolError("Unexpected Symbol. Expected '{', number or string");
+			throw UnexpectedSymbolError(token_.content, TokenType::openListB,
+											lexer_.getLineNum(), lexer_.getColNum());
 		}
 	} else {
-		throw ParserException("Unexpected Symbol. Expected '='");
+		throw UnexpectedSymbolError(token_.content, TokenType::eq,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 }
 
 CSL_Assignment_ptr Parser::singleAssignment(std::string_view name) {
 	CSL_Assignment_ptr result = std::make_unique<CSL_Assignment>();
 
-	// TODO: Do this with an initialization
 	result->name = name;
 	result->element = token_.content;
 
@@ -223,7 +182,7 @@ CSL_Assignment_ptr Parser::singleAssignment(std::string_view name) {
 
 CSL_ListAssignment_ptr Parser::listAssignment(std::string_view name) {
 	CSL_ListAssignment_ptr result = std::make_unique<CSL_ListAssignment>();
-	// TODO: Do this with an initialization
+
 	result->name = name;
 
 	nextToken();
@@ -235,11 +194,14 @@ CSL_ListAssignment_ptr Parser::listAssignment(std::string_view name) {
 		result->elements.push_back(parseFloat());
 		nextToken();
 	} else {
-		throw ParserException("Unexpected Symbol. Expected number");
+//		throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
+		throw UnexpectedSymbolError(token_.content, TokenType::floatingPoint,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
 	while (token_.type == TokenType::semicolon) {
 		nextToken();
+
 		if (token_.type == TokenType::integer) {
 			result->elements.push_back(parseInt());
 			nextToken();
@@ -247,14 +209,17 @@ CSL_ListAssignment_ptr Parser::listAssignment(std::string_view name) {
 			result->elements.push_back(parseFloat());
 			nextToken();
 		} else {
-			throw ParserException("Unexpected Symbol. Expected number");
+//			throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
+			throw UnexpectedSymbolError(token_.content, TokenType::floatingPoint,
+											lexer_.getLineNum(), lexer_.getColNum());
 		}
 	}
 
 	if (token_.type == TokenType::closeListB) {
 		nextToken();
 	} else {
-		throw ParserException("Unexpected Symbol. Expected '}'");
+		throw UnexpectedSymbolError(token_.content, TokenType::closeListB,
+										lexer_.getLineNum(), lexer_.getColNum());
 	}
 
 	return result;

@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 
 	std::string line;
 	while(getline(f, line))
-		content += line;
+		content += line + '\n';
 
 	f.close();
 
@@ -93,10 +93,14 @@ int main(int argc, char *argv[]) {
 	try {
 		std::unique_ptr<CSL_Element> el = parser.parse();
 //		printElement(el);
-	} catch(LexerException &e) {
-		std::cout << "LexerException occurred:\n\t" << e.what() << std::endl;
-	} catch(ParserException &e) {
-		std::cout << "ParserException occurred:\n\t" << e.what() << std::endl;
+	} catch(const UnknownCharacterError &e) {
+		std::cout << "UnknownCharacterError occurred:\n\t" << e.what() << std::endl;
+	} catch(const InvalidInputError &e) {
+		std::cout << "InvalidInpuError occurred:\n\t" << e.what() << std::endl;
+	} catch(const UnexpectedSymbolError &e) {
+		std::cout << "UnexpectedSymbolError occurred:\n\t" << e.what() << std::endl;
+	} catch(const SemanticError &e) {
+		std::cout << "SemanticError occurred:\n\t" << e.what() << std::endl;
 	}
 
 
