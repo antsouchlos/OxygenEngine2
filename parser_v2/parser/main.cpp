@@ -15,52 +15,52 @@ void printIndent() {
 	}	
 }
 
-void printAssignment(CSL_Assignment &a) {
+void printAssignment(std::unique_ptr<CSL_Assignment> &a) {
 	printIndent();
-	std::cout << a.name << ": " << std::setprecision(50) << a.element << '\n';
+	std::cout << a->name << ": " << std::setprecision(50) << a->element << '\n';
 
 }
 
-void printListAssignment(CSL_ListAssignment &a) {
+void printListAssignment(std::unique_ptr<CSL_ListAssignment> &a) {
 	printIndent();
-	std::cout << a.name << ": { ";
+	std::cout << a->name << ": { ";
 
-	for (auto &as : a.elements)
+	for (auto &as : a->elements)
 		std::cout << std::setprecision(50) << as << ", ";
 
 	std::cout << "}\n";
 
 }
 
-void printElement(CSL_Element &elem) {
+void printElement(std::unique_ptr<CSL_Element> &elem) {
 	printIndent();
-	std::cout << '<' << elem.name << ">\n";
+	std::cout << '<' << elem->name << ">\n";
 
 	indent++;
 
-	for (auto &a : elem.attributes) {
+	for (auto &a : elem->attributes) {
 		std::visit([](auto&& arg) {
 			using T = std::decay_t<decltype(arg)>;
 
-			if constexpr (std::is_same_v<T, CSL_Assignment>) {
+			if constexpr (std::is_same_v<T, std::unique_ptr<CSL_Assignment>>) {
 				printAssignment(arg);
-			} else if constexpr (std::is_same_v<T, CSL_ListAssignment>) {
+			} else if constexpr (std::is_same_v<T, std::unique_ptr<CSL_ListAssignment>>) {
 				printListAssignment(arg);
 			}
 		}, a);
 	}
 
-	for (auto &e : elem.elements) {
+	for (auto &e : elem->elements) {
 		printElement(e);
 	}
 	
-	for (auto &a : elem.assignments) {
+	for (auto &a : elem->assignments) {
 		std::visit([](auto&& arg) {
 			using T = std::decay_t<decltype(arg)>;
 
-			if constexpr (std::is_same_v<T, CSL_Assignment>) {
+			if constexpr (std::is_same_v<T, std::unique_ptr<CSL_Assignment>>) {
 				printAssignment(arg);
-			} else if constexpr (std::is_same_v<T, CSL_ListAssignment>) {
+			} else if constexpr (std::is_same_v<T, std::unique_ptr<CSL_ListAssignment>>) {
 				printListAssignment(arg);
 			}
 		}, a);
@@ -69,7 +69,7 @@ void printElement(CSL_Element &elem) {
 	indent--;
 
 	printIndent();
-	std::cout << "</" << elem.name << ">\n";
+	std::cout << "</" << elem->name << ">\n";
 }
 
 int main(int argc, char *argv[]) {
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 	Parser parser(content);
 
 	try {
-		CSL_Element el = parser.parse();
+		std::unique_ptr<CSL_Element> el = parser.parse();
 //		Lexer lexer(content);
 //
 //		Token t;
