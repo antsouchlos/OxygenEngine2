@@ -92,12 +92,6 @@ int main(int argc, char *argv[]) {
 
 	try {
 		std::unique_ptr<CSL_Element> el = parser.parse();
-//		Lexer lexer(content);
-//
-//		Token t;
-//		while (t.type != TokenType::eos)
-//			t = lexer.nextToken();
-
 //		printElement(el);
 	} catch(LexerException &e) {
 		std::cout << "LexerException occurred:\n\t" << e.what() << std::endl;

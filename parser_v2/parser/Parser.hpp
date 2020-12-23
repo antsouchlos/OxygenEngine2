@@ -23,6 +23,20 @@ class ParserException : std::exception {
 		const char *msg_; 
 };
 
+
+struct CSL_ListAssignment;
+struct CSL_Assignment;
+struct CSL_Element;
+
+using CSL_Element_ptr			= std::unique_ptr<CSL_Element>;
+using CSL_Assignment_ptr		= std::unique_ptr<CSL_Assignment>;
+using CSL_ListAssignment_ptr	= std::unique_ptr<CSL_ListAssignment>;
+
+using CSL_GenericAssignment_ptr	= std::variant<CSL_Assignment_ptr, CSL_ListAssignment_ptr>;
+
+using CSL_OpenTagResult			= std::pair< std::string_view,
+	  								std::vector<CSL_GenericAssignment_ptr> >;
+
 /*
 * -------------------------- Grammar ------------------------
 *
@@ -60,23 +74,21 @@ struct CSL_Assignment {
 	std::string_view element;
 };
 
-using CSL_GenericAssignment = std::variant<std::unique_ptr<CSL_Assignment>, std::unique_ptr<CSL_ListAssignment>>;
 
 struct CSL_Element {
 	std::string_view name;
+	std::vector<CSL_GenericAssignment_ptr> attributes;
 
-	std::vector<CSL_GenericAssignment> attributes;
-
-	std::vector<std::unique_ptr<CSL_Element>> elements;
-
-	std::vector<CSL_GenericAssignment> assignments;
+	std::vector<CSL_Element_ptr> elements;
+	std::vector<CSL_GenericAssignment_ptr> assignments;
 };
+
 
 class Parser {
 	public:
 		Parser(std::string &input) : lexer_(input) {};
 
-		std::unique_ptr<CSL_Element> parse();
+		CSL_Element_ptr parse();
 	private:
 		Lexer lexer_;
 
@@ -90,13 +102,13 @@ class Parser {
 		float parseFloat() const;
 		std::size_t parseInt() const;
 		
-		std::unique_ptr<CSL_Element> element();
-		std::pair< std::string_view, std::vector<CSL_GenericAssignment> > openTag();
+		CSL_Element_ptr element();
+		CSL_OpenTagResult openTag();
 		void closeTag(std::string_view tagIdentifier);
 
-		CSL_GenericAssignment genericAssignment();
-		std::unique_ptr<CSL_Assignment> singleAssignment(std::string_view name);
-		std::unique_ptr<CSL_ListAssignment> listAssignment(std::string_view name);
+		CSL_GenericAssignment_ptr genericAssignment();
+		CSL_Assignment_ptr singleAssignment(std::string_view name);
+		CSL_ListAssignment_ptr listAssignment(std::string_view name);
 };
 
 
