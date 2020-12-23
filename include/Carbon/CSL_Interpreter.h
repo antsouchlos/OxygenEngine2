@@ -1,6 +1,8 @@
 #ifndef CSL_INTERPRETER_H_
 #define CSL_INTERPRETER_H_
 
+#include <algorithm>
+
 #include <types/OE_World.h>
 
 #include <Carbon/CSL_Parser.h>
@@ -14,29 +16,19 @@ public:
 	std::shared_ptr<OE_World> interpret(std::string sourceCode);
 	std::shared_ptr<OE_World> interpretFile(std::string pathToFile);
     
-    ~CSL_Interpreter();
-    
-    OE_SharedIndexMap<OE_Scene>          scenesList;
-    OE_SharedIndexMap<OE_Object>         objectsList;
-    OE_SharedIndexMap<OE_Material>       materialsList;
-    OE_SharedIndexMap<OE_Texture>        texturesList;
-    OE_SharedIndexMap<OE_TCM>            tcmsList;
-    OE_SharedIndexMap<OE_ViewportConfig> viewportsList;
-    
+//	OE_SharedIndexMap<OE_Scene>          scenesList;
+//	OE_SharedIndexMap<OE_Object>         objectsList;
+//	OE_SharedIndexMap<OE_Material>       materialsList;
+//	OE_SharedIndexMap<OE_Texture>        texturesList;
+//	OE_SharedIndexMap<OE_TCM>            tcmsList;
+//	OE_SharedIndexMap<OE_ViewportConfig> viewportsList;
 private:
-
-	//parser to parse the code before interpreting
-	CSL_Parser *parser{nullptr};
-
-	//return value of "interpret()"
-	//OE_World *world; UNNECESSARY
-
 	//a pointer to the CNode currently beeing processed
-	CSL_Node *curNode{nullptr};
+	std::unique_ptr<CSL_Element> curElement;
 
 	//a function for each type
 	//the functions are called recursively (processWorld()->processScene()->processCamera->...)
-	std::shared_ptr<OE_World>          processWorld();
+	std::shared_ptr<OE_World>          processWorld(CSL_Element_ptr);
 	std::shared_ptr<OE_Scene>          processScene();
     std::shared_ptr<OE_Camera>         processCamera();
     std::shared_ptr<OE_Light>          processLight();
