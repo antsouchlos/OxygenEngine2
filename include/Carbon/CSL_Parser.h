@@ -11,7 +11,7 @@
 #include <math.h>
 
 
-#include "Lexer.hpp"
+#include <Carbon/Lexer.h>
 
 // Sadly, ParseError cannon inherit from std::exception, since that would not allow the return type
 // to be a string, which is necessary in this case in order to get a proper error message
@@ -24,7 +24,7 @@ class ParserError {
 
 class UnexpectedSymbolError : ParserError {
 	public:
-		UnexpectedSymbolError(std::string_view unexpected, TokenType expected,
+		UnexpectedSymbolError(std::string_view unexpected, CSL_TokenType expected,
 							const std::size_t lineNum, const std::size_t colNum)
 			: unexpected_(unexpected), expected_(expected), lineNum_(lineNum), colNum_(colNum) {};
 
@@ -40,7 +40,7 @@ class UnexpectedSymbolError : ParserError {
 		}
 	private:
 		std::string_view unexpected_;
-		TokenType expected_;
+		CSL_TokenType expected_;
 		const std::size_t lineNum_;
 		const std::size_t colNum_;
 };
@@ -118,17 +118,15 @@ struct CSL_Element {
 };
 
 
-class Parser {
+class CSL_Parser {
 	public:
-		Parser(std::string &input) : lexer_(input) {};
+		CSL_Parser(std::string &input) : lexer_(input) {};
 
 		CSL_Element_ptr parse();
 	private:
-		Lexer lexer_;
+		CSL_Lexer lexer_;
 
-		Token token_;
-
-
+		CSL_Token token_;
 
 
 		void nextToken(); 
@@ -144,9 +142,6 @@ class Parser {
 		CSL_Assignment_ptr singleAssignment(std::string_view name);
 		CSL_ListAssignment_ptr listAssignment(std::string_view name);
 };
-
-
-#include "Parser.cpp"
 
 
 #endif
