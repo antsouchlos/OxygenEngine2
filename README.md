@@ -262,14 +262,14 @@ An impressive 2 sec loading time!!! (after reading from disk)
 Performance is more than good enough (O(n)) and i like the extensible design of the parser and interpreter, BUT there are still performance optimizations possible in the parser IMHO. You basically copy the whole source code and allocate heap memory all the time...
 
 My ideas:
- - for CSL_Lexer and CSL_Parser to store indices in the source code
- - for CSL_Node->id and CSL_Node->args to store the indices in the source code instead of copying the source code string itself.
+ ~~- for CSL_Lexer and CSL_Parser to store indices in the source code~~
+ ~~- for CSL_Node->id and CSL_Node->args to store the indices in the source code instead of copying the source code string itself.~~
  - Use string.substr() in the interpreter
- - for CSL_Node->type to be stored as an enum. (because the types are firmly defined right?)
- - Same optimizations ofr CSL_Token and CSL_Char (formerly CChar and CToken)
+ ~~- for CSL_Node->type to be stored as an enum. (because the types are firmly defined right?)~~
+ ~~- Same optimizations ofr CSL_Token and CSL_Char (formerly CChar and CToken)~~
 
 
-On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!
+~~On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!~~
 Check with ```valgrind --leak-check=full ./builddir/CSL_Test```.
 
 ```
