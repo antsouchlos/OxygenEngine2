@@ -1,10 +1,10 @@
-CSL_Element Parser::parse() {
-	CSL_Element result;
+std::unique_ptr<CSL_Element> Parser::parse() {
+	std::unique_ptr<CSL_Element> result;
 	
 	nextToken();
 
 	if (token_.type == TokenType::openTagB) {
-		result = element();
+		result = std::move(element());
 	} else {
 		throw ParserException("Unexpected Symbol. Expexted '<'");
 	}
@@ -114,29 +114,29 @@ std::size_t Parser::parseInt() const {
 	
 	return i;
 }
+/**/
+std::unique_ptr<CSL_Element> Parser::element() {
+	std::unique_ptr<CSL_Element> result = std::make_unique<CSL_Element>();
 
-CSL_Element Parser::element() {
-	CSL_Element result;
+	std::pair< std::string_view, std::vector<CSL_GenericAssignment> > openTagResult = openTag();
 
-	std::pair< std::string_view,
-		std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> >
-			openTagResult = openTag();
+	result->name = openTagResult.first;
 
-	result.name = openTagResult.first;
-	result.attributes = openTagResult.second;
+	std::move(openTagResult.second.begin(), openTagResult.second.end(),
+			std::back_inserter(result->attributes));
 
 	while (token_.type == TokenType::openTagB
 			|| token_.type == TokenType::ident) {
 
 		if (token_.type == TokenType::openTagB) {
-			result.elements.push_back(element());
+			result->elements.push_back(element());
 		} else if (token_.type == TokenType::ident) {
-			result.assignments.push_back(genericAssignment());
+			result->assignments.push_back(genericAssignment());
 		}
 	}
 
 	if (token_.type == TokenType::openClosingTagB) {
-		closeTag(result.name);
+		closeTag(result->name);
 	} else {
 		throw ParserException("Unexpected Symbol. Expected \"</\"");	
 	}
@@ -144,12 +144,9 @@ CSL_Element Parser::element() {
 	return result;
 }
 
-std::pair<std::string_view,
-			std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>>
-				> Parser::openTag() {
-
-	std::pair< std::string_view,
-		std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> > result;
+std::pair< std::string_view, std::vector<CSL_GenericAssignment> >
+Parser::openTag() {
+	std::pair< std::string_view, std::vector<CSL_GenericAssignment> > result;
 
 	nextToken();
 
@@ -194,8 +191,7 @@ void Parser::closeTag(std::string_view tagIdentifier) {
 	}
 }
 
-std::variant<CSL_Assignment, CSL_ListAssignment>
-Parser::genericAssignment() {
+CSL_GenericAssignment Parser::genericAssignment() {
 	std::string_view name = token_.content;
 
 	nextToken();
@@ -218,28 +214,31 @@ Parser::genericAssignment() {
 	}
 }
 
-CSL_Assignment Parser::singleAssignment(std::string_view name) {
-	CSL_Assignment result;
+std::unique_ptr<CSL_Assignment> Parser::singleAssignment(std::string_view name) {
+	std::unique_ptr<CSL_Assignment> result = std::make_unique<CSL_Assignment>();
 
-	result.name = name;
-	result.element = token_.content;
+	// TODO: Do this with an initialization
+	result->name = name;
+	result->element = token_.content;
 
 	nextToken();
 
 	return result;
 }
 
-CSL_ListAssignment Parser::listAssignment(std::string_view name) {
-	CSL_ListAssignment result;
-	result.name = name;
+
+std::unique_ptr<CSL_ListAssignment> Parser::listAssignment(std::string_view name) {
+	std::unique_ptr<CSL_ListAssignment> result = std::make_unique<CSL_ListAssignment>();
+	// TODO: Do this with an initialization
+	result->name = name;
 
 	nextToken();
 
 	if (token_.type == TokenType::integer) {
-		result.elements.push_back(parseInt());
+		result->elements.push_back(parseInt());
 		nextToken();
 	} else if (token_.type == TokenType::floatingPoint) {
-		result.elements.push_back(parseFloat());
+		result->elements.push_back(parseFloat());
 		nextToken();
 	} else {
 		throw ParserException("Unexpected Symbol. Expected number");
@@ -248,10 +247,10 @@ CSL_ListAssignment Parser::listAssignment(std::string_view name) {
 	while (token_.type == TokenType::semicolon) {
 		nextToken();
 		if (token_.type == TokenType::integer) {
-			result.elements.push_back(parseInt());
+			result->elements.push_back(parseInt());
 			nextToken();
 		} else if (token_.type == TokenType::floatingPoint) {
-			result.elements.push_back(parseFloat());
+			result->elements.push_back(parseFloat());
 			nextToken();
 		} else {
 			throw ParserException("Unexpected Symbol. Expected number");
@@ -266,4 +265,3 @@ CSL_ListAssignment Parser::listAssignment(std::string_view name) {
 
 	return result;
 }
-

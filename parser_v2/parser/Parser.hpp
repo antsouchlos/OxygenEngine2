@@ -60,21 +60,23 @@ struct CSL_Assignment {
 	std::string_view element;
 };
 
+using CSL_GenericAssignment = std::variant<std::unique_ptr<CSL_Assignment>, std::unique_ptr<CSL_ListAssignment>>;
+
 struct CSL_Element {
 	std::string_view name;
 
-	std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> attributes;
+	std::vector<CSL_GenericAssignment> attributes;
 
-	std::vector<CSL_Element> elements;
+	std::vector<std::unique_ptr<CSL_Element>> elements;
 
-	std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> assignments;
+	std::vector<CSL_GenericAssignment> assignments;
 };
 
 class Parser {
 	public:
 		Parser(std::string &input) : lexer_(input) {};
 
-		CSL_Element parse();
+		std::unique_ptr<CSL_Element> parse();
 	private:
 		Lexer lexer_;
 
@@ -88,14 +90,13 @@ class Parser {
 		float parseFloat() const;
 		std::size_t parseInt() const;
 		
-		CSL_Element element();
-		std::pair< std::string_view,
-			std::vector<std::variant<CSL_Assignment, CSL_ListAssignment>> > openTag();
+		std::unique_ptr<CSL_Element> element();
+		std::pair< std::string_view, std::vector<CSL_GenericAssignment> > openTag();
 		void closeTag(std::string_view tagIdentifier);
 
-		std::variant<CSL_Assignment, CSL_ListAssignment> genericAssignment();
-		CSL_Assignment singleAssignment(std::string_view name);
-		CSL_ListAssignment listAssignment(std::string_view name);
+		CSL_GenericAssignment genericAssignment();
+		std::unique_ptr<CSL_Assignment> singleAssignment(std::string_view name);
+		std::unique_ptr<CSL_ListAssignment> listAssignment(std::string_view name);
 };
 
 
