@@ -5,14 +5,14 @@ using namespace std;
 
 int main(){
         
-    OE_TaskManager taskMgr = OE_TaskManager();
+/*    OE_TaskManager taskMgr = OE_TaskManager();
     
     taskMgr.Init();
     
     SDL_Delay(20);
-    taskMgr.Start();
+    taskMgr.Start();*/
     
-    /*CSL_Interpreter interpreter;
+    CSL_Interpreter interpreter;
     auto t = clock();
     cout << "CSL TEST BEGIN" << endl;
     
