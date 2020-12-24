@@ -80,6 +80,13 @@ struct CSL_Element {
 };
 
 
+// TODO: Expand this namespace to basically include all the parser infrastructure. That
+// way we can lose the CSL_ prefix and use csl:: instead
+namespace csl {
+	float parseFloat(std::string_view s);
+	std::size_t parseInt(std::string_view s);
+}
+
 class CSL_Parser {
 	public:
 		CSL_Parser(std::string &input) : lexer_(input) {};
@@ -92,10 +99,7 @@ class CSL_Parser {
 
 
 		void nextToken(); 
-
-		float parseFloat() const;
-		std::size_t parseInt() const;
-		
+	
 		CSL_Element_ptr element();
 		CSL_OpenTagResult openTag();
 		void closeTag(std::string_view tagIdentifier);

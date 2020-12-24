@@ -23,6 +23,7 @@ const char* getTokenTypeStringRep(CSL_TokenType t);
 class LexerError {
 	public:
 		virtual std::string what() const throw() = 0;
+		virtual ~LexerError() = default;
 };
 
 class UnknownCharacterError : LexerError {
@@ -62,6 +63,7 @@ class InvalidInputError : LexerError {
 class ParserError {
 	public:
 		virtual std::string what() const throw() = 0;
+		virtual ~ParserError() = default;
 };
 
 class UnexpectedSymbolError : ParserError {
@@ -91,6 +93,7 @@ class UnexpectedSymbolError : ParserError {
 class InterpreterError {
 	public:
 		virtual std::string what() const throw() = 0;
+		virtual ~InterpreterError() = default;
 };
 
 // TODO: Find a way to get line and column number

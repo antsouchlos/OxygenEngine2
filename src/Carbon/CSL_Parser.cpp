@@ -20,7 +20,10 @@ void CSL_Parser::nextToken() {
 	token_ = lexer_.nextToken();
 }
 
-float CSL_Parser::parseFloat() const {
+
+namespace csl {
+
+float parseFloat(std::string_view s) {
 	// Although the standard defines it for c++17, g++ does not implement
 	// std::from_chars(const char*, const char*, double), only
 	// std::from_chars(const char*, const char*, int), so we have to get a little bit
@@ -30,41 +33,36 @@ float CSL_Parser::parseFloat() const {
 	std::size_t i1 = 0;
 	std::size_t i2 = 0;
 
-	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i1);
-//	// TODO: Is this necessary or even desireable?
-//	if (ec1 == std::errc()) {
-//		throw UnexpectedSymbolError("Unexpected character in number");
-//	}
+	auto [c1, ec1] = std::from_chars(std::begin(s), std::end(s), i1);
+	if (ec1 == std::errc()) {
+		throw SemanticError("Unexpected character in number");
+	}
 
-	std::size_t length1  = c1 - std::begin(token_.content);
+	std::size_t length1  = c1 - std::begin(s);
 
-	auto [c2, ec2]
-		= std::from_chars(std::begin(token_.content) + length1 + 1, std::end(token_.content), i2);
-//	// TODO: Is this necessary or even desireable?
-//	if (ec2 == std::errc()) {
-//		throw UnexpectedSymbolError("Unexpected character in number");
-//	}
+	auto [c2, ec2] = std::from_chars(std::begin(s) + length1 + 1, std::end(s), i2);	
+	if (ec2 == std::errc()) {
+		throw SemanticError("Unexpected character in number");
+	}
 	
-	//std::size_t length2 = ceil( (i2 ? log10(i2) : 1) );
-	std::size_t length2  = c2 - (std::begin(token_.content) + length1 + 1);
+	std::size_t length2  = c2 - (std::begin(s) + length1 + 1);
 
-	float f = i1 + i2 / static_cast<float>(pow(10, length2));
-
-	return f;
+	return ( i1 + i2 / static_cast<float>(pow(10, length2)) );
 }
 
-std::size_t CSL_Parser::parseInt() const {
-	std::size_t i;
+std::size_t parseInt(std::string_view s) {
+	std::size_t i = 0;
 
-	auto [c1, ec1] = std::from_chars(std::begin(token_.content), std::end(token_.content), i);
+	auto [c1, ec1] = std::from_chars(std::begin(s), std::end(s), i);
 
-//	// TODO: Is this necessary or even desireable?
-//	if (ec1 == std::errc()) {
-//		throw UnexpectedSymbolError("Unexpected character in number");
-//	}
-//
+	if (ec1 == std::errc()) {
+		throw SemanticError("Error while parsing integer: Unexpected character");
+	}
+
 	
 	return i;
+}
+
 }
 
 CSL_Element_ptr CSL_Parser::element() {
@@ -191,10 +189,10 @@ CSL_ListAssignment_ptr CSL_Parser::listAssignment(std::string_view name) {
 	nextToken();
 
 	if (token_.type == CSL_TokenType::integer) {
-		result->values.push_back(parseInt());
+		result->values.push_back(csl::parseInt(token_.content));
 		nextToken();
 	} else if (token_.type == CSL_TokenType::floatingPoint) {
-		result->values.push_back(parseFloat());
+		result->values.push_back(csl::parseFloat(token_.content));
 		nextToken();
 	} else {
 //		throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
@@ -206,10 +204,10 @@ CSL_ListAssignment_ptr CSL_Parser::listAssignment(std::string_view name) {
 		nextToken();
 
 		if (token_.type == CSL_TokenType::integer) {
-			result->values.push_back(parseInt());
+			result->values.push_back(csl::parseInt(token_.content));
 			nextToken();
 		} else if (token_.type == CSL_TokenType::floatingPoint) {
-			result->values.push_back(parseFloat());
+			result->values.push_back(csl::parseFloat(token_.content));
 			nextToken();
 		} else {
 //			throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
