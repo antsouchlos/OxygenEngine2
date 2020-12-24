@@ -6,16 +6,78 @@
 | |____| |  | |_____    | |______  | |___| | | |______  | |___| |    |_|
 \________/  |_______|   |________| |_______| |________| |_______|     
 ```
-The Oxygen Engine (OE) is a hobbyist modular game engine written in C++ in development for learning purposes.
+The Oxygen Engine (OE) is a hobbyist modular 3D game engine written in C++ in development for learning purposes.
+
+It currently implements a custom file format with asynchronous loading (.csl), a multithreaded pipeline with game logic and renderer running in separate threads, an event handler and an OpenGL 3.1+/ES 3.0+ Renderer using SDL2, GLad and GLM. This means at least a Shader Model 4.0/DX10-capable GPU is required to run OE.
+
 Originally it was an ongoing project in 2015-16, but it is stagnated and now is (hopefully) being finally restarted in 2020.
 
 ## Installation
 This section will in the future describe how to install/compile/run on Linux and Windows.
 
+### Compile on Linux
+
+Prerequisites: SDL2, meson and ninja.
+
+The CC and CXX environment variables are optional. Meson can use ```ccache``` automatically if it exists as well.
+For the very first time setup run:
+
+```
+$ CC=gcc CXX=g++ meson builddir
+```
+
+Otherwise, just run:
+```
+$ meson compile -C builddir
+```
+After compilation is finished,
+in order to execute the demos, just run:
+```
+$ ./builddir/CSL_Test
+```
+or:
+```
+$ ./builddir/OE_Test
+```
+
+### Cross compile on Linux for Windows
+
+Prerequisites: MinGW-w64, wine, SDL2, meson, ninja.
+
+Run this script, which takes care of the dirty work for you automatically.
+Note that this will compile SDL2 together with the Oxygen Engine.
+```
+$ ./cross_linux2windows
+```
+
+It is also possible to use ```meson compile -C builddir```, but only AFTER the above script
+has been run at least ONCE to generate the ```builddir``` directory and apply the needed hacks.
+
+Then after compilation is finished, on Linux it is possible to test with:
+
+```
+$ wine builddir/OE_Test.exe
+```
+or
+```
+$ wine builddir/CSL_Test.exe
+```
+
+All required .dll files:
+
+```
+libwinpthread-1.dll
+
+```
+
+are in the ```builddir``` directory and must be distributed together with the ```.exe``` files.
+
 ### Installing the blender plugin
 
+Prerequisites: Blender (duh!)
+
 The blender plugin now works again!
-Only for materials, meshes, lights and cameras as of 2020/10/02.
+Only for materials, meshes, lights and cameras as of 2020/11/03.
 But textures weren't working anyway in the engine itself, so whatever. They will be added later.
 
 From blender:
@@ -69,21 +131,126 @@ The design is a little different from 2016, in that synchro threads are synchron
 Added window system support, proper SDL and OpenGL library support. Added [GLM](https://github.com/g-truc/glm) 
 as our default math library, though this can be changed in the future if desired.
 
-Now our Oxygen Engine can properly create and destroy a windowed/fullscreen OpenGL/OpenGL ES renderer without GLEW and with less fuss. 
+Now our Oxygen Engine can properly create and destroy a windowed/fullscreen OpenGL/OpenGL ES renderer without GLEW and with less fuss.
 
-Next task: Renderer
+2020/10/31:
+
+Renderer now works! It can render the challenge car (in contrast to the 2016 version) and any other object.
+Currently uses mesh normals as vertex colors. In the Demo one can move the camera with WASD to see around the object meshes.
+
+Added several more .csl example files as a test for the renderer and parser/interpreter.
+
+~~Next task: Proper build system (meson) integration with unit tests.~~
+
+2020/11/01:
+
+Added meson build system support, it was much easier than i thought. It took 30 mins.
+
+2020/11/03:
+
+Added cross compilation support. Some hacks were needed in order to get SDL2 to compile, but with Meson
+it was still straightforward. It will have to be updated when more libraries are added.
+
+2020/11/12
+
+Added keyboard/mouse input API. Added basic Object movement API. Updated types database to use shared_ptr. Renderer can now update positions of different objects independently of one another. Added basic materials and hardcoded a single point light at (0, 0, 0) to the renderer. Renderer is now ready for the physics engine.
+
+Now to evaluate whether i will use one of the 100000000 approaches possible to structure a proper renderer.
+This will take a while, so the code will be touched sparingly for some time.
+
+2020/11/24 - Andreas
+
+CAUTION: The following does not constitute any real progress on the parser that will be used by the OxygenEngine. Nevertheless, it is a substantial part of my process for building an understanding about parsing algorithms.
+
+Added a breadth-first implementation of a general directional top-down parser for context-free languages (with some restrictions). It is a very naive implementation,
+lacking in MANY departments (frankly, at some points poorly implemented out of boredom - input tokens have to be separated by spaces for example,
+because I just couldn't be bothered to write a lexical analyzer). With all it's faults, this implementation has one really nice feature: Since it is not 
+a recursive-decent implementation, one is quite literaly able to input a grammar, recompile (although with a bit of effort, even recompiling isn't necessary;
+the grammar could be loaded from a configuration file) and run the parser.
+
+2020/11/24 - philsegeler
+
+Primarily renderer stuff:
+- Added NRE_GPU_Shader classes enabling the use of different shaders for different objects and modes.  Shaders are also reusable for different objects to prevent unnecessary pipeline changes.
+- Two shading modes are supported: ```regular``` and ```normals```. 
+- Fixed some bugs regarding the window system and OpenGL ES.
+- Added a Z-pre-pass to the renderer for optimization and in preparation for implementing a Light-Indexed-Deferred Renderer.
+- Draw calls are now sorted.
+- The renderer can now be restarted on the fly at runtime.
+- Overhauled the event handler and pushed (almost) all SDL2-specific event handling code in ```OE_SDL_WindowSystem.h/cpp```. Now it is more maintenable.
+- Added possibility to change shading mode and restart the renderer in the demo using left/right mouse click.
+
+2020/12/07 - philsegeler
+
+Renderer stuff
+- Added basic gamma correction to both OpenGL and OpenGL ES. Colors now look correct.
+- Added wireframe rendering (only on desktop OpenGL and for debugging purposes)
+- Added Bounding Box calculation and rendering
+- Use F5/F6/F7/F8 to change render modes in the demo.
+
+2020/12/20 - antsouchlos
+
+Uploaded new Implementation of Lexer onto parser_v2 branch - I know I know, I should not just commit the whole thing when it's done.
+This wasn't that much work though
+
+Error Handling must be possible another way. Right now, essentially every time the char iterator is incremented, an extra if statement has to be
+written, to check the iterator against the length of the string. Maybe create a wrapper for the integer that is the iterator, that does this automatically?
+Does an Iterator like the wrapper just proposed already exist? Is there a way to automatically throw an exception, when one tries to access a character of
+a string outside of it's size()? I really don't fancy writing a wrapper for std::basic_string_view
+
+2020/12/23 - antsouchlos
+
+New Lexer and Parser are now done and reasonably optimized. No memory leaks and quite the performance impovement compared to the previous ones.
+We now embark on the great journey of actually integrating the new Lexer and Parser into OxygenEngine, i.e. rewriting the Interpreter while leaving
+it's interface unchanged
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
-- Proper cleanup of code from 2016. (mostly working, but muh legacy cruft + renaming of files and classes) (IN PROGRESS, 2020/10/15: only renderer + API missing)
-- Rewrite of the build system to use [Meson](https://mesonbuild.com/).
-- Get cross compilation done at least for Windows (and in the future Android\iOS\MacOS as well).
+- ~~Proper cleanup of code from 2016. (mostly working, but muh legacy cruft + renaming of files and classes) (IN PROGRESS, 2020/10/15: only renderer + API missing)~~ (DONE)
+- ~~Rewrite of the build system to use [Meson](https://mesonbuild.com/).~~ (DONE: Easier than i thought)
+- ~~Get cross compilation done at least for Windows (and in the future Android\iOS\MacOS as well).~~(DONE: Linux-to-Windows)
 - ~~Removal of outdated 'glew' dependency ([Glad](https://glad.dav1d.de/) should replace it, which is only a few auto-generated headers for OpenGL and not an external library).~~ (DONE)
 - ~~Fix the blender plugin and update it for blender 2.8+.~~ (DONE)
 - ~~(Possible but difficult) autogenerated parser script (reader+writer) for carbon, so that classes can change easily without having to change the Carbon code manually by hand.~~(WONTFIX)
 
-## TODO list for antsouchlos
+## TODO list for philsegeler - Renderer
+
+Finally the initial TODO list is ready and done! Now i can start working on the renderer properly!
+UPDATE 2020/11/12: It was enhanced.
+
+- ~~Basic Material and Lighting support.~~(DONE)
+- ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
+- ~~Support multiple shaders~~
+- Implement Directional Light rendering pass.
+- Implement Point+Area Light-Indexed rendering pass.
+- Support multiple render targets and framebuffers in the Renderer API
+- Implement Light Indexed Deferred Renderer.
+- Integration of the ```SDL2_image``` library and basic Texture streaming support with diffuse maps.
+- Integration of the ```SDL2_ttf``` + ```'freetype``` libraries and basic font loading and text-rendering support.
+
+In the future and in no particular order:
+
+- Android support
+- Skeletal animation and bones support (depends on File format, API and physics engine support)
+- Antialiasing support
+- Normal maps support.
+- Stencil/Shadow Mapping support
+- Basic Occlusion Culling
+- Alpha transparency support
+- Cube Map Reflections support
+- SSAO support
+- Level-of-detail and mipmapping/anisotropic filtering support
+- Multi-Texturing and Stencil-Texturing support.
+- (Maybe) Pseudo-2D support (Orthographic rendering, Sprite(?))
+- Particle effects
+- Usage of OpenGL AZDO extensions to improve performance
+- Physically-based-rendering(?!)
+- Tesselation (?!)
+- MacOS/iOS support
+
+
+## TODO list for antsouchlos parser
 The C++ interpreter/writer is working with the new format and i have prepared a simple Makefile, so you can test them yourself. Just hit ```make``` in the top level directory and then execute ```./CSL_Test```. (UPDATE: You will need to (un)comment some stuff)
 
 I have prepared benchmark objects exported from blender in order to measure the performance.
@@ -95,18 +262,18 @@ An impressive 2 sec loading time!!! (after reading from disk)
 Performance is more than good enough (O(n)) and i like the extensible design of the parser and interpreter, BUT there are still performance optimizations possible in the parser IMHO. You basically copy the whole source code and allocate heap memory all the time...
 
 My ideas:
- - for CSL_Lexer and CSL_Parser to store indices in the source code
- - for CSL_Node->id and CSL_Node->args to store the indices in the source code instead of copying the source code string itself.
+ ~~- for CSL_Lexer and CSL_Parser to store indices in the source code~~
+ ~~- for CSL_Node->id and CSL_Node->args to store the indices in the source code instead of copying the source code string itself.~~
  - Use string.substr() in the interpreter
- - for CSL_Node->type to be stored as an enum. (because the types are firmly defined right?)
- - Same optimizations ofr CSL_Token and CSL_Char (formerly CChar and CToken)
+ ~~- for CSL_Node->type to be stored as an enum. (because the types are firmly defined right?)~~
+ ~~- Same optimizations ofr CSL_Token and CSL_Char (formerly CChar and CToken)~~
 
 
-On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!
-Check with ```valgrind --leak-check=full ./CSL_Test```.
+~~On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!~~
+Check with ```valgrind --leak-check=full ./builddir/CSL_Test```.
 
 ```
-$ ./CSL_test
+$ ./builddir/CSL_test
 CSL TEST BEGIN
 CSL TEST READ FILE: 0.015779
 CSL TEST PARSE: 0.235009
@@ -126,5 +293,31 @@ CSL TEST WRITER 1.18851
 ```
 
 Run ```diff challenge_car_copy.csl challenge_car_copy2.csl``` to verify correctness
+
+## TODO list for antsouchlos physics engine
+
+The rendere, types and engine itself are now ready for the introduction of the physics engine. :)
+Now all work into physics, renderer, the engine itself and the interpreter/parser can happen independently of one another.
+
+To do this you should first subclass ```OE_PhysicsEngineBase``` found in ```OE_DummyClasses.h``` and implement the virtual functions.
+You will have access to all objects through the API if you wish, which is in ```OE_API.h```. (You can include that in your .cpp files.)
+To get and idea how you can do it you can take a look at ```Renderer/NRE_RenderData.cpp```.
+
+The physics engine is supposed to handle ALL and i really mean ALL movements of the engine itself. That also includes (apart from collision detection and regular physics updates) things like child objects following their parents, updating of animations, camera following algorithms and anything that is not supposed to be calculated by the user manually. The renderer only uses existing object and position data.
+
+I highly recommend that after collision detection is finished you go with rigid body mechanics and first/third person character physics (that means moving around, jumping, enforcing boundaries and constraints, etc.)
+
+You are fully in charge of the whole physics and movement API and the way physics properties are stored in the .csl files and/or imported from blender. The only things that are important to work as is for the renderer are the ```OE_Object::GetModelMatrix()``` and ```OE_Object::GetViewMatrix()``` methods, since they are used to upload updated object and camera positions to the GPU.
+
+To test the physics engine you can now reliably export from blender and import directly into .csl in the engine. You just need to make sure that:
+
+1. All object rotation modes inside blender must be ```Quaternion WXYZ```, not ```XYZ Euler``` or anything else, otherwise the rotations won't be written correctly.
+2. Each object that should be visible MUST have a material.
+3. The materials MUST use nodes and have a ```Specular``` node as the surface, otherwise there will be errors on the export into .csl. (More will be added later on)
+4. There must be one scene and one camera (as of 2020/11/12) and the camera should be named "Camera". This way upon import in ```oe_main_test.cpp``` and the ```builddir/OE_Test``` executable, it is possible to move around the camera using WASD +Q/E and mouse movement with spacebar to freely take a look around the scene.
+
+
+
+
 
 

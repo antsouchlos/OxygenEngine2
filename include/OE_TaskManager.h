@@ -3,17 +3,17 @@
 
 #include <OE_Task.h>
 #include <types/OE_World.h>
+#include <Carbon/CSL_Interpreter.h>
 #include <OE_SDL_WindowSystem.h>
 #include <Events/OE_MutexCondition.h>
-#include <Renderer/NRE_RenderData.h>
+#include <Renderer/NRE_RendererMain.h>
 
-using namespace std;
 
 class OE_TaskManager;
 
 /* this is a shortcut type definition
  * to make code clearer.
- * It stores a pointer of a method of FTaskManager-derived classes
+ * It stores a pointer of a method of OE_TaskManager-derived classes
  */
 typedef int(*OE_METHOD)(void*, OE_Task);
 
@@ -30,6 +30,8 @@ struct OE_ThreadData{
 struct OE_UnsyncThreadData{
     OE_METHOD func;
     void* data;
+    OE_TaskManager* taskMgr;
+    std::string name;
 };
 
 struct OE_ThreadStruct {
@@ -39,6 +41,9 @@ struct OE_ThreadStruct {
      * - the pointer methods to execute which represent an FTask
      * - a boolean to make the thread asynchronous
      */
+    
+    OE_ThreadStruct();
+    virtual ~OE_ThreadStruct();
 
     std::vector<OE_Task>        tasks;
     std::vector<OE_METHOD>      functions;
@@ -80,27 +85,33 @@ class OE_TaskManager: public OE_MutexCondition
         ~OE_TaskManager();
 
         // stores threads by their name
-        std::map<std::string, struct OE_ThreadStruct>     threads = {};
+        std::map<std::string, struct OE_ThreadStruct>   threads = {};
         std::map<std::string,    SDL_Thread*>           threadIDs = {};
 
         // stores threads which should not be synchronized
         //std::map<std::string, struct OE_ThreadStruct>  unsync_threads = {};
-        std::map<std::string,    SDL_Thread*>        unsync_threadIDs = {};
+        std::map<std::string,    SDL_Thread*>       unsync_threadIDs = {};
+        std::set<std::string>                       finished_unsync_threadIDs = {};
         
         std::map<std::string, std::string> active_tasks = {};
-        
-        //SDL_sem*                           global_semaphore;
+
         //very important variable
-        bool                                done;
+        std::atomic<bool>                                done;
         
         
-        OE_EventHandler                     event_handler;
+        OE_THREAD_SAFETY_OBJECT             renderer_mutex;
         OE_RendererBase*                    renderer{nullptr};
+        
+        OE_THREAD_SAFETY_OBJECT             physics_mutex;
         OE_PhysicsEngineBase*               physics{nullptr};
+        
+        OE_THREAD_SAFETY_OBJECT             window_mutex;
         OE_WindowSystemBase*                window{nullptr};
         
-        OE_World*                           world{nullptr};
-
+        std::shared_ptr<OE_World>   world{nullptr};
+        
+        std::shared_ptr<OE_World>   pending_world{nullptr}; // for loading a world
+        
         OE_Task                             events_task;
         
         
@@ -117,15 +128,15 @@ class OE_TaskManager: public OE_MutexCondition
         */
         void AddTask(std::string, const OE_METHOD, void*);
         void AddTask(std::string, const OE_METHOD, int, void*);
-        void AddTask(std::string, const OE_METHOD, int, string, void*);
-        void AddTask(std::string, const OE_METHOD, string, void*);
+        void AddTask(std::string, const OE_METHOD, int, std::string, void*);
+        void AddTask(std::string, const OE_METHOD, std::string, void*);
         // similar to do-task, but only executes the function once after certain time has passed
         void DoOnce( std::string, const OE_METHOD, int, void*);
         OE_Task GetTaskInfo(std::string, std::string);
         
         
         // Main functions
-        int Init();
+        int Init(std::string, int, int, bool);
         void CreateNewThread(std::string);
         void CreateUnsyncThread(std::string, const OE_METHOD, void*);
         void Step();
@@ -139,6 +150,7 @@ class OE_TaskManager: public OE_MutexCondition
 
         void updateThread(const std::string);
         
+        void removeFinishedUnsyncThreads();
 
     protected:
         int getReadyThreads();
@@ -153,7 +165,7 @@ class OE_TaskManager: public OE_MutexCondition
         
     private:
         
-        
+        void updateWorld();
         void runThreadTasks(const std::string&);
         void sortThreadTasks(const std::string&);
 };

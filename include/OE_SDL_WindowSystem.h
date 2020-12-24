@@ -9,11 +9,14 @@ public:
     OE_SDL_WindowSystem();
     ~OE_SDL_WindowSystem();
     
-    
     bool init(int, int, std::string, bool, void*);
     bool update();
     
     void finishInit();
+    
+    bool getMouseLockedState();
+    void lockMouse();
+    void unlockMouse();
     
     bool updateEvents();
     void destroy();
@@ -21,7 +24,15 @@ public:
     SDL_Window* window;
     SDL_GLContext context;
     
+    SDL_Event event;
+    
     int counter{0};
+    
+    bool mouse_moved{false};
+    
+protected:
+    
+    void updateWindowEvents();
 };
 
 

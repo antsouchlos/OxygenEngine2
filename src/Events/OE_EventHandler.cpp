@@ -10,27 +10,28 @@ OE_EventHandler::OE_EventHandler(){
 }
 void OE_EventHandler::init(){
 	this->input_handler.createEvents(&this->internal_events);
-
+    for (auto x : this->internal_events){
+        this->happened_events_counter[x.first] = 0;
+    }
+    this->done = false;
 }
 
 OE_EventHandler::~OE_EventHandler(){
-
-	for(auto x: this->internal_events) delete x.second;
     this->internal_events.clear();
-
+    this->happened_events_counter.clear();
 }
 
-// THIS IS TOTALLY USELESS
-OE_Event* OE_EventHandler::getIEvent(string a_name){
+// THIS IS VERY USEFUL
+std::shared_ptr<OE_Event> OE_EventHandler::getIEvent(string a_name){
    /// wraps getIEventUNSAFE in a mutex, (now in 2020: like... seriously????)
    lockMutex();
 
-   OE_Event* output = getIEventUNSAFE(a_name);
+   std::shared_ptr<OE_Event> output = getIEventUNSAFE(a_name);
    unlockMutex();
    return output;
 }
 
-OE_Event* OE_EventHandler::getIEventUNSAFE(string a_name){
+std::shared_ptr<OE_Event> OE_EventHandler::getIEventUNSAFE(string a_name){
 	/// function to simplify fetching an event by name 
 	/// WARNING: DO NOT USE THE FUNCTION OUTSIDE OF MUTEXES
    
@@ -42,12 +43,15 @@ OE_Event* OE_EventHandler::getIEventUNSAFE(string a_name){
 
 void OE_EventHandler::createUserEvent(string a_name){
 
-	OE_CustomEvent* event = new OE_CustomEvent();
+	std::shared_ptr<OE_CustomEvent> event = std::make_shared<OE_CustomEvent>();
 	event->name = a_name;
 	event->setFunc(&template_event_func, nullptr);
 	
 	lockMutex();
-	internal_events[a_name] = event;
+    if (internal_events.count(a_name) == 0){
+        internal_events[a_name] = event;
+        happened_events_counter[a_name] = 0;
+    }
 	unlockMutex();
 }
 
@@ -56,8 +60,7 @@ void OE_EventHandler::createUserEvent(string a_name){
 void OE_EventHandler::destroyIEvent(string a_name){
    lockMutex();
        
-   delete internal_events[a_name];
-   internal_events.erase(a_name);
+   this->obsolete_events.push_back(a_name);
 
    unlockMutex();
    //return output;
@@ -117,20 +120,20 @@ void OE_EventHandler::broadcastIEvent(string a_name, void* data){
     	this->broadcastIEvent(x, nullptr);
 }
 
-// TOTALLY USELESS
+// TODO
 void OE_EventHandler::broadcastIEventWait(string a_name, int milliseconds){}
 
 /// so simple
 int OE_EventHandler::callIEvent(string a_name, OE_Task* task, void* data){
 
     /// generic event management
-    
-    if (getIEventUNSAFE(a_name) != nullptr){
+    auto event = getIEvent(a_name);
+    if (event != nullptr){
         
-        getIEventUNSAFE(a_name)->lockMutex();
-        getIEventUNSAFE(a_name)->times_invoked++;
-        getIEventUNSAFE(a_name)->call(task, data);
-        getIEventUNSAFE(a_name)->unlockMutex();
+        event->lockMutex();
+        event->times_invoked++;
+        event->call(task, data);
+        event->unlockMutex();
     } 
     else{
         // TODO: handle error
@@ -138,6 +141,28 @@ int OE_EventHandler::callIEvent(string a_name, OE_Task* task, void* data){
 
     return 0;
 }
+
+std::size_t OE_EventHandler::getEventActivations(std::string a_name){
+    size_t output = 0;
+    lockMutex();
+    if (this->happened_events_counter.count(a_name) == 1){
+        output = this->happened_events_counter[a_name];
+    }
+    unlockMutex();
+    return output;
+}
+
+std::size_t OE_EventHandler::getEventCounter(std::string a_name){
+    size_t output = 0;
+    auto event = getIEvent(a_name);
+    if (event != nullptr){
+        event->lockMutex();
+        output = event->times_invoked;
+        event->unlockMutex();
+    }
+    return output;
+}
+
 
 bool OE_EventHandler::havePendingEvents(){
     lockMutex();
@@ -151,11 +176,18 @@ bool OE_EventHandler::havePendingEvents(){
  */
 int OE_EventHandler::handleAllEvents(OE_Task* task){
     
+    lockMutex();
+    for (auto x : this->happened_events_counter){
+        this->happened_events_counter[x.first] = 0;
+    }
+    unlockMutex();
+    
     while(havePendingEvents()){
         
         ///fetch an event and delete it from the queue
         /// so that other threads target next events
         lockMutex();
+        
         
         this->happened_events.clear();
         
@@ -165,6 +197,9 @@ int OE_EventHandler::handleAllEvents(OE_Task* task){
         }
         
         this->happened_events = std::exchange(this->pending_events, {});
+        for (const auto& x : this->happened_events){
+            this->happened_events_counter[x]++;
+        }
         unlockMutex();
         
         for (auto a_event: happened_events)
@@ -180,8 +215,8 @@ void OE_EventHandler::cleanup(){
     
     for(auto &a_name: obsolete_events){
         if (getIEventUNSAFE(a_name) != nullptr){
-            delete internal_events[a_name];
             internal_events.erase(a_name);
+            happened_events_counter.erase(a_name);
         }
     }
     obsolete_events.clear();
