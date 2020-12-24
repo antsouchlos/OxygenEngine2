@@ -29,11 +29,6 @@ class OE_Scene : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         
     //protected:
         
-        //std::unordered_map<std::size_t, std::shared_ptr<OE_Object>>       objects;
-        
-        //std::unordered_map<std::size_t, std::shared_ptr<OE_Texture>>      textures;
-        //std::unordered_map<std::size_t, std::shared_ptr<OE_Material>>     materials;
-        //std::unordered_map<std::size_t, std::shared_ptr<OE_TCM>>          texture_CMs;    
         std::set<std::size_t> objects;
         std::set<std::size_t> materials;
         std::set<std::size_t> textures;

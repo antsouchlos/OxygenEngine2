@@ -126,6 +126,7 @@ int main(){
     //OE_LoadWorld("challenge_car.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("monkeys.csl", &OnLoadObject, nullptr);
     //OE_LoadWorld("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
+    //OE_LoadWorld("OE_VerySImple.csl", &OnLoadObject, nullptr);
     OE_LoadWorld("OE_Demo.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
     OE_Start();

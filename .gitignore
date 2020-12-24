@@ -24,3 +24,4 @@ csl_very_large_object_test_copy.csl
 builddir
 subprojects/SDL2-2.0.12/
 subprojects/packagecache/
+callgrind*
