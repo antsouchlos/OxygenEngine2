@@ -204,6 +204,10 @@ New Lexer and Parser are now done and reasonably optimized. No memory leaks and 
 We now embark on the great journey of actually integrating the new Lexer and Parser into OxygenEngine, i.e. rewriting the Interpreter while leaving
 it's interface unchanged
 
+2020/12/25 - philsegeler
+
+Changed user-facing API of OE to starting with ```oe::``` and using underscores instead of camelCase-like naming conventions + fixes in renderer.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
