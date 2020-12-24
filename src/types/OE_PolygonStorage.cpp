@@ -41,7 +41,8 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
             for (size_t i=0; i < 2+ mesh->data.num_of_uvs; i++){
                 std::bitset<64> temp(lhs[i]);
                 if (i%4 >= 2){
-                    OE_ReverseBitset(temp);
+					// TODO
+//                    OE_ReverseBitset(temp);
                 }
                 if(i%2 != 0){
                     temp = temp << 32;
