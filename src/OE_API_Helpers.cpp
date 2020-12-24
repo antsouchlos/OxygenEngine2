@@ -1,7 +1,7 @@
 #include <OE_API_Helpers.h>
 #include <OE_API.h>
 
-using namespace OE;
+using namespace oe;
 using namespace OE_API_Helpers;
 using namespace std;
 
@@ -22,7 +22,7 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
     OE_World::scenesList.extend(interpreter.scenesList, true);
     OE_Main->pending_world = loaded_world;
     OE_Main->unlockMutex();
-    OE_BroadcastEvent("loaded-" + filename, nullptr);
+    oe::broadcast_event("loaded-" + filename, nullptr);
     return 0;
 }
 
