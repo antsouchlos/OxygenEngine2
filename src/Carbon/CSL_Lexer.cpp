@@ -105,9 +105,9 @@ void CSL_Lexer::setNextTokenContent(iter_t first, iter_t last) {
 bool CSL_Lexer::isIdentifierHeadChar() const {
 	int n = static_cast<int>(getChar());
 
-	if (	(65 <= n) && (n <= 90)
-			|| (97 <= n) && (n <= 122)
-			|| (95 == n) ) {
+	if (	( (65 <= n) && (n <= 90) ) 
+		 || ( (97 <= n) && (n <= 122) )
+		 || (95 == n) ) {
 		return true;
 	} else {
 		return false;
@@ -118,10 +118,10 @@ bool CSL_Lexer::isIdentifierHeadChar() const {
 bool CSL_Lexer::isIdentifierTailChar() const {
 	int n = static_cast<int>(getChar());
 
-	if (	(65 <= n) && (n <= 90)
-			|| (97 <= n) && (n <= 122)
-	  		|| (48 <= n) && (n <= 57)
-			|| (95 == n) ) {
+	if (	( (65 <= n) && (n <= 90) )
+		 || ( (97 <= n) && (n <= 122) )
+	  	 || ( (48 <= n) && (n <= 57) )
+		 || (95 == n) ) {
 		return true;
 	} else {
 		return false;

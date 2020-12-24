@@ -31,20 +31,20 @@ private:
 	//a function for each type
 	//the functions are called recursively (processWorld()->processScene()->processCamera->...)
 	std::shared_ptr<OE_World>          processWorld(CSL_Element_ptr world_e);
-	std::shared_ptr<OE_Scene>          processScene();
-    std::shared_ptr<OE_Camera>         processCamera();
-    std::shared_ptr<OE_Light>          processLight();
+	std::shared_ptr<OE_Scene>          processScene(CSL_Element_ptr scene_e);
+    std::shared_ptr<OE_Camera>         processCamera(CSL_Element_ptr camera_e);
+    std::shared_ptr<OE_Light>          processLight(CSL_Element_ptr light_e);
     //void processInteraction(OE_Interaction *interaction);
-    std::shared_ptr<OE_Mesh32>         processMesh();
+    std::shared_ptr<OE_Mesh32>         processMesh(CSL_Element_ptr mesh_e);
     //void processVertex(OE_Vertex *vertex);
     void processUVMapData(OE_UVMapData &uvmap, const std::size_t&);
-    OE_VertexGroup *    processVertexGroup();
+	std::shared_ptr<OE_VertexGroup>		processVertexGroup(CSL_Element_ptr vGroup_e);
     //void processAnimation(OE_Animation *animation);
     //void processTransformation(OE_Transformation *transformation);
     void processTriangle(OE_Mesh32 *mesh, const std::size_t& num_of_uvs);
     //void processPhysics(OE_Physics *physics);
-    std::shared_ptr<OE_Texture>  processTexture();
-    std::shared_ptr<OE_Material> processMaterial();
+    std::shared_ptr<OE_Texture>  processTexture(CSL_Element_ptr texture_e);
+    std::shared_ptr<OE_Material> processMaterial(CSL_Element_ptr material_e);
     std::shared_ptr<OE_TCM>      processTCM(CSL_Element_ptr tcm_e);
 //    void processTCM_Texture(OE_TCM_Texture &tcm_texture);
     std::shared_ptr<OE_ViewportConfig> processViewportConfig(CSL_Element_ptr vconf_e);
