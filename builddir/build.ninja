@@ -7,13 +7,13 @@ ninja_required_version = 1.7.1
 # Rules for compiling.
 
 rule c_COMPILER
- command = cc $ARGS -MD -MQ $out -MF $DEPFILE -o $out -c $in
+ command = gcc $ARGS -MD -MQ $out -MF $DEPFILE -o $out -c $in
  deps = gcc
  depfile = $DEPFILE_UNQUOTED
  description = Compiling C object $out
 
 rule cpp_COMPILER
- command = c++ $ARGS -MD -MQ $out -MF $DEPFILE -o $out -c $in
+ command = g++ $ARGS -MD -MQ $out -MF $DEPFILE -o $out -c $in
  deps = gcc
  depfile = $DEPFILE_UNQUOTED
  description = Compiling C++ object $out
@@ -25,7 +25,7 @@ rule STATIC_LINKER
  description = Linking static target $out
 
 rule cpp_LINKER
- command = c++ $ARGS -o $out $in $LINK_ARGS
+ command = g++ $ARGS -o $out $in $LINK_ARGS
  description = Linking target $out
 
 # Other rules
@@ -49,7 +49,7 @@ build PHONY: phony
 build libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o: cpp_COMPILER ../src/OE_SDL_WindowSystem.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Renderer_glad.c.o: c_COMPILER ../src/Renderer/glad.c
  DEPFILE = libOxygenEngine.a.p/src_Renderer_glad.c.o.d
@@ -59,170 +59,180 @@ build libOxygenEngine.a.p/src_Renderer_glad.c.o: c_COMPILER ../src/Renderer/glad
 build libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o: cpp_COMPILER ../src/Renderer/NRE_GL3_API.cpp
  DEPFILE = libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o: cpp_COMPILER ../src/Renderer/NRE_GPU_API.cpp
  DEPFILE = libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
+
+build libOxygenEngine.a.p/src_Renderer_NRE_GPU_Shaders.cpp.o: cpp_COMPILER ../src/Renderer/NRE_GPU_Shaders.cpp
+ DEPFILE = libOxygenEngine.a.p/src_Renderer_NRE_GPU_Shaders.cpp.o.d
+ DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Renderer_NRE_GPU_Shaders.cpp.o.d
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
+
+build libOxygenEngine.a.p/src_Renderer_NRE_GL3_Shaders.cpp.o: cpp_COMPILER ../src/Renderer/NRE_GL3_Shaders.cpp
+ DEPFILE = libOxygenEngine.a.p/src_Renderer_NRE_GL3_Shaders.cpp.o.d
+ DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Renderer_NRE_GL3_Shaders.cpp.o.d
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o: cpp_COMPILER ../src/Renderer/NRE_RendererMain.cpp
  DEPFILE = libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o: cpp_COMPILER ../src/Renderer/NRE_RenderData.cpp
  DEPFILE = libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o: cpp_COMPILER ../src/Events/OE_MutexCondition.cpp
  DEPFILE = libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o: cpp_COMPILER ../src/OE_API_Helpers.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_OE_API.cpp.o: cpp_COMPILER ../src/OE_API.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_API.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_API.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_OE_Math.cpp.o: cpp_COMPILER ../src/OE_Math.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_Math.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_Math.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o: cpp_COMPILER ../src/OE_DummyClasses.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_OE_TaskManager.cpp.o: cpp_COMPILER ../src/OE_TaskManager.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_TaskManager.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_TaskManager.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_OE_Task.cpp.o: cpp_COMPILER ../src/OE_Task.cpp
  DEPFILE = libOxygenEngine.a.p/src_OE_Task.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_OE_Task.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o: cpp_COMPILER ../src/Events/OE_EventHandler.cpp
  DEPFILE = libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o: cpp_COMPILER ../src/Events/OE_InputEventHandler.cpp
  DEPFILE = libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o: cpp_COMPILER ../src/Events/OE_EventParser.cpp
  DEPFILE = libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Events_OE_Event.cpp.o: cpp_COMPILER ../src/Events/OE_Event.cpp
  DEPFILE = libOxygenEngine.a.p/src_Events_OE_Event.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Events_OE_Event.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o: cpp_COMPILER ../src/Carbon/CSL_Interpreter.cpp
  DEPFILE = libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o: cpp_COMPILER ../src/Carbon/CSL_Parser.cpp
  DEPFILE = libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o: cpp_COMPILER ../src/Carbon/CSL_Lexer.cpp
  DEPFILE = libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o: cpp_COMPILER ../src/types/OE_TypesBase.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Camera.cpp.o: cpp_COMPILER ../src/types/OE_Camera.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Camera.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Camera.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Light.cpp.o: cpp_COMPILER ../src/types/OE_Light.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Light.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Light.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Material.cpp.o: cpp_COMPILER ../src/types/OE_Material.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Material.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Material.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o: cpp_COMPILER ../src/types/OE_Mesh.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Object.cpp.o: cpp_COMPILER ../src/types/OE_Object.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Object.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Object.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o: cpp_COMPILER ../src/types/OE_PolygonStorage.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Scene.cpp.o: cpp_COMPILER ../src/types/OE_Scene.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Scene.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Scene.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_TCM.cpp.o: cpp_COMPILER ../src/types/OE_TCM.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_TCM.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_TCM.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_Texture.cpp.o: cpp_COMPILER ../src/types/OE_Texture.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_Texture.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_Texture.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o: cpp_COMPILER ../src/types/OE_VertexGroup.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o: cpp_COMPILER ../src/types/OE_ViewportConfig.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o: cpp_COMPILER ../src/types/OE_VertexStorage.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
 build libOxygenEngine.a.p/src_types_OE_World.cpp.o: cpp_COMPILER ../src/types/OE_World.cpp
  DEPFILE = libOxygenEngine.a.p/src_types_OE_World.cpp.o.d
  DEPFILE_UNQUOTED = libOxygenEngine.a.p/src_types_OE_World.cpp.o.d
- ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -fPIC -D_REENTRANT
+ ARGS = -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -fPIC -D_REENTRANT
 
-build libOxygenEngine.a: STATIC_LINKER libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o libOxygenEngine.a.p/src_Renderer_glad.c.o libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o libOxygenEngine.a.p/src_OE_API.cpp.o libOxygenEngine.a.p/src_OE_Math.cpp.o libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o libOxygenEngine.a.p/src_OE_TaskManager.cpp.o libOxygenEngine.a.p/src_OE_Task.cpp.o libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o libOxygenEngine.a.p/src_Events_OE_Event.cpp.o libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o libOxygenEngine.a.p/src_types_OE_Camera.cpp.o libOxygenEngine.a.p/src_types_OE_Light.cpp.o libOxygenEngine.a.p/src_types_OE_Material.cpp.o libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o libOxygenEngine.a.p/src_types_OE_Object.cpp.o libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o libOxygenEngine.a.p/src_types_OE_Scene.cpp.o libOxygenEngine.a.p/src_types_OE_TCM.cpp.o libOxygenEngine.a.p/src_types_OE_Texture.cpp.o libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o libOxygenEngine.a.p/src_types_OE_World.cpp.o
+build libOxygenEngine.a: STATIC_LINKER libOxygenEngine.a.p/src_OE_SDL_WindowSystem.cpp.o libOxygenEngine.a.p/src_Renderer_glad.c.o libOxygenEngine.a.p/src_Renderer_NRE_GL3_API.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_GPU_API.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_GPU_Shaders.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_GL3_Shaders.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_RendererMain.cpp.o libOxygenEngine.a.p/src_Renderer_NRE_RenderData.cpp.o libOxygenEngine.a.p/src_Events_OE_MutexCondition.cpp.o libOxygenEngine.a.p/src_OE_API_Helpers.cpp.o libOxygenEngine.a.p/src_OE_API.cpp.o libOxygenEngine.a.p/src_OE_Math.cpp.o libOxygenEngine.a.p/src_OE_DummyClasses.cpp.o libOxygenEngine.a.p/src_OE_TaskManager.cpp.o libOxygenEngine.a.p/src_OE_Task.cpp.o libOxygenEngine.a.p/src_Events_OE_EventHandler.cpp.o libOxygenEngine.a.p/src_Events_OE_InputEventHandler.cpp.o libOxygenEngine.a.p/src_Events_OE_EventParser.cpp.o libOxygenEngine.a.p/src_Events_OE_Event.cpp.o libOxygenEngine.a.p/src_Carbon_CSL_Interpreter.cpp.o libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o libOxygenEngine.a.p/src_Carbon_CSL_Lexer.cpp.o libOxygenEngine.a.p/src_types_OE_TypesBase.cpp.o libOxygenEngine.a.p/src_types_OE_Camera.cpp.o libOxygenEngine.a.p/src_types_OE_Light.cpp.o libOxygenEngine.a.p/src_types_OE_Material.cpp.o libOxygenEngine.a.p/src_types_OE_Mesh.cpp.o libOxygenEngine.a.p/src_types_OE_Object.cpp.o libOxygenEngine.a.p/src_types_OE_PolygonStorage.cpp.o libOxygenEngine.a.p/src_types_OE_Scene.cpp.o libOxygenEngine.a.p/src_types_OE_TCM.cpp.o libOxygenEngine.a.p/src_types_OE_Texture.cpp.o libOxygenEngine.a.p/src_types_OE_VertexGroup.cpp.o libOxygenEngine.a.p/src_types_OE_ViewportConfig.cpp.o libOxygenEngine.a.p/src_types_OE_VertexStorage.cpp.o libOxygenEngine.a.p/src_types_OE_World.cpp.o
  LINK_ARGS = csrD
 
 build CSL_Test.p/csl_main_test.cpp.o: cpp_COMPILER ../csl_main_test.cpp
  DEPFILE = CSL_Test.p/csl_main_test.cpp.o.d
  DEPFILE_UNQUOTED = CSL_Test.p/csl_main_test.cpp.o.d
- ARGS = -ICSL_Test.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -D_REENTRANT
+ ARGS = -ICSL_Test.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -D_REENTRANT
 
 build CSL_Test: cpp_LINKER CSL_Test.p/csl_main_test.cpp.o | /usr/lib/libSDL2.so libOxygenEngine.a
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined -Wl,--start-group libOxygenEngine.a -pthread /usr/lib/libSDL2.so -Wl,--end-group
@@ -230,7 +240,7 @@ build CSL_Test: cpp_LINKER CSL_Test.p/csl_main_test.cpp.o | /usr/lib/libSDL2.so 
 build OE_Test.p/oe_main_test.cpp.o: cpp_COMPILER ../oe_main_test.cpp
  DEPFILE = OE_Test.p/oe_main_test.cpp.o.d
  DEPFILE_UNQUOTED = OE_Test.p/oe_main_test.cpp.o.d
- ARGS = -IOE_Test.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++14 -O2 -g -D_REENTRANT
+ ARGS = -IOE_Test.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++17 -O2 -g -D_REENTRANT
 
 build OE_Test: cpp_LINKER OE_Test.p/oe_main_test.cpp.o | /usr/lib/libSDL2.so libOxygenEngine.a
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined -Wl,--start-group libOxygenEngine.a -pthread /usr/lib/libSDL2.so -Wl,--end-group

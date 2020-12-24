@@ -5,14 +5,13 @@ using namespace std;
 
 OE_TaskManager* OE_ThreadData::taskMgr = nullptr;
 
-/*int test_unsync_thread(void* data, OE_Task task){
+OE_ThreadStruct::OE_ThreadStruct(){
     
-    SDL_Delay(6000);
-    cout << "THIS THREAD IS FINISHED" << endl;
-    
-    return 0;
-}*/
+}
 
+OE_ThreadStruct::~OE_ThreadStruct(){
+    
+}
 
 extern "C" int oxygen_engine_update_thread(void* data){
 
@@ -25,7 +24,6 @@ extern "C" int oxygen_engine_update_thread(void* data){
     OE_ThreadData::taskMgr->threads[actual_data->name].physics_task = OE_Task("OE_Physics", 0, 0, OE_ThreadData::taskMgr->getTicks());
     
     OE_ThreadData::taskMgr->updateThread(actual_data->name);
-    //cout << actual_data->name;
     delete actual_data;
     return 0;
 }
@@ -35,6 +33,9 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     // execute detached threads
     OE_UnsyncThreadData* actual_data = static_cast<OE_UnsyncThreadData*>(data);
     int output = actual_data->func(actual_data->data, OE_Task());
+    actual_data->taskMgr->lockMutex();
+    actual_data->taskMgr->finished_unsync_threadIDs.insert(actual_data->name);
+    actual_data->taskMgr->unlockMutex();
     delete actual_data;
     return output;
 }
@@ -68,6 +69,7 @@ OE_TaskManager::OE_TaskManager()
     done = false;
     started_threads = 0;
     countar = 0;
+    world = nullptr;
 }
 
 OE_TaskManager::~OE_TaskManager()
@@ -79,14 +81,26 @@ OE_TaskManager::~OE_TaskManager()
  *  INIT
  * ***********************/
 
-int OE_TaskManager::Init(){
+int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
+    
     
     this->window = new OE_SDL_WindowSystem();
-    this->renderer = new OE_RendererBase();
-    this->renderer->screen = this->window;
-    this->physics = new OE_PhysicsEngineBase();
     
-    this->window->init(800, 600, "Oxygen Engine Test", false, nullptr);
+    // the lock and unlockMutexes are for making sure the mutexes are initialized
+    this->window_mutex.lockMutex();
+    this->window_mutex.unlockMutex();
+    
+    this->renderer_mutex.lockMutex();
+    this->renderer = new NRE_Renderer();
+    this->renderer->screen = this->window;
+    this->renderer_mutex.unlockMutex();
+    
+    this->physics_mutex.lockMutex();
+    this->physics = new OE_PhysicsEngineBase();
+    this->physics_mutex.unlockMutex();
+    
+    this->window->init(x, y, titlea, fullscreen, nullptr);
+    this->renderer->init();
     
     this->createCondition();
     this->createCondition();
@@ -95,7 +109,6 @@ int OE_TaskManager::Init(){
     
     this->events_task = OE_Task("OE_Physics", 0, 0, this->getTicks());
     
-    this->event_handler.input_handler.createEvents(&this->event_handler.internal_events);
     this->SetFrameRate(200);
     this->done = false;
     
@@ -110,21 +123,23 @@ void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func
     OE_UnsyncThreadData* threaddata = new OE_UnsyncThreadData();
     threaddata->func = func;
     threaddata->data = params;
+    threaddata->name = thread_name;
+    threaddata->taskMgr = this;
+    lockMutex();
     this->unsync_threadIDs[thread_name] = SDL_CreateThread(oxygen_engine_update_unsync_thread, thread_name.c_str(), (void*)threaddata);
-    
+    unlockMutex();
 }
 
 void OE_TaskManager::CreateNewThread(string thread_name){
     
     bool synchro = true;
-    OE_ThreadStruct defaultThread = OE_ThreadStruct();
-    defaultThread.synchronize = synchro;
-    defaultThread.changed = true;
     
     lockMutex();
     
-    this->threads[thread_name] = defaultThread;
-
+    this->threads[thread_name] = OE_ThreadStruct();
+    this->threads[thread_name].synchronize = true;
+    this->threads[thread_name].changed = true;
+    
     OE_ThreadData::taskMgr = this;
     OE_ThreadData* data = new OE_ThreadData();
     data->name = thread_name;
@@ -134,6 +149,18 @@ void OE_TaskManager::CreateNewThread(string thread_name){
     else //USELESS
         this->unsync_threadIDs[thread_name] = SDL_CreateThread(oxygen_engine_update_thread, thread_name.c_str(), (void*)data);
     
+    unlockMutex();
+}
+
+// This is for removing finished unsynchronized threads
+// Otherwise they will pile up and waste memory on longer gaming sessions
+void OE_TaskManager::removeFinishedUnsyncThreads(){
+    lockMutex();
+    for (const auto &x: this->finished_unsync_threadIDs){
+        SDL_DetachThread(this->unsync_threadIDs[x]);
+        this->unsync_threadIDs.erase(x);
+    }
+    this->finished_unsync_threadIDs.clear();
     unlockMutex();
 }
 
@@ -154,17 +181,35 @@ void OE_TaskManager::Step(){
         condWait(1);
     }
     unlockMutex();
-    done = this->event_handler.update();
 
     this->renderer->updateSingleThread();
-    this->window->update();
+    done = this->window->update();
     // count how many times the step function has been called
     countar++;
-
+    
+    // THIS is where obsolete unsync threads are cleaned up
+    this->removeFinishedUnsyncThreads();
+    
     lockMutex();
     completed_threads++;
 
-	
+
+	// --------------------------------------------------------------
+	// 	Is this really the most elegant and efficient way to solve 
+	// 	the problem of a zombie thread?		- Anderas, est. 1999
+	// --------------------------------------------------------------
+    // ------------------ANSWER--------------------------------------
+    // No, this is not the place to solve zombie threads. There cannot be
+    // any "zombie" threads anyways. Unsynchronized threads are only handled in destroy()
+    // This is just for synchronizing all main engine threads each frame.
+    // Instead of using ONE mutex condition. The new OE Task Manager
+    // uses at minimum 2 and a 3rd one for the physics engine, which would allow you
+    // to do all sorts of things with the objects without having to worry about
+    // other people accessing them (the synchronization with the renderer happens
+    // exactly after this condition on THIS MAIN THREAD in this->renderer->updateData())
+    // - Filippos, est. 2056
+    // --------------------------------------------------------------
+    
     if(completed_threads > getReadyThreads()){
         /// if this is the last motheyacking thread
         /// that slows down the game, signal all other threads
@@ -179,10 +224,22 @@ void OE_TaskManager::Step(){
     }
     unlockMutex();
     
-    this->events_task.update();
-    this->event_handler.handleAllEvents(&events_task);
-    if (this->world != nullptr)
+    //this->updateWorld();
+    //this->events_task.update();
+    //this->window->event_handler.handleAllEvents(&events_task);
+    
+    if (this->world != nullptr){
+        
+        this->physics->world = this->world;
+        this->renderer->world = this->world;
+        //auto t=clock();
         this->renderer->updateData();
+        //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    }
+    
+    this->updateWorld();
+    this->events_task.update();
+    this->window->event_handler.handleAllEvents(&events_task);
 }
 
 void OE_TaskManager::Start(){
@@ -221,13 +278,17 @@ void OE_TaskManager::Destroy(){
     this->renderer->destroy();
     this->physics->destroy();
     
-    this->event_handler.cleanup();
-    
+    this->window->event_handler.cleanup();
     this->window->destroy();
     
     delete this->renderer;
     delete this->physics;
     delete this->window;
+    
+    if (this->world != nullptr)
+        this->world = nullptr;
+    if (this->pending_world != nullptr)
+        this->pending_world = nullptr;
     
     this->destroy(); // from OE_MutexCondition
 }
@@ -317,17 +378,30 @@ void OE_TaskManager::updateThread(const string name){
 int OE_TaskManager::getReadyThreads(){
     /// count ALL (i repeat) AAALLLLL threads that are set to be synchronized together
     unsigned int number_of_threads=0;
-    for(auto thread: threads){
+    // WARNING: For some reason this causes a segmentation fault sometimes and i have no idea why
+    /*for(auto thread: threads){
         if(thread.second.synchronize){
             number_of_threads+=1;
         }
-    }
+    }*/
+    number_of_threads = this->threads.size();
     return number_of_threads;
 }
 
 /************************
  *  OTHER FUNCS
  * ***********************/
+
+void OE_TaskManager::updateWorld(){
+    lockMutex();
+    if (this->pending_world != nullptr){
+        if (this->world != nullptr)
+            this->world = nullptr;
+        this->world = this->pending_world;
+    }
+    this->pending_world = nullptr;
+    unlockMutex();
+}
 
 unsigned int OE_TaskManager::GetFrameRate(){
     // return active framerate
@@ -420,14 +494,16 @@ OE_Task OE_TaskManager::GetTaskInfo(string threadname, string name){
 
 void OE_TaskManager::runThreadTasks(const std::string& name){
     unsigned int tasks_size = this->threads[name].functions.size();
+    
 	//this->event_handler.updateEventThreads(nullptr);
     // after updating the task queue start executing the functions
     if( tasks_size != 0){
         
         vector<unsigned int> obsolete_tasks;
         for(unsigned int task= 0; task< this->threads[name].task_queue.size(); task++){
-
-            OE_ThreadStruct temp = this->threads[name];
+            
+            auto temp = this->threads[name];
+            //OE_ThreadStruct temp = this->threads[name];
             // store active task
             this->active_tasks[name] = this->threads[name].tasks[task].GetName();
             this->threads[name].tasks[task].update();
@@ -435,7 +511,8 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             int output = 0;
             #ifdef FE_DEBUG
             try{
-                output =  temp.functions[task](temp.task_data[task], temp.tasks[task]);
+                if (this->threads[name].functions[task] != nullptr)
+                    output =  this->threads[name].functions[task](this->threads[name].task_data[task], this->threads[name].tasks[task]);
             } 
             catch(runtime_error& exc){
                 /// universal error handling. will catch any error inherited from std::runtime_error
@@ -445,7 +522,8 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
                 output = 1;
             }
             #else
-            output = temp.functions[task](temp.task_data[task], temp.tasks[task]);
+            if (this->threads[name].functions[task] != nullptr)
+                output = this->threads[name].functions[task](this->threads[name].task_data[task], this->threads[name].tasks[task]);
             #endif
             //cout << name << endl;
             switch(output){
@@ -453,6 +531,8 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             }
             //this->event_handler.updateEventThreads(nullptr);
         }
+        
+        
         
         for(auto task : obsolete_tasks){
             this->threads[name].functions.erase(this->threads[name].functions.begin()+task);

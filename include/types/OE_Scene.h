@@ -18,9 +18,7 @@ class OE_Scene : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     
     public:
         
-        static std::unordered_map<std::size_t, std::string> id2name;
-        static std::size_t current_id;
-        static OE_Name2ID name2id;
+        static std::atomic<std::size_t> current_id;
         std::size_t id;
         
         OE_Scene();
@@ -31,10 +29,15 @@ class OE_Scene : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         
     //protected:
         
-        std::unordered_map<std::size_t, OE_Object*>       objects;
-        std::unordered_map<std::size_t, OE_Texture*>      textures;
-        std::unordered_map<std::size_t, OE_Material*>     materials;
-        std::unordered_map<std::size_t, OE_TCM*>          texture_CMs;    
+        //std::unordered_map<std::size_t, std::shared_ptr<OE_Object>>       objects;
+        
+        //std::unordered_map<std::size_t, std::shared_ptr<OE_Texture>>      textures;
+        //std::unordered_map<std::size_t, std::shared_ptr<OE_Material>>     materials;
+        //std::unordered_map<std::size_t, std::shared_ptr<OE_TCM>>          texture_CMs;    
+        std::set<std::size_t> objects;
+        std::set<std::size_t> materials;
+        std::set<std::size_t> textures;
+        std::set<std::size_t> texture_CMs;
 };
 
 

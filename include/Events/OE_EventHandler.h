@@ -4,7 +4,7 @@
 
 #include <Events/OE_InputEventHandler.h>
 
-class OE_EventHandler: OE_THREAD_SAFETY_OBJECT{
+class OE_EventHandler: public OE_THREAD_SAFETY_OBJECT{
 public:
     
     friend class OE_TaskManager;
@@ -14,42 +14,54 @@ public:
     
     // internal event functions
     void init();
-    OE_Event* getIEvent(std::string); // THIS IS TOTALLY USELESS! WTF WAS I EVEN THINKING??!
-    OE_Event* getIEventUNSAFE(std::string);
+    std::shared_ptr<OE_Event> getIEvent(std::string);
+    std::shared_ptr<OE_Event> getIEventUNSAFE(std::string);
     
     void createUserEvent(std::string);
     void setIEventFunc(std::string, const OE_EVENTFUNC, void*);
     void broadcastIEvent(std::string, void*);
     
-    void broadcastIEventWait(std::string, int); // TOTALLY USELESS
+    void broadcastIEventWait(std::string, int); // TODO
     void mapIEvent(std::string, std::string);
     void unmapIEvent(std::string, std::string);
     int callIEvent(std::string, OE_Task*, void*);
     void destroyIEvent(std::string);
     
+    std::size_t getEventActivations(std::string);
+    std::size_t getEventCounter(std::string);
+    
     void updateInput();
-    bool update();
     void cleanup();
-    void updateInputEvents();
     int handleAllEvents(OE_Task*);
+    
+    
+    void updatePostInputLoop();
+    
+    // The methods starting with internal* are only supposed to be usede
+    // in subclasses of OE_WindowSystemBase
+    // the key strings must exist
+    
+    void internalBroadcastKeyDownEvent(const std::string&);
+    void internalBroadcastKeyUpEvent(const std::string&);
+    
+    std::atomic<bool> done;
+    
+    OE_InputEventHandler input_handler;
     
 protected:
 	
 	bool havePendingEvents();
 
-    OE_InputEventHandler input_handler;
     
-    std::map<std::string, OE_Event*> internal_events;
+    
+    std::map<std::string, std::shared_ptr<OE_Event>> internal_events;
     std::vector<std::string> obsolete_events;
     std::vector<std::string> pending_events;
     
     std::vector<std::string> happened_events;
-    uint8_t index = -1;
-    bool done;
+    std::unordered_map<std::string, std::size_t> happened_events_counter;
     
-    //SDL specific
-    SDL_Event event;
-    
+    uint8_t index = -1;    
 };
 
 #endif //OE_EVENT_HANDLER_H

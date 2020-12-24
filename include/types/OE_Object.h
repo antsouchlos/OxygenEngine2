@@ -2,6 +2,7 @@
 #define OE_OBJECT_H
 
 #include <types/OE_TypesBase.h>
+#include <OE_Math.h>
 
 // NOTE:  the structure of this struct (yeah i know) is subject to change
 struct OE_ObjectData{
@@ -18,12 +19,11 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     
     friend class OE_CSL_Writer;
     friend class OE_CSL_Interpreter;
+    friend class NRE_Renderer;
     
     public:
         
-        static std::unordered_map<std::size_t, std::string> id2name;
-        static std::size_t current_id;
-        static OE_Name2ID name2id;
+        static std::atomic<std::size_t> current_id;
         std::size_t id;
         
         OE_Object();
@@ -31,9 +31,15 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         virtual ~OE_Object();
         
         virtual std::string getType() const;
-        virtual std::string to_str() const;
-    
-    protected:
+        virtual std::string to_str() const;        
+        
+        OE_Quat GetRot();
+        void SetRot(OE_Quat);
+        
+        OE_Mat4x4 GetModelMatrix();
+        OE_Mat4x4 GetViewMatrix();
+        
+    //protected:
         OE_ObjectData       current_state;
         
         std::size_t         parent{0};

@@ -18,6 +18,14 @@ enum OE_WINSYS : int{
     OE_SOMETHING_ELSE=2
 };
 
+enum OE_RENDERER_SHADING_MODE {
+    OE_RENDERER_NORMALS_SHADING,
+    OE_RENDERER_NO_LIGHTS_SHADING,
+    OE_RENDERER_DIR_LIGHTS_SHADING,
+    OE_RENDERER_INDEXED_LIGHTS_SHADING,
+    OE_RENDERER_REGULAR_SHADING
+};
+
 /** This a dummy class aimed to be used as a base class for windowing systems
   * It 
   */
@@ -29,6 +37,10 @@ public:
     
     virtual bool init(int, int, std::string, bool, void*);
     virtual bool update();
+    
+    virtual bool getMouseLockedState();
+    virtual void lockMouse();
+    virtual void unlockMouse();
     
     virtual bool updateEvents();
     virtual void destroy();
@@ -44,6 +56,14 @@ public:
     std::string title;
     bool fullscreen{false};
     int major{0}; int minor{0}; bool isES{false};
+    
+    bool mouse_locked{false};
+    
+    std::atomic<bool> reset_renderer{false};
+    std::atomic<bool> restart_renderer{false};
+    
+    // The global event handler is here and must be initialized in all sub classes
+    OE_EventHandler event_handler;
 };
 
 /** This is a dummy class aimed to be a base class for
@@ -62,9 +82,13 @@ class OE_RendererBase : public OE_THREAD_SAFETY_OBJECT {
     virtual void destroy();
     
     bool                    isMultiThreaded{false};
-    OE_World*               world{nullptr};
+    std::shared_ptr<OE_World>   world{nullptr};
     OE_WindowSystemBase*    screen{nullptr};
     std::string             name{"default"};
+    
+    OE_RENDERER_SHADING_MODE    shading_mode{OE_RENDERER_REGULAR_SHADING};
+    std::atomic<bool>           use_wireframe{false};
+    std::atomic<bool>           render_bounding_boxes{false};
 };
 
 /** This is a dummy class aimed to be a base class for
@@ -81,8 +105,10 @@ class OE_PhysicsEngineBase : public OE_THREAD_SAFETY_OBJECT {
     virtual void destroy();
     
     bool                isMultiThreaded{false};
-    OE_World*           world{nullptr};   
-    OE_EventHandler*    handler{nullptr};
+    std::shared_ptr<OE_World>   world{nullptr};
+    // You do not actually need this since you can use API functions directly in your 
+    // Physics engine .cpp :))
+    //OE_EventHandler*    handler{nullptr};
     std::string         name{"default"};
 };
 

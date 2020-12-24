@@ -43,13 +43,22 @@ class OE_VertexStorage{
     friend class CSL_Interpreter;
     friend class OE_Mesh32;
     friend class OE_PolygonStorage32;
+    friend class NRE_Renderer;
     
     public:
         OE_VertexStorage();
         ~OE_VertexStorage();
         
-        
         //int removeVertex(std::size_t);
+        // These are the bounding box coordinates
+        
+        float max_x{0.0f}, max_y{0.0f}, max_z{0.0f};
+        float min_x{0.0f}, min_y{0.0f}, min_z{0.0f};
+        
+        void calculateNaiveBoundingBox();
+        std::vector<float> genBoundingBoxMesh();
+        
+        bool calculatedBoundingBox{false};
         
     protected:
         

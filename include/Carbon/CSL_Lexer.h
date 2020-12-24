@@ -7,51 +7,13 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <Carbon/CSL_Exceptions.h>
 
-enum class CSL_TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
-							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
-							slash, eos, undef};
 
 struct CSL_Token {
 	CSL_TokenType type = CSL_TokenType::undef;
 	std::string_view content;
 };
-
-class LexerError {
-	public:
-		virtual std::string what() const throw() { return ""; };
-};
-
-class UnknownCharacterError : LexerError {
-	public:
-		UnknownCharacterError(char c, std::size_t lineNum, std::size_t colNum)
-			: c_(c), lineNum_(lineNum), colNum_(colNum) {};
-
-		std::string what() const throw () {
-			std::stringstream result_ss;
-
-			result_ss << "Unknown character '" << c_ << "' at line " << lineNum_ << ':' << colNum_;
-
-			return result_ss.str();
-		}
-	private:
-		const char c_;
-		const std::size_t lineNum_;
-		const std::size_t colNum_;
-};
-
-class InvalidInputError : LexerError {
-	public:
-		InvalidInputError(std::string msg) : msg_(msg) {};
-
-		std::string what() const throw() {
-			return msg_;
-		}
-	private:
-		const std::string msg_;
-};
-
-const char* getTokenTypeStringRep(CSL_TokenType t);
 
 
 /*

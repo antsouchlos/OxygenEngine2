@@ -26,9 +26,7 @@ class OE_TCM : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     friend class CSL_Interpreter;
     
     public:
-        static std::unordered_map<std::size_t, std::string> id2name;
-        static std::size_t current_id;
-        static OE_Name2ID name2id;
+        static std::atomic<std::size_t> current_id;
         std::size_t id;
         
         OE_TCM();

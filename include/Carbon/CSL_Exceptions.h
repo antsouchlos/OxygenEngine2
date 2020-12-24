@@ -11,6 +11,175 @@
 #include <types/OE_Libs.h>
 
 
+// Defined here, because it is needed for UnexpectedSymbolError
+// TODO: Find a better place to put this
+enum class CSL_TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
+							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
+							slash, eos, undef};
+
+
+
+/*const char* getTokenTypeStringRep(CSL_TokenType t) {
+	switch(t) {
+		case CSL_TokenType::ident:
+			return "Identifier";
+			break;
+		case CSL_TokenType::string:
+			return "String";
+			break;
+		case CSL_TokenType::integer:
+			return "Integer";
+			break;
+		case CSL_TokenType::floatingPoint:
+			return "Float";
+			break;
+		case CSL_TokenType::openTagB:
+			return "<";
+			break;
+		case CSL_TokenType::closeTagB:
+			return ">";
+			break;
+		case CSL_TokenType::openClosingTagB:
+			return "</";
+			break;
+		case CSL_TokenType::openListB:
+			return "{";
+			break;
+		case CSL_TokenType::closeListB:
+			return "}";
+			break;
+		case CSL_TokenType::eq:
+			return "=";
+			break;
+		case CSL_TokenType::comma:
+			return ",";
+			break;
+		case CSL_TokenType::semicolon:
+			return ";";
+			break;
+		case CSL_TokenType::comment:
+			return "Comment";
+			break;
+		case CSL_TokenType::slash:
+			return "/";
+			break;
+		case CSL_TokenType::eos:
+			return "EOS";
+			break;
+		case CSL_TokenType::undef:
+			return "Undefined Token";
+			break;
+		default:
+			return "[Unknown Type]";
+	}
+}*/
+
+
+class LexerError {
+	public:
+		virtual std::string what() const throw() { return ""; };
+};
+
+class UnknownCharacterError : LexerError {
+	public:
+		UnknownCharacterError(char c, std::size_t lineNum, std::size_t colNum)
+			: c_(c), lineNum_(lineNum), colNum_(colNum) {};
+
+		std::string what() const throw () {
+			std::stringstream result_ss;
+
+			result_ss << "Unknown character '" << c_ << "' at line " << lineNum_ << ':' << colNum_;
+
+			return result_ss.str();
+		}
+	private:
+		const char c_;
+		const std::size_t lineNum_;
+		const std::size_t colNum_;
+};
+
+class InvalidInputError : LexerError {
+	public:
+		InvalidInputError(std::string msg) : msg_(msg) {};
+
+		std::string what() const throw() {
+			return msg_;
+		}
+	private:
+		const std::string msg_;
+};
+
+
+// Sadly, ParseError cannon inherit from std::exception, since that would not allow the return type
+// to be a string, which is necessary in this case in order to get a proper error message
+// (Returning "result_ss.str().c_str()" doesn't work, since it returns a pointer to an object that
+// gets destroyed a soon as the scope of "what()" is left, thereby basically returning garbage)
+class ParserError {
+	public:
+		virtual std::string what() const throw() { return ""; };
+};
+
+class UnexpectedSymbolError : ParserError {
+	public:
+		UnexpectedSymbolError(std::string_view unexpected, CSL_TokenType expected,
+							const std::size_t lineNum, const std::size_t colNum)
+			: unexpected_(unexpected), expected_(expected), lineNum_(lineNum), colNum_(colNum) {};
+
+		std::string what() const throw() {
+			std::stringstream result_ss;
+			result_ss << "Unexpetcted Symbol \"" << unexpected_ << "\" ";
+		   	result_ss << "at line " << lineNum_ << ':' << (colNum_ - unexpected_.size()) << ": ";
+			result_ss << "Expected \"";
+//			result_ss << getTokenTypeStringRep(expected_);
+			result_ss << "\"";
+
+			return result_ss.str().c_str();
+		}
+	private:
+		std::string_view unexpected_;
+		CSL_TokenType expected_;
+		const std::size_t lineNum_;
+		const std::size_t colNum_;
+};
+
+
+class InterpreterError {
+	public:
+		virtual std::string what() const throw() { return ""; };
+};
+
+// TODO: Find a way to get line and column number
+template<const char *T>
+class UnknownMemberError : InterpreterError {
+	public:
+		UnknownMemberError(std::string_view unknown) : unknown_(unknown) {};
+
+		std::string what() const throw() {
+			std::stringstream result_ss;
+
+			result_ss << "Unknown member " << T << " \"" << unknown_ << "\"";
+
+			return result_ss.str();
+		}
+	private:
+		const std::string_view unknown_;
+};
+
+// TODO: Find a way to get line and column number
+class SemanticError : ParserError, InterpreterError {
+	public:
+		SemanticError(const char* msg) : msg_(msg) {};
+
+		std::string what() const throw() { return msg_; };
+	private:
+		const char* msg_;
+};
+
+
+
+
+
+
 class CSL_UnknownIDException : public std::runtime_error {
 public:
 	CSL_UnknownIDException(std::string msg) : std::runtime_error(msg) {this->msg += msg; }
