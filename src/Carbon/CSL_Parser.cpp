@@ -175,7 +175,7 @@ CSL_Assignment_ptr CSL_Parser::singleAssignment(std::string_view name) {
 	CSL_Assignment_ptr result = std::make_unique<CSL_Assignment>();
 
 	result->name = name;
-	result->element = token_.content;
+	result->value = token_.content;
 
 	nextToken();
 
@@ -191,10 +191,10 @@ CSL_ListAssignment_ptr CSL_Parser::listAssignment(std::string_view name) {
 	nextToken();
 
 	if (token_.type == CSL_TokenType::integer) {
-		result->elements.push_back(parseInt());
+		result->values.push_back(parseInt());
 		nextToken();
 	} else if (token_.type == CSL_TokenType::floatingPoint) {
-		result->elements.push_back(parseFloat());
+		result->values.push_back(parseFloat());
 		nextToken();
 	} else {
 //		throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");
@@ -206,10 +206,10 @@ CSL_ListAssignment_ptr CSL_Parser::listAssignment(std::string_view name) {
 		nextToken();
 
 		if (token_.type == CSL_TokenType::integer) {
-			result->elements.push_back(parseInt());
+			result->values.push_back(parseInt());
 			nextToken();
 		} else if (token_.type == CSL_TokenType::floatingPoint) {
-			result->elements.push_back(parseFloat());
+			result->values.push_back(parseFloat());
 			nextToken();
 		} else {
 //			throw UnexpectedSymbolError("Unexpected Symbol. Expected float or integer");

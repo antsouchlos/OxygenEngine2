@@ -5,7 +5,7 @@
 #include <Events/OE_EventParser.h>
 
 
-/** Temporary documentation:
+/** Temporary documentation: (OUTDATED)
   *
   * OE_Event::call(Ftask*, void*):
   * Return values:

@@ -14,7 +14,7 @@ bl_info = {"name": "Export Oxygen Engine (.csl)",
 import bpy
 from bpy_extras.io_utils import ExportHelper
 #from bpy.props import *
-import sys, os
+import sys, os, math
 
 from bpy_extras.wm_utils.progress_report import (
     ProgressReport,
@@ -138,6 +138,17 @@ def handle_mesh(progress, cur_scene, obj):
     normal_dict = {}
     uv_dicts = [{} for i in temp_mesh.uv_layers]
     
+    smooth_normals = False;
+    # decide if smooth or not mesh
+    for tri in temp_mesh.polygons:
+        if tri.use_smooth:
+            smooth_normals = True
+            break
+    
+    if smooth_normals:
+        mesh.normals = [0.0 for i in range(len(mesh.vertices))]
+    else:
+        mesh.normals = [0.0 for i in range(len(temp_mesh.polygons)*3)]
     
     tri_count = 0
     for tri in temp_mesh.polygons:
@@ -167,13 +178,26 @@ def handle_mesh(progress, cur_scene, obj):
             # store vertex normal index 
             # and update mesh.normals
             nor = list(li.normal)
-            nor_simplified = round_floats(nor)
-            if normal_dict.get(tuple(nor_simplified)) != None:
-                cur_v.append(normal_dict[tuple(nor_simplified)])
+            if smooth_normals:
+                cur_v.append(li.vertex_index)
+                mesh.normals[li.vertex_index*3]   = nor[0]
+                mesh.normals[li.vertex_index*3+1] = nor[1]
+                mesh.normals[li.vertex_index*3+2] = nor[2]
             else:
-                cur_v.append(len(mesh.normals)//3)
-                normal_dict[tuple(nor_simplified)] = len(mesh.normals)//3
-                mesh.normals.extend(nor)
+                cur_v.append(tri_count)
+                mesh.normals[tri_count*3]   = nor[0]
+                mesh.normals[tri_count*3+1] = nor[1]
+                mesh.normals[tri_count*3+2] = nor[2]
+            
+            
+            #nor = list(li.normal)
+            #nor_simplified = round_floats(nor)
+            #if normal_dict.get(tuple(nor_simplified)) != None:
+            #    cur_v.append(normal_dict[tuple(nor_simplified)])
+            #else:
+            #    cur_v.append(len(mesh.normals)//3)
+            #    normal_dict[tuple(nor_simplified)] = len(mesh.normals)//3
+            #    mesh.normals.extend(nor)
                 
             # store uv map data
             # and update mesh.uvmaps
@@ -226,18 +250,25 @@ def handle_camera(progress, cur_scene, obj):
 def handle_material(progress, cur_scene, material):
     mat = f.OE_Material(material.name)
     
-    mat.dif_r                   = material.diffuse_color[0]
-    mat.dif_g                   = material.diffuse_color[1]
-    mat.dif_b                   = material.diffuse_color[2]
-    mat.dif_a                   = material.diffuse_color[3]
+    nodes = material.node_tree.nodes
     
-    mat.scol_r                  = material.specular_color[0]
-    mat.scol_g                  = material.specular_color[1]
-    mat.scol_b                  = material.specular_color[2]
-    
-    mat.specular_intensity      = material.specular_intensity
-    mat.specular_hardness       = material.roughness
-    mat.alpha                   = material.alpha_threshold
+    for node in nodes:
+        if node.name == "Specular":
+            mat.dif_r = node.inputs['Base Color'].default_value[0]
+            mat.dif_g = node.inputs['Base Color'].default_value[1]
+            mat.dif_b = node.inputs['Base Color'].default_value[2]
+            
+            mat.scol_r = node.inputs['Specular'].default_value[0]
+            mat.scol_g = node.inputs['Specular'].default_value[1]
+            mat.scol_b = node.inputs['Specular'].default_value[2]
+            
+            mat.specular_hardness = node.inputs['Roughness'].default_value
+            mat.specular_intensity = 1.0
+            print(mat.dif_r)
+            print(mat.dif_g)
+            print(mat.dif_b)
+            
+            mat.alpha = 1.0
     
     return mat
 
@@ -284,7 +315,8 @@ class ExportOxygenEngine(bpy.types.Operator, ExportHelper):
         # only add scene information
         if self.use_selection:
             final_scene = handle_scene(progress, context.scene, context.selected_objects)
-            writeToFile(self.filepath, str(final_scene))
+            cur_world.scenes.append(final_scene)
+            writeToFile(self.filepath, str(cur_world))
         
             # handle all objects in all scenes
         else:

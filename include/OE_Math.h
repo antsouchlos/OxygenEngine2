@@ -9,6 +9,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //#include <glm/ext/vector_trigonometric.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -23,6 +24,7 @@
 #include <glm/ext/quaternion_common.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/quaternion_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include <glm/gtc/noise.hpp>
 
@@ -34,27 +36,35 @@
 typedef glm::vec4 OE_Vec4;
 typedef glm::vec3 OE_Vec3;
 typedef glm::mat4 OE_Mat4x4;
+typedef glm::mat3 OE_Mat3x3;
 typedef glm::quat OE_Quat;
 
-#define OE_Pi2          glm::half_pi
+#define OE_Pi2         glm::half_pi
 
-#define OE_Abs          glm::abs
-#define OE_Pow          glm::pow
-#define OE_Sqrt         glm::sqrt
+#define OE_Abs         glm::abs
+#define OE_Pow         glm::pow
+#define OE_Sqrt        glm::sqrt
 
-#define OE_Perspective  glm::perspective;
-#define OE_Rotate       glm::rotate;
-#define OE_Normalize    glm::normalize;
-#define OE_Cross        glm::cross;
-#define OE_Dot          glm::dot;
-#define OE_Translate    glm::translate;
-#define OE_Identity     glm::identity;
-#define OE_Det          glm::determinant;
-#define OE_Transpose    glm::transpose;
+//#define OE_Perspective  glm::perspective
+#define OE_Rotate       glm::rotate
+#define OE_Normalize    glm::normalize
+#define OE_Cross        glm::cross
+#define OE_Dot          glm::dot
+#define OE_Translate    glm::translate
+#define OE_Identity     glm::identity
+#define OE_Det          glm::determinant
+#define OE_Transpose    glm::transpose
+#define OE_Quat2Mat4x4  glm::toMat4
 
-#define OE_2Euler       glm::eulerAngles;
+#define OE_Mat2Euler       glm::eulerAngles
 #define OE_Slerp        glm::slerp
 #define OE_Lerp         glm::lerp
+
+std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4);
+OE_Mat4x4 OE_Perspective(float, float, float, float);
+
+OE_Quat OE_QuatFromAxisAngle(float, float, float, float);
+
 
  class FMath
 {

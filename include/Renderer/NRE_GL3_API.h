@@ -4,6 +4,7 @@
 
 #include <Renderer/NRE_GPU_API.h>
 #include <Renderer/glad.h>
+#include <Renderer/NRE_GL3_Shaders.h>
 
 struct NRE_GL3_VertexBuffer{
     GLuint                  handle;
@@ -35,10 +36,12 @@ struct NRE_GL3_ProgramUniformState{
 };
 
 struct NRE_GL3_Program{
-    std::string vs;
+    
+    NRE_GPU_VertexShader vs;
     GLuint vs_handle{0};
     bool vs_setup{false};
-    std::string fs;
+    
+    NRE_GPU_PixelShader fs;
     GLuint fs_handle{0};
     bool fs_setup{false};
     
@@ -49,14 +52,24 @@ struct NRE_GL3_Program{
     std::vector<NRE_GL3_ProgramUniformState> uniforms;
     
     std::size_t hasUniform(std::string);
+    
+    // this is needed for it to be in an std::set
+    bool operator< (const NRE_GL3_Program&) const;
 };
 
 GLenum NRE2GL_BufferUse(NRE_GPU_BUFFER_USAGE);
 
 class NRE_GL3_API : public NRE_GPU_API{
 public:
+    
+    
+    
     NRE_GL3_API();
     ~NRE_GL3_API();
+    
+    void destroy();
+    
+    std::string getRenderingAPI();
     
     std::size_t newVertexBuffer();
     std::size_t newVertexLayout();
@@ -66,21 +79,26 @@ public:
     
     void setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t);
+    void setVertexBufferMemoryData(std::size_t, const std::vector<float>&, NRE_GPU_BUFFER_USAGE);
     void deleteVertexBuffer(std::size_t);
     
     void setIndexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setIndexBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
+    void setIndexBufferMemoryData(std::size_t, const std::vector<uint32_t>&, NRE_GPU_BUFFER_USAGE);
     void deleteIndexBuffer(std::size_t);
     
     void setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
     void setProgramUniformSlot(std::size_t, std::string, int);
-    void setUniformState(std::size_t, int, std::size_t, std::size_t);
+    void setUniformState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     void deleteUniformBuffer(std::size_t);
     
     void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
     void deleteVertexLayout(std::size_t);
+    
+    void setProgramVS(std::size_t, NRE_GPU_VertexShader);
+    void setProgramFS(std::size_t, NRE_GPU_PixelShader);
     
     void setProgramVS(std::size_t, std::string);
     //void setProgramGS(std::size_t, FE_GPU_Shader);
@@ -88,12 +106,15 @@ public:
     //void setProgramTCS(std::size_t, FE_GPU_Shader);
     //void setProgramTES(std::size_t, FE_GPU_Shader);
     void setupProgram(std::size_t);
+    void deleteProgram(std::size_t);
     
     void draw(std::size_t, std::size_t, int, int);
     void draw(std::size_t, std::size_t);
     
     void draw(std::size_t, std::size_t, std::size_t, int, int);
     void draw(std::size_t, std::size_t, std::size_t);
+    
+    void setRenderMode(NRE_GPU_RENDERMODE);
     
 protected:
     
@@ -110,6 +131,10 @@ protected:
     std::unordered_map<std::size_t, NRE_GL3_Program>          progs;
     
     std::size_t getVAOSize(std::size_t);
+    
+    std::map<NRE_GPU_VertexShader,  GLuint> vs_db;
+    std::map<NRE_GPU_PixelShader,   GLuint> fs_db;
+    std::map<NRE_GL3_Program,       GLuint> prog_db;
 };
 
 

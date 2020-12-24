@@ -59,15 +59,15 @@ std::shared_ptr<OE_World> CSL_Interpreter::interpretFile(string pathToFile) {
 	return interpret(sourceCode);
 }
 
-std::shared_ptr<OE_World> CSL_Interpreter::processWorld(CSL_Element_ptr element) {
+std::shared_ptr<OE_World> CSL_Interpreter::processWorld(CSL_Element_ptr world_e) {
 	std::shared_ptr<OE_World> world = std::make_shared<OE_World>();
 
-	if (element->name != "World"sv) {
+	if (world_e->name != "World"sv) {
 		// TODO
 		//throw InterpreterException("Element root must be \"World\"");
 	}
 
-	for (auto &e : element->elements) {
+	for (auto &e : world_e->elements) {
 		if (e->name == "Scene"sv) {
 //			auto scene = processScene();
 //			world->scenes.insert(scene->id);
@@ -81,11 +81,11 @@ std::shared_ptr<OE_World> CSL_Interpreter::processWorld(CSL_Element_ptr element)
 	}
 
 	// TODO: Are attributes even necessary?
-	for (auto &a : element->attributes) {
+	for (auto &a : world_e->attributes) {
 	
 	}
 
-	for (auto &a : element->assignments) {
+	for (auto &a : world_e->assignments) {
 	
 	}
 
@@ -849,29 +849,54 @@ std::shared_ptr<OE_Material> CSL_Interpreter::processMaterial() {
         curNode = saveNode;
     }
     return material;
-}
+}*/
 
-std::shared_ptr<OE_TCM> CSL_Interpreter::processTCM() {
-    std::shared_ptr<OE_TCM> tcm = nullptr;
+/*
+std::shared_ptr<OE_<++>> CSL_Interpreter::<++>(CSL_Element_ptr <++>_e) {
+	std::shared_ptr<OE_<++>> <++>= nullptr;
+
+	for (auto &att : <++>->attributes) {
+		if (auto att_ptr_ptr = std::get_if<CSL_Assignment_ptr>(&att))<++>
+		auto att_ptr = std::move
+	}
+
+	return <++>
+}
+*/
+
+std::shared_ptr<OE_TCM> CSL_Interpreter::processTCM(CSL_Element_ptr tcm_e) {
+	std::shared_ptr<OE_TCM> tcm = nullptr;
+
+	for (auto &att : tcm_e->attributes) {
+		if (auto att_ptr_ptr = std::get_if<CSL_Assignment_ptr>(&att)) {
+			auto att_ptr = std::move(*att_ptr_ptr);
+
+//			tcm = std::make_shared<OE_TCM>(att_ptr->element);
+//			this->tcmsList.append(child->args[0], tcm);
+		} else {
+			throw SemanticError("The name attribute of the TCM element is not a list");
+		}
+	}
+
+	for (auto &e : tcm_e->elements) {
+		if (e->name == "TCM_Texture"sv) {
+			assert(tcm != nullptr);
+
+			OE_TCM_Texture tcm_tex;
+			// TODO
+			// processTCM_Texture(tcm_tex);
+			tcm->textures.push_back(tcm_tex);			
+		} else {
+			throw UnknownMemberElementError(e->name);
+		}
+	}
+
+/*    std::shared_ptr<OE_TCM> tcm = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
 
         CSL_Node *saveNode = curNode;
-        if (type == "tag") {
-            assert(tcm != nullptr);
-            if (id == "TCM_Texture"){
-                OE_TCM_Texture tcm_tex;
-                processTCM_Texture(tcm_tex);
-                tcm->textures.push_back(tcm_tex);
-            }
-            else{
-                throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
-            }
-        }
-        else if (type == "closedtag") {
-            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
-        }
         else if (type == "assignment") {
             assert(tcm != nullptr);
             if (id == "combine_mode") {
@@ -909,102 +934,105 @@ std::shared_ptr<OE_TCM> CSL_Interpreter::processTCM() {
             }
         }
         curNode = saveNode;
-    }
+    }*/
     return tcm;
 }
 
-void CSL_Interpreter::processTCM_Texture(OE_TCM_Texture &tcm_tex) {
-    for (auto& child : curNode->children) {
-        string type = child->type;
-        string id = child->ID;
+// TODO
+//void CSL_Interpreter::processTCM_Texture(OE_TCM_Texture &tcm_tex) {
+//    for (auto& child : curNode->children) {
+//        string type = child->type;
+//        string id = child->ID;
+//
+//        CSL_Node *saveNode = curNode;
+//        if (type == "tag") {
+//            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
+//        }
+//        else if (type == "closedtag") {
+//            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
+//        }
+//        else if (type == "assignment") {
+//            if (id == "textureID") {
+//                tcm_tex.textureID = this->texturesList.name2id(child->args[0]);
+//            }
+//            else if (id == "mode"){
+//                tcm_tex.mode = stoi(child->args[0]);
+//            }
+//            else if (id == "textureMulFactor"){
+//                tcm_tex.textureMulFactor = stoi(child->args[0]);
+//            }
+//            else if (id == "uvmap"){
+//                tcm_tex.uvmap = stoi(child->args[0]);
+//            }
+//            else {
+//                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"TCM\"");
+//            }
+//        }
+//        else if (type == "listassignment") {
+//            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"TCM\"");
+//        }
+//        else if (type == "tagassignment") {
+//            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
+//        }
+//        curNode = saveNode;
+//    }
+//}
 
-        CSL_Node *saveNode = curNode;
-        if (type == "tag") {
-            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"TCM\"");
-        }
-        else if (type == "closedtag") {
-            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
-        }
-        else if (type == "assignment") {
-            if (id == "textureID") {
-                tcm_tex.textureID = this->texturesList.name2id(child->args[0]);
-            }
-            else if (id == "mode"){
-                tcm_tex.mode = stoi(child->args[0]);
-            }
-            else if (id == "textureMulFactor"){
-                tcm_tex.textureMulFactor = stoi(child->args[0]);
-            }
-            else if (id == "uvmap"){
-                tcm_tex.uvmap = stoi(child->args[0]);
-            }
-            else {
-                throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"TCM\"");
-            }
-        }
-        else if (type == "listassignment") {
-            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No list-variable with the ID \"" + id + "\" in \"TCM\"");
-        }
-        else if (type == "tagassignment") {
-            throw CSL_UnknownIDException("UnknownIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"TCM\"");
-        }
-        curNode = saveNode;
-    }
-}
+std::shared_ptr<OE_ViewportConfig>
+CSL_Interpreter::processViewportConfig(CSL_Element_ptr vconf_e) {
+	// TODO: Why was this a nullpointer?	
+    //std::shared_ptr<OE_ViewportConfig> vconf = nullptr;
 
-std::shared_ptr<OE_ViewportConfig> CSL_Interpreter::processViewportConfig() {
+	std::shared_ptr<OE_ViewportConfig> vconf = std::make_shared<OE_ViewportConfig>();
+
+	for (auto &att : vconf_e->attributes) {
+		if ( auto att_ptr_ptr = std::get_if<CSL_Assignment_ptr>(&att) ) {
+			CSL_Assignment_ptr att_ptr = std::move(*att_ptr_ptr);
+
+			if (att_ptr->name == "name"sv) {
+				//vconf = std::make_shared<OE_ViewportConfig>(child->args[0]);
+				//this->viewportsList.append(child->args[0], vconf);
+			} else {
+				throw UnknownMemberAttributeError(att_ptr->name);
+			}
+		} else {
+			throw SemanticError("The name attribute of the ViewportConfigElement is not a list");
+		}
+	}
+
+	for (auto &as : vconf_e->assignments) {
+		if ( auto as_ptr_ptr = std::get_if<CSL_ListAssignment_ptr>(&as) ) {
+			CSL_ListAssignment_ptr as_ptr = std::move(*as_ptr_ptr);
+
+			if (as_ptr->name == "cameras"sv) {
+				for (const auto &v : as_ptr->values) {
+					// TODO: Fuck, is this a list-assignment with strings?
+					//vconf->cameras.push_back(this->objectsList.name2id[v]);
+				}
+			} else if (as_ptr->name == "split_screen_positions"sv) {
+				for (const auto &v : as_ptr->values) {
+					vconf->split_screen_positions.push_back(v);
+				}
+			} else if (as_ptr->name == "camera_modes"sv) {
+                for (const auto &v : as_ptr->values){
+                    vconf->camera_modes.push_back(v);
+                } 
+			} else if (as_ptr->name == "layer_combine_modes"sv) {
+				for (const auto &v : as_ptr->values) {
+					// TODO: For ints use ints and not floats
+					vconf->layer_combine_modes.push_back(static_cast<int>(v));
+				}
+			} else {
+				throw UnknownMemberVariableError(as_ptr->name);
+			}
+		} else {
+			throw SemanticError("The ViewportConfig element only contains list variables");
+		}
+	}
+
+	if (vconf_e->elements.size() != 0) {
+		throw SemanticError("The ViewportConfig element does not have childen elements");
+	}
     
-    std::shared_ptr<OE_ViewportConfig> vconf = nullptr;
-    for (auto& child : curNode->children) {
-        string type = child->type;
-        string id = child->ID;
-
-        CSL_Node *saveNode = curNode;
-        if (type == "tag") {
-            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-blocks in \"UVMapData\"");
-        } 
-        else if (type == "closedtag") {
-            throw CSL_UnexpectedTypeException("UnexpectedTypeException at " + to_string(child->line) + ":" + to_string(child->col) + ": \"closedtag\" is not beeing used by the current version of the Carbon_Scripting_Language");
-        } 
-        else if (type == "assignment") {
-            throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
-        }
-        else if (type == "listassignment") {
-            assert(vconf != nullptr);
-            if (id == "cameras") {
-                for (const auto& x: child->args){
-                    vconf->cameras.push_back(this->objectsList.name2id[x]);
-                } 
-            } 
-            else if (id == "split_screen_positions"){
-                for (const auto& x: child->args){
-                    vconf->split_screen_positions.push_back(stof(x));
-                } 
-            }
-            else if (id == "camera_modes"){
-                for (const auto& x: child->args){
-                    vconf->camera_modes.push_back(stoi(x));
-                } 
-            }
-            else if (id == "layer_combine_modes"){
-                for (const auto& x: child->args){
-                    vconf->layer_combine_modes.push_back(stoi(x));
-                } 
-            }
-            else {
-                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No regular-variable with the ID \"" + id + "\" in \"UVMapData\"");
-            }
-        } 
-        else if (type == "tagassignment") {
-            if (id == "name") {
-                vconf = std::make_shared<OE_ViewportConfig>(child->args[0]);
-                this->viewportsList.append(child->args[0], vconf);
-            } 
-            else {
-                throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"UVMapData\"");
-            }
-        }
-        curNode = saveNode;
-    }
-    return vconf;
-}*/
+	return vconf;
+}
