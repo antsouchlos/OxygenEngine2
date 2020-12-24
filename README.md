@@ -188,6 +188,22 @@ Renderer stuff
 - Added Bounding Box calculation and rendering
 - Use F5/F6/F7/F8 to change render modes in the demo.
 
+2020/12/20 - antsouchlos
+
+Uploaded new Implementation of Lexer onto parser_v2 branch - I know I know, I should not just commit the whole thing when it's done.
+This wasn't that much work though
+
+Error Handling must be possible another way. Right now, essentially every time the char iterator is incremented, an extra if statement has to be
+written, to check the iterator against the length of the string. Maybe create a wrapper for the integer that is the iterator, that does this automatically?
+Does an Iterator like the wrapper just proposed already exist? Is there a way to automatically throw an exception, when one tries to access a character of
+a string outside of it's size()? I really don't fancy writing a wrapper for std::basic_string_view
+
+2020/12/23 - antsouchlos
+
+New Lexer and Parser are now done and reasonably optimized. No memory leaks and quite the performance impovement compared to the previous ones.
+We now embark on the great journey of actually integrating the new Lexer and Parser into OxygenEngine, i.e. rewriting the Interpreter while leaving
+it's interface unchanged
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -246,14 +262,14 @@ An impressive 2 sec loading time!!! (after reading from disk)
 Performance is more than good enough (O(n)) and i like the extensible design of the parser and interpreter, BUT there are still performance optimizations possible in the parser IMHO. You basically copy the whole source code and allocate heap memory all the time...
 
 My ideas:
- - for CSL_Lexer and CSL_Parser to store indices in the source code
- - for CSL_Node->id and CSL_Node->args to store the indices in the source code instead of copying the source code string itself.
+ ~~- for CSL_Lexer and CSL_Parser to store indices in the source code~~
+ ~~- for CSL_Node->id and CSL_Node->args to store the indices in the source code instead of copying the source code string itself.~~
  - Use string.substr() in the interpreter
- - for CSL_Node->type to be stored as an enum. (because the types are firmly defined right?)
- - Same optimizations ofr CSL_Token and CSL_Char (formerly CChar and CToken)
+ ~~- for CSL_Node->type to be stored as an enum. (because the types are firmly defined right?)~~
+ ~~- Same optimizations ofr CSL_Token and CSL_Char (formerly CChar and CToken)~~
 
 
-On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!
+~~On the bad side, there are A LOT and i mean ABOUT 198MBs(!) of memory leaks coming from the parser after all of the 3 tests! Pleaaase fix!~~
 Check with ```valgrind --leak-check=full ./builddir/CSL_Test```.
 
 ```
