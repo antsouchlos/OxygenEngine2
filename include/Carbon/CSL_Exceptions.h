@@ -17,67 +17,12 @@ enum class CSL_TokenType {ident, string, integer, floatingPoint, openTagB, openC
 							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
 							slash, eos, undef};
 
-
-
-/*const char* getTokenTypeStringRep(CSL_TokenType t) {
-	switch(t) {
-		case CSL_TokenType::ident:
-			return "Identifier";
-			break;
-		case CSL_TokenType::string:
-			return "String";
-			break;
-		case CSL_TokenType::integer:
-			return "Integer";
-			break;
-		case CSL_TokenType::floatingPoint:
-			return "Float";
-			break;
-		case CSL_TokenType::openTagB:
-			return "<";
-			break;
-		case CSL_TokenType::closeTagB:
-			return ">";
-			break;
-		case CSL_TokenType::openClosingTagB:
-			return "</";
-			break;
-		case CSL_TokenType::openListB:
-			return "{";
-			break;
-		case CSL_TokenType::closeListB:
-			return "}";
-			break;
-		case CSL_TokenType::eq:
-			return "=";
-			break;
-		case CSL_TokenType::comma:
-			return ",";
-			break;
-		case CSL_TokenType::semicolon:
-			return ";";
-			break;
-		case CSL_TokenType::comment:
-			return "Comment";
-			break;
-		case CSL_TokenType::slash:
-			return "/";
-			break;
-		case CSL_TokenType::eos:
-			return "EOS";
-			break;
-		case CSL_TokenType::undef:
-			return "Undefined Token";
-			break;
-		default:
-			return "[Unknown Type]";
-	}
-}*/
+const char* getTokenTypeStringRep(CSL_TokenType t);
 
 
 class LexerError {
 	public:
-		virtual std::string what() const throw() { return ""; };
+		virtual std::string what() const throw() = 0;
 };
 
 class UnknownCharacterError : LexerError {
@@ -116,7 +61,7 @@ class InvalidInputError : LexerError {
 // gets destroyed a soon as the scope of "what()" is left, thereby basically returning garbage)
 class ParserError {
 	public:
-		virtual std::string what() const throw() { return ""; };
+		virtual std::string what() const throw() = 0;
 };
 
 class UnexpectedSymbolError : ParserError {
@@ -130,7 +75,7 @@ class UnexpectedSymbolError : ParserError {
 			result_ss << "Unexpetcted Symbol \"" << unexpected_ << "\" ";
 		   	result_ss << "at line " << lineNum_ << ':' << (colNum_ - unexpected_.size()) << ": ";
 			result_ss << "Expected \"";
-//			result_ss << getTokenTypeStringRep(expected_);
+			result_ss << getTokenTypeStringRep(expected_);
 			result_ss << "\"";
 
 			return result_ss.str().c_str();
@@ -145,7 +90,7 @@ class UnexpectedSymbolError : ParserError {
 
 class InterpreterError {
 	public:
-		virtual std::string what() const throw() { return ""; };
+		virtual std::string what() const throw() = 0;
 };
 
 // TODO: Find a way to get line and column number
@@ -176,8 +121,13 @@ class SemanticError : ParserError, InterpreterError {
 };
 
 
+extern char const CSL_IteratorElementString[8];
+extern char const CSL_IteratorAttributeString[10];
+extern char const CSL_IteratorVariableString[9];
 
-
+using UnknownMemberElementError = UnknownMemberError<CSL_IteratorElementString>;
+using UnknownMemberAttributeError = UnknownMemberError<CSL_IteratorAttributeString>;
+using UnknownMemberVariableError = UnknownMemberError<CSL_IteratorVariableString>;
 
 
 class CSL_UnknownIDException : public std::runtime_error {

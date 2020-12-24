@@ -10,24 +10,6 @@
 #include <Carbon/CSL_Parser.h>
 
 
-// TODO
-/*extern char const CSL_IteratorElementString[] = "element";
-extern char const CSL_IteratorAttributeString[] = "attribute";
-extern char const CSL_IteratorVariableString[] = "variable";
-
-using UnknownMemberElementError = UnknownMemberError<CSL_IteratorElementString>;
-using UnknownMemberAttributeError = UnknownMemberError<CSL_IteratorAttributeString>;
-using UnknownMemberVariableError = UnknownMemberError<CSL_IteratorVariableString>;*/
-
-class UnknownMemberElementError {
-	public:
-		UnknownMemberElementError(std::string_view &s) {};
-};
-
-using UnknownMemberAttributeError = UnknownMemberElementError;
-using UnknownMemberVariableError = UnknownMemberElementError;
-
-
 // This is a helper function for the interpreter
 void OE_ReverseBitset(std::bitset<64>&);
 
