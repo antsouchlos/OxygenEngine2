@@ -8,7 +8,11 @@
 #ifndef CSL_EXCEPTIONS_H_
 #define CSL_EXCEPTIONS_H_
 
-#include <types/OE_Libs.h>
+//#include <types/OE_Libs.h>
+#include <string>
+#include <string_view>
+#include <stdexcept>
+#include <sstream>
 
 
 // Defined here, because it is needed for UnexpectedSymbolError
