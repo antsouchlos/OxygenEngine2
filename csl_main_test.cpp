@@ -1,6 +1,8 @@
-#include <OE_API.h>
-#include<Carbon/CSL_Lexer.h>
-
+//#include <OE_API.h>
+#include <Carbon/CSL_Lexer.h>
+#include <string_view>
+#include <fstream>
+#include <string>
 
 int main(){
 	/*
@@ -36,7 +38,7 @@ int main(){
 	csl::Lexer lexer(input);
 
 	for (auto t : lexer) {
-		std::cout << static_cast<int>(t.token_type) << ": " << t.content << std::endl;
+//		std::cout << static_cast<int>(t.token_type) << ": " << t.content << std::endl;
 	}
 
 
