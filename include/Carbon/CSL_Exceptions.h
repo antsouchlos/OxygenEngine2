@@ -17,7 +17,60 @@ enum class CSL_TokenType {ident, string, integer, floatingPoint, openTagB, openC
 							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
 							slash, eos, undef};
 
-const char* getTokenTypeStringRep(CSL_TokenType t);
+inline const char* getTokenTypeStringRep(CSL_TokenType t) {
+	switch(t) {
+		case CSL_TokenType::ident:
+			return "Identifier";
+			break;
+		case CSL_TokenType::string:
+			return "String";
+			break;
+		case CSL_TokenType::integer:
+			return "Integer";
+			break;
+		case CSL_TokenType::floatingPoint:
+			return "Float";
+			break;
+		case CSL_TokenType::openTagB:
+			return "<";
+			break;
+		case CSL_TokenType::closeTagB:
+			return ">";
+			break;
+		case CSL_TokenType::openClosingTagB:
+			return "</";
+			break;
+		case CSL_TokenType::openListB:
+			return "{";
+			break;
+		case CSL_TokenType::closeListB:
+			return "}";
+			break;
+		case CSL_TokenType::eq:
+			return "=";
+			break;
+		case CSL_TokenType::comma:
+			return ",";
+			break;
+		case CSL_TokenType::semicolon:
+			return ";";
+			break;
+		case CSL_TokenType::comment:
+			return "Comment";
+			break;
+		case CSL_TokenType::slash:
+			return "/";
+			break;
+		case CSL_TokenType::eos:
+			return "EOS";
+			break;
+		case CSL_TokenType::undef:
+			return "Undefined Token";
+			break;
+		default:
+			return "[Unknown Type]";
+	}
+}
 
 
 class LexerError {
@@ -54,6 +107,7 @@ class InvalidInputError : LexerError {
 	private:
 		const std::string msg_;
 };
+
 
 
 // Sadly, ParseError cannon inherit from std::exception, since that would not allow the return type
@@ -124,9 +178,9 @@ class SemanticError : ParserError, InterpreterError {
 };
 
 
-extern char const CSL_IteratorElementString[8];
-extern char const CSL_IteratorAttributeString[10];
-extern char const CSL_IteratorVariableString[9];
+inline extern char const CSL_IteratorElementString[] = "element";
+inline extern char const CSL_IteratorAttributeString[] = "attribute";
+inline extern char const CSL_IteratorVariableString[] = "variable";
 
 using UnknownMemberElementError = UnknownMemberError<CSL_IteratorElementString>;
 using UnknownMemberAttributeError = UnknownMemberError<CSL_IteratorAttributeString>;

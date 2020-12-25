@@ -1,9 +1,29 @@
 #include <OE_API.h>
 
-using namespace std;
-using namespace OE;
 
 int main(){
+	/*
+	std::string input = "";
+
+	csl::Lexer l(input);
+	csl::token t;
+
+	csl::lexer<std::string> l(input);
+
+	while(l.next(t)) {
+		if (t.type == csl::token::floating_point) {
+		
+		} else if (t.type == csl::token::integer) {
+		
+		} else if (t.type == csl::token::string) {
+		
+		} else {
+		
+		}
+	}
+*/
+
+
 
     return 0;
 }
