@@ -4,8 +4,15 @@
 // TODO: Check performance, when the Lexer is not compiled separetely to the Parser,
 // 			in order for the compiler to be able to inline functions better
 
+namespace csl {
 
-CSL_Token CSL_Lexer::nextToken() {
+
+token Lexer::nextToken() {
+	// TODO: Check performance penalty of this if statement
+	if (next_token_type_ == token::eos) {
+		return {next_token_type_, next_token_content_};
+	}
+
 	skipWhitespace();
 
 	switch (getChar()) {
@@ -50,12 +57,12 @@ CSL_Token CSL_Lexer::nextToken() {
 			break;
 	}
 
-	CSL_Token newToken = { nextTokenType_, nextTokenContent_ };
+	token newToken = { next_token_type_, next_token_content_ };
 
 	return newToken;
 }
 
-std::size_t CSL_Lexer::getLineNum() {
+std::size_t Lexer::getLineNum() {
 	auto it = input_.begin();
 
 	std::size_t lineNum = 1;
@@ -71,7 +78,7 @@ std::size_t CSL_Lexer::getLineNum() {
 	return lineNum;
 }
 
-std::size_t CSL_Lexer::getColNum() {
+std::size_t Lexer::getColNum() {
 	if (iter_ == input_.begin()) {
 		return 0;
 	}
@@ -92,17 +99,24 @@ std::size_t CSL_Lexer::getColNum() {
 	return colNum;
 }
 
+Lexer::iterator Lexer::begin() {
+	return iterator(this);
+}
 
-char CSL_Lexer::getChar() const {
+Lexer::iterator Lexer::end() {
+	return iterator(this, {token::eos, ""});
+}
+
+char Lexer::getChar() const {
 	return *iter_;
 }
 
-void CSL_Lexer::setNextTokenContent(iter_t first, iter_t last) {
-	nextTokenContent_ = std::string_view(&*first, last - first);
+void Lexer::setNextTokenContent(iter_t first, iter_t last) {
+	next_token_content_ = std::string_view(&*first, last - first);
 }
 
 // TODO: Make this work with non-ascii files
-bool CSL_Lexer::isIdentifierHeadChar() const {
+bool Lexer::isIdentifierHeadChar() const {
 	int n = static_cast<int>(getChar());
 
 	if (	( (65 <= n) && (n <= 90) ) 
@@ -115,7 +129,7 @@ bool CSL_Lexer::isIdentifierHeadChar() const {
 }
 
 // TODO: Make this work with non-ascii files
-bool CSL_Lexer::isIdentifierTailChar() const {
+bool Lexer::isIdentifierTailChar() const {
 	int n = static_cast<int>(getChar());
 
 	if (	( (65 <= n) && (n <= 90) )
@@ -128,7 +142,7 @@ bool CSL_Lexer::isIdentifierTailChar() const {
 	}
 }
 
-bool CSL_Lexer::isDigit() const {
+bool Lexer::isDigit() const {
 	int n = static_cast<int>(getChar());
 
 	if ( (48 <= n) && (n <= 57) ) {
@@ -138,28 +152,28 @@ bool CSL_Lexer::isDigit() const {
 	}
 }
 
-bool CSL_Lexer::isEOS() const {
+bool Lexer::isEOS() const {
 	return (iter_ == std::end(input_));
 }
 
-void CSL_Lexer::skipWhitespace() {
+void Lexer::skipWhitespace() {
 	while ( (getChar() == ' ') || (getChar() == '\t') || (getChar() == '\n') ) {
 		++iter_;
 	}
 }
 		
-void CSL_Lexer::identifier() {
+void Lexer::identifier() {
 	auto temp = iter_;
 
 	while (isIdentifierTailChar()) {
 		++iter_;
 	}
 
-	nextTokenType_ = CSL_TokenType::ident;
+	next_token_type_ = token::ident;
 	setNextTokenContent(temp, iter_);
 }
 
-void CSL_Lexer::string() {
+void Lexer::string() {
 	++iter_;
 
 	auto temp = iter_;
@@ -172,13 +186,13 @@ void CSL_Lexer::string() {
 
 	++iter_;
 
-	nextTokenType_ = CSL_TokenType::string;
+	next_token_type_ = token::string;
 	setNextTokenContent(temp, iter_ - 1);
 }
 
-void CSL_Lexer::number() {
+void Lexer::number() {
 	auto temp = iter_;
-	nextTokenType_ = CSL_TokenType::integer;
+	next_token_type_ = token::integer;
 
 	if (getChar() == '-')
 		++iter_;
@@ -189,7 +203,7 @@ void CSL_Lexer::number() {
 
 	if (getChar() == '.') {
 		++iter_;
-		nextTokenType_ = CSL_TokenType::floatingPoint;
+		next_token_type_ = token::floatingPoint;
 
 		while(isDigit()) {
 			++iter_;
@@ -199,57 +213,57 @@ void CSL_Lexer::number() {
 	setNextTokenContent(temp, iter_);
 }
 
-void CSL_Lexer::openTagBracket() {
+void Lexer::openTagBracket() {
 	++iter_;
 	
 	if (getChar() == '/') {
 		++iter_;
 
-		nextTokenType_ = CSL_TokenType::openClosingTagB;
+		next_token_type_ = token::openClosingTagB;
 		setNextTokenContent(iter_ - 2, iter_);
 	} else {
-		nextTokenType_ = CSL_TokenType::openTagB;
+		next_token_type_ = token::openTagB;
 		setNextTokenContent(iter_ - 1, iter_);
 	}
 }
 
-void CSL_Lexer::closeTagBracket() {
-	nextTokenType_ = CSL_TokenType::closeTagB;
+void Lexer::closeTagBracket() {
+	next_token_type_ = token::closeTagB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void CSL_Lexer::openListBracket() {
-	nextTokenType_ = CSL_TokenType::openListB;
+void Lexer::openListBracket() {
+	next_token_type_ = token::openListB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void CSL_Lexer::closeListBracket() {
-	nextTokenType_ = CSL_TokenType::closeListB;
+void Lexer::closeListBracket() {
+	next_token_type_ = token::closeListB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void CSL_Lexer::eq() {
-	nextTokenType_ = CSL_TokenType::eq;
+void Lexer::eq() {
+	next_token_type_ = token::eq;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void CSL_Lexer::semicolon() {
-	nextTokenType_ = CSL_TokenType::semicolon;
+void Lexer::semicolon() {
+	next_token_type_ = token::semicolon;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void CSL_Lexer::comma() {
-	nextTokenType_ = CSL_TokenType::comma;
+void Lexer::comma() {
+	next_token_type_ = token::comma;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
-void CSL_Lexer::commentStartSlash() {
+void Lexer::commentStartSlash() {
 	++iter_;
 	
 	if (getChar() == '*') {
@@ -259,7 +273,7 @@ void CSL_Lexer::commentStartSlash() {
 	}
 }
 
-void CSL_Lexer::commentStart() {
+void Lexer::commentStart() {
 	// Only the second character has to be consumed, for the first one this happened already,
 	// in commentStartSlash()
 	++iter_;
@@ -278,7 +292,7 @@ void CSL_Lexer::commentStart() {
 		}
 	}
 
-	nextTokenType_ = CSL_TokenType::comment;
+	next_token_type_ = token::comment;
 
 	if (temp != std::end(input_)) {
 		setNextTokenContent(temp, iter_ - 1);
@@ -287,14 +301,17 @@ void CSL_Lexer::commentStart() {
 	}
 }
 
-void CSL_Lexer::slash() {
+void Lexer::slash() {
 	// No character has to be consumed, that has already happened in commentStartSlash()
 	
-	nextTokenType_ = CSL_TokenType::slash;
+	next_token_type_ = token::slash;
 	setNextTokenContent(iter_ - 1, iter_);
 }
 
-void CSL_Lexer::eos() {
-	nextTokenType_ = CSL_TokenType::eos;
+void Lexer::eos() {
+	next_token_type_ = token::eos;
 	setNextTokenContent(iter_, iter_);
+}
+
+
 }
