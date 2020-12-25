@@ -10,12 +10,6 @@
 #include <Carbon/CSL_Exceptions.h>
 
 
-struct CSL_Token {
-	CSL_TokenType type = CSL_TokenType::undef;
-	std::string_view content;
-};
-
-
 /*
  *
  * identifier				= identifierhead
@@ -53,21 +47,59 @@ struct CSL_Token {
 
 // TODO: Crazy Idea - Make the Lexer class work with iterators. Token Iterators. Instead of calling
 // nextToken(), the user could increment an iterator - OR DECREMENT IT
+namespace csl {
 
-class CSL_Lexer {
+class Lexer {
 	public:
+		class iterator {
+			public:
+				// TODO: Make this forward at some point
+				using iterator_category = std::input_iterator_tag;
+				using value_type = token;
+				using difference_type = std::size_t;
+				using reference = token&;
+				using pointer = token*;
+
+				iterator(Lexer* lexer) : lexer_(lexer) {}
+				iterator(Lexer* lexer, token t) : lexer_(lexer), t_(t) {};
+
+				// TODO: Check overhead of having if statement
+				const iterator& operator++() {
+					if (t_.type != token::eos)
+						t_ = lexer_->nextToken();
+
+					return *this;
+				};
+				const iterator operator++(int) { iterator tmp(*this); ++(*this); return *this; };
+
+				const token& operator*() { return t_; };
+				const token* operator->() { return &t_; };
+
+				bool operator==(iterator& rhs) { return ( (this == &rhs)
+														|| this->t_.type == token::eos
+															&& rhs->type == token::eos ); }
+				bool operator!=(iterator& rhs) { return !((*this) == rhs); };
+			private:
+				Lexer *lexer_;
+				token t_;
+
+		};
+
 		// A string is passed by reference and not a string_view, to make sure there
 		// is a terminating character, which this lexer depends on
-		CSL_Lexer(const std::string_view input) : input_(input), iter_(std::begin(input_)) {
+		Lexer(const std::string &input) : input_(input), iter_(std::begin(input_)) {
 
 			if (input.size() == 0)
 				throw InvalidInputError("The input length must be greater than 0");
 		}
 
-		CSL_Token nextToken();
+		token nextToken();
 
 		std::size_t getLineNum();
 		std::size_t getColNum();
+
+		iterator begin();
+		iterator end();
 
 	private:
 		using iter_t = std::string_view::iterator;
@@ -76,8 +108,8 @@ class CSL_Lexer {
 		std::string_view input_;
 		iter_t iter_;
 
-		CSL_TokenType nextTokenType_;
-		std::string_view nextTokenContent_;
+		token::token_type next_token_type_;
+		std::string_view next_token_content_;
 
 
 		char getChar() const;
@@ -109,6 +141,8 @@ class CSL_Lexer {
 
 		void eos();
 };
+
+}
 
 
 #endif

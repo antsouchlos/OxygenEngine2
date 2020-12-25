@@ -13,58 +13,65 @@
 
 // Defined here, because it is needed for UnexpectedSymbolError
 // TODO: Find a better place to put this
-enum class CSL_TokenType {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
+namespace csl {
+
+struct token {
+	enum token_type {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
 							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
 							slash, eos, undef};
 
-inline const char* getTokenTypeStringRep(CSL_TokenType t) {
+	token_type type = undef;
+	std::string_view content;
+};
+
+inline const char* getTokenTypeStringRep(token::token_type t) {
 	switch(t) {
-		case CSL_TokenType::ident:
+		case token::ident:
 			return "Identifier";
 			break;
-		case CSL_TokenType::string:
+		case token::string:
 			return "String";
 			break;
-		case CSL_TokenType::integer:
+		case token::integer:
 			return "Integer";
 			break;
-		case CSL_TokenType::floatingPoint:
+		case token::floatingPoint:
 			return "Float";
 			break;
-		case CSL_TokenType::openTagB:
+		case token::openTagB:
 			return "<";
 			break;
-		case CSL_TokenType::closeTagB:
+		case token::closeTagB:
 			return ">";
 			break;
-		case CSL_TokenType::openClosingTagB:
+		case token::openClosingTagB:
 			return "</";
 			break;
-		case CSL_TokenType::openListB:
+		case token::openListB:
 			return "{";
 			break;
-		case CSL_TokenType::closeListB:
+		case token::closeListB:
 			return "}";
 			break;
-		case CSL_TokenType::eq:
+		case token::eq:
 			return "=";
 			break;
-		case CSL_TokenType::comma:
+		case token::comma:
 			return ",";
 			break;
-		case CSL_TokenType::semicolon:
+		case token::semicolon:
 			return ";";
 			break;
-		case CSL_TokenType::comment:
+		case token::comment:
 			return "Comment";
 			break;
-		case CSL_TokenType::slash:
+		case token::slash:
 			return "/";
 			break;
-		case CSL_TokenType::eos:
+		case token::eos:
 			return "EOS";
 			break;
-		case CSL_TokenType::undef:
+		case token::undef:
 			return "Undefined Token";
 			break;
 		default:
@@ -122,7 +129,7 @@ class ParserError {
 
 class UnexpectedSymbolError : ParserError {
 	public:
-		UnexpectedSymbolError(std::string_view unexpected, CSL_TokenType expected,
+		UnexpectedSymbolError(std::string_view unexpected, token::token_type expected,
 							const std::size_t lineNum, const std::size_t colNum)
 			: unexpected_(unexpected), expected_(expected), lineNum_(lineNum), colNum_(colNum) {};
 
@@ -138,7 +145,7 @@ class UnexpectedSymbolError : ParserError {
 		}
 	private:
 		std::string_view unexpected_;
-		CSL_TokenType expected_;
+		token::token_type expected_;
 		const std::size_t lineNum_;
 		const std::size_t colNum_;
 };
@@ -186,6 +193,7 @@ using UnknownMemberElementError = UnknownMemberError<CSL_IteratorElementString>;
 using UnknownMemberAttributeError = UnknownMemberError<CSL_IteratorAttributeString>;
 using UnknownMemberVariableError = UnknownMemberError<CSL_IteratorVariableString>;
 
+}
 
 class CSL_UnknownIDException : public std::runtime_error {
 public:
