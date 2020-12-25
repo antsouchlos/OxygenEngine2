@@ -226,6 +226,9 @@ UPDATE 2020/11/12: It was enhanced.
 - ~~Basic Material and Lighting support.~~(DONE)
 - ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
 - ~~Support multiple shaders~~
+- Implement rendering of bounding spheres
+- Implement rendering of cones
+- Implement sorting front-to-back or back-to-front of objects
 - Implement Directional Light rendering pass.
 - Implement Point+Area Light-Indexed rendering pass.
 - Support multiple render targets and framebuffers in the Renderer API

@@ -4,6 +4,27 @@
 #include <OE_TaskManager.h>
 #include <OE_API_Helpers.h>
 
+/*enum OE_OS : int{
+    OE_UNDEFINED=0,
+    OE_LINUX=1,
+    OE_WINDOWS=2
+};
+
+enum OE_WINSYS : int{
+    OE_NONE=0,
+    OE_SDL=1,
+    OE_SOMETHING_ELSE=2
+};
+
+enum oe::renderer::shading_mode::type : int{
+    OE_RENDERER_NORMALS_SHADING=0,
+    OE_RENDERER_NO_LIGHTS_SHADING=1,
+    OE_RENDERER_DIR_LIGHTS_SHADING=2,
+    OE_RENDERER_INDEXED_LIGHTS_SHADING=3,
+    OE_RENDERER_REGULAR_SHADING=4
+};*/
+
+
 // This is going to be a very long header with ALL avaiable API functions declared
 // TODO: Make this extern "C" so that we have a C compatible API (Long-term goal)
 
@@ -11,6 +32,47 @@ namespace oe{
     
     // GLOBAL VARIABLE
     extern OE_TaskManager* OE_Main;
+    
+    // class typedefs
+    
+    typedef OE_Task     task;
+    typedef OE_Vec3     vec3;
+    typedef OE_Vec4     vec4;
+    typedef OE_Mat4x4   mat4x4;
+    typedef OE_Quat     quat;
+    typedef OE_Mat3x3   mat3x3;
+    
+    // enum typedefs
+    
+    typedef OE_METHOD       method_type;
+    typedef OE_EVENTFUNC    event_func_type;
+    
+    namespace os{
+        typedef OE_OS type;
+        const type undefined = (type)0;
+        const type linux = (type)1;
+        const type windows = (type)2;
+    };
+    
+    namespace winsys{
+        typedef OE_WINSYS type;
+        const type none=(type)0;
+        const type sdl = (type)1;
+        const type something_else = (type)2;
+    };
+    
+    namespace renderer{
+        
+        namespace shading_mode{
+            
+            typedef OE_RENDERER_SHADING_MODE type;
+            const type normals = (type)0;
+            const type no_light = (type)1;
+            const type dir_lights = (type)2;
+            const type indexed_lights = (type)3;
+            const type regular = (type)4;
+        };
+    };
     
     /** Basic API functions for starting the Oxygen Engine
      *  and assigning tasks
@@ -29,17 +91,17 @@ namespace oe{
     // The API functions inside this block are the only ones that are 
     // safe to be called on an unsynchronized thread together with all the get* functions
     
-    void add_task(std::string, const OE_METHOD, void*);
-    void add_task(std::string, const OE_METHOD, int, void*);
-    void add_task(std::string, const OE_METHOD, int, std::string, void*);
-    void add_task(std::string, const OE_METHOD, std::string, void*);
+    void add_task(std::string, const oe::method_type, void*);
+    void add_task(std::string, const oe::method_type, int, void*);
+    void add_task(std::string, const oe::method_type, int, std::string, void*);
+    void add_task(std::string, const oe::method_type, std::string, void*);
     
     void remove_task(std::string);
     void remove_task(std::string, std::string);
     
     void broadcast_event(std::string, void*);
     void create_event(std::string);
-    void set_event_func(std::string, const OE_EVENTFUNC, void*);
+    void set_event_func(std::string, const oe::event_func_type, void*);
     
     void destroy_event(std::string);
     
@@ -73,12 +135,12 @@ namespace oe{
     OE_Task get_task_info(std::string, std::string);
     
     void create_new_thread(std::string);
-    void create_unsync_thread(std::string, const OE_METHOD, void*);
+    void create_unsync_thread(std::string, const oe::method_type, void*);
     
     /** API functions for loading worlds/scenes/objects/etc.
      */
     
-    void load_world(std::string, const OE_EVENTFUNC, void*);
+    void load_world(std::string, const oe::event_func_type, void*);
     
     /** API functions for manipulating objects and basic types
      * to be vastly extended when the physics engine comes
@@ -133,8 +195,8 @@ namespace oe{
      */
     
     void restart_renderer();
-    void set_shading_mode(OE_RENDERER_SHADING_MODE);
-    OE_RENDERER_SHADING_MODE get_shading_mode();
+    void set_shading_mode(oe::renderer::shading_mode::type);
+    oe::renderer::shading_mode::type get_shading_mode();
     
     void render_wireframe(bool);
     void toggle_wireframe_rendering();
