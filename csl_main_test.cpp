@@ -1,4 +1,5 @@
 #include <OE_API.h>
+#include<Carbon/CSL_Lexer.h>
 
 
 int main(){
@@ -23,6 +24,20 @@ int main(){
 	}
 */
 
+	std::string input = "";
+	std::ifstream f("csl_very_large_object_test.csl");
+
+	std::string line;
+	while(getline(f, line))
+		input += line;
+
+	f.close();
+
+	csl::Lexer lexer(input);
+
+	for (auto t : lexer) {
+		std::cout << static_cast<int>(t.token_type) << ": " << t.content << std::endl;
+	}
 
 
     return 0;
