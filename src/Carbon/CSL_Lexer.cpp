@@ -9,7 +9,7 @@ namespace csl {
 
 token Lexer::nextToken() {
 	// TODO: Check performance penalty of this if statement
-	if (next_token_type_ == token::eos) {
+	if (next_token_type_ == token::type::eos) {
 		return {next_token_type_, next_token_content_};
 	}
 
@@ -104,7 +104,7 @@ Lexer::iterator Lexer::begin() {
 }
 
 Lexer::iterator Lexer::end() {
-	return iterator(this, {token::eos, ""});
+	return iterator(this, {token::type::eos, ""});
 }
 
 char Lexer::getChar() const {
@@ -169,7 +169,7 @@ void Lexer::identifier() {
 		++iter_;
 	}
 
-	next_token_type_ = token::ident;
+	next_token_type_ = token::type::ident;
 	setNextTokenContent(temp, iter_);
 }
 
@@ -186,13 +186,13 @@ void Lexer::string() {
 
 	++iter_;
 
-	next_token_type_ = token::string;
+	next_token_type_ = token::type::string;
 	setNextTokenContent(temp, iter_ - 1);
 }
 
 void Lexer::number() {
 	auto temp = iter_;
-	next_token_type_ = token::integer;
+	next_token_type_ = token::type::integer;
 
 	if (getChar() == '-')
 		++iter_;
@@ -203,7 +203,7 @@ void Lexer::number() {
 
 	if (getChar() == '.') {
 		++iter_;
-		next_token_type_ = token::floatingPoint;
+		next_token_type_ = token::type::floatingPoint;
 
 		while(isDigit()) {
 			++iter_;
@@ -219,46 +219,46 @@ void Lexer::openTagBracket() {
 	if (getChar() == '/') {
 		++iter_;
 
-		next_token_type_ = token::openClosingTagB;
+		next_token_type_ = token::type::openClosingTagB;
 		setNextTokenContent(iter_ - 2, iter_);
 	} else {
-		next_token_type_ = token::openTagB;
+		next_token_type_ = token::type::openTagB;
 		setNextTokenContent(iter_ - 1, iter_);
 	}
 }
 
 void Lexer::closeTagBracket() {
-	next_token_type_ = token::closeTagB;
+	next_token_type_ = token::type::closeTagB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
 void Lexer::openListBracket() {
-	next_token_type_ = token::openListB;
+	next_token_type_ = token::type::openListB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
 void Lexer::closeListBracket() {
-	next_token_type_ = token::closeListB;
+	next_token_type_ = token::type::closeListB;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
 void Lexer::eq() {
-	next_token_type_ = token::eq;
+	next_token_type_ = token::type::eq;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
 void Lexer::semicolon() {
-	next_token_type_ = token::semicolon;
+	next_token_type_ = token::type::semicolon;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
 
 void Lexer::comma() {
-	next_token_type_ = token::comma;
+	next_token_type_ = token::type::comma;
 	setNextTokenContent(iter_, iter_ + 1);
 	++iter_;
 }
@@ -292,7 +292,7 @@ void Lexer::commentStart() {
 		}
 	}
 
-	next_token_type_ = token::comment;
+	next_token_type_ = token::type::comment;
 
 	if (temp != std::end(input_)) {
 		setNextTokenContent(temp, iter_ - 1);
@@ -304,12 +304,12 @@ void Lexer::commentStart() {
 void Lexer::slash() {
 	// No character has to be consumed, that has already happened in commentStartSlash()
 	
-	next_token_type_ = token::slash;
+	next_token_type_ = token::type::slash;
 	setNextTokenContent(iter_ - 1, iter_);
 }
 
 void Lexer::eos() {
-	next_token_type_ = token::eos;
+	next_token_type_ = token::type::eos;
 	setNextTokenContent(iter_, iter_);
 }
 

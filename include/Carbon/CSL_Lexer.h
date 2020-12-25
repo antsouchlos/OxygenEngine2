@@ -65,7 +65,7 @@ class Lexer {
 
 				// TODO: Check overhead of having if statement
 				const iterator& operator++() {
-					if (t_.type != token::eos)
+					if (t_.token_type != token::type::eos)
 						t_ = lexer_->nextToken();
 
 					return *this;
@@ -75,9 +75,9 @@ class Lexer {
 				const token& operator*() { return t_; };
 				const token* operator->() { return &t_; };
 
-				bool operator==(iterator& rhs) { return ( (this == &rhs)
-														|| this->t_.type == token::eos
-															&& rhs->type == token::eos ); }
+				bool operator==(iterator& rhs) {
+					return ( (this == &rhs) || this->t_.token_type == token::type::eos
+												&& rhs->token_type == token::type::eos ); }
 				bool operator!=(iterator& rhs) { return !((*this) == rhs); };
 			private:
 				Lexer *lexer_;
@@ -108,7 +108,7 @@ class Lexer {
 		std::string_view input_;
 		iter_t iter_;
 
-		token::token_type next_token_type_;
+		token::type next_token_type_;
 		std::string_view next_token_content_;
 
 

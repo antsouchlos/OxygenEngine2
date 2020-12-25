@@ -16,62 +16,62 @@
 namespace csl {
 
 struct token {
-	enum token_type {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
+	enum class type {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
 							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
 							slash, eos, undef};
 
-	token_type type = undef;
+	type token_type = type::undef;
 	std::string_view content;
 };
 
-inline const char* getTokenTypeStringRep(token::token_type t) {
+inline const char* getTokenTypeStringRep(token::type t) {
 	switch(t) {
-		case token::ident:
+		case token::type::ident:
 			return "Identifier";
 			break;
-		case token::string:
+		case token::type::string:
 			return "String";
 			break;
-		case token::integer:
+		case token::type::integer:
 			return "Integer";
 			break;
-		case token::floatingPoint:
+		case token::type::floatingPoint:
 			return "Float";
 			break;
-		case token::openTagB:
+		case token::type::openTagB:
 			return "<";
 			break;
-		case token::closeTagB:
+		case token::type::closeTagB:
 			return ">";
 			break;
-		case token::openClosingTagB:
+		case token::type::openClosingTagB:
 			return "</";
 			break;
-		case token::openListB:
+		case token::type::openListB:
 			return "{";
 			break;
-		case token::closeListB:
+		case token::type::closeListB:
 			return "}";
 			break;
-		case token::eq:
+		case token::type::eq:
 			return "=";
 			break;
-		case token::comma:
+		case token::type::comma:
 			return ",";
 			break;
-		case token::semicolon:
+		case token::type::semicolon:
 			return ";";
 			break;
-		case token::comment:
+		case token::type::comment:
 			return "Comment";
 			break;
-		case token::slash:
+		case token::type::slash:
 			return "/";
 			break;
-		case token::eos:
+		case token::type::eos:
 			return "EOS";
 			break;
-		case token::undef:
+		case token::type::undef:
 			return "Undefined Token";
 			break;
 		default:
@@ -129,7 +129,7 @@ class ParserError {
 
 class UnexpectedSymbolError : ParserError {
 	public:
-		UnexpectedSymbolError(std::string_view unexpected, token::token_type expected,
+		UnexpectedSymbolError(std::string_view unexpected, token::type expected,
 							const std::size_t lineNum, const std::size_t colNum)
 			: unexpected_(unexpected), expected_(expected), lineNum_(lineNum), colNum_(colNum) {};
 
@@ -145,7 +145,7 @@ class UnexpectedSymbolError : ParserError {
 		}
 	private:
 		std::string_view unexpected_;
-		token::token_type expected_;
+		token::type expected_;
 		const std::size_t lineNum_;
 		const std::size_t colNum_;
 };
