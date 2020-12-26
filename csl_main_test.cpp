@@ -4,29 +4,65 @@
 #include <fstream>
 #include <string>
 
+
 int main(){
-	/*
-	std::string input = "";
+	constexpr csl::token_def lt_def				= { csl::token_type::lt,			[](char c) { return c == '<'; }, [](auto &it) {} };
+	constexpr csl::token_def gt_def				= { csl::token_type::gt,			[](char c) { return c == '>'; }, [](auto &it) {} };
+	constexpr csl::token_def open_brace_def		= { csl::token_type::open_brace,	[](char c) { return c == '{'; }, [](auto &it) {} };
+	constexpr csl::token_def close_brace_def	= { csl::token_type::close_brace,	[](char c) { return c == '}'; }, [](auto &it) {} };
+	constexpr csl::token_def eq_def				= { csl::token_type::eq,			[](char c) { return c == '='; }, [](auto &it) {} };
+	constexpr csl::token_def semicolon_def		= { csl::token_type::semicolon,		[](char c) { return c == ';'; }, [](auto &it) {} };
+	constexpr csl::token_def comma_def			= { csl::token_type::comma,			[](char c) { return c == ','; }, [](auto &it) {} };
+	constexpr csl::token_def slash_def			= { csl::token_type::slash,			[](char c) { return c == '/'; }, [](auto &it) {} };
 
-	csl::Lexer l(input);
-	csl::token t;
-
-	csl::lexer<std::string> l(input);
-
-	while(l.next(t)) {
-		if (t.type == csl::token::floating_point) {
-		
-		} else if (t.type == csl::token::integer) {
-		
-		} else if (t.type == csl::token::string) {
-		
-		} else {
-		
+	constexpr csl::token_def string_def = {
+		csl::token_type::string,
+		[](char c) { return c == '"'; },
+		[](auto &it) {
+			while(*it != '"') it++;
+			it++;
 		}
-	}
-*/
+	};
+	
+	constexpr csl::token_def identifier_def = {
+		csl::token_type::identifier,
+		[](char c) { return is_identifier_head_char(c); },
+		[](auto &it) { while (is_identifier_tail_char(*it)) it++;  }
+	};
 
+	constexpr csl::token_def integer_def = {
+		csl::token_type::integer,
+		[](char c) { return is_number(c); },
+		[](auto &it) { while(is_number(*it)) it++;  }
+	};
+
+	
 	std::string input = "";
+	std::ifstream f("csl_very_large_object_test.csl");
+
+	std::string line;
+	while(getline(f, line))
+		input += line;
+
+	f.close();
+
+//	std::string input = ",;/=<>";
+
+	csl::Generic_Lexer<lt_def, gt_def, open_brace_def, close_brace_def, eq_def, semicolon_def, comma_def, slash_def, string_def, identifier_def, integer_def> lexer(input);
+
+	csl::token t = lexer.next_token();
+
+	while (t.type != csl::token_type::eoi) {
+//		std::cout << t.type << ": " << t.content << std::endl;
+		t = lexer.next_token();
+	}
+
+	std::cout << "end" << std::endl;
+
+	return 0;
+
+
+/*	std::string input = "";
 	std::ifstream f("csl_very_large_object_test.csl");
 
 	std::string line;
@@ -37,10 +73,20 @@ int main(){
 
 	csl::Lexer lexer(input);
 
-	for (auto t : lexer) {
-//		std::cout << static_cast<int>(t.token_type) << ": " << t.content << std::endl;
+	for (auto &t : lexer) {
+		std::cout << static_cast<int>(t.token_type) << ": " << t.content << std::endl;
 	}
 
 
-    return 0;
+
+	
+	auto it = lexer.begin();
+
+	while(it != lexer.end()) {
+		std::cout << static_cast<int>(it->token_type) << ": " << it->content << std::endl;
+		it = std::next(it);
+	}
+
+    return 0;*/
+
 }
