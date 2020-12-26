@@ -20,8 +20,8 @@
 namespace csl {
 
 struct token {
-	enum class type {ident, string, integer, floatingPoint, openTagB, openClosingTagB,
-							closeTagB, openListB, closeListB, eq, semicolon, comma, comment,
+	enum class type {ident, string, integer, floating_point, lt, openClosingTagB,
+							gt, open_brace, close_brace, eq, semicolon, comma, comment,
 							slash, eos, undef};
 
 	type token_type = type::undef;
@@ -39,22 +39,22 @@ inline const char* getTokenTypeStringRep(token::type t) {
 		case token::type::integer:
 			return "Integer";
 			break;
-		case token::type::floatingPoint:
+		case token::type::floating_point:
 			return "Float";
 			break;
-		case token::type::openTagB:
+		case token::type::lt:
 			return "<";
 			break;
-		case token::type::closeTagB:
+		case token::type::gt:
 			return ">";
 			break;
 		case token::type::openClosingTagB:
 			return "</";
 			break;
-		case token::type::openListB:
+		case token::type::open_brace:
 			return "{";
 			break;
-		case token::type::closeListB:
+		case token::type::close_brace:
 			return "}";
 			break;
 		case token::type::eq:
