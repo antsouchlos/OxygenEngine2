@@ -38,7 +38,7 @@ int main(){
 
 	
 	std::string input = "";
-	std::ifstream f("csl_very_large_object_test.csl");
+	std::ifstream f("test.csl");
 
 	std::string line;
 	while(getline(f, line))
@@ -46,9 +46,8 @@ int main(){
 
 	f.close();
 
-//	std::string input = ",;/=<>";
 
-	csl::Generic_Lexer<lt_def, gt_def, open_brace_def, close_brace_def, eq_def, semicolon_def, comma_def, slash_def, string_def, identifier_def, integer_def> lexer(input);
+	csl::Generic_Lexer lexer(input, lt_def, gt_def, open_brace_def, close_brace_def, eq_def, semicolon_def, comma_def, slash_def, string_def, identifier_def, integer_def, gt_def, open_brace_def);
 
 	csl::token t = lexer.next_token();
 
@@ -60,33 +59,4 @@ int main(){
 	std::cout << "end" << std::endl;
 
 	return 0;
-
-
-/*	std::string input = "";
-	std::ifstream f("csl_very_large_object_test.csl");
-
-	std::string line;
-	while(getline(f, line))
-		input += line;
-
-	f.close();
-
-	csl::Lexer lexer(input);
-
-	for (auto &t : lexer) {
-		std::cout << static_cast<int>(t.token_type) << ": " << t.content << std::endl;
-	}
-
-
-
-	
-	auto it = lexer.begin();
-
-	while(it != lexer.end()) {
-		std::cout << static_cast<int>(it->token_type) << ": " << it->content << std::endl;
-		it = std::next(it);
-	}
-
-    return 0;*/
-
 }
