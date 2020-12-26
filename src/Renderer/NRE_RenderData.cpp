@@ -4,6 +4,11 @@
 using namespace std;
 using namespace oe;
 
+std::vector<float> NRE_MeshRenderData::genBoundingBoxVBO(){
+    return OE_GetBoundingBoxVertexBuffer(max_x, min_x, max_y, min_y, max_z, min_z);
+}
+
+
 bool NRE_RenderGroup::operator < (const NRE_RenderGroup& other) const{
     
     // sort by camera
@@ -263,8 +268,18 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         mesh->calculateProperBoundingBox();
         //---- </TEMPORARY> ---//
         
+        assert (mesh->data.vertices.calculatedBoundingBox);
+        
+        this->meshes[id].max_x = mesh->data.vertices.max_x;
+        this->meshes[id].max_y = mesh->data.vertices.max_y;
+        this->meshes[id].max_z = mesh->data.vertices.max_z;
+        
+        this->meshes[id].min_x = mesh->data.vertices.min_x;
+        this->meshes[id].min_y = mesh->data.vertices.min_y;
+        this->meshes[id].min_z = mesh->data.vertices.min_z;
+        
         this->meshes[id].vbo_bbox = this->api->newVertexBuffer();
-        this->api->setVertexBufferMemoryData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), NRE_GPU_STREAM);
+        this->api->setVertexBufferMemoryData(this->meshes[id].vbo_bbox, this->meshes[id].genBoundingBoxVBO(), NRE_GPU_STREAM);
         
         this->meshes[id].vao_bbox = this->api->newVertexLayout();
         std::vector<VLI> vao_bbox_data;
@@ -283,8 +298,18 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
             // This should not be done here but in the physics engine
             mesh->calculateProperBoundingBox();
             //---- </TEMPORARY> ---//
+            
+            assert (mesh->data.vertices.calculatedBoundingBox);
         
-            this->api->setVertexBufferData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), 0);
+            this->meshes[id].max_x = mesh->data.vertices.max_x;
+            this->meshes[id].max_y = mesh->data.vertices.max_y;
+            this->meshes[id].max_z = mesh->data.vertices.max_z;
+        
+            this->meshes[id].min_x = mesh->data.vertices.min_x;
+            this->meshes[id].min_y = mesh->data.vertices.min_y;
+            this->meshes[id].min_z = mesh->data.vertices.min_z;
+            
+            this->api->setVertexBufferData(this->meshes[id].vbo_bbox, this->meshes[id].genBoundingBoxVBO(), 0);
         }
         
         this->meshes[id].changed = true;

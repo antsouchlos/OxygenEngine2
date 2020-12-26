@@ -1,5 +1,6 @@
 #include <types/OE_Object.h>
 #include <types/OE_World.h>
+#include <OE_Math.h>
 
 using namespace std;
 

@@ -56,7 +56,6 @@ class OE_VertexStorage{
         float min_x{0.0f}, min_y{0.0f}, min_z{0.0f};
         
         void calculateNaiveBoundingBox();
-        std::vector<float> genBoundingBoxMesh();
         
         bool calculatedBoundingBox{false};
         
