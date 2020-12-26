@@ -55,7 +55,11 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
     std::vector<NRE_GPU_VertexLayoutInput> vao_input;
     
     std::size_t vbo_bbox;
-    std::size_t vao_bbox;    
+    std::size_t vao_bbox;   
+    
+    float max_x{0.0f}, min_x{0.0f}, max_y{0.0f}, min_y{0.0f}, max_z{0.0f}, min_z{0.0f};
+    
+    std::vector<float> genBoundingBoxVBO();
 };
 
 struct NRE_LightRenderData : public NRE_BaseObject{

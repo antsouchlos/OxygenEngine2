@@ -73,6 +73,7 @@ void OE_Mesh32::calculateProperBoundingBox(){
             }
     }
     
+    this->data.vertices.calculatedBoundingBox = true;
     //cout << "BOUNDING BOX UPDATE IN " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
 }
 
