@@ -41,3 +41,101 @@ OE_Quat OE_QuatFromAxisAngle(float a, float xx, float yy, float zz){
     float factor = std::sin( a / 2.0f );
     return OE_Normalize(OE_Quat(std::cos (a / 2.0f), xx*factor, yy*factor, zz*factor));
 }
+
+std::vector<float> OE_GetBoundingBoxVertexBuffer(float max_x, float min_x, float max_y, float min_y, float max_z, float min_z){
+    
+    std::vector<float> output;
+    output.reserve(216);
+    
+    // max_x
+    output.push_back(max_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    
+    output.push_back(max_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    
+    // min_x
+    output.push_back(min_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(-1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(-1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(-1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    
+    output.push_back(min_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(-1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(-1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(-1.0f); output.push_back(0.0f);output.push_back(0.0f);
+    
+    // max_y
+    output.push_back(max_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(1.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(1.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(1.0f);output.push_back(0.0f);
+    
+    output.push_back(min_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(1.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(1.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(1.0f);output.push_back(0.0f);
+    
+    // min_y
+    output.push_back(min_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(-1.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(-1.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(-1.0f);output.push_back(0.0f);
+    
+    output.push_back(max_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(-1.0f);output.push_back(0.0f);
+    output.push_back(min_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(-1.0f);output.push_back(0.0f);
+    output.push_back(max_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(-1.0f);output.push_back(0.0f);
+    
+    // max_z
+    output.push_back(min_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(1.0f);
+    output.push_back(max_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(1.0f);
+    output.push_back(min_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(1.0f);
+    
+    output.push_back(max_x); output.push_back(max_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(1.0f);
+    output.push_back(min_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(1.0f);
+    output.push_back(max_x); output.push_back(min_y); output.push_back(max_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(1.0f);
+    
+    // min_z
+    output.push_back(max_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(-1.0f);
+    output.push_back(min_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(-1.0f);
+    output.push_back(min_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(-1.0f);
+    
+    output.push_back(min_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(-1.0f);
+    output.push_back(max_x); output.push_back(max_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(-1.0f);
+    output.push_back(max_x); output.push_back(min_y); output.push_back(min_z);
+    output.push_back(0.0f); output.push_back(0.0f);output.push_back(-1.0f);
+    
+    return output;
+}

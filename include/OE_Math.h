@@ -31,6 +31,7 @@
 #define FE_EPSILON 0.000001f
 #define OE_EPSILON 0.000001f
 
+
 // This is done, so that in the event we want to change the math library
 // it will be easy
 typedef glm::vec4 OE_Vec4;
@@ -38,6 +39,8 @@ typedef glm::vec3 OE_Vec3;
 typedef glm::mat4 OE_Mat4x4;
 typedef glm::mat3 OE_Mat3x3;
 typedef glm::quat OE_Quat;
+
+//class OE_Vec4 : public glm::vec4{};
 
 #define OE_Pi2         glm::half_pi
 
@@ -65,5 +68,7 @@ std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4);
 OE_Mat4x4 OE_Perspective(float, float, float, float);
 
 OE_Quat OE_QuatFromAxisAngle(float, float, float, float);
+
+std::vector<float> OE_GetBoundingBoxVertexBuffer(float, float, float, float, float, float);
 
 #endif // FMATH_H_INCLUDED

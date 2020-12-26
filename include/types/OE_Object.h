@@ -4,6 +4,7 @@
 #include <types/OE_TypesBase.h>
 #include <OE_Math.h>
 
+
 // NOTE:  the structure of this struct (yeah i know) is subject to change
 struct OE_ObjectData{
     float pos_x{0.0f}, pos_y{0.0f}, pos_z{0.0f}, rot_w{0.0f}, rot_x{0.0f}, rot_y{0.0f}, rot_z{0.0f}, sca_x{1.0f}, sca_y{1.0f}, sca_z{1.0f};
