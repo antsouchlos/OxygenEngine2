@@ -2,23 +2,26 @@
 #include <string_view>
 #include <string>
 #include <fstream>
-#include <array>
 
 
 namespace csl {
 	class token_type_def {
 		public:
-			static const unsigned int eoi	= 0;
-			static const unsigned int undef	= 1;
+			static const unsigned int eoi				= 0;
+			static const unsigned int undef				= 1;
 	};
 
-//	template<class condition, class action>
+	template<typename T, typename U>
 	struct token_def {
 		std::size_t type = token_type_def::undef;
 
-		bool (*condition)(std::string_view::iterator&);
-		void (*action)(std::string_view::iterator&);
+		const T condition;
+		const U action;
 	};
+
+	// Needed for compilation with clang
+	template<typename T, typename U>
+	token_def(int, T, U) -> token_def<T, U>;
 
 	struct token {
 		std::size_t type = token_type_def::undef;
@@ -27,10 +30,28 @@ namespace csl {
 
 
 	template<typename... T>
+	void for_each(std::size_t &type, std::string_view::iterator &it, T... cws);
+
+	template<typename T, typename... U>
+	void for_each(std::size_t &type, std::string_view::iterator &it, T cw, U... cws) {
+		if (cw.condition(it)) {
+			type = cw.type;
+			it++;
+			cw.action(it);
+		} else {
+			for_each(type, it, cws...);
+		}
+	}
+
+	template<>
+	void for_each(std::size_t &type, std::string_view::iterator &it) {}
+
+
+	template<token_def... t_defs>
 	class Generic_Lexer {
 		public:
-			Generic_Lexer(std::string& input, T... t_defs)
-			    : input_(input), input_it_(input_.begin()), t_defs_{t_defs...} {};
+			Generic_Lexer(std::string& input)
+			    : input_(input), input_it_(input_.begin()) {};
 
 			token next_token() {
 				if (input_it_ == input_.end())
@@ -39,16 +60,7 @@ namespace csl {
 			    next_token_type_ = token_type_def::undef;
 
 			    auto temp = input_it_;
-				for (auto t_def : t_defs_) {
-					if (t_def.condition(input_it_)) {
-						next_token_type_ = t_def.type;
-
-						input_it_++;
-						t_def.action(input_it_);
-
-						break;
-					}
-				}
+			    for_each(next_token_type_, input_it_, t_defs...);
 
 				if (next_token_type_ == token_type_def::undef)
 					input_it_++;
@@ -61,10 +73,6 @@ namespace csl {
 			std::string_view::iterator input_it_;
 
 			std::size_t next_token_type_ = token_type_def::undef;
-
-			const std::array<token_def, sizeof...(T)> t_defs_;
 	};
 }
-
-
 
