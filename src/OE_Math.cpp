@@ -2,14 +2,69 @@
 
 using namespace std;
 
+// basically translation from the GLM library
+
+// overloading operators
+
+OE_Quat::OE_Quat(glm::quat q){
+    this->w = q.w;
+    this->x = q.x;
+    this->y = q.y;
+    this->z = q.z;
+    
+}
+
+OE_Vec3 OE_Mat3x3::operator * (const OE_Vec3& other){
+    auto temp = static_cast<glm::mat3>(*this) * static_cast<glm::vec3>(other);
+    return OE_Vec3(temp[0], temp[1], temp[2]);
+}
+
+OE_Mat4x4 OE_Mat4x4::operator * (const OE_Mat4x4& other){
+    auto temp = static_cast<glm::mat4>(*this) * static_cast<glm::mat4>(other);
+    return OE_Mat4x4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+OE_Quat OE_Quat::operator * (const OE_Quat& other){
+    auto temp = static_cast<glm::quat>(*this) * static_cast<glm::quat>(other);
+    return OE_Quat(temp);
+}
+
+
+// math library functions
+
+
+OE_Mat4x4 OE_Translate(OE_Mat4x4 mat4, OE_Vec3 vec3){
+    auto temp = glm::translate(static_cast<glm::mat4>(mat4), static_cast<glm::vec3>(vec3));
+    return OE_Mat4x4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+OE_Mat4x4 OE_Scale(OE_Mat4x4 mat4, OE_Vec3 vec3){
+    auto temp = glm::scale(static_cast<glm::mat4>(mat4), static_cast<glm::vec3>(vec3));
+    return OE_Mat4x4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+OE_Mat4x4 OE_Quat2Mat4x4(OE_Quat quat){
+    
+    auto temp = glm::toMat4(static_cast<glm::quat>(quat));
+    return OE_Mat4x4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+OE_Vec4 OE_Normalize(OE_Vec4 vec4){
+    auto temp = glm::normalize(static_cast<glm::vec4>(vec4));
+    return OE_Vec4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+OE_Quat OE_Normalize(OE_Quat quat){
+    auto temp = glm::normalize(static_cast<glm::quat>(quat));
+    return OE_Quat(temp);
+}
+
 std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4 matrix){
     vector<float> output; output.reserve(16);
     
-    float* mat = glm::value_ptr(matrix);
-    
     for (int i=0; i < 4; i++){
         for (int j=0; j<4; j++){
-            output.push_back(mat[4*i+j]);
+            output.push_back(matrix[i][j]);
         }
     }
     return output;

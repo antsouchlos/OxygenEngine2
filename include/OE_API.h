@@ -3,6 +3,7 @@
 
 #include <OE_TaskManager.h>
 #include <OE_API_Helpers.h>
+#include <OE_Math.h>
 
 /*enum OE_OS : int{
     OE_UNDEFINED=0,

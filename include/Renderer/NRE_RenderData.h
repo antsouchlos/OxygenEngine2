@@ -2,9 +2,8 @@
 #define NRE_RENDERDATA_H
 
 #include <types/OE_World.h>
-//#include "FE_GPU_API.h"
-#include <OE_Math.h>
 #include <Renderer/NRE_GPU_API.h>
+#include <OE_Math.h>
 
 struct NRE_BaseObject{
     bool changed{false};

@@ -132,5 +132,15 @@ int main(){
     //taskMgr.Start();
     oe::start();
     
+    
+    if (__cplusplus >= 202002L){
+        cout << "C++20" << endl;
+    }
+    else if (__cplusplus == 201703L){
+        cout << "C++17" << endl;
+    }
+    else {
+        cout << __cplusplus << endl;
+    }
     return 0;
 }

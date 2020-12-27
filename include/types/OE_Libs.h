@@ -11,7 +11,7 @@
 
 #include <SDL2/SDL.h>
 
-#else
+#elif defined(_WIN32)
 
 #define OE_PLATFORM_PC
 #define OE_PLATFORM_WINDOWS
@@ -20,8 +20,15 @@
 
 #include <SDL.h>
 
-#endif
+#else
 
+#define OE_PLATFORM_PC
+#define OE_PLATFORM_UNKNOWN
+#define OE_RENDERER_OPENGL
+
+#include <SDL2/SDL.h>
+
+#endif
 
 
 #include <cassert>
