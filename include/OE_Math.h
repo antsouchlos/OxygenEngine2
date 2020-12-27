@@ -31,16 +31,48 @@
 #define FE_EPSILON 0.000001f
 #define OE_EPSILON 0.000001f
 
-
 // This is done, so that in the event we want to change the math library
 // it will be easy
-typedef glm::vec4 OE_Vec4;
-typedef glm::vec3 OE_Vec3;
-typedef glm::mat4 OE_Mat4x4;
-typedef glm::mat3 OE_Mat3x3;
-typedef glm::quat OE_Quat;
 
-//class OE_Vec4 : public glm::vec4{};
+class OE_Vec4 : public glm::vec4{
+    
+    using glm::vec4::vec4;
+    
+};
+
+class OE_Vec3 : public glm::vec3{
+    
+    using glm::vec3::vec3;
+    
+};
+
+class OE_Mat4x4 : public glm::mat4{
+public:
+    using glm::mat4::mat4;
+    
+    OE_Mat4x4 operator * (const OE_Mat4x4&);
+    
+};
+
+class OE_Mat3x3: public glm::mat3{
+public:
+    
+    using glm::mat3::mat3;
+    
+    OE_Vec3 operator * (const OE_Vec3&);
+};
+
+class OE_Quat : public glm::quat{
+public: 
+    
+    using glm::quat::quat;
+    
+    OE_Quat(glm::quat);
+    
+    OE_Quat operator * (const OE_Quat&);
+};//*/
+
+
 
 #define OE_Pi2         glm::half_pi
 
@@ -48,17 +80,22 @@ typedef glm::quat OE_Quat;
 #define OE_Pow         glm::pow
 #define OE_Sqrt        glm::sqrt
 
-//#define OE_Perspective  glm::perspective
 #define OE_Rotate       glm::rotate
-#define OE_Scale        glm::scale
-#define OE_Normalize    glm::normalize
+//#define OE_Scale        glm::scale
+
 #define OE_Cross        glm::cross
 #define OE_Dot          glm::dot
-#define OE_Translate    glm::translate
+
 #define OE_Identity     glm::identity
 #define OE_Det          glm::determinant
 #define OE_Transpose    glm::transpose
-#define OE_Quat2Mat4x4  glm::toMat4
+
+OE_Mat4x4 OE_Translate(OE_Mat4x4, OE_Vec3);
+OE_Mat4x4 OE_Scale(OE_Mat4x4, OE_Vec3);
+
+OE_Mat4x4 OE_Quat2Mat4x4(OE_Quat);
+OE_Vec4 OE_Normalize(OE_Vec4);
+OE_Quat OE_Normalize(OE_Quat);
 
 #define OE_Mat2Euler       glm::eulerAngles
 #define OE_Slerp        glm::slerp
