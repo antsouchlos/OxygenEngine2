@@ -2,7 +2,6 @@
 #define NRE_GPU_API_H_INCLUDED
 
 #include <types/OE_TypesBase.h>
-#include <OE_Math.h>
 #include <Renderer/NRE_GPU_Shaders.h>
 
 /** platform-specific namespaces
