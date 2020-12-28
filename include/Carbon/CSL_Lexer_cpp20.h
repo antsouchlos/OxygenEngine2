@@ -5,16 +5,19 @@
 
 
 namespace csl {
-	class token_type_def {
+	using lexer_input_it = std::string_view::iterator;
+	using token_type_t = unsigned int;
+
+	class token_type_predef {
 		public:
-			static const unsigned int eoi				= 0;
-			static const unsigned int undef				= 1;
-			static const unsigned int skip				= 2;
+			static const token_type_t eoi	= 0;
+			static const token_type_t undef	= 1;
+			static const token_type_t skip	= 2;
 	};
 
 	template<typename T, typename U>
 	struct token_def {
-		std::size_t type = token_type_def::undef;
+		token_type_t type = token_type_predef::undef;
 
 		const T condition;
 		const U action;
@@ -25,18 +28,18 @@ namespace csl {
 	token_def(int, T, U) -> token_def<T, U>;
 
 	struct token {
-		std::size_t type = token_type_def::undef;
+		token_type_t type = token_type_predef::undef;
 		std::string_view content;
 	};
 
 
 	template<typename... T>
-	void for_each(std::size_t &type, std::string_view::iterator &it,
-					const std::string_view::iterator& end_it, T... cws);
+	inline void for_each(token_type_t &type, lexer_input_it &it,
+					const lexer_input_it& end_it, T... cws);
 
 	template<typename T, typename... U>
-	void for_each(std::size_t &type, std::string_view::iterator &it,
-						const std::string_view::iterator& end_it, T cw, U... cws) {
+	inline void for_each(token_type_t &type, lexer_input_it &it,
+						const lexer_input_it& end_it, T cw, U... cws) {
 		if (cw.condition(it, end_it)) {
 			type = cw.type;
 			it++;
@@ -47,8 +50,8 @@ namespace csl {
 	}
 
 	template<>
-	void for_each(std::size_t &type, std::string_view::iterator &it,
-									const std::string_view::iterator& end_it) {}
+	inline void for_each(token_type_t &type, lexer_input_it &it,
+									const lexer_input_it& end_it) {}
 
 
 	template<token_def... t_defs>
@@ -74,8 +77,8 @@ namespace csl {
 					iterator operator++(int)    { iterator tmp(*this); ++(*this); return tmp; };
 
 					bool operator==(const iterator& rhs) {
-						return  (this==&rhs) || ( (t_.type==token_type_def::eoi)
-												&& ((*rhs).type==token_type_def::eoi) );
+						return  (this==&rhs) || ( (t_.type==token_type_predef::eoi)
+												&& ((*rhs).type==token_type_predef::eoi) );
 					};
 					bool operator!=(const iterator& rhs) { return !((*this) == rhs); }
 
@@ -90,16 +93,16 @@ namespace csl {
 
 			token next_token() {
 				if (input_it_ == end_it_)
-					return {token_type_def::eoi, std::string_view(*&input_it_, 0)};
+					return {token_type_predef::eoi, std::string_view(*&input_it_, 0)};
 
-			    next_token_type_ = token_type_def::undef;
+			    next_token_type_ = token_type_predef::undef;
 
 			    auto temp = input_it_;
 			    for_each(next_token_type_, input_it_, end_it_, t_defs...);
 
-				if (next_token_type_ == token_type_def::undef) {
+				if (next_token_type_ == token_type_predef::undef) {
 					input_it_++;
-				} else if (next_token_type_ == token_type_def::skip) {
+				} else if (next_token_type_ == token_type_predef::skip) {
 					return next_token();
 				}
 					
@@ -112,14 +115,42 @@ namespace csl {
 			}
 
 			iterator end() {
-				return iterator({token_type_def::eoi, std::string_view(*&end_it_, 0)});
+				return iterator({token_type_predef::eoi, std::string_view(*&end_it_, 0)});
+			}
+
+			std::size_t get_line_num() const {
+				std::size_t result = 1;
+
+				auto it = input_.begin();
+				while(it != input_it_) {
+					if (*it == '\n')
+						result++;
+
+					it++;
+				}
+
+				return result;
+			}
+
+			std::size_t get_col_num() const {
+				std::size_t result = 1;
+
+				auto it = input_it_;
+
+				while( (*it != '\n') && (it != input_.begin()) ) {
+					result++;
+					it--;
+				}
+
+
+				return result;
 			}
 		private:
 			const std::string_view input_;
-			std::string_view::iterator input_it_;
-			const std::string_view::iterator end_it_;
+			lexer_input_it input_it_;
+			const lexer_input_it end_it_;
 
-			std::size_t next_token_type_ = token_type_def::undef;
+			token_type_t next_token_type_ = token_type_predef::undef;
 	};
 }
 
