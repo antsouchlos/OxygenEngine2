@@ -41,6 +41,9 @@ bool NRE_Renderer::init(){
 
 bool NRE_Renderer::updateSingleThread(){
     
+    // generate draw calls
+    this->generateDrawCalls();
+    
     // upload all remaining data to the GPU 
     this->updateMeshGPUData();
     this->updateMaterialGPUData();
@@ -184,6 +187,22 @@ void NRE_Renderer::setupBoundingBoxProgram(){
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Camera", 0);
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Mesh32", 1);
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+}
+
+void NRE_Renderer::generateDrawCalls(){
+    
+    for (auto mesh : this->meshes){
+        for (auto vgroup : mesh.second.vgroups){
+            auto render_data = NRE_RenderGroup();
+            render_data.camera = this->camera_id;
+            render_data.vgroup = vgroup;
+            render_data.mesh = mesh.first;
+            render_data.material = this->vgroups[vgroup].material_id;
+            if (!this->existsRenderGroup(render_data)){
+                this->render_groups.push_back(render_data);
+            }
+        }
+    }
 }
 
 
