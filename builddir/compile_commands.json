@@ -121,12 +121,6 @@
   },
   {
     "directory": "/home/andreas/git/OxyGenEngine2/builddir",
-    "command": "g++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++2a -O3 -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o -MF libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o.d -o libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o -c ../src/Carbon/CSL_Parser.cpp",
-    "file": "../src/Carbon/CSL_Parser.cpp",
-    "output": "libOxygenEngine.a.p/src_Carbon_CSL_Parser.cpp.o"
-  },
-  {
-    "directory": "/home/andreas/git/OxyGenEngine2/builddir",
     "command": "g++ -IlibOxygenEngine.a.p -I. -I.. -I../include -I/usr/include/SDL2 -fdiagnostics-color=always -pipe -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -Wnon-virtual-dtor -std=c++2a -O3 -fPIC -D_REENTRANT -MD -MQ libOxygenEngine.a.p/src_Carbon_CSL_Exceptions.cpp.o -MF libOxygenEngine.a.p/src_Carbon_CSL_Exceptions.cpp.o.d -o libOxygenEngine.a.p/src_Carbon_CSL_Exceptions.cpp.o -c ../src/Carbon/CSL_Exceptions.cpp",
     "file": "../src/Carbon/CSL_Exceptions.cpp",
     "output": "libOxygenEngine.a.p/src_Carbon_CSL_Exceptions.cpp.o"
