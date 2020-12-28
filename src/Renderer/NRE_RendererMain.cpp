@@ -14,6 +14,13 @@ bool NRE_Renderer::init(){
     
     
     // make sure there are no stored objects
+    /*cout << "NRE Cameras: " << this->cameras.size() << endl;
+    cout << "NRE Materials: " << this->materials.size() << endl;
+    cout << "NRE Meshes: " << this->meshes.size() << endl;
+    cout << "NRE Vgroups: " << this->vgroups.size() << endl;
+    cout << "NRE Draw calls: " << this->render_groups.size() << endl;*/
+    
+    
     this->cameras.clear();
     this->materials.clear();
     this->vgroups.clear();
