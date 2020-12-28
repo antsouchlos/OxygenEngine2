@@ -208,6 +208,12 @@ it's interface unchanged
 
 Changed user-facing API of OE to starting with ```oe::``` and using underscores instead of camelCase-like naming conventions + fixes in renderer.
 
+2020/12/28 - philsegeler
+
+Overhauled math library to be easily extensible. 
+Optimized Natrium Renderer by offloading all OpenGL buffer data calls into the ```updateSingleThread()``` method instead of ```updateData```. This would make synchronization between the renderer and the physics engine more performant.
+
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
