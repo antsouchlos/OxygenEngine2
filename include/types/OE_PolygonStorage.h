@@ -144,6 +144,9 @@ class OE_PolygonStorage32 {
     private:
         // This stuff is only of interest to the renderer
         // Those vectors should be cleared after first use by the renderer on loading the object
+        // both should be guarded by mutexes
+        OE_THREAD_SAFETY_OBJECT vbo_mutex;
+        OE_THREAD_SAFETY_OBJECT ibos_mutex;
         std::vector<float> vbo;
         std::unordered_map<std::size_t, OE_IndexBufferReady> ibos;
         
