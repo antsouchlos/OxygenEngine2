@@ -127,13 +127,13 @@ int main(){
     //oe::load_world("challenge_car.csl", &OnLoadObject, nullptr);
     //oe::load_world("monkeys.csl", &OnLoadObject, nullptr);
     //oe::load_world("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
-    //oe::load_world("OE_VerySImple.csl", &OnLoadObject, nullptr);
+    //oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
     oe::load_world("OE_Demo.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
     oe::start();
     
     
-    if (__cplusplus >= 202002L){
+    if (__cplusplus > 201703L){
         cout << "C++20" << endl;
     }
     else if (__cplusplus == 201703L){

@@ -25,3 +25,4 @@ builddir
 subprojects/SDL2-2.0.12/
 subprojects/packagecache/
 callgrind*
+massif.out*
