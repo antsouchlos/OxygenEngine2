@@ -6,22 +6,25 @@
 
 
 namespace csl {
-	class token_type_def {
+	using lexer_input_it = std::string_view::iterator;
+	using token_type_t = unsigned int;
+
+	class token_type_predef {
 		public:
-			static const unsigned int eoi	= 0;
-			static const unsigned int undef	= 1;
-			static const unsigned int skip	= 2;
+			static const token_type_t eoi	= 0;
+			static const token_type_t undef	= 1;
+			static const token_type_t skip	= 2;
 	};
 
 	struct token_def {
-		std::size_t type = token_type_def::undef;
+		token_type_t type = token_type_predef::undef;
 
-		bool (*condition)(std::string_view::iterator&, const std::string_view::iterator&);
-		void (*action)(std::string_view::iterator&, const std::string_view::iterator&);
+		bool (*condition)(lexer_input_it&, const lexer_input_it&);
+		void (*action)(lexer_input_it&, const lexer_input_it&);
 	};
 
 	struct token {
-		std::size_t type = token_type_def::undef;
+		token_type_t type = token_type_predef::undef;
 		std::string_view content;
 	};
 
@@ -49,8 +52,8 @@ namespace csl {
 					iterator operator++(int)    { iterator tmp(*this); ++(*this); return tmp; };
 
 					bool operator==(const iterator& rhs) {
-						return  (this==&rhs) || ( (t_.type==token_type_def::eoi)
-												&& ((*rhs).type==token_type_def::eoi) );
+						return  (this==&rhs) || ( (t_.type==token_type_predef::eoi)
+												&& ((*rhs).type==token_type_predef::eoi) );
 					};
 					bool operator!=(const iterator& rhs) { return !((*this) == rhs); }
 
@@ -66,9 +69,9 @@ namespace csl {
 
 			token next_token() {
 				if (input_it_ == end_it_)
-					return {token_type_def::eoi, std::string_view(*&input_it_, 0)};
+					return {token_type_predef::eoi, std::string_view(*&input_it_, 0)};
 
-			    next_token_type_ = token_type_def::undef;
+			    next_token_type_ = token_type_predef::undef;
 
 			    auto temp = input_it_;
 				for (auto t_def : t_defs_) {
@@ -82,9 +85,9 @@ namespace csl {
 					}
 				}
 
-				if (next_token_type_ == token_type_def::undef) {
+				if (next_token_type_ == token_type_predef::undef) {
 					input_it_++;
-				} else if (next_token_type_ == token_type_def::skip) {
+				} else if (next_token_type_ == token_type_predef::skip) {
 					return next_token();
 				}
 
@@ -96,14 +99,42 @@ namespace csl {
 			}
 
 			iterator end() {
-				return iterator({token_type_def::eoi, std::string_view(*&end_it_, 0)});
+				return iterator({token_type_predef::eoi, std::string_view(*&end_it_, 0)});
+			}
+			
+			std::size_t get_line_num() const {
+				std::size_t result = 1;
+
+				auto it = input_.begin();
+				while(it != input_it_) {
+					if (*it == '\n')
+						result++;
+
+					it++;
+				}
+
+				return result;
+			}
+
+			std::size_t get_col_num() const {
+				std::size_t result = 1;
+
+				auto it = input_it_;
+
+				while( (*it != '\n') && (it != input_.begin()) ) {
+					result++;
+					it--;
+				}
+
+
+				return result;
 			}
 		private:
 			const std::string_view input_;
-			std::string_view::iterator input_it_;
-			const std::string_view::iterator end_it_;
+			lexer_input_it input_it_;
+			const lexer_input_it end_it_;
 
-			std::size_t next_token_type_ = token_type_def::undef;
+			token_type_t next_token_type_ = token_type_predef::undef;
 
 			const std::array<token_def, sizeof...(T)> t_defs_;
 	};
