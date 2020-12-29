@@ -213,6 +213,9 @@ Changed user-facing API of OE to starting with ```oe::``` and using underscores 
 Overhauled math library to be easily extensible. 
 Optimized Natrium Renderer by offloading all OpenGL buffer data calls into the ```updateSingleThread()``` method instead of ```updateData```. This would make synchronization between the renderer and the physics engine more performant.
 
+2020/12/29 - philsegeler
+
+NRE: Fixed an OpenGL bug on Windows/Intel. Updated with TODO list for anything but renderer.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
@@ -261,6 +264,14 @@ In the future and in no particular order:
 - Physically-based-rendering(?!)
 - Tesselation (?!)
 - MacOS/iOS support
+
+## TODO list for philsegeler - Anything but renderer
+
+Now that it was decided that C++17 will be the minimum requirement:
+
+- Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.
+- Handle errors in the API properly.
+- Investigate possible optimizations in the Event handler
 
 
 ## TODO list for antsouchlos parser
