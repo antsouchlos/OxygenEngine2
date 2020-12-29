@@ -6,6 +6,8 @@
 #include <OE_Math.h>
 
 struct NRE_BaseObject{
+    
+    std::size_t     id{0};
     bool changed{false};
     bool has_init{false};
     std::vector<float> data;
@@ -13,22 +15,24 @@ struct NRE_BaseObject{
 
 struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
-    std::size_t     id{0};
+    
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
 };
 
 struct NRE_MaterialRenderData : public NRE_BaseObject{
-    std::size_t     id{0};
+
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
 };
 
 struct NRE_VGroupRenderData{
-    OE_Mat4x4       bone_mat;
+    
     std::size_t     id{0};
+    OE_Mat4x4       bone_mat;
+    
     std::size_t     ibo{0};
     std::size_t     material_id{0};
     std::size_t     mesh_id{0};
@@ -39,7 +43,6 @@ struct NRE_VGroupRenderData{
 
 struct NRE_MeshRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
-    std::size_t     id{0};
     
     unsigned int    uvmaps{0};
     unsigned int    bones{0};
@@ -74,7 +77,7 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
 
 struct NRE_LightRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
-    std::size_t     id{0};
+
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};

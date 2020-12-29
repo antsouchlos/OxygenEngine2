@@ -3,8 +3,8 @@
 using namespace std;
 
 CSL_Node::~CSL_Node(){
-    //for (auto& x: children)
-    //    delete x; //IS THIS CORRECT HERE? DO WE NEED TO DO THIS? MEMORY LEAK??????!!!!!
+    for (auto& x: children)
+        delete x; //IS THIS CORRECT HERE? DO WE NEED TO DO THIS? MEMORY LEAK??????!!!!!
 }
 
 
