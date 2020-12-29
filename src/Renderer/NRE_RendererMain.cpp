@@ -140,8 +140,9 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
         this->api->setupProgram(ren_group->program);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Camera", 0);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Mesh32", 1);
-        this->api->setProgramUniformSlot(ren_group->program, "OE_Material", 2);
-        
+        if (this->api->getProgramUniformSlot(ren_group->program, "OE_Material") != -2){
+            this->api->setProgramUniformSlot(ren_group->program, "OE_Material", 2);
+        }
     }
     
     this->api->setUniformState(this->meshes[ren_group->mesh].ubo, ren_group->program, 1, 0, 0);
