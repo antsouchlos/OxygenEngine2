@@ -194,7 +194,9 @@ void NRE_Renderer::setupBoundingBoxProgram(){
     this->api->setupProgram(this->prog_bbox);
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Camera", 0);
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Mesh32", 1);
-    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+    if (this->api->getProgramUniformSlot(this->prog_bbox, "OE_Material") != -2){
+        this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+    }
 }
 
 void NRE_Renderer::generateDrawCalls(){
