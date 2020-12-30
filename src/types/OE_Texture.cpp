@@ -18,6 +18,7 @@ OE_Texture::OE_Texture(){
 }
 
 
+// TODO: YOU HAVE TO BE FUCKING KIDDING ME M8. JUST REMOVE THE CONSTRUCTOR
 OE_Texture::OE_Texture(const string &name){
     
     this->source                    = 0;

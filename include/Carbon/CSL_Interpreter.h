@@ -12,17 +12,33 @@
 #include <string_view>
 
 
+// Philipp might kill me for this, but I really think it looks better,
+// so it's a chance I'm willing to take
+namespace oe {
+	using world		= OE_World;
+	using scene		= OE_Scene;
+	using camera	= OE_Camera;
+	using light		= OE_Light;
+	using mesh		= OE_Mesh32;
+	using vgroup	= OE_VertexGroup;
+	using texture	= OE_Texture;
+	using material	= OE_Material;
+	using tcm		= OE_TCM;
+	using vpconfig	= OE_ViewportConfig;
+}
+
+
 namespace csl {
-	using world_ptr		= std::shared_ptr<OE_World>;
-	using scene_ptr		= std::shared_ptr<OE_Scene>;
-	using camera_ptr	= std::shared_ptr<OE_Camera>;
-	using light_ptr		= std::shared_ptr<OE_Light>;
-	using mesh_ptr		= std::shared_ptr<OE_Mesh32>;
-	using vgroup_ptr	= std::shared_ptr<OE_VertexGroup>;
-	using texture_ptr	= std::shared_ptr<OE_Texture>;
-	using material_ptr	= std::shared_ptr<OE_Material>;
-	using tcm_ptr		= std::shared_ptr<OE_TCM>;
-	using vpconfig_ptr	= std::shared_ptr<OE_ViewportConfig>;
+	using world_ptr		= std::shared_ptr<oe::world>;
+	using scene_ptr		= std::shared_ptr<oe::scene>;
+	using camera_ptr	= std::shared_ptr<oe::camera>;
+	using light_ptr		= std::shared_ptr<oe::light>;
+	using mesh_ptr		= std::shared_ptr<oe::mesh>;
+	using vgroup_ptr	= std::shared_ptr<oe::vgroup>;
+	using texture_ptr	= std::shared_ptr<oe::texture>;
+	using material_ptr	= std::shared_ptr<oe::material>;
+	using tcm_ptr		= std::shared_ptr<oe::tcm>;
+	using vpconfig_ptr	= std::shared_ptr<oe::vpconfig>;
 
 
 	class Interpreter {
@@ -39,7 +55,7 @@ namespace csl {
 			OE_SharedIndexMap<OE_Object>         object_list_;
 			OE_SharedIndexMap<OE_Material>       material_lList_;
 			OE_SharedIndexMap<OE_Texture>        texture_list_;
-			OE_SharedIndexMap<OE_TCM>            tcms_list_;
+			OE_SharedIndexMap<OE_TCM>            tcm_list_;
 			OE_SharedIndexMap<OE_ViewportConfig> viewport_list_;
 
 			world_ptr		process_world(const csl::element&);

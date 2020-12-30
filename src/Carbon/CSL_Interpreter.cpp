@@ -1,19 +1,5 @@
 #include <Carbon/CSL_Interpreter.h>
 
-// Philipp might kill me for this, but I really think it looks better,
-// so it's a chance I'm willing to take
-namespace oe {
-	using world		= OE_World;
-	using scene		= OE_Scene;
-	using camera	= OE_Camera;
-	using light		= OE_Light;
-	using mesh		= OE_Mesh32;
-	using vgroup	= OE_VertexGroup;
-	using texture	= OE_Texture;
-	using material	= OE_Material;
-	using tcm		= OE_TCM;
-	using vpconfig	= OE_ViewportConfig;
-}
 
 namespace csl {
 	int Interpreter::sv_to_int(std::string_view sv) {
@@ -257,39 +243,99 @@ namespace csl {
 		// TODO: Set vgroup name
 		// result->name = vgroup_e.attributes.at("name");
 
-		result->visible = !!sv_to_int(vgroup_e.attributes.at("visible"));
-
-
-		// Single Assignments
-
-
-		// TODO: WHY?
-		result->bone_id = 0;
-
-		// TODO: Is this an id or a name? Change the identifier in the file accordingly
-		auto material_id = light_e.single_assignments.at("material_id");
-		// TODO: Dependency
-		// TODO: std::string
-		result->material_id = material_list_.name2id(std::string(material_id));
-
-
-		// List Assignments
-
-
-		for (const auto& p : vgroup_e.list_assignments.at("polygons")) {
-			vgroup.polygons.push_back(sv_to_int(p));
-		}
-	
+		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
+//		result->visible = !!sv_to_int(vgroup_e.attributes.at("visible"));
+//
+//
+//		// Single Assignments
+//
+//
+//		// TODO: WHY?
+//		result->bone_id = 0;
+//
+//		// TODO: Is this an id or a name? Change the identifier in the file accordingly
+//		auto material_id = vgroup_e.single_assignments.at("material_id");
+//		// TODO: Dependency
+//		// TODO: std::string
+//		result->material_id = material_list_.name2id(std::string(material_id));
+//
+//
+//		// List Assignments
+//
+//
+//		for (const auto& p : vgroup_e.list_assignments.at("polygons")) {
+//			result->polygons.push_back(sv_to_int(p));
+//		}
 	}
 
 	texture_ptr Interpreter::process_texture(const csl::element& texture_e) {
 		texture_ptr result = std::make_shared<oe::texture>();
 	
+
+		// Attributes
+
+
+		// TODO: Set vgroup name
+		// result->name = vgroup_e.attributes.at("name");
+		
+
+		// Single Assignments
+
+
+		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
+//		// TODO: std::string
+//		result->path = std::string(texture_e.attributes.at("path"));
+//		
+//		auto camera = texture_e.single_assignments.at("camera");
+//		// TODO: Dependency
+//		// TODO: std::string
+//		result->camera = object_list_.name2id(std::string(camera));
 	}
 
 	material_ptr Interpreter::process_material(const csl::element& material_e) {
 		material_ptr result = std::make_shared<oe::material>();
-	
+
+
+		// Attributes
+
+		
+		// TODO: Remove name from the csl format
+		
+
+		// Single Assignments
+
+
+		// TODO: FOR THE LOVE OF GOD AND ALL THAT IS HOLY, AT LEAST MAKE THE USE OF
+		// SINGLE- OR LIST ASSIGNMENTS UNIFORM. HOLY FUCK.
+		
+		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
+//		result->alpha			= sv_to_float(material_e.single_assignments.at("alpha"));
+//		result->dif_r			= sv_to_float(material_e.single_assignments.at("dif_r"));
+//		result->dif_g			= sv_to_float(material_e.single_assignments.at("dif_g"));
+//		result->dif_b			= sv_to_float(material_e.single_assignments.at("dif_b"));
+//		result->dif_a			= sv_to_float(material_e.single_assignments.at("dif_a"));
+//		result->scol_r			= sv_to_float(material_e.single_assignments.at("scol_r"));
+//		result->scol_g			= sv_to_float(material_e.single_assignments.at("scol_g"));
+//		result->scol_b			= sv_to_float(material_e.single_assignments.at("scol_b"));
+//		result->illuminosity	= sv_to_float(material_e.single_assignments.at("illuminosity"));
+//		
+//		result->translucency
+//							= sv_to_float(material_e.single_assignments.at("translucency"));
+//		result->specular_intensity
+//							= sv_to_float(material_e.single_assignments.at("specular_intensity"));
+//		result->specular_hardness
+//							= sv_to_float(material_e.single_assignments.at("specular_hardness"));
+//
+//
+//		// List Assignments
+//
+//
+//		// TODO: Make naming uniform (textureCM_IDs -> tcms)
+//		for (const auto& t : material_e.list_assignments.at("textureCM_IDs")) {
+//			// TODO: Dependency
+//			// TODO: std::string
+//			result->textureCM_IDs.push_back(tcm_list_.name2id[std::string(t)]);
+//		}
 	}
 
 	tcm_ptr Interpreter::process_tcm(const csl::element& tcm_e) {
