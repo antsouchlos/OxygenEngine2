@@ -324,14 +324,38 @@ namespace csl {
 			const std::size_t col_num_;
 	};
 
-	class semantic_error : parser_error{
+	// TODO: Put this in a more logical place
+	class interpreter_error {
+		public:
+			virtual std::string what() const throw() = 0;
+			virtual ~interpreter_error() = default;
+	};
+
+	class unset_object_error : interpreter_error {
+		public:
+			unset_object_error(std::string_view object) : object_(object) {}
+
+			std::string what() const throw() {
+				std::stringstream result_ss;
+
+				result_ss << "Object \"" << object_ << "\" is not contained in the";
+				result_ss << " syntax tree obtained by the parser";
+
+				return result_ss.str();
+			}
+		private:
+			std::string_view object_;
+	};
+	
+	// TODO: Somehow show line and col nmber 
+	class semantic_error : parser_error, interpreter_error {
 		public:
 			semantic_error(const char* msg) : msg_(msg){}
 			std::string what() const throw() { return msg_; }
 		private:
 			const char* msg_;
 	};
-
+	
 
 	/*
 	 *
@@ -341,8 +365,27 @@ namespace csl {
 	 *
 	 */
 
-	template<class T>
-	using parser_map_t = std::map<std::string_view, T>;
+	template<typename T, typename U>
+	class csl_map {
+		public:
+			U& operator[](const T& t) {
+				return map_[t];
+			}
+
+			const U& at(const T& t) const {
+				try {
+					return map_.at(t);
+				} catch(std::out_of_range& e) {
+					throw unset_object_error(t);
+				}
+			}
+		private:
+			std::map<T, U> map_;
+	};
+
+
+	template<typename T>
+	using parser_map_t = csl_map<std::string_view, T>;
 
 	using single_assignment_t = std::string_view;
 	using list_assignment_t = std::vector<std::string_view>;
@@ -350,7 +393,7 @@ namespace csl {
 	using generic_assignment_t = std::variant<single_assignment_t, list_assignment_t>;
 
 	struct element {
-		parser_map_t<element> elements;
+		parser_map_t<std::vector<element>> elements;
 
 		parser_map_t<single_assignment_t> attributes;
 
@@ -444,7 +487,7 @@ namespace csl {
 					} else if (has_type(token_type::lt)) {
 						token_it_++;
 						std::string_view sub_el_name = token_it_->content;
-						result.elements[sub_el_name] = parse_element();
+						result.elements[sub_el_name].push_back(parse_element());
 					} else {
 						break;
 					}
@@ -471,6 +514,7 @@ namespace csl {
 				return result;
 			}
 
+			// TODO: Get rid of RTTI use
 			generic_assignment_t parse_assignment() {
 				// TODO: Check where to put this in order to get more performance
 				expect_token(token_type::integer, token_type::floating_point,
