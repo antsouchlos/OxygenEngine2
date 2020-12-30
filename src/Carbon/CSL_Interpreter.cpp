@@ -48,7 +48,6 @@ namespace csl {
 
 		for (const auto& scene_e : world_e.elements.at("Scene")) {
 			scene_ptr scene = process_scene(scene_e);
-			// TODO: Why not just load the whole scene here? Why only add the id to world?
 			result->scenes.insert(scene->id);
 		}
 
@@ -66,7 +65,7 @@ namespace csl {
   		auto loaded_viewport = world_e.single_assignments.at("loaded_viewport");
 		auto loaded_scene = world_e.single_assignments.at("loaded_scene");
 
-		// TODO: Make this use std::string_view
+		// TODO: Dependency
 		result->loaded_viewport = viewport_list_.name2id[std::string(loaded_viewport)];
 		result->loaded_scene = scene_list_.name2id[std::string(loaded_scene)];
 
@@ -82,6 +81,7 @@ namespace csl {
 		
 
 		// TODO: Is it smart to make this use string_view? Maybe a const char* would be better
+		// TODO: Actually set the name of the scene
 		scene_list_.append(std::string(scene_e.attributes.at("name")), result);
 
 
@@ -133,11 +133,13 @@ namespace csl {
 		
 
 		// TODO: Is it smart to make this use string_view? Maybe a const char* would be better
+		// TODO: Actually set the name of the camera
 		object_list_.append(std::string(camera_e.attributes.at("name")), result);
 
 		result->visible = !!sv_to_int(camera_e.attributes.at("visible"));
 
-		// Assignments
+
+		// Single Assignments
 		
 
 		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
@@ -147,6 +149,7 @@ namespace csl {
 //		result->far				= sv_to_float(camera_e.single_assignments.at("far"));	
 //		// TODO: Make this use std::string_view
 //		auto parent = camera_e.single_assignments.at("parent");
+//		// TODO: Dependency
 //		result->parent			= object_list_.name2id(std::string(parent));
 //		// TODO: This waw wrong in the previous interpreter
 //		result->parent_type		= sv_to_int(camera_e.single_assignments.at("parent_type"));	
@@ -155,8 +158,7 @@ namespace csl {
 		// List Assignments
 
 
-		// TODO: In order to make functions more uniform, change this and split it into
-		// single assignments
+		// TODO: Make functions more readable: make a function for current_state
 		auto cs_v = camera_e.list_assignments.at("current_state");
 		if (cs_v.size() != 10)
 			throw semantic_error("The current_state member variable must have exactly"
@@ -177,6 +179,67 @@ namespace csl {
 	light_ptr Interpreter::process_light(const csl::element& light_e) {
 		light_ptr result = std::make_shared<oe::light>();
 
+
+		// Attributes
+
+
+		// TODO: Is it smart to make this use string_view? Maybe a const char* would be better
+		// TODO: Actually set the name of the light
+		object_list_.append(std::string(light_e.attributes.at("name")), result);
+
+		result->visible = !!sv_to_int(light_e.attributes.at("visible"));
+
+
+		// Single Assignments
+
+
+		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
+//		result->light_type		= sv_to_int(light_e.single_assignments.at("light_type"));
+//		result->range			= sv_to_float(light_e.single_assignments.at("range"));
+//		result->intensity		= sv_to_float(light_e.single_assignments.at("intensity"));
+//		result->fov				= sv_to_float(light_e.single_assignments.at("fov"));
+//
+//		auto parent = light_e.single_assignments.at("parent");
+//		// TODO: Dependency
+//		result->parent			= object_list_.name2id(std::string(parent));
+//		result->parent_type		= sv_to_int(light_e.single_assignments.at("parent_type"));	
+
+
+		// List Assignments
+
+
+		auto cs_v = light_e.list_assignments.at("current_state");
+		if (cs_v.size() != 10)
+			throw semantic_error("The current_state member variable must have exactly"
+								 "10 elements");
+		
+		// TODO: Make functions more readable: make a function for current_state
+		result->current_state.pos_x = sv_to_float(cs_v[0]);
+		result->current_state.pos_y = sv_to_float(cs_v[1]);
+		result->current_state.pos_z = sv_to_float(cs_v[2]);
+		result->current_state.rot_w = sv_to_float(cs_v[3]);
+		result->current_state.rot_x = sv_to_float(cs_v[4]);
+		result->current_state.rot_y = sv_to_float(cs_v[5]);
+		result->current_state.rot_z = sv_to_float(cs_v[6]);
+		result->current_state.sca_x = sv_to_float(cs_v[7]);
+		result->current_state.sca_y = sv_to_float(cs_v[8]);
+		result->current_state.sca_z = sv_to_float(cs_v[9]);
+
+		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
+//		auto color_v = light_e.list_assignments.at("color");
+//		if (color_v.size() != 3)
+//			throw semantic_error("The color member variable must have exactly 3 elements");
+//
+//		result->color.r = sv_to_float(color_v[0]);
+//		result->color.g = sv_to_float(color_v[1]);
+//		result->color.b = sv_to_float(color_v[2]);
+//
+//		for (const auto& o : light_e.list_assignments.at("objects")) {
+//			// TODO: Is emplace_back an option?
+//			// TODO: Dependency
+//			// TODO: Make this not use std::string
+//			result->objects.push_back(object_list_.name2id[std::string(o)]);
+//		}
 	}
 
 	mesh_ptr Interpreter::process_mesh(const csl::element& mesh_e) {
