@@ -25,7 +25,8 @@ namespace csl {
 	}
 
 
-	world_ptr Interpreter::process_world(const csl::element& world_e) {
+
+	world_ptr Interpreter::process_world(const element& world_e) {
 		world_ptr result = std::make_shared<oe::world>();
 
 
@@ -59,7 +60,9 @@ namespace csl {
 		return result;
 	}
 
-	scene_ptr Interpreter::process_scene(const csl::element& scene_e) {
+
+
+	scene_ptr Interpreter::process_scene(const element& scene_e) {
 		scene_ptr result = std::make_shared<oe::scene>();
 
 		
@@ -110,7 +113,9 @@ namespace csl {
 		return result;	
 	}
 
-	camera_ptr Interpreter::process_camera(const csl::element& camera_e) {
+
+
+	camera_ptr Interpreter::process_camera(const element& camera_e) {
 		camera_ptr result = std::make_shared<oe::camera>();
 
 
@@ -158,8 +163,10 @@ namespace csl {
 		result->current_state.sca_y = sv_to_float(cs_v[8]);
 		result->current_state.sca_z = sv_to_float(cs_v[9]);
 	}
+	
 
-	light_ptr Interpreter::process_light(const csl::element& light_e) {
+
+	light_ptr Interpreter::process_light(const element& light_e) {
 		light_ptr result = std::make_shared<oe::light>();
 
 
@@ -223,12 +230,16 @@ namespace csl {
 		}
 	}
 
-	mesh_ptr Interpreter::process_mesh(const csl::element& mesh_e) {
+
+
+	mesh_ptr Interpreter::process_mesh(const element& mesh_e) {
 		mesh_ptr result = std::make_shared<oe::mesh>();
 	
 	}
 
-	vgroup_ptr Interpreter::process_vgroup(const csl::element& vgroup_e) {
+
+
+	vgroup_ptr Interpreter::process_vgroup(const element& vgroup_e) {
 		vgroup_ptr result = nullptr;
 
 
@@ -263,16 +274,11 @@ namespace csl {
 		}
 	}
 
-	texture_ptr Interpreter::process_texture(const csl::element& texture_e) {
+
+
+	texture_ptr Interpreter::process_texture(const element& texture_e) {
 		texture_ptr result = std::make_shared<oe::texture>();
 	
-
-		// Attributes
-
-
-		// TODO: Set vgroup name
-		// result->name = vgroup_e.attributes.at("name");
-		
 
 		// Single Assignments
 
@@ -286,7 +292,9 @@ namespace csl {
 		result->camera = object_list_.name2id(std::string(camera));
 	}
 
-	material_ptr Interpreter::process_material(const csl::element& material_e) {
+
+
+	material_ptr Interpreter::process_material(const element& material_e) {
 		material_ptr result = std::make_shared<oe::material>();
 
 
@@ -331,12 +339,38 @@ namespace csl {
 		}
 	}
 
-	tcm_ptr Interpreter::process_tcm(const csl::element& tcm_e) {
+
+
+	tcm_ptr Interpreter::process_tcm(const element& tcm_e) {
 		tcm_ptr result = std::make_shared<oe::tcm>();
+
+
+		// Single Assignments
+
+
+		// TODO: Make the code uniform: Either put every rgba thiny inside a list-assignment
+		// or not
+		result->r				= sv_to_float(tcm_e.single_assignments.at("r"));
+		result->g				= sv_to_float(tcm_e.single_assignments.at("g"));
+		result->b				= sv_to_float(tcm_e.single_assignments.at("b"));
+		result->a				= sv_to_float(tcm_e.single_assignments.at("a"));
+		result->combine_mode	= sv_to_int(tcm_e.single_assignments.at("combine_mode"));
+		result->texture_array	= !!sv_to_int(tcm_e.single_assignments.at("texture_array"));
+
+
+		// Child Elements
+		
+
+		for (const auto& tcm_texture_e : tcm_e.elements.at("TCM_Texture")) {
+			// TODO: Is emplace_back an option?
+			result->textures.push_back(process_tcm_texture(tcm_texture_e));
+		}
 	
 	}
 
-	vpconfig_ptr Interpreter::process_vpconfig(const csl::element& vpconfig_e) {
+
+
+	vpconfig_ptr Interpreter::process_vpconfig(const element& vpconfig_e) {
 		vpconfig_ptr result = std::make_shared<oe::vpconfig>();
 
 
@@ -360,5 +394,56 @@ namespace csl {
 			// TODO: std::string
 			result->cameras.push_back(object_list_.name2id[std::string(c)]);
 		}	
+	}
+
+
+
+	oe::tcm_texture Interpreter::process_tcm_texture(const element& tcm_texture_e) {
+		oe::tcm_texture result;
+
+
+		// Single Assignments
+
+
+		result.mode			= sv_to_int(tcm_texture_e.single_assignments.at("mode"));
+		result.uvmap		= sv_to_int(tcm_texture_e.single_assignments.at("uvmap"));
+		
+		// TODO: Uniform naming convention
+		result.textureMulFactor
+							= sv_to_int(tcm_texture_e.single_assignments.at("textureMulFactor"));
+		
+		// TODO: Uniform naming convention
+		auto texture_id		= tcm_texture_e.single_assignments.at("textureID");
+		// TODO: Dependency
+		// TODO: std::string
+		result.textureID	= texture_list_.name2id(std::string(texture_id));
+
+
+		return result;
+	}
+
+
+
+	oe::uvmap_data Interpreter::process_uvmap_data(const element& uvmap_data_e) {
+		oe::uvmap_data result;
+
+
+		// Single Assignments
+
+
+		// TODO: Make this an attribute
+		std::size_t num_of_uvs = sv_to_int(uvmap_data_e.single_assignments.at("num_of_uvs"));
+		result.elements.reserve(num_of_uvs);
+
+
+		// List Assignments
+
+
+		for (const auto& e : uvmap_data_e.list_assignments.at("elements")) {
+			result.elements.push_back(sv_to_float(e));
+		}
+
+
+		return result;
 	}
 }
