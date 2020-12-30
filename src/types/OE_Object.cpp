@@ -19,20 +19,6 @@ OE_Object::OE_Object(){
     this->id                        = ++OE_Object::current_id;
 }
 
-
-OE_Object::OE_Object(const string &name){
-    
-    this->parent                    = 0;
-    this->parent_type               = 0;
-    this->visible                   = true;
-    
-    this->id                        = ++OE_Object::current_id;
-}
-
-OE_Object::~OE_Object(){
-
-}  
-
 string OE_Object::to_str() const{
     return "NOTHING";
 }

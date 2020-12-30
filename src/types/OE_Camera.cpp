@@ -12,13 +12,6 @@ OE_Camera::OE_Camera(){
     
 }
 
-OE_Camera::OE_Camera(const string& name) : OE_Object(name){
-    this->near = 0.1f;
-    this->far = 10000.0f;
-    this->fov = 0.0f;
-    this->aspect_ratio = 16.0f/9.0f;
-}
-
 OE_Camera::~OE_Camera(){
     
 }

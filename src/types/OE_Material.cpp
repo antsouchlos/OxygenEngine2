@@ -12,16 +12,6 @@ OE_Material::OE_Material(){
     this->id                        = ++OE_Material::current_id;
 }
 
-
-OE_Material::OE_Material(const string &name){
-
-    this->id                        = ++OE_Material::current_id;
-}
-
-OE_Material::~OE_Material(){
-
-}  
-
 std::vector<float> OE_Material::GetRendererData(){
     
     vector<float> output;

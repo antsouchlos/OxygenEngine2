@@ -16,6 +16,7 @@ OE_VertexGroup::OE_VertexGroup(){
     this->visible       = true;
     
     this->id            = ++OE_VertexGroup::current_id;
+	// TODO: Why even have a constructor without a name argument if the name is necessary?
     OE_VertexGroup::id2name[this->id] = "noname_"+ to_string(this->id);
 }
 

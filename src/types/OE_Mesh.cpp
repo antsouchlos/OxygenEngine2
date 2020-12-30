@@ -9,15 +9,6 @@ OE_Mesh32::OE_Mesh32(){
     
 }
 
-OE_Mesh32::OE_Mesh32(const string& name) : OE_Object(name){
-    
-    this->physics_data     = nullptr;
-}
-
-OE_Mesh32::~OE_Mesh32(){
-    
-}
-
 // This takes into account rotation as well
 
 void OE_Mesh32::calculateProperBoundingBox(){

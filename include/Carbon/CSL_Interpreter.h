@@ -53,7 +53,7 @@ namespace csl {
 		private:
 			OE_SharedIndexMap<OE_Scene>          scene_list_;
 			OE_SharedIndexMap<OE_Object>         object_list_;
-			OE_SharedIndexMap<OE_Material>       material_lList_;
+			OE_SharedIndexMap<OE_Material>       material_list_;
 			OE_SharedIndexMap<OE_Texture>        texture_list_;
 			OE_SharedIndexMap<OE_TCM>            tcm_list_;
 			OE_SharedIndexMap<OE_ViewportConfig> viewport_list_;

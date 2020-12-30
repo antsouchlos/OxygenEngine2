@@ -10,12 +10,6 @@ OE_Scene::OE_Scene(){
     this->id                        = ++OE_Scene::current_id;
 }
 
-
-OE_Scene::OE_Scene(const string &name){
-
-    this->id                        = ++OE_Scene::current_id;
-}
-
 OE_Scene::~OE_Scene(){
     for (auto object : this->objects){
         OE_World::objectsList.remove(object);
