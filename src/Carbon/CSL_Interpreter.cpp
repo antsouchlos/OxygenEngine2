@@ -249,6 +249,36 @@ namespace csl {
 
 	vgroup_ptr Interpreter::process_vgroup(const csl::element& vgroup_e) {
 		vgroup_ptr result = std::make_shared<oe::vgroup>();
+
+
+		// Attributes
+
+
+		// TODO: Set vgroup name
+		// result->name = vgroup_e.attributes.at("name");
+
+		result->visible = !!sv_to_int(vgroup_e.attributes.at("visible"));
+
+
+		// Single Assignments
+
+
+		// TODO: WHY?
+		result->bone_id = 0;
+
+		// TODO: Is this an id or a name? Change the identifier in the file accordingly
+		auto material_id = light_e.single_assignments.at("material_id");
+		// TODO: Dependency
+		// TODO: std::string
+		result->material_id = material_list_.name2id(std::string(material_id));
+
+
+		// List Assignments
+
+
+		for (const auto& p : vgroup_e.list_assignments.at("polygons")) {
+			vgroup.polygons.push_back(sv_to_int(p));
+		}
 	
 	}
 
