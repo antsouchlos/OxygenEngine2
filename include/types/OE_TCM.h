@@ -23,19 +23,17 @@ class OE_TCM_Texture: public CSL_WriterBase{
 
 class OE_TCM : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     
-    friend class CSL_Interpreter;
+//    friend class CSL_Interpreter;
     
     public:
         static std::atomic<std::size_t> current_id;
         std::size_t id;
         
         OE_TCM();
-        OE_TCM(const std::string&);
-        ~OE_TCM();
         
         std::string to_str() const;
         
-    protected:
+//    protected:
         std::vector<OE_TCM_Texture>    textures;
         
         int         combine_mode;
