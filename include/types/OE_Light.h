@@ -16,17 +16,16 @@ struct OE_RGBColor{
 
 class OE_Light : public OE_Object{
     
-    friend class CSL_Interpreter;
+//    friend class Interpreter;
     
     public:
         OE_Light();
-        OE_Light(const std::string&);
         ~OE_Light();
         
         std::string getType() const;
         std::string to_str() const;
         
-    protected:
+//    protected:
         std::size_t                 light_type;
         std::vector<std::size_t>    objects;
         OE_RGBColor                 color;

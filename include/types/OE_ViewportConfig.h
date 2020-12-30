@@ -9,7 +9,7 @@
 
 class OE_ViewportConfig : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     
-    friend class CSL_Interpreter;
+//    friend class CSL_Interpreter;
     
     public:
         static std::atomic<std::size_t> current_id;
@@ -17,13 +17,10 @@ class OE_ViewportConfig : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         
         OE_ViewportConfig();
-        OE_ViewportConfig(const std::string&);
-        
-        ~OE_ViewportConfig();
         
         std::string to_str() const;
         
-    protected:
+//    protected:
         // for each camera
         std::vector<int>            layers;
         std::vector<std::size_t>    cameras;

@@ -15,8 +15,6 @@ class OE_Mesh32 : public OE_Object{
     public:
     
         OE_Mesh32();
-        OE_Mesh32(const std::string&);
-        ~OE_Mesh32();
         
         // This takes into account rotation as well
         void calculateProperBoundingBox();
