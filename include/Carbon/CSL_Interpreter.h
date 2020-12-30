@@ -6,6 +6,54 @@
 #include <Carbon/CSL_Exceptions.h>
 #include <Carbon/CSL_Parser.h>
 
+#include <charconv>
+#include <memory>
+#include <string>
+#include <string_view>
+
+
+namespace csl {
+	using world_ptr		= std::shared_ptr<OE_World>;
+	using scene_ptr		= std::shared_ptr<OE_Scene>;
+	using camera_ptr	= std::shared_ptr<OE_Camera>;
+	using light_ptr		= std::shared_ptr<OE_Light>;
+	using mesh_ptr		= std::shared_ptr<OE_Mesh32>;
+	using vgroup_ptr	= std::shared_ptr<OE_VertexGroup>;
+	using texture_ptr	= std::shared_ptr<OE_Texture>;
+	using material_ptr	= std::shared_ptr<OE_Material>;
+	using tcm_ptr		= std::shared_ptr<OE_TCM>;
+	using vpconfig_ptr	= std::shared_ptr<OE_ViewportConfig>;
+
+
+	class Interpreter {
+		public:
+			static int		sv_to_int(std::string_view sv);
+			static float	sv_to_float(std::string_view sv);
+
+
+			std::shared_ptr<OE_World> interpret(std::string& input);
+			std::shared_ptr<OE_World> interpret_file(std::string& path_to_file);
+
+		private:
+			OE_SharedIndexMap<OE_Scene>          scene_list_;
+			OE_SharedIndexMap<OE_Object>         object_list_;
+			OE_SharedIndexMap<OE_Material>       material_lList_;
+			OE_SharedIndexMap<OE_Texture>        texture_list_;
+			OE_SharedIndexMap<OE_TCM>            tcms_list_;
+			OE_SharedIndexMap<OE_ViewportConfig> viewport_list_;
+
+			world_ptr		process_world(const csl::element&);
+			scene_ptr		process_scene(const csl::element&);
+			camera_ptr		process_camera(const csl::element&);
+			light_ptr		process_light(const csl::element&);
+			mesh_ptr		process_mesh(const csl::element&);
+			vgroup_ptr		process_vgroup(const csl::element&);
+			texture_ptr		process_texture(const csl::element&);
+			material_ptr	process_material(const csl::element&);
+			tcm_ptr			process_tcm(const csl::element&);
+			vpconfig_ptr	process_vpconfig(const csl::element&);
+	};
+}
 
 //// This is a helper function for the interpreter
 //void OE_ReverseBitset(std::bitset<64>&);
