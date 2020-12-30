@@ -3,14 +3,15 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-
-#include <unistd.h>
+#include <array>
+#include <vector>
+#include <memory>
 
 #define CPP20
 
 #include <Carbon/CSL_Parser.h>
 
-
+/*
 unsigned int indentation = 0;
 
 std::string get_whitespace() {
@@ -73,27 +74,29 @@ void print_element(std::string_view name, csl::element el) {
 
 	std::cout << get_whitespace() << "</" << name << '>';
 }
-
+*/
 
 int main(){
-/*	std::string input = "";
-	std::ifstream f("csl_very_large_object_test.csl");
+	csl::csl_map<std::string, int> m;
 
-	std::string line;
-	while(getline(f, line))
-		input += line + '\n';
-
-	f.close();
+	m["a"] = 4;
+	m["b"] = 5;
+	m["c"] = 6;
+	m["d"] = 7;
 
 	try {
-		csl::element e = csl::parse(input);
-
-	} catch (csl::unexpected_symbol_error& e) {
-		std::cout << "csl::unexpected_symbol_error:\n\t" << e.what() << std::endl;
-	}*/
-
-
-
+		std::cout << m.at("d") << std::endl;
+		std::cout << m.at("e") << std::endl;
+	} catch (csl::unset_object_error& e) {
+		std::cout << e.what() << std::endl;
+	}
 
 	return 0;
 }
+
+
+
+
+
+
+
