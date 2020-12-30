@@ -345,6 +345,28 @@ namespace csl {
 
 	vpconfig_ptr Interpreter::process_vpconfig(const csl::element& vpconfig_e) {
 		vpconfig_ptr result = std::make_shared<oe::vpconfig>();
-	
+
+
+		// List Assignments
+
+
+		// TODO: WHY TF ARE ALL OF THESE PROTECTED AND NOT PUBLIC M8?
+//		for (const auto& s : vpconfig_e.list_assignments.at("split_screen_positions")) {
+//			result->split_screen_positions.push_back(sv_to_float(s));
+//		}
+//
+//		for (const auto& c : vpconfig_e.list_assignments.at("camera_modes")) {
+//			result->camera_modes.push_back(sv_to_int(c));
+//		}
+//		
+//		for (const auto& l : vpconfig_e.list_assignments.at("layer_combine_modes")) {
+//			result->layer_combine_modes.push_back(sv_to_int(l));
+//		}
+//		
+//		for (const auto& c : vpconfig_e.list_assignments.at("cameras")) {
+//			// TODO: Dependency
+//			// TODO: std::string
+//			result->cameras.push_back(object_list_.name2id[std::string(c)]);
+//		}	
 	}
 }
