@@ -256,12 +256,13 @@ namespace csl {
 		result->color.g = sv_to_float(color_v[1]);
 		result->color.b = sv_to_float(color_v[2]);
 
-		for (const auto& o : light_e.list_assignments.at("objects")) {
-			// TODO: Is emplace_back an option?
-			// TODO: Dependency
-			// TODO: Make this not use std::string
-			result->objects.push_back(object_list_.name2id[std::string(o)]);
-		}
+		// TODO: Apparently this member variable is not in use yet
+//		for (const auto& o : light_e.list_assignments.at("objects")) {
+//			// TODO: Is emplace_back an option?
+//			// TODO: Dependency
+//			// TODO: Make this not use std::string
+//			result->objects.push_back(object_list_.name2id[std::string(o)]);
+//		}
 
 
 		return result;
