@@ -49,9 +49,7 @@ namespace csl {
 	using camera_ptr		= std::shared_ptr<oe::camera>;
 	using light_ptr			= std::shared_ptr<oe::light>;
 	using mesh_ptr			= std::shared_ptr<oe::mesh>;
-	// TODO: Smart pointers
-	//using vgroup_ptr		= std::shared_ptr<oe::vgroup>;
-	using vgroup_ptr		= oe::vgroup*;
+	using vgroup_ptr		= std::shared_ptr<oe::vgroup>;
 	using texture_ptr		= std::shared_ptr<oe::texture>;
 	using material_ptr		= std::shared_ptr<oe::material>;
 	using tcm_ptr			= std::shared_ptr<oe::tcm>;

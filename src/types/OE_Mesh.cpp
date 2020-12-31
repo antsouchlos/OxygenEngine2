@@ -7,7 +7,7 @@ using namespace std;
 OE_Mesh32::OE_Mesh32(){
     
    this->physics_data     = nullptr;
-    
+   this->data = std::make_shared<OE_PolygonStorage32>();
 }
 
 OE_Mesh32::OE_Mesh32(const string& name) : OE_Object(name){
