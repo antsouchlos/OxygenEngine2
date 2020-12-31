@@ -12,10 +12,14 @@
 #include <string_view>
 
 
+// TODO: Don't do that.
+// This is a helper function for the interpreter
+void OE_ReverseBitset(std::bitset<64>&);
+
+
 // TODO: Make use of RAII in every type class
 // TODO: Everywhere, where num_of* is used, instead just call *.elements.at("*").size(). No extra
 // 		 variable is necessary
-
 
 // Philipp might kill me for this, but I really think it looks better,
 // so it's a chance I'm willing to take

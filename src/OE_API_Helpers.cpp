@@ -10,7 +10,7 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
     string filename = *static_cast<string*>(file);
     delete static_cast<string*>(file);
     
-    CSL_Interpreter interpreter;
+/*    CSL_Interpreter interpreter;
     shared_ptr<OE_World> loaded_world = interpreter.interpretFile(filename);
     
     OE_Main->lockMutex();
@@ -22,7 +22,7 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
     OE_World::scenesList.extend(interpreter.scenesList, true);
     OE_Main->pending_world = loaded_world;
     OE_Main->unlockMutex();
-    oe::broadcast_event("loaded-" + filename, nullptr);
+    oe::broadcast_event("loaded-" + filename, nullptr);*/
     return 0;
 }
 
