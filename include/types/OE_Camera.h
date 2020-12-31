@@ -19,7 +19,7 @@ class OE_Camera : public OE_Object {
         std::string getType() const;
         std::string to_str() const;
         
-    protected:
+//    protected:
         float aspect_ratio;
         float fov;
 

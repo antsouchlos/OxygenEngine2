@@ -35,7 +35,7 @@ class OE_TCM : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         std::string to_str() const;
         
-    protected:
+//    protected:
         std::vector<OE_TCM_Texture>    textures;
         
         int         combine_mode;

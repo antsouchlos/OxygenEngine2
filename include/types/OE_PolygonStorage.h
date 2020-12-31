@@ -74,7 +74,7 @@ class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         
         std::string to_str(const std::size_t&) const;
     
-    protected:
+//    protected:
         uint32_t*   v1{nullptr};
         uint32_t*   v2{nullptr};
         uint32_t*   v3{nullptr};
@@ -127,7 +127,7 @@ class OE_PolygonStorage32 {
         
         bool changed{false};
         
-    protected:
+//    protected:
         
         // Internal but IMPORTANT stuff
         // This is the glue between the physics engine and the renderer
