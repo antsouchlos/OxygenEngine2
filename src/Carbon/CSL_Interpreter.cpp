@@ -37,7 +37,6 @@ namespace csl {
 	}
 
 
-
 	world_ptr Interpreter::process_world(const element& world_e) {
 		world_ptr result = std::make_shared<oe::world>();
 
