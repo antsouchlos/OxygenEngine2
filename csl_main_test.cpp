@@ -4,6 +4,17 @@ using namespace std;
 using namespace oe;
 
 int main() {
+	csl::Interpreter interpreter;
+	std::string filename = "challenge_car.csl";
+
+	try {
+		auto w = interpreter.interpret_file(filename);
+	} catch(csl::unset_object_error& e) {
+		std::cout << "csl::unset_object_error:\n" << '\t' << e.what() << std::endl;
+	}
+
+	return 0;
+
 //    CSL_Interpreter* interpreter = new CSL_Interpreter();
 //    auto t = clock();
 //    cout << "CSL TEST BEGIN" << endl;
