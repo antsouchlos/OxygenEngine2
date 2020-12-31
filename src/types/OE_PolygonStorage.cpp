@@ -38,7 +38,7 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
         
             std::bitset<64> lhs_bits;
         
-            for (size_t i=0; i < 2+ mesh->data.num_of_uvs; i++){
+            for (size_t i=0; i < 2+ mesh->data->num_of_uvs; i++){
                 std::bitset<64> temp(lhs[i]);
                 if (i%4 >= 2){
                     OE_ReverseBitset(temp);
@@ -52,7 +52,7 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
     };
     
     auto lambda_equals = [mesh](const uint32_t* lhs, const uint32_t* rhs){
-        for (size_t i=0; i < 2+ mesh->data.num_of_uvs; i++){
+        for (size_t i=0; i < 2+ mesh->data->num_of_uvs; i++){
             if(lhs[i] != rhs[i])
                 return false;
         }
@@ -81,7 +81,7 @@ std::size_t OE_IndexBufferUnorderedMap::size(){
 
 OE_IndexBufferMap::OE_IndexBufferMap(OE_Mesh32* mesh){
     auto lambda_func = [mesh](const uint32_t* lhs, const uint32_t* rhs) {
-        for(size_t i=0; i< 2+ mesh->data.num_of_uvs; i++){
+        for(size_t i=0; i< 2+ mesh->data->num_of_uvs; i++){
             if(lhs[i] < rhs[i]){
                 return true;
             }
@@ -151,6 +151,14 @@ string OE_Triangle32::to_str(const size_t &arraysize) const{
     return CSL_Join("\n", {temp1, temp2, temp3, temp4, temp5});
 }
 
+void printArray(const uint32_t* x, const uint32_t& arrsize){
+    cout << "{ ";
+    for (size_t oa=0; oa < arrsize; oa++){
+        cout << x[oa] << " ";
+    }
+    cout << "}";
+}
+
 
 OE_PolygonStorage32::OE_PolygonStorage32(){
     this->vertices = OE_VertexStorage();
@@ -163,24 +171,11 @@ OE_PolygonStorage32::OE_PolygonStorage32(){
 }
 
 OE_PolygonStorage32::~OE_PolygonStorage32(){
-    for (auto &vgroup : this->triangle_groups){
-        delete vgroup.second;
-    }
     this->triangle_groups.clear();
     
     for (auto &index : this->vertex_buffer){
         delete[] index;
     }
-    if (this->index_buffer != nullptr)
-        delete this->index_buffer;
-}
-
-void printArray(const uint32_t* x, const uint32_t& arrsize){
-    cout << "{ ";
-    for (size_t oa=0; oa < arrsize; oa++){
-        cout << x[oa] << " ";
-    }
-    cout << "}";
 }
 
 // This should be BLAAAZING FAST
@@ -193,10 +188,10 @@ uint32_t* OE_PolygonStorage32::addTriangle(uint32_t* indices){
         //printArray(indices, 2+num_of_uvs);
         //cout << endl;
         isFound = true;
-        output = this->vertex_buffer[this->index_buffer[0][indices]];
+        output = this->vertex_buffer[(*(this->index_buffer))[indices]];
     }
     if (!isFound){
-        this->index_buffer[0][indices] = this->vertex_buffer.size();
+        (*(this->index_buffer))[indices] = this->vertex_buffer.size();
         this->vertex_buffer.push_back(indices);
     }
     return output;
@@ -236,8 +231,9 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
 }
 
 std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgroup_id){
-    
-    auto vgroup = this->triangle_groups[vgroup_id];    
+	// TODO: Custom error handling
+    auto vgroup = this->triangle_groups.at(vgroup_id);
+
     std::vector<uint32_t> output;
     
     // sort optimizing for vertex cache 
@@ -255,10 +251,10 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
     // do the expensive allocation at the start
     output.reserve(vgroup->polygons.size()*3);
     
-    for (const auto& tri : vgroup->polygons){
-        output.push_back(this->index_buffer[0][this->triangles[tri].v1]);
-        output.push_back(this->index_buffer[0][this->triangles[tri].v2]);
-        output.push_back(this->index_buffer[0][this->triangles[tri].v3]);
+    for (const auto& tri : vgroup->polygons){ 
+        output.push_back((*(this->index_buffer))[this->triangles[tri].v1]);
+        output.push_back((*(this->index_buffer))[this->triangles[tri].v2]);
+        output.push_back((*(this->index_buffer))[this->triangles[tri].v3]);
     }
     
     return output;
@@ -267,11 +263,11 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
 /*********************************************/
         
 void OE_PolygonStorage32::initUnorderedIB(OE_Mesh32* mesh){
-    this->index_buffer = new OE_IndexBufferUnorderedMap(mesh);
+    this->index_buffer = std::make_shared<OE_IndexBufferUnorderedMap>(mesh);
 }
 
 void OE_PolygonStorage32::initOrderedIB(OE_Mesh32* mesh){
-    this->index_buffer = new OE_IndexBufferMap(mesh);
+    this->index_buffer = std::make_shared<OE_IndexBufferMap>(mesh);
 }
 
 void OE_PolygonStorage32::genVertexBufferInternally(){
