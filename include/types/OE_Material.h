@@ -19,7 +19,7 @@ class OE_Material : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         std::string to_str();
     
-    protected:
+//    protected:
         float dif_r{0.0f}, dif_g{0.0f}, dif_b{0.0f}, dif_a{1.0f};
         float scol_r{0.0f}, scol_g{0.0f}, scol_b{0.0f};
         

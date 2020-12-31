@@ -27,7 +27,7 @@ class OE_VertexGroup : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         std::string to_str() const;
         
-    protected:
+//    protected:
         
         std::vector<uint32_t>       polygons;
         std::size_t                 material_id;

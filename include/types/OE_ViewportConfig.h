@@ -23,7 +23,7 @@ class OE_ViewportConfig : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         std::string to_str() const;
         
-    protected:
+//    protected:
         // for each camera
         std::vector<int>            layers;
         std::vector<std::size_t>    cameras;
