@@ -26,7 +26,7 @@ class OE_Light : public OE_Object{
         std::string getType() const;
         std::string to_str() const;
         
-    protected:
+//    protected:
         std::size_t                 light_type;
         std::vector<std::size_t>    objects;
         OE_RGBColor                 color;

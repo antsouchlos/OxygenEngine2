@@ -59,7 +59,7 @@ class OE_VertexStorage{
         
         bool calculatedBoundingBox{false};
         
-    protected:
+//    protected:
         
         std::vector<float>              positions;
         std::vector<float>              normals;

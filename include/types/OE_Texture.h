@@ -21,7 +21,7 @@ class OE_Texture: public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         
         std::string to_str();
 
-    protected:
+//    protected:
         int         source;
         std::string path;
         std::size_t camera;
