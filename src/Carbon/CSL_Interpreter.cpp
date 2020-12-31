@@ -173,6 +173,9 @@ namespace csl {
 		result->current_state.sca_x = sv_to_float(cs_v[7]);
 		result->current_state.sca_y = sv_to_float(cs_v[8]);
 		result->current_state.sca_z = sv_to_float(cs_v[9]);
+
+
+		return result;
 	}
 	
 
@@ -239,6 +242,9 @@ namespace csl {
 			// TODO: Make this not use std::string
 			result->objects.push_back(object_list_.name2id[std::string(o)]);
 		}
+
+
+		return result;
 	}
 
 
@@ -301,7 +307,6 @@ namespace csl {
 			result->textureCM_IDs.push_back(oe::world::tcmsList.name2id[std::string(t)]);
 		}
 
-		std::size_t n_vertices;
 		for (const auto& v : mesh_e.list_assignments.at("vertices")) {
 			result->data.vertices.positions.push_back(sv_to_float(v));
 		}
@@ -397,6 +402,9 @@ namespace csl {
 		for (const auto& p : vgroup_e.list_assignments.at("polygons")) {
 			result->polygons.push_back(sv_to_int(p));
 		}
+
+
+		return result;
 	}
 
 
@@ -415,6 +423,9 @@ namespace csl {
 		// TODO: Dependency
 		// TODO: std::string
 		result->camera = object_list_.name2id(std::string(camera));
+
+
+		return result;
 	}
 
 
@@ -462,6 +473,9 @@ namespace csl {
 			// TODO: std::string
 			result->textureCM_IDs.push_back(tcm_list_.name2id[std::string(t)]);
 		}
+
+
+		return result;
 	}
 
 
@@ -490,7 +504,9 @@ namespace csl {
 			// TODO: Is emplace_back an option?
 			result->textures.push_back(process_tcm_texture(tcm_texture_e));
 		}
-	
+
+
+		return result;
 	}
 
 
@@ -518,7 +534,10 @@ namespace csl {
 			// TODO: Dependency
 			// TODO: std::string
 			result->cameras.push_back(object_list_.name2id[std::string(c)]);
-		}	
+		}
+
+
+		return result;
 	}
 
 
