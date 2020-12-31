@@ -69,10 +69,10 @@ namespace csl {
 			result->scenes.insert(scene->id);
 		}
 
-		for (const auto& vpconfig_e : world_e.elements.at("ViewportConfig")) {
-			vpconfig_ptr vpconfig = process_vpconfig(vpconfig_e);
-			result->viewports.insert(vpconfig->id);
-		}
+//		for (const auto& vpconfig_e : world_e.elements.at("ViewportConfig")) {
+//			vpconfig_ptr vpconfig = process_vpconfig(vpconfig_e);
+//			result->viewports.insert(vpconfig->id);
+//		}
 		
 		
 		// Single Assignments
@@ -122,21 +122,21 @@ namespace csl {
 			result->objects.insert(m->id);
 		}
 
-		for (const auto& texture_e : scene_e.elements.at("Texture")) {
-			texture_ptr t = process_texture(texture_e);
-			result->objects.insert(t->id);
-		}
+//		for (const auto& texture_e : scene_e.elements.at("Texture")) {
+//			texture_ptr t = process_texture(texture_e);
+//			result->objects.insert(t->id);
+//		}
 
 		for (const auto& material_e : scene_e.elements.at("Material")) {
 			material_ptr m = process_material(material_e);
 			result->objects.insert(m->id);
 		}
 
-		for (const auto& tcm_e : scene_e.elements.at("TextureCombineMode")) {
-			tcm_ptr t = process_tcm(tcm_e);
-			result->objects.insert(t->id);
-		
-		}
+//		for (const auto& tcm_e : scene_e.elements.at("TextureCombineMode")) {
+//			tcm_ptr t = process_tcm(tcm_e);
+//			result->objects.insert(t->id);
+//		
+//		}
 
 
 		// TODO: It is utterly stupid to return the whole scene_ptr if the only thing used of it
@@ -282,6 +282,7 @@ namespace csl {
 		result->data.num_of_uvs	= sv_to_int(mesh_e.attributes.at("num_uvs"));
 		result->visible			= !!sv_to_int(mesh_e.attributes.at("visible"));
 
+		std::cout << "[DEBUG] Processed Attributes" << std::endl;
 
 		// Single Assignments
 
@@ -301,6 +302,7 @@ namespace csl {
 		result->parent_type		= sv_to_int(mesh_e.single_assignments.at("parent_type"));	
 
 
+		std::cout << "[DEBUG] Processed Single Assignments" << std::endl;
 		// List Assignments
 
 
@@ -322,11 +324,11 @@ namespace csl {
 		result->current_state.sca_z = sv_to_float(cs_v[9]);
 	
 		// TODO: Uniform naming convention
-		for (const auto& t : mesh_e.list_assignments.at("textureCM_IDs")) {
-			// TODO: std::string
-			// TODO: WHY TF.
-			result->textureCM_IDs.push_back(oe::world::tcmsList.name2id[std::string(t)]);
-		}
+//		for (const auto& t : mesh_e.list_assignments.at("textureCM_IDs")) {
+//			// TODO: std::string
+//			// TODO: WHY TF.
+//			result->textureCM_IDs.push_back(oe::world::tcmsList.name2id[std::string(t)]);
+//		}
 
 		for (const auto& v : mesh_e.list_assignments.at("vertices")) {
 			result->data.vertices.positions.push_back(sv_to_float(v));
@@ -335,20 +337,17 @@ namespace csl {
 		for (const auto& n : mesh_e.list_assignments.at("normals")) {
 			result->data.vertices.normals.push_back(sv_to_float(n));
 		}
-
+		
+		
+		
+		std::cout << "[DEBUG] Processed List Assignments" << std::endl;
 
 		// Child Elements
 
 
 		for (const auto& vgroup_e : mesh_e.elements.at("VertexGroup")) {
 			vgroup_ptr v = process_vgroup(vgroup_e);
-			// TODO: Make this a std::shared_ptr
-			result->data.triangle_groups[v->id] = v.get();
-		}
-
-		for (const auto& triangle_e : mesh_e.elements.at("Triangle")) {
-			oe::triangle t = process_triangle(result, triangle_e, result->data.num_of_uvs);
-			result->data.triangles.push_back(t);
+			result->data.triangle_groups[v->id] = v;
 		}
 
 		std::size_t num_of_uvmaps = 0;
@@ -359,7 +358,8 @@ namespace csl {
 
 
 		// Perform operations depending on parsed values
-		
+		// TODO: FOR THE FUCKIG LOVE OF I DON'T KNOW WHO: YOU CAN'T DEPEND ON ME CALLING EVERYTHIN
+		// IN THE RIGHT ORDER OR FAIL WITH A SEGFAULT. JESUS.CHRIST.
 
 		std::size_t max_uv_num = 0;
 		for (const auto& n : result->data.vertices.uvmaps) {
@@ -378,9 +378,16 @@ namespace csl {
 			// TODO: Make this use std::shared_ptr
 			result->data.initOrderedIB(result.get());
 		}
+
+		std::cout << "[DEBUG] Initialized Index Buffer" << std::endl;
 		
-		// TODO: Naming. N. A. M. I. N. G. (Why is there an s in the second function
-		// and no s in the first one?)
+
+		for (const auto& triangle_e : mesh_e.elements.at("Triangle")) {
+			oe::triangle t = process_triangle(result, triangle_e, result->data.num_of_uvs);
+			result->data.triangles.push_back(t);
+		}
+		
+		
 		result->data.genVertexBufferInternally();
 		result->data.genIndexBuffersInternally();
 
@@ -399,7 +406,9 @@ namespace csl {
 
 		// TODO: std::string
 		auto name = vgroup_e.attributes.at("name");
-		result = std::make_shared<oe::vgroup>(std::string(name));
+		// TODO: Smart pointers
+		//result = std::make_shared<oe::vgroup>(std::string(name));
+		result = new oe::vgroup(std::string(name));
 
 		result->visible = !!sv_to_int(vgroup_e.attributes.at("visible"));
 
@@ -488,12 +497,12 @@ namespace csl {
 		// List Assignments
 
 
-		// TODO: Make naming uniform (textureCM_IDs -> tcms)
-		for (const auto& t : material_e.list_assignments.at("textureCM_IDs")) {
-			// TODO: Dependency
-			// TODO: std::string
-			result->textureCM_IDs.push_back(tcm_list_.name2id[std::string(t)]);
-		}
+//		// TODO: Make naming uniform (textureCM_IDs -> tcms)
+//		for (const auto& t : material_e.list_assignments.at("textureCM_IDs")) {
+//			// TODO: Dependency
+//			// TODO: std::string
+//			result->textureCM_IDs.push_back(tcm_list_.name2id[std::string(t)]);
+//		}
 
 
 		return result;
@@ -620,7 +629,8 @@ namespace csl {
 
 		
 		// List Assignments
-		
+	
+
 		// TODO: Proper naming
 		std::size_t n = 2 + num_of_uvs;
 		
@@ -635,15 +645,9 @@ namespace csl {
 			for (std::size_t i = 0; i < n; i++) {
 				result.v1[i] = sv_to_int(v);
 			}
-
-			//TODO: Smart pointers
-			uint32_t* actual_indices = mesh->data.addTriangle(result.v1);
-			if (actual_indices != result.v1) {
-				delete[] result.v1;
-				result.v1 = actual_indices;
-			}
 		}
 		
+
 		if (triangle_e.list_assignments.at("v2").size() != n)
 			// TODO
 			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v2\").size()");
@@ -654,15 +658,9 @@ namespace csl {
 			for (std::size_t i = 0; i < n; i++) {
 				result.v2[i] = sv_to_int(v);
 			}
-
-			//TODO: Smart pointers
-			uint32_t* actual_indices = mesh->data.addTriangle(result.v2);
-			if (actual_indices != result.v2) {
-				delete[] result.v2;
-				result.v2 = actual_indices;
-			}
 		}
 		
+
 		if (triangle_e.list_assignments.at("v3").size() != n)
 			// TODO
 			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v3\").size()");
@@ -673,13 +671,28 @@ namespace csl {
 			for (std::size_t i = 0; i < n; i++) {
 				result.v3[i] = sv_to_int(v);
 			}
+		}
 
-			//TODO: Smart pointers
-			uint32_t* actual_indices = mesh->data.addTriangle(result.v3);
-			if (actual_indices != result.v3) {
-				delete[] result.v3;
-				result.v3 = actual_indices;
-			}
+		
+		//TODO: Smart pointers
+		uint32_t* actual_indices = mesh->data.addTriangle(result.v1);
+		if (actual_indices != result.v1) {
+			delete[] result.v1;
+			result.v1 = actual_indices;
+		}
+		
+		//TODO: Smart pointers
+		actual_indices = mesh->data.addTriangle(result.v2);
+		if (actual_indices != result.v2) {
+			delete[] result.v2;
+			result.v2 = actual_indices;
+		}
+		
+		//TODO: Smart pointers
+		actual_indices = mesh->data.addTriangle(result.v3);
+		if (actual_indices != result.v3) {
+			delete[] result.v3;
+			result.v3 = actual_indices;
 		}
 
 
