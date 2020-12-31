@@ -100,59 +100,68 @@ class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
 
 class OE_PolygonStorage32 {
     
-    friend class CSL_Interpreter;
+//    friend class CSL_Interpreter;
     friend class OE_Mesh32;
     friend class NRE_Renderer;
     
     public:
+		// TODO: initOrdered or initUnordered should be run in here
         OE_PolygonStorage32();
+		// TODO: Remove
         ~OE_PolygonStorage32();
         
-        uint32_t* addTriangle(uint32_t* indices);
-        //int removeTriangle(size_t);
         
-        /// These four are used by the renderer
         std::vector<float>      genVertexBuffer();
         std::vector<uint32_t>   genIndexBuffer(const std::size_t &vgroup_id);
+
         void genVertexBufferInternally();
-        void genIndexBuffersInternally();
-        
+       	void genIndexBuffersInternally();
+       
+
+	   	// TODO: Does this have to be public?	
         std::size_t                                 num_of_uvs;
-    //protected:
-        OE_VertexStorage                            vertices;
-        bool                                        isDynamic{true};
+
+
+
+//    protected:
+		// TODO: Handle internally, remove raw pointer
+        uint32_t*	addTriangle(uint32_t* indices);
+		// TODO: Make these private
+        void		initUnorderedIB(OE_Mesh32*);
+        void		initOrderedIB(OE_Mesh32*);
+
+
         std::vector<OE_Triangle32>                  triangles;
-        std::map<std::size_t, OE_VertexGroup*>      triangle_groups;
+        std::map<std::size_t, OE_VertexGroup*>      triangle_groups; 
+
+        OE_VertexStorage                            vertices;
+
+        bool                                        isDynamic{true};
+        bool										changed{false};
         
-        
-        bool changed{false};
-        
-    protected:
-        
-        // Internal but IMPORTANT stuff
-        // This is the glue between the physics engine and the renderer
-        // DO NOT TOUCH unless you REAAALLY know what you are doing (probably not)
-        
+		// TODO: Smart pointers
         std::vector<uint32_t*>                      vertex_buffer;        
         OE_IndexBufferWrapperBase*                  index_buffer;
         
-        // optimize by using either an ordered or unordered map
-        // depending on the number of triangles, vertices, uvs, polygons
-        void initUnorderedIB(OE_Mesh32*);
-        void initOrderedIB(OE_Mesh32*);
-        
+
+
     private:
+		// TODO: "Should be cleared after first use": Do that automatically
         // This stuff is only of interest to the renderer
         // Those vectors should be cleared after first use by the renderer on loading the object
         // both should be guarded by mutexes
         OE_THREAD_SAFETY_OBJECT vbo_mutex;
         OE_THREAD_SAFETY_OBJECT ibos_mutex;
+
+
         std::vector<float> vbo;
         std::unordered_map<std::size_t, OE_IndexBufferReady> ibos;
-        
+
         bool vbo_exists{false};
         bool ibos_exist{false};
 };
+
+
 
 void printArray(const uint32_t* x, const uint32_t& arrsize);
 
