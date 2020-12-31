@@ -1,6 +1,18 @@
 #include <Carbon/CSL_Interpreter.h>
 
 
+// TODO: Don't do that.
+
+// This is a helper function for the interpreter
+void OE_ReverseBitset(std::bitset<64>& bitseta){
+    std::bitset<64> temp;
+    for (size_t i=0;i < 32; i++){
+        temp[i] = bitseta[31-i];
+    }   
+    bitseta = temp;
+}
+
+
 namespace csl {
 	int Interpreter::sv_to_int(std::string_view sv) {
 		int result = 0;
