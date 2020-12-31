@@ -44,7 +44,7 @@ private:
     std::shared_ptr<OE_Mesh32>         processMesh();
     //void processVertex(OE_Vertex *vertex);
     void processUVMapData(OE_UVMapData &uvmap, const std::size_t&);
-    OE_VertexGroup *    processVertexGroup();
+	std::shared_ptr<OE_VertexGroup>    processVertexGroup();
     //void processAnimation(OE_Animation *animation);
     //void processTransformation(OE_Transformation *transformation);
     void processTriangle(OE_Mesh32 *mesh, const std::size_t& num_of_uvs);

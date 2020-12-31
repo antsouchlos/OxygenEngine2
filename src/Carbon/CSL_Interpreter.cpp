@@ -359,7 +359,7 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
         if (type == "tag") {
             assert (mesh != nullptr);
             if (id == "VertexGroup") {
-                OE_VertexGroup *vgroup = processVertexGroup();
+				std::shared_ptr<OE_VertexGroup> vgroup = processVertexGroup();
                 mesh->data->triangle_groups[vgroup->id] = vgroup;
             } 
             else if (id == "Triangle") {
@@ -566,9 +566,9 @@ void CSL_Interpreter::processUVMapData(OE_UVMapData &uvmap, const size_t& uvmapI
     }
 }
 
-OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
+std::shared_ptr<OE_VertexGroup> CSL_Interpreter::processVertexGroup() {
     
-    OE_VertexGroup* vgroup = nullptr;
+	std::shared_ptr<OE_VertexGroup> vgroup = nullptr;
     for (auto& child : curNode->children) {
         string type = child->type;
         string id = child->ID;
@@ -604,7 +604,7 @@ OE_VertexGroup * CSL_Interpreter::processVertexGroup() {
         } 
         else if (type == "tagassignment") {
             if (id == "name") {
-                vgroup = new OE_VertexGroup(child->args[0]);
+                vgroup = std::make_shared<OE_VertexGroup>(child->args[0]);
             }
             else if (id == "visible"){
                 assert(vgroup != nullptr);
