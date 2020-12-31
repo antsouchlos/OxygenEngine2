@@ -33,11 +33,46 @@
 
 // This is done, so that in the event we want to change the math library
 // it will be easy
-typedef glm::vec4 OE_Vec4;
-typedef glm::vec3 OE_Vec3;
-typedef glm::mat4 OE_Mat4x4;
-typedef glm::mat3 OE_Mat3x3;
-typedef glm::quat OE_Quat;
+
+class OE_Vec4 : public glm::vec4{
+    
+    using glm::vec4::vec4;
+    
+};
+
+class OE_Vec3 : public glm::vec3{
+    
+    using glm::vec3::vec3;
+    
+};
+
+class OE_Mat4x4 : public glm::mat4{
+public:
+    using glm::mat4::mat4;
+    
+    OE_Mat4x4 operator * (const OE_Mat4x4&);
+    
+};
+
+class OE_Mat3x3: public glm::mat3{
+public:
+    
+    using glm::mat3::mat3;
+    
+    OE_Vec3 operator * (const OE_Vec3&);
+};
+
+class OE_Quat : public glm::quat{
+public: 
+    
+    using glm::quat::quat;
+    
+    OE_Quat(glm::quat);
+    
+    OE_Quat operator * (const OE_Quat&);
+};//*/
+
+
 
 #define OE_Pi2         glm::half_pi
 
@@ -45,16 +80,22 @@ typedef glm::quat OE_Quat;
 #define OE_Pow         glm::pow
 #define OE_Sqrt        glm::sqrt
 
-//#define OE_Perspective  glm::perspective
 #define OE_Rotate       glm::rotate
-#define OE_Normalize    glm::normalize
+//#define OE_Scale        glm::scale
+
 #define OE_Cross        glm::cross
 #define OE_Dot          glm::dot
-#define OE_Translate    glm::translate
+
 #define OE_Identity     glm::identity
 #define OE_Det          glm::determinant
 #define OE_Transpose    glm::transpose
-#define OE_Quat2Mat4x4  glm::toMat4
+
+OE_Mat4x4 OE_Translate(OE_Mat4x4, OE_Vec3);
+OE_Mat4x4 OE_Scale(OE_Mat4x4, OE_Vec3);
+
+OE_Mat4x4 OE_Quat2Mat4x4(OE_Quat);
+OE_Vec4 OE_Normalize(OE_Vec4);
+OE_Quat OE_Normalize(OE_Quat);
 
 #define OE_Mat2Euler       glm::eulerAngles
 #define OE_Slerp        glm::slerp
@@ -65,111 +106,6 @@ OE_Mat4x4 OE_Perspective(float, float, float, float);
 
 OE_Quat OE_QuatFromAxisAngle(float, float, float, float);
 
+std::vector<float> OE_GetBoundingBoxVertexBuffer(float, float, float, float, float, float);
 
- class FMath
-{
-    public:
-        FMath();
-        ~FMath();
-
-    protected:
-    private:
-};
-class FE_Vec4;
- class FE_Mat4;
-class FE_Quat;
-
- namespace FE_Math{
-
-    float  pow(float, float);
-    int    pow(int, int);
-    double pow(double, double);
-    double  abs(double);
-    float   abs(float);
-    int     abs(int);
-    float   radians(float);
-    float   degrees(float);
-
-    FE_Vec4    cross(FE_Vec4, FE_Vec4);
-    FE_Mat4    view(FE_Vec4, FE_Vec4);
-    FE_Mat4    perspective(float, float, float, float);
-    FE_Vec4    normalize(FE_Vec4);
-    FE_Quat    normalize(FE_Quat);
-    float      dot(FE_Quat, FE_Quat);
-    FE_Quat    slerp(FE_Quat, FE_Quat, float);
-    //long double pi = 3.1415926535;
-}
-
-class FE_Vec4{
-    public:
-        float x;
-        float y;
-        float z;
-        float w;
-        bool axis_angle;
-        FE_Vec4();
-        FE_Vec4(float, float, float, float);
-        FE_Vec4(float, float, float, float, bool);
-        ~FE_Vec4();
-        bool isAxisAngle();
-        std::array<float, 4> toArray();
-        FE_Vec4 operator +(FE_Vec4);
-        FE_Vec4 operator -(FE_Vec4);
-        FE_Vec4 operator +(float);
-        FE_Vec4 operator -(float);
-        FE_Vec4 operator *(float);
-        bool operator ==(FE_Vec4);
-        float operator *(FE_Vec4);
-        std::string   print(bool);
-
-};
-
-class FE_Mat4{
-public:
-    FE_Vec4 x;
-    FE_Vec4 y;
-    FE_Vec4 z;
-    FE_Vec4 w;
-
-    FE_Mat4();
-    FE_Mat4(float);
-    FE_Mat4(FE_Vec4, FE_Vec4, FE_Vec4, FE_Vec4);
-    ~FE_Mat4();
-    std::array<float, 16> toArray();
-    std::string           print(bool);
-    FE_Mat4 operator +(FE_Mat4);
-    FE_Mat4 operator -(FE_Mat4);
-    FE_Mat4 operator *(float);
-    FE_Vec4 operator *(FE_Vec4);
-    FE_Mat4 operator *(FE_Mat4);
-    bool    operator ==(FE_Mat4);
-    FE_Mat4 transpose();
-    void  setRot(FE_Vec4);
-    void setRot(FE_Quat);
-    void  setPos(FE_Vec4);
-    void setScale(FE_Vec4);
-};
-
-class FE_Quat{
-public:
-    float rad, x, y, z;
-    bool quatted;
-
-    FE_Quat();
-    FE_Quat(FE_Vec4);
-    FE_Quat(float, float, float, float, bool);
-    FE_Quat operator +(FE_Quat);
-    FE_Quat operator *(float);
-    FE_Quat operator *(FE_Quat);
-
-    std::string  print();
-    FE_Quat makeQuat();
-    void setRad(float);
-
-    void fromEuler(FE_Vec4);
-    void fromAxisAngle(FE_Vec4);
-    FE_Vec4 toAxisAngle();
-    FE_Vec4 toEuler();
-    FE_Mat4 toMatrix();
-};
 #endif // FMATH_H_INCLUDED

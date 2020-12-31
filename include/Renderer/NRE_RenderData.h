@@ -2,33 +2,37 @@
 #define NRE_RENDERDATA_H
 
 #include <types/OE_World.h>
-//#include "FE_GPU_API.h"
-#include <OE_Math.h>
 #include <Renderer/NRE_GPU_API.h>
+#include <OE_Math.h>
 
 struct NRE_BaseObject{
+    
+    std::size_t     id{0};
     bool changed{false};
+    bool has_init{false};
     std::vector<float> data;
 };
 
 struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
-    std::size_t     id{0};
+    
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
 };
 
 struct NRE_MaterialRenderData : public NRE_BaseObject{
-    std::size_t     id{0};
+
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
 };
 
 struct NRE_VGroupRenderData{
-    OE_Mat4x4       bone_mat;
+    
     std::size_t     id{0};
+    OE_Mat4x4       bone_mat;
+    
     std::size_t     ibo{0};
     std::size_t     material_id{0};
     std::size_t     mesh_id{0};
@@ -39,12 +43,13 @@ struct NRE_VGroupRenderData{
 
 struct NRE_MeshRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
-    std::size_t     id{0};
     
     unsigned int    uvmaps{0};
     unsigned int    bones{0};
     
     std::size_t     vbo{0};
+    std::size_t     vbo_size{0};
+    
     std::size_t     vao{0};
     std::size_t     ubo{0};
     unsigned int    offset{0};
@@ -54,13 +59,25 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
     
     std::vector<NRE_GPU_VertexLayoutInput> vao_input;
     
-    std::size_t vbo_bbox;
-    std::size_t vao_bbox;    
+    std::size_t vbo_bbox{0};
+    std::size_t vbo_bbox_size{0};
+    std::size_t vao_bbox{0};   
+    
+    float max_x{0.0f}, min_x{0.0f}, max_y{0.0f}, min_y{0.0f}, max_z{0.0f}, min_z{0.0f};
+    
+    bool vao_bbox_initialized{false};
+    
+    std::vector<float> genBoundingBoxVBO();
+    
+    // the mesh is used too fetch vertices only
+    std::shared_ptr<OE_Mesh32> mesh{nullptr};
+    
+    std::set<size_t> vgroups;
 };
 
 struct NRE_LightRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
-    std::size_t     id{0};
+
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};

@@ -32,7 +32,7 @@ struct NRE_GL3_UniformBuffer{
 
 struct NRE_GL3_ProgramUniformState{
     std::string name;
-    GLint slot;
+    GLint slot{0};
 };
 
 struct NRE_GL3_Program{
@@ -91,6 +91,8 @@ public:
     void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
     void setProgramUniformSlot(std::size_t, std::string, int);
+    int  getProgramUniformSlot(std::size_t, std::string);
+    
     void setUniformState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     void deleteUniformBuffer(std::size_t);
     

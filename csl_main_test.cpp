@@ -1,102 +1,102 @@
-//#include <OE_API.h>
-#include <string_view>
-#include <fstream>
-#include <string>
-#include <iostream>
-#include <array>
-#include <vector>
-#include <memory>
+#include <OE_API.h>
 
-#define CPP20
-
-#include <Carbon/CSL_Parser.h>
-
-/*
-unsigned int indentation = 0;
-
-std::string get_whitespace() {
-	std::string result = "";
-
-	for (unsigned int i = 0; i < indentation; i++)
-		result += "\t";
-
-	return result;
-}
-
-void print_attribute(std::string_view name, csl::single_assignment_t att) {
-	std::cout << name << " = " << att;
-}
-
-void print_single_assignment(std::string_view name, csl::single_assignment_t as) {
-	std::cout << get_whitespace() << name << " = " << as;
-}
-
-void print_list_assignment(std::string_view name, csl::list_assignment_t as) {
-	std::cout << get_whitespace() << name << " = {";
-
-	for (const auto& v : as) {
-		std::cout << v << "; ";
-	}
-
-	std::cout << "};";
-}
-
-void print_element(std::string_view name, csl::element el) {
-	std::cout << get_whitespace() << '<' << name;
-
-	for (const auto& [name, att] : el.attributes) {
-		std::cout << ' ';
-		print_attribute(name, att);
-		std::cout << ' ';
-	}
-
-	std::cout << ">\n";
-	
-	indentation++;
-	
-	for (const auto& [name, sub_el] : el.elements) {
-		print_element(name, sub_el);
-		std::cout << '\n';
-	}
-
-
-	for (const auto& [name, as] : el.single_assignments) {
-		print_single_assignment(name, as);
-		std::cout << ";\n";
-	}
-
-	for (const auto& [name, as] : el.list_assignments) {
-		print_list_assignment(name, as);
-		std::cout << '\n';
-	}
-	
-	indentation--;
-
-	std::cout << get_whitespace() << "</" << name << '>';
-}
-*/
+using namespace std;
+using namespace oe;
 
 int main(){
-	csl::csl_map<std::string, int> m;
-
-	m["a"] = 4;
-	m["b"] = 5;
-	m["c"] = 6;
-	m["d"] = 7;
-
-	try {
-		std::cout << m.at("d") << std::endl;
-		std::cout << m.at("e") << std::endl;
-	} catch (csl::unset_object_error& e) {
-		std::cout << e.what() << std::endl;
-	}
-
-	return 0;
+        
+    CSL_Interpreter* interpreter = new CSL_Interpreter();
+    auto t = clock();
+    cout << "CSL TEST BEGIN" << endl;
+    
+    
+    // These boilerplate lines of code are absolutely necessary for proper testing in
+    // the new format
+    std::shared_ptr<OE_World> world = interpreter->interpretFile("challenge_car.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
+    t = clock();
+    auto a = (world->to_str());
+    cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    world = nullptr;
+    
+    //OE_WriteToLog(a);
+    ofstream myfile;
+    myfile.open ("challenge_car_copy.csl");
+    myfile << a;
+    myfile.close();
+    
+    t = clock();
+    cout << "CSL TEST BEGIN 2" << endl;
+    delete interpreter;
+    interpreter = new CSL_Interpreter();
+    std::shared_ptr<OE_World> world2 = interpreter->interpretFile("challenge_car_copy.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
+    t = clock();
+    auto b = (world2->to_str());
+    cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    
+    world2 = nullptr;
+    
+    ofstream myfile2;
+    myfile2.open ("challenge_car_copy2.csl");
+    myfile2 << b;
+    myfile2.close();
+    
+    t = clock();
+    cout << "CSL TEST BEGIN 3" << endl;
+    delete interpreter;
+    interpreter = new CSL_Interpreter();
+    std::shared_ptr<OE_World> world3 = interpreter->interpretFile("csl_very_large_object_test.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
+    t = clock();
+    auto c = (world3->to_str());
+    cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    
+    world3 = nullptr;
+    delete interpreter;
+    /*t = clock();
+    cout << "CSL TEST BEGIN 4" << endl;
+    interpreter = new CSL_Interpreter();
+    world3 = interpreter->interpretFile("csl_2UVMAP_TEST.csl");
+    OE_World::objectsList.extend(interpreter->objectsList, true);
+    OE_World::materialsList.extend(interpreter->materialsList, true);
+    OE_World::texturesList.extend(interpreter->texturesList, true);
+    OE_World::tcmsList.extend(interpreter->tcmsList, true);
+    OE_World::viewportsList.extend(interpreter->viewportsList, true);
+    OE_World::scenesList.extend(interpreter->scenesList, true);
+    
+    t = clock();
+    auto d = (world3->to_str());
+    cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    //SDL_Delay(1000);
+    
+    cout << "NRE VERTEX/INDEX BUFFERS " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    world3 = nullptr;//*/
+    
+    //ofstream myfile3;
+    //myfile3.open ("csl_very_large_object_test_copy.csl");
+    //myfile3 << c;
+    //myfile3.close();
+    
+    //SDL_Delay(6000);
+    
+    return 0;
 }
-
-
-
-
-
-
-

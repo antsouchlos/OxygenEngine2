@@ -12,6 +12,16 @@ OE_ViewportConfig::OE_ViewportConfig(){
     
 }
 
+
+OE_ViewportConfig::OE_ViewportConfig(const string &name){
+
+    this->id                                = ++OE_ViewportConfig::current_id;    
+}
+
+OE_ViewportConfig::~OE_ViewportConfig(){
+
+}
+ 
 std::string OE_ViewportConfig::to_str() const{
     
     string output = outputTypeTag("ViewportConfig", {{"name", "\"" + OE_World::viewportsList.id2name[this->id] + "\""}});

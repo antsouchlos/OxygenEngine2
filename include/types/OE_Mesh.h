@@ -10,11 +10,13 @@
 
 class OE_Mesh32 : public OE_Object{
     
-//    friend class CSL_Interpreter;
+    friend class CSL_Interpreter;
     
     public:
     
         OE_Mesh32();
+        OE_Mesh32(const std::string&);
+        ~OE_Mesh32();
         
         // This takes into account rotation as well
         void calculateProperBoundingBox();
@@ -31,12 +33,6 @@ class OE_Mesh32 : public OE_Object{
         //std::size_t                 num_of_normals
         void*                       physics_data;
 };
-
-
-
-
-
-
 
 
 

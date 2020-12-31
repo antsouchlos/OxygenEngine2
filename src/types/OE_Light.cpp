@@ -16,6 +16,13 @@ OE_Light::OE_Light(){
     
 }
 
+OE_Light::OE_Light(const string& name) : OE_Object(name){
+    this->light_type = 0;
+    this->fov = 0.0f;
+    this->range = 0.0f;
+    this->intensity = 0.0f;
+}
+
 OE_Light::~OE_Light(){
     
 }

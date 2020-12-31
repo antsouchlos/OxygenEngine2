@@ -1,4 +1,4 @@
-project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++2a', 'buildtype=release'])
+project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++17', 'buildtype=debugoptimized'])
 
 src = ['src/OE_SDL_WindowSystem.cpp',
        'src/Renderer/glad.c',
@@ -20,9 +20,8 @@ src = ['src/OE_SDL_WindowSystem.cpp',
        'src/Events/OE_EventParser.cpp',
        'src/Events/OE_Event.cpp',
        'src/Carbon/CSL_Interpreter.cpp',
-	   #'src/Carbon/CSL_Parser.cpp',
-	   #       'src/Carbon/CSL_Lexer.cpp',
-	   'src/Carbon/CSL_Exceptions.cpp',
+       'src/Carbon/CSL_Parser.cpp',
+       'src/Carbon/CSL_Lexer.cpp',
        'src/types/OE_TypesBase.cpp',
        'src/types/OE_Camera.cpp',
        'src/types/OE_Light.cpp',

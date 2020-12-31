@@ -1,11 +1,21 @@
 #include <types/OE_Mesh.h>
 #include <types/OE_World.h>
+#include <OE_Math.h>
 
 using namespace std;
 
 OE_Mesh32::OE_Mesh32(){
     
    this->physics_data     = nullptr;
+    
+}
+
+OE_Mesh32::OE_Mesh32(const string& name) : OE_Object(name){
+    
+    this->physics_data     = nullptr;
+}
+
+OE_Mesh32::~OE_Mesh32(){
     
 }
 
@@ -64,6 +74,7 @@ void OE_Mesh32::calculateProperBoundingBox(){
             }
     }
     
+    this->data.vertices.calculatedBoundingBox = true;
     //cout << "BOUNDING BOX UPDATE IN " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
 }
 

@@ -8,17 +8,18 @@
 
 class OE_Camera : public OE_Object {
     
-//    friend class Interpreter;
+    friend class CSL_Interpreter;
     friend class NRE_Renderer;
 
     public:
         OE_Camera();
+        OE_Camera(const std::string&);
         ~OE_Camera();
         
         std::string getType() const;
         std::string to_str() const;
         
-//    protected:
+    protected:
         float aspect_ratio;
         float fov;
 
