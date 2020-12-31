@@ -38,7 +38,7 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
         
             std::bitset<64> lhs_bits;
         
-            for (size_t i=0; i < 2+ mesh->data.num_of_uvs; i++){
+            for (size_t i=0; i < 2+ mesh->data->num_of_uvs; i++){
                 std::bitset<64> temp(lhs[i]);
                 if (i%4 >= 2){
                     OE_ReverseBitset(temp);
@@ -52,7 +52,7 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
     };
     
     auto lambda_equals = [mesh](const uint32_t* lhs, const uint32_t* rhs){
-        for (size_t i=0; i < 2+ mesh->data.num_of_uvs; i++){
+        for (size_t i=0; i < 2+ mesh->data->num_of_uvs; i++){
             if(lhs[i] != rhs[i])
                 return false;
         }
@@ -81,7 +81,7 @@ std::size_t OE_IndexBufferUnorderedMap::size(){
 
 OE_IndexBufferMap::OE_IndexBufferMap(OE_Mesh32* mesh){
     auto lambda_func = [mesh](const uint32_t* lhs, const uint32_t* rhs) {
-        for(size_t i=0; i< 2+ mesh->data.num_of_uvs; i++){
+        for(size_t i=0; i< 2+ mesh->data->num_of_uvs; i++){
             if(lhs[i] < rhs[i]){
                 return true;
             }
@@ -151,6 +151,14 @@ string OE_Triangle32::to_str(const size_t &arraysize) const{
     return CSL_Join("\n", {temp1, temp2, temp3, temp4, temp5});
 }
 
+void printArray(const uint32_t* x, const uint32_t& arrsize){
+    cout << "{ ";
+    for (size_t oa=0; oa < arrsize; oa++){
+        cout << x[oa] << " ";
+    }
+    cout << "}";
+}
+
 
 OE_PolygonStorage32::OE_PolygonStorage32(){
     this->vertices = OE_VertexStorage();
@@ -173,14 +181,6 @@ OE_PolygonStorage32::~OE_PolygonStorage32(){
     }
     if (this->index_buffer != nullptr)
         delete this->index_buffer;
-}
-
-void printArray(const uint32_t* x, const uint32_t& arrsize){
-    cout << "{ ";
-    for (size_t oa=0; oa < arrsize; oa++){
-        cout << x[oa] << " ";
-    }
-    cout << "}";
 }
 
 // This should be BLAAAZING FAST
