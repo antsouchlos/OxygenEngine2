@@ -10,7 +10,7 @@
 
 class OE_Mesh32 : public OE_Object{
     
-    friend class CSL_Interpreter;
+//    friend class CSL_Interpreter;
     
     public:
     
