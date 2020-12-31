@@ -26,12 +26,13 @@ class OE_Mesh32 : public OE_Object{
         
     //protected:
         
-        OE_PolygonStorage32         data;
-        std::vector<std::size_t>    textureCM_IDs;
-        //std::size_t                 num_of_triangles;
-        //std::size_t                 num_of_vertices;
-        //std::size_t                 num_of_normals
-        void*                       physics_data;
+		//TODO: std::make_shared in processMesh
+		std::shared_ptr<OE_PolygonStorage32>    data;
+        std::vector<std::size_t>                textureCM_IDs;
+        //std::size_t                             num_of_triangles;
+        //std::size_t                             num_of_vertices;
+        //std::size_t                             num_of_normals
+        void*                                   physics_data;
 };
 
 

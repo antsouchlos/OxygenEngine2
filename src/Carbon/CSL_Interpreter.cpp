@@ -360,7 +360,7 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
             assert (mesh != nullptr);
             if (id == "VertexGroup") {
                 OE_VertexGroup *vgroup = processVertexGroup();
-                mesh->data.triangle_groups[vgroup->id] = vgroup;
+                mesh->data->triangle_groups[vgroup->id] = vgroup;
             } 
             else if (id == "Triangle") {
                 //-----------------------------WTF IS THE CONSTRUCTOR FOR!?--------------------------------------
@@ -372,14 +372,14 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
                 assert(uvs_set == true);
                 assert(uvs_set == true);
                 assert(map_chosen == true);
-                processTriangle(mesh.get(), mesh->data.num_of_uvs);
+                processTriangle(mesh.get(), mesh->data->num_of_uvs);
                 
             }
             else if (id == "UVMapData"){
                 
                 OE_UVMapData uvmap;
                 processUVMapData(uvmap, num_of_uvmaps);
-                mesh->data.vertices.uvmaps.push_back(uvmap);
+                mesh->data->vertices.uvmaps.push_back(uvmap);
                 num_of_uvmaps++;
             }
             else {
@@ -399,21 +399,21 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
             }
             else if (id == "num_of_vertices"){
                 if(!vertices_reserved){
-                    mesh->data.vertices.positions.reserve(stoi(child->args[0]));
+                    mesh->data->vertices.positions.reserve(stoi(child->args[0]));
                     vnum = stoi(child->args[0]);
                 }
                 vertices_reserved = true;
             } 
             else if (id == "num_of_normals"){
                 if(!normals_reserved){
-                    mesh->data.vertices.normals.reserve(stoi(child->args[0]));
+                    mesh->data->vertices.normals.reserve(stoi(child->args[0]));
                     nnum = stoi(child->args[0]);
                 }
                 normals_reserved = true;
             }
             else if (id == "num_of_triangles"){
                 if(!triangles_reserved){
-                    mesh->data.triangles.reserve(stoi(child->args[0]));
+                    mesh->data->triangles.reserve(stoi(child->args[0]));
                     num_of_triangles = stoi(child->args[0]);
                 }
                 triangles_reserved = true;
@@ -445,13 +445,13 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
             else if (id == "vertices") {
                 vertices_reserved = true;
                 for (const auto& x: child->args){
-                    mesh->data.vertices.positions.push_back(stof(x));
+                    mesh->data->vertices.positions.push_back(stof(x));
                 } 
             } 
             else if (id == "normals") {
                 normals_reserved = true;
                 for (const auto& x: child->args){
-                    mesh->data.vertices.normals.push_back(stof(x));
+                    mesh->data->vertices.normals.push_back(stof(x));
                 } 
             } 
             else {
@@ -469,21 +469,21 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
             }
             else if (id == "isDynamic"){
                 assert(mesh != nullptr);
-                mesh->data.isDynamic = !!stoi(child->args[0]);
+                mesh->data->isDynamic = !!stoi(child->args[0]);
             }
             else if (id == "num_uvs"){
                 assert(mesh != nullptr);
-                mesh->data.num_of_uvs = stoi(child->args[0]);
+                mesh->data->num_of_uvs = stoi(child->args[0]);
                 uvs_set = true;
             }
             else {
                 throw CSL_UnknownIDException("UnexpectedIDException at " + to_string(child->line) + ":" + to_string(child->col) + ": No tag-variable with the ID \"" + id + "\" in \"Mesh\"");
             }
         }
-        if (!map_chosen && uvs_set && vertices_reserved && normals_reserved && (num_of_uvmaps == mesh->data.num_of_uvs) && triangles_reserved){
+        if (!map_chosen && uvs_set && vertices_reserved && normals_reserved && (num_of_uvmaps == mesh->data->num_of_uvs) && triangles_reserved){
             
             size_t uvnum = 0;
-            for (auto x : mesh->data.vertices.uvmaps){
+            for (auto x : mesh->data->vertices.uvmaps){
                 uvnum = max(uvnum, x.elements.size());
             }
             size_t tnum = num_of_triangles;
@@ -494,13 +494,13 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
             // But ordered map O(logn) is faster on larger objects especially with several uv maps 
             
             if (vnum <= 65536 && nnum <= 65536 && uvnum <= 65536 && tnum*3 <= 65536 && num_of_uvmaps <= 2){
-                mesh->data.initUnorderedIB(mesh.get());
+                mesh->data->initUnorderedIB(mesh.get());
             } 
             else if (num_of_uvmaps == 0){
-                mesh->data.initUnorderedIB(mesh.get());
+                mesh->data->initUnorderedIB(mesh.get());
             }
             else{
-                mesh->data.initOrderedIB(mesh.get());
+                mesh->data->initOrderedIB(mesh.get());
             }
             
             map_chosen = true;
@@ -508,8 +508,8 @@ std::shared_ptr<OE_Mesh32> CSL_Interpreter::processMesh() {
         
         curNode = saveNode;
     }
-    mesh->data.genVertexBufferInternally();
-    mesh->data.genIndexBuffersInternally();
+    mesh->data->genVertexBufferInternally();
+    mesh->data->genIndexBuffersInternally();
     return mesh;
 }
 
@@ -647,7 +647,7 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
                     triangle.v1[i] = stoi(child->args[i]);
                 }
                 //check if triangle indices already exists to save space
-                uint32_t* actual_indices = mesh->data.addTriangle(triangle.v1);
+                uint32_t* actual_indices = mesh->data->addTriangle(triangle.v1);
                 if(actual_indices != triangle.v1){
                     delete[] triangle.v1;
                     triangle.v1 = actual_indices;
@@ -663,7 +663,7 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
                     triangle.v2[i] = stoi(child->args[i]);
                 }
                 //check if triangle indices already exists to save space
-                uint32_t* actual_indices = mesh->data.addTriangle(triangle.v2);
+                uint32_t* actual_indices = mesh->data->addTriangle(triangle.v2);
                 if(actual_indices != triangle.v2){
                     delete[] triangle.v2;
                     triangle.v2 = actual_indices;
@@ -679,7 +679,7 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
                     triangle.v3[i] = stoi(child->args[i]);
                 }
                 //check if triangle indices already exists to save space
-                uint32_t* actual_indices = mesh->data.addTriangle(triangle.v3);
+                uint32_t* actual_indices = mesh->data->addTriangle(triangle.v3);
                 if(actual_indices != triangle.v3){
                     //cout << "MALAKIES" << endl;
                     //printArray(actual_indices, 2+num_of_uvs);
@@ -696,7 +696,7 @@ void CSL_Interpreter::processTriangle(OE_Mesh32 *mesh, const size_t &num_of_uvs)
         }
         curNode = saveNode;
     }
-    mesh->data.triangles.push_back(triangle);
+    mesh->data->triangles.push_back(triangle);
 }
 
 
