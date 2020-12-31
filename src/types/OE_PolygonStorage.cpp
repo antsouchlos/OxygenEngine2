@@ -176,8 +176,6 @@ OE_PolygonStorage32::~OE_PolygonStorage32(){
     for (auto &index : this->vertex_buffer){
         delete[] index;
     }
-    if (this->index_buffer != nullptr)
-        delete this->index_buffer;
 }
 
 // This should be BLAAAZING FAST
@@ -190,10 +188,10 @@ uint32_t* OE_PolygonStorage32::addTriangle(uint32_t* indices){
         //printArray(indices, 2+num_of_uvs);
         //cout << endl;
         isFound = true;
-        output = this->vertex_buffer[this->index_buffer[0][indices]];
+        output = this->vertex_buffer[(*(this->index_buffer))[indices]];
     }
     if (!isFound){
-        this->index_buffer[0][indices] = this->vertex_buffer.size();
+        (*(this->index_buffer))[indices] = this->vertex_buffer.size();
         this->vertex_buffer.push_back(indices);
     }
     return output;
@@ -254,11 +252,10 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
     // do the expensive allocation at the start
     output.reserve(vgroup->polygons.size()*3);
     
-    for (const auto& tri : vgroup->polygons){
-        
-        output.push_back(this->index_buffer[0][this->triangles[tri].v1]);
-        output.push_back(this->index_buffer[0][this->triangles[tri].v2]);
-        output.push_back(this->index_buffer[0][this->triangles[tri].v3]);
+    for (const auto& tri : vgroup->polygons){ 
+        output.push_back((*(this->index_buffer))[this->triangles[tri].v1]);
+        output.push_back((*(this->index_buffer))[this->triangles[tri].v2]);
+        output.push_back((*(this->index_buffer))[this->triangles[tri].v3]);
     }
     
     return output;
@@ -267,11 +264,11 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
 /*********************************************/
         
 void OE_PolygonStorage32::initUnorderedIB(OE_Mesh32* mesh){
-    this->index_buffer = new OE_IndexBufferUnorderedMap(mesh);
+    this->index_buffer = std::make_shared<OE_IndexBufferUnorderedMap>(mesh);
 }
 
 void OE_PolygonStorage32::initOrderedIB(OE_Mesh32* mesh){
-    this->index_buffer = new OE_IndexBufferMap(mesh);
+    this->index_buffer = std::make_shared<OE_IndexBufferMap>(mesh);
 }
 
 void OE_PolygonStorage32::genVertexBufferInternally(){
