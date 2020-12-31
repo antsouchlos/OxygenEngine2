@@ -139,7 +139,7 @@ namespace csl {
 		auto parent = camera_e.single_assignments.at("parent");
 		// TODO: Dependency
 		result->parent			= object_list_.name2id(std::string(parent));
-		// TODO: This waw wrong in the previous interpreter
+		// TODO: This was wrong in the previous interpreter
 		result->parent_type		= sv_to_int(camera_e.single_assignments.at("parent_type"));	
 
 
@@ -234,7 +234,121 @@ namespace csl {
 
 	mesh_ptr Interpreter::process_mesh(const element& mesh_e) {
 		mesh_ptr result = std::make_shared<oe::mesh>();
+
 	
+		// Attributes
+
+
+		// TODO: Uniform naming convetion
+		result->data.isDynamic	= sv_to_int(mesh_e.attributes.at("isDynamic"));
+		result->data.num_of_uvs	= sv_to_int(mesh_e.attributes.at("num_uvs"));
+		result->visible			= !!sv_to_int(mesh_e.attributes.at("visible"));
+
+
+		// Single Assignments
+
+
+		auto num_of_vertices = sv_to_int(mesh_e.single_assignments.at("num_of_vertices"));
+		result->data.vertices.positions.reserve(num_of_vertices);
+
+		auto num_of_normals = sv_to_int(mesh_e.single_assignments.at("num_of_normals"));
+		result->data.vertices.normals.reserve(num_of_normals);
+		
+		auto num_of_triangles = sv_to_int(mesh_e.single_assignments.at("num_of_triangles"));
+		result->data.triangles.reserve(num_of_triangles);
+
+		auto parent = mesh_e.single_assignments.at("parent");
+		// TODO: Dependency
+		result->parent			= object_list_.name2id(std::string(parent));
+		result->parent_type		= sv_to_int(mesh_e.single_assignments.at("parent_type"));	
+
+
+		// List Assignments
+
+
+		auto cs_v = mesh_e.list_assignments.at("current_state");
+		if (cs_v.size() != 10)
+			throw semantic_error("The current_state member variable must have exactly"
+								 "10 elements");
+		
+		// TODO: Make functions more readable: make a function for current_state
+		result->current_state.pos_x = sv_to_float(cs_v[0]);
+		result->current_state.pos_y = sv_to_float(cs_v[1]);
+		result->current_state.pos_z = sv_to_float(cs_v[2]);
+		result->current_state.rot_w = sv_to_float(cs_v[3]);
+		result->current_state.rot_x = sv_to_float(cs_v[4]);
+		result->current_state.rot_y = sv_to_float(cs_v[5]);
+		result->current_state.rot_z = sv_to_float(cs_v[6]);
+		result->current_state.sca_x = sv_to_float(cs_v[7]);
+		result->current_state.sca_y = sv_to_float(cs_v[8]);
+		result->current_state.sca_z = sv_to_float(cs_v[9]);
+	
+		// TODO: Uniform naming convention
+		for (const auto& t : mesh_e.list_assignments.at("textureCM_IDs")) {
+			// TODO: std::string
+			// TODO: WHY TF.
+			result->textureCM_IDs.push_back(oe::world::tcmsList.name2id[std::string(t)]);
+		}
+
+		std::size_t n_vertices;
+		for (const auto& v : mesh_e.list_assignments.at("vertices")) {
+			result->data.vertices.positions.push_back(sv_to_float(v));
+		}
+	
+		for (const auto& n : mesh_e.list_assignments.at("normals")) {
+			result->data.vertices.normals.push_back(sv_to_float(n));
+		}
+
+
+		// Child Elements
+
+
+		for (const auto& vgroup_e : mesh_e.elements.at("VertexGroup")) {
+			vgroup_ptr v = process_vgroup(vgroup_e);
+			// TODO: Make this a std::shared_ptr
+			result->data.triangle_groups[v->id] = v.get();
+		}
+
+		for (const auto& triangle_e : mesh_e.elements.at("Triangle")) {
+			oe::triangle t = process_triangle(result, triangle_e, result->data.num_of_uvs);
+			result->data.triangles.push_back(t);
+		}
+
+		std::size_t num_of_uvmaps = 0;
+		for (const auto& uvmap_data_e : mesh_e.elements.at("UVMapData")) {
+			oe::uvmap_data u = process_uvmap_data(uvmap_data_e, num_of_uvmaps++);
+			result->data.vertices.uvmaps.push_back(u);
+		}
+
+
+		// Perform operations depending on parsed values
+		
+
+		std::size_t max_uv_num = 0;
+		for (const auto& n : result->data.vertices.uvmaps) {
+			max_uv_num = std::max(max_uv_num, n.elements.size());
+		}
+	
+		if ( (num_of_vertices<=65536) && (num_of_normals<=65536) && (max_uv_num<=65536)
+				&& (num_of_triangles*3<=65536) && (num_of_uvmaps<=2) ) {
+
+			// TODO: Make this use std::shared_ptr
+			result->data.initUnorderedIB(result.get());
+		} else if (num_of_uvmaps == 0) {
+			// TODO: Make this use std::shared_ptr
+			result->data.initUnorderedIB(result.get());
+		} else {
+			// TODO: Make this use std::shared_ptr
+			result->data.initOrderedIB(result.get());
+		}
+		
+		// TODO: Naming. N. A. M. I. N. G. (Why is there an s in the second function
+		// and no s in the first one?)
+		result->data.genVertexBufferInternally();
+		result->data.genIndexBuffersInternally();
+
+
+		return result;
 	}
 
 
@@ -424,8 +538,9 @@ namespace csl {
 
 
 
-	oe::uvmap_data Interpreter::process_uvmap_data(const element& uvmap_data_e) {
-		oe::uvmap_data result;
+	oe::uvmap_data Interpreter::process_uvmap_data(const element& uvmap_data_e, std::size_t num) {
+		// TODO: std::string
+		oe::uvmap_data result(num, std::string(uvmap_data_e.attributes.at("name")));
 
 
 		// Single Assignments
@@ -441,6 +556,79 @@ namespace csl {
 
 		for (const auto& e : uvmap_data_e.list_assignments.at("elements")) {
 			result.elements.push_back(sv_to_float(e));
+		}
+
+
+		return result;
+	}
+
+	oe::triangle Interpreter::process_triangle(mesh_ptr mesh, const element& triangle_e,
+									std::size_t num_of_uvs) {
+
+		oe::triangle result;
+
+		
+		// List Assignments
+		
+		// TODO: Proper naming
+		std::size_t n = 2 + num_of_uvs;
+		
+
+		if (triangle_e.list_assignments.at("v1").size() != n)
+			// TODO
+			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v1\").size()");
+
+		for (const auto& v : triangle_e.list_assignments.at("v1")) {
+			// TODO: Smart pointers
+			result.v1 = new uint32_t[n];
+			for (std::size_t i = 0; i < n; i++) {
+				result.v1[i] = sv_to_int(v);
+			}
+
+			//TODO: Smart pointers
+			uint32_t* actual_indices = mesh->data.addTriangle(result.v1);
+			if (actual_indices != result.v1) {
+				delete[] result.v1;
+				result.v1 = actual_indices;
+			}
+		}
+		
+		if (triangle_e.list_assignments.at("v2").size() != n)
+			// TODO
+			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v2\").size()");
+
+		for (const auto& v : triangle_e.list_assignments.at("v2")) {
+			// TODO: Smart pointers
+			result.v2 = new uint32_t[n];
+			for (std::size_t i = 0; i < n; i++) {
+				result.v2[i] = sv_to_int(v);
+			}
+
+			//TODO: Smart pointers
+			uint32_t* actual_indices = mesh->data.addTriangle(result.v2);
+			if (actual_indices != result.v2) {
+				delete[] result.v2;
+				result.v2 = actual_indices;
+			}
+		}
+		
+		if (triangle_e.list_assignments.at("v3").size() != n)
+			// TODO
+			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v3\").size()");
+
+		for (const auto& v : triangle_e.list_assignments.at("v3")) {
+			// TODO: Smart pointers
+			result.v3 = new uint32_t[n];
+			for (std::size_t i = 0; i < n; i++) {
+				result.v3[i] = sv_to_int(v);
+			}
+
+			//TODO: Smart pointers
+			uint32_t* actual_indices = mesh->data.addTriangle(result.v3);
+			if (actual_indices != result.v3) {
+				delete[] result.v3;
+				result.v3 = actual_indices;
+			}
 		}
 
 

@@ -13,6 +13,8 @@
 
 
 // TODO: Make use of RAII in every type class
+// TODO: Everywhere, where num_of* is used, instead just call *.elements.at("*").size(). No extra
+// 		 variable is necessary
 
 
 // Philipp might kill me for this, but I really think it looks better,
@@ -24,6 +26,7 @@ namespace oe {
 	using light			= OE_Light;
 	using mesh			= OE_Mesh32;
 	using uvmap_data	= OE_UVMapData;
+	using triangle		= OE_Triangle32;
 	using vgroup		= OE_VertexGroup;
 	using texture		= OE_Texture;
 	using tcm_texture	= OE_TCM_Texture;
@@ -76,7 +79,9 @@ namespace csl {
 			vpconfig_ptr	process_vpconfig(const element&);
 			
 			oe::tcm_texture	process_tcm_texture(const element&);
-			oe::uvmap_data	process_uvmap_data(const element&);
+			oe::uvmap_data	process_uvmap_data(const element&, std::size_t);
+
+			oe::triangle	process_triangle(mesh_ptr, const element&, std::size_t);
 	};
 }
 
