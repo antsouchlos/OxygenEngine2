@@ -1,42 +1,42 @@
 #include <OE_API.h>
 
-using namespace OE;
+using namespace oe;
 using namespace std;
 
-OE_TaskManager* OE::OE_Main = nullptr;
+OE_TaskManager* oe::OE_Main = nullptr;
 
-size_t OE::OE_Init(){    
+size_t oe::init(){    
     OE_Main = new OE_TaskManager();
     return OE_Main->Init("Oxygen Engine Test", 800, 600, false);
 }
-size_t OE::OE_Init(std::string title, bool fullscreen){
+size_t oe::init(std::string title, bool fullscreen){
     OE_Main = new OE_TaskManager();
     return OE_Main->Init(title, 800, 600, fullscreen);
 }
-size_t OE::OE_Init(std::string title, int x, int y, bool fullscreen){
+size_t oe::init(std::string title, int x, int y, bool fullscreen){
     OE_Main = new OE_TaskManager();
     return OE_Main->Init(title, x, y, fullscreen);
 }
-void OE::OE_Step(){
+void oe::step(){
     assert (OE_Main != nullptr);
     OE_Main->Step();
 }
-void OE::OE_Start(){
+void oe::start(){
     assert (OE_Main != nullptr);
     OE_Main->Start();
 }
-void OE::OE_Destroy(){
+void oe::destroy(){
     assert (OE_Main != nullptr);
     OE_Main->Destroy();
     delete OE_Main;
     OE_Main = nullptr;
 }
-bool OE::OE_IsDone(){
+bool oe::is_done(){
     assert (OE_Main != nullptr);
     return OE_Main->done;
 }
 // ?? Where do i even need this ??? UPDATE: Now I remember
-void OE::OE_Finish(){
+void oe::finish(){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.done = true;
 } 
@@ -47,84 +47,84 @@ void OE::OE_Finish(){
 // The API functions inside this block are the only ones that are 
 // safe to be called on an unsynchronized thread
     
-void OE::OE_AddTask(std::string name, const OE_METHOD func, void* data){
+void oe::add_task(std::string name, const OE_METHOD func, void* data){
     assert (OE_Main != nullptr);
     OE_Main->AddTask(name, func, data);
 }
 
-void OE::OE_AddTask(std::string name, const OE_METHOD func, int priority, void* data){
+void oe::add_task(std::string name, const OE_METHOD func, int priority, void* data){
     assert (OE_Main != nullptr);
     OE_Main->AddTask(name, func, data);
 }
 
-void OE::OE_AddTask(std::string name, const OE_METHOD func, int priority, std::string threadname, void* data){
+void oe::add_task(std::string name, const OE_METHOD func, int priority, std::string threadname, void* data){
     assert (OE_Main != nullptr);
     OE_Main->AddTask(name, func, priority, threadname, data);
 }
 
-void OE::OE_AddTask(std::string name, const OE_METHOD func, std::string threadname, void* data){
+void oe::add_task(std::string name, const OE_METHOD func, std::string threadname, void* data){
     assert (OE_Main != nullptr);
     OE_Main->AddTask(name, func, threadname, data);
 }
     
-void OE::OE_RemoveTask(std::string task){
+void oe::remove_task(std::string task){
     assert (OE_Main != nullptr);
     OE_Main->RemoveTask(task);
 }
 
-void OE::OE_RemoveTask(std::string task, std::string thread){
+void oe::remove_task(std::string task, std::string thread){
     assert (OE_Main != nullptr);
     OE_Main->RemoveTask(task, thread);
 }
     
-void OE::OE_BroadcastEvent(std::string name, void* data){
+void oe::broadcast_event(std::string name, void* data){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.broadcastIEvent(name, data);
 }
-void OE::OE_CreateEvent(std::string name){
+void oe::create_event(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.createUserEvent(name);
 }
-void OE::OE_SetEventFunc(std::string name, const OE_EVENTFUNC func, void* data){
+void oe::set_event_func(std::string name, const OE_EVENTFUNC func, void* data){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.setIEventFunc(name, func, data);
 }
 
-size_t OE::OE_GetEventActivations(std::string name){
+size_t oe::get_event_activations(std::string name){
     assert (OE_Main != nullptr);
     return OE_Main->window->event_handler.getEventActivations(name);
 }
 
-size_t OE::OE_GetEventCounter(std::string name){
+size_t oe::get_event_counter(std::string name){
     assert (OE_Main != nullptr);
     return OE_Main->window->event_handler.getEventCounter(name);
 }
 
-bool OE::OE_IsKeyJustPressed(std::string key){
+bool oe::is_key_just_pressed(std::string key){
     assert (OE_Main != nullptr);
-    return OE_GetEventActivations(key+"+") > 0;
+    return oe::get_event_activations(key+"+") > 0;
 }
 
-bool OE::OE_IsKeyJustReleased(std::string key){
+bool oe::is_key_just_released(std::string key){
     assert (OE_Main != nullptr);
-    return OE_GetEventActivations(key+"-") > 0;
+    return oe::get_event_activations(key+"-") > 0;
 }
     
-bool OE::OE_IsKeyHeld(std::string key){
+bool oe::is_key_held(std::string key){
     assert (OE_Main != nullptr);
-    return OE_GetEventActivations(key) > 0;
+    return oe::get_event_activations(key) > 0;
 }
 
-bool OE::OE_IsKeyPressed(std::string key){
+bool oe::is_key_pressed(std::string key){
     assert (OE_Main != nullptr);
-    return (OE_GetEventActivations(key) > 0) || (OE_GetEventActivations(key+"+") > 0);
+    return (oe::get_event_activations(key) > 0) || (oe::get_event_activations(key+"+") > 0);
 }
 
-bool OE::OE_IsMouseMoved(){
-    return OE_GetEventActivations("mouse-motion") > 0;
+bool oe::is_mouse_moved(){
+    return oe::get_event_activations("mouse-motion") > 0;
 }
 
-int OE::OE_GetDeltaMouseX(){
+int oe::get_delta_mouse_x(){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::delta_x;
@@ -132,7 +132,7 @@ int OE::OE_GetDeltaMouseX(){
     return output;
 }
 
-int OE::OE_GetDeltaMouseY(){
+int oe::get_delta_mouse_y(){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::delta_y;
@@ -140,7 +140,7 @@ int OE::OE_GetDeltaMouseY(){
     return output;
 }
     
-int OE::OE_GetMouseX(){
+int oe::get_mouse_x(){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::x;
@@ -148,7 +148,7 @@ int OE::OE_GetMouseX(){
     return output;
 }
 
-int OE::OE_GetMouseY(){
+int oe::get_mouse_y(){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::y;
@@ -156,46 +156,46 @@ int OE::OE_GetMouseY(){
     return output;
 }
 
-void OE::OE_DestroyEvent(std::string name){
+void oe::destroy_event(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.destroyIEvent(name);
 }
 
-void OE::OE_Pause(int x){
+void oe::pause(int x){
     assert (OE_Main != nullptr);
     OE_Main->pause(x);
 }
 
-bool OE::OE_IsMouseLocked(){
+bool oe::is_mouse_locked(){
     return OE_Main->window->getMouseLockedState();
 }
 
-void OE::OE_MouseLock(){
+void oe::mouse_lock(){
     
-    OE_CreateEvent("mouse-lock");
-    OE_SetEventFunc("mouse-lock", &OE_API_Helpers::manage_mouse, nullptr);
-    OE_BroadcastEvent("mouse-lock", nullptr);
+    oe::create_event("mouse-lock");
+    oe::set_event_func("mouse-lock", &OE_API_Helpers::manage_mouse, nullptr);
+    oe::broadcast_event("mouse-lock", nullptr);
     
 }
-void OE::OE_MouseUnlock(){
-    OE_CreateEvent("mouse-unlock");
-    OE_SetEventFunc("mouse-unlock", &OE_API_Helpers::manage_mouse, nullptr);
-    OE_BroadcastEvent("mouse-unlock", nullptr);
+void oe::mouse_unlock(){
+    oe::create_event("mouse-unlock");
+    oe::set_event_func("mouse-unlock", &OE_API_Helpers::manage_mouse, nullptr);
+    oe::broadcast_event("mouse-unlock", nullptr);
 }
 
 //------------------------BLOCK-------------------------//
 
-OE_Task OE::OE_GetTaskInfo(std::string thread, std::string task){
+OE_Task oe::get_task_info(std::string thread, std::string task){
     assert (OE_Main != nullptr);
     return OE_Main->GetTaskInfo(thread, task);
 }
     
-void OE::OE_CreateNewThread(std::string name){
+void oe::create_new_thread(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->CreateNewThread(name);
 }
 
-void OE::OE_CreateUnsyncThread(std::string name, const OE_METHOD func, void* data){
+void oe::create_unsync_thread(std::string name, const OE_METHOD func, void* data){
     assert (OE_Main != nullptr);
     OE_Main->CreateUnsyncThread(name, func, data);
 }
@@ -203,27 +203,27 @@ void OE::OE_CreateUnsyncThread(std::string name, const OE_METHOD func, void* dat
 /** API functions for loading worlds/scenes/objects/etc.
  */
     
-void OE::OE_LoadWorld(std::string filename, const OE_EVENTFUNC func, void* data){
+void oe::load_world(std::string filename, const OE_EVENTFUNC func, void* data){
     
-    OE_CreateEvent("loaded-" + filename);
-    OE_SetEventFunc("loaded-" + filename, func, data);
+    oe::create_event("loaded-" + filename);
+    oe::set_event_func("loaded-" + filename, func, data);
     string* argument = new string();
     *argument = filename;
-    OE_CreateUnsyncThread("loading-" + filename, &OE_API_Helpers::load_world, (void*)argument);
+    oe::create_unsync_thread("loading-" + filename, &OE_API_Helpers::load_world, (void*)argument);
 }
 
 /** API functions for manipulating objects and basic types
      * to be vastly extended when the physics engine comes
      */
     
-std::size_t OE::OE_GetObjectID(std::string name){
+std::size_t oe::get_object_id(std::string name){
     OE_World::objectsList.lockMutex();
     std::size_t output = OE_World::objectsList.name2id[name];
     OE_World::objectsList.unlockMutex();
     return output;
 }
 
-std::string OE::OE_GetObjectName(std::size_t id){
+std::string oe::get_object_name(std::size_t id){
     OE_World::objectsList.lockMutex();
     std::string output;
     if (OE_World::objectsList.id2name.count(id)){
@@ -233,7 +233,7 @@ std::string OE::OE_GetObjectName(std::size_t id){
     return output;
 }
     
-std::set<std::size_t>   OE::OE_GetSceneObjects(std::size_t id){
+std::set<std::size_t>   oe::get_scene_objects(std::size_t id){
     
     std::set<std::size_t> output;
     
@@ -249,7 +249,7 @@ std::set<std::size_t>   OE::OE_GetSceneObjects(std::size_t id){
     return output;
 }
 
-OE_Vec3 OE::OE_GetObjectPos(std::size_t id){
+OE_Vec3 oe::get_object_pos(std::size_t id){
     
     OE_Vec3 output;
     
@@ -264,7 +264,7 @@ OE_Vec3 OE::OE_GetObjectPos(std::size_t id){
     return output;
 }
 
-OE_Quat OE::OE_GetObjectRot(std::size_t id){
+OE_Quat oe::get_object_rot(std::size_t id){
     
     OE_Quat output = OE_Quat();
     
@@ -277,7 +277,7 @@ OE_Quat OE::OE_GetObjectRot(std::size_t id){
     return output;
 }
 
-std::set<std::size_t>   OE::OE_GetSceneObjects(std::string name){
+std::set<std::size_t>   oe::get_scene_objects(std::string name){
     
     std::set<std::size_t> output;
     
@@ -293,7 +293,7 @@ std::set<std::size_t>   OE::OE_GetSceneObjects(std::string name){
     return output;
 }
 
-OE_Vec3 OE::OE_GetObjectPos(std::string name){
+OE_Vec3 oe::get_object_pos(std::string name){
     
     OE_Vec3 output;
     
@@ -308,7 +308,7 @@ OE_Vec3 OE::OE_GetObjectPos(std::string name){
     return output;
 }
 
-OE_Quat OE::OE_GetObjectRot(std::string name){
+OE_Quat oe::get_object_rot(std::string name){
     
     OE_Quat output;
     
@@ -321,7 +321,7 @@ OE_Quat OE::OE_GetObjectRot(std::string name){
     return output;
 }
     
-void OE::OE_SetObjectPos(std::size_t id, OE_Vec3 pos){
+void oe::set_object_pos(std::size_t id, OE_Vec3 pos){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -332,7 +332,7 @@ void OE::OE_SetObjectPos(std::size_t id, OE_Vec3 pos){
     }
 }
 
-void OE::OE_SetObjectRot(std::size_t id, OE_Quat rot){
+void oe::set_object_rot(std::size_t id, OE_Quat rot){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -341,7 +341,7 @@ void OE::OE_SetObjectRot(std::size_t id, OE_Quat rot){
     }
 }
 
-void OE::OE_SetObjectRot(std::size_t id, OE_Vec4 rot){
+void oe::set_object_rot(std::size_t id, OE_Vec4 rot){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -350,7 +350,7 @@ void OE::OE_SetObjectRot(std::size_t id, OE_Vec4 rot){
     }
 }
     
-void OE::OE_ChangeObjectPos(std::size_t id, OE_Vec3 pos){
+void oe::change_object_pos(std::size_t id, OE_Vec3 pos){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -361,7 +361,7 @@ void OE::OE_ChangeObjectPos(std::size_t id, OE_Vec3 pos){
     }
 }
 
-void OE::OE_ChangeObjectRot(std::size_t id, OE_Quat rot){
+void oe::change_object_rot(std::size_t id, OE_Quat rot){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -370,7 +370,7 @@ void OE::OE_ChangeObjectRot(std::size_t id, OE_Quat rot){
     }
 }
 
-void OE::OE_ChangeObjectRot(std::size_t id, OE_Vec4 rot){
+void oe::change_object_rot(std::size_t id, OE_Vec4 rot){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -379,7 +379,7 @@ void OE::OE_ChangeObjectRot(std::size_t id, OE_Vec4 rot){
     }
 }
     
-void OE::OE_SetObjectPos(std::string name, OE_Vec3 pos){
+void oe::set_object_pos(std::string name, OE_Vec3 pos){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -390,7 +390,7 @@ void OE::OE_SetObjectPos(std::string name, OE_Vec3 pos){
     }
 }
 
-void OE::OE_SetObjectRot(std::string name, OE_Quat rot){    
+void oe::set_object_rot(std::string name, OE_Quat rot){    
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -399,7 +399,7 @@ void OE::OE_SetObjectRot(std::string name, OE_Quat rot){
     }
 }
 
-void OE::OE_SetObjectRot(std::string name, OE_Vec4 rot){
+void oe::set_object_rot(std::string name, OE_Vec4 rot){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -408,7 +408,7 @@ void OE::OE_SetObjectRot(std::string name, OE_Vec4 rot){
     }
 }
     
-void OE::OE_ChangeObjectPos(std::string name, OE_Vec3 pos){
+void oe::change_object_pos(std::string name, OE_Vec3 pos){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -419,7 +419,7 @@ void OE::OE_ChangeObjectPos(std::string name, OE_Vec3 pos){
     }
 }
 
-void OE::OE_ChangeObjectRot(std::string name, OE_Quat rot){
+void oe::change_object_rot(std::string name, OE_Quat rot){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -428,7 +428,7 @@ void OE::OE_ChangeObjectRot(std::string name, OE_Quat rot){
     }
 }
 
-void OE::OE_ChangeObjectRot(std::string name, OE_Vec4 rot){
+void oe::change_object_rot(std::string name, OE_Vec4 rot){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -437,7 +437,7 @@ void OE::OE_ChangeObjectRot(std::string name, OE_Vec4 rot){
     }
 }
 
-void OE::OE_ChangeObjectGlobalRot(std::size_t id, OE_Quat rot){
+void oe::change_object_global_rot(std::size_t id, OE_Quat rot){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -446,7 +446,7 @@ void OE::OE_ChangeObjectGlobalRot(std::size_t id, OE_Quat rot){
     }
 }
 
-void OE::OE_ChangeObjectGlobalRot(std::size_t id, OE_Vec4 rot){
+void oe::change_object_global_rot(std::size_t id, OE_Vec4 rot){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -455,7 +455,7 @@ void OE::OE_ChangeObjectGlobalRot(std::size_t id, OE_Vec4 rot){
     }
 }
 
-void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Quat rot){
+void oe::change_object_global_rot(std::string name, OE_Quat rot){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -464,7 +464,7 @@ void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Quat rot){
     }
 }
 
-void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Vec4 rot){
+void oe::change_object_global_rot(std::string name, OE_Vec4 rot){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -473,7 +473,7 @@ void OE::OE_ChangeObjectGlobalRot(std::string name, OE_Vec4 rot){
     }
 }
 
-void OE::OE_ChangeObjectLocalPos(std::size_t id, OE_Vec3 pos){
+void oe::change_object_local_pos(std::size_t id, OE_Vec3 pos){
     auto object = OE_World::objectsList[id];
     if (object != nullptr){
         object->lockMutex();
@@ -486,7 +486,7 @@ void OE::OE_ChangeObjectLocalPos(std::size_t id, OE_Vec3 pos){
     }
 }
 
-void OE::OE_ChangeObjectLocalPos(std::string name, OE_Vec3 pos){
+void oe::change_object_local_pos(std::string name, OE_Vec3 pos){
     auto object = OE_World::objectsList[name];
     if (object != nullptr){
         object->lockMutex();
@@ -498,12 +498,57 @@ void OE::OE_ChangeObjectLocalPos(std::string name, OE_Vec3 pos){
         object->unlockMutex();
     }
 }
+
+void oe::set_object_scale(std::size_t id , OE_Vec3 sca){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = sca.x;
+        object->current_state.sca_y = sca.y;
+        object->current_state.sca_z = sca.z;
+        object->unlockMutex();
+    }
+}
+
+void oe::set_object_scale(std::string name, OE_Vec3 sca){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = sca.x;
+        object->current_state.sca_y = sca.y;
+        object->current_state.sca_z = sca.z;
+        object->unlockMutex();
+    }
+}
+    
+void oe::change_object_scale(std::size_t id, OE_Vec3 sca){
+    auto object = OE_World::objectsList[id];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = object->current_state.sca_x + sca.x;
+        object->current_state.sca_y = object->current_state.sca_y + sca.y;
+        object->current_state.sca_z = object->current_state.sca_z + sca.z;
+        object->unlockMutex();
+    }
+}
+
+void oe::change_object_scale(std::string name, OE_Vec3 sca){
+    auto object = OE_World::objectsList[name];
+    if (object != nullptr){
+        object->lockMutex();
+        object->current_state.sca_x = object->current_state.sca_x + sca.x;
+        object->current_state.sca_y = object->current_state.sca_y + sca.y;
+        object->current_state.sca_z = object->current_state.sca_z + sca.z;
+        object->unlockMutex();
+    }
+}
+
 
 /** API functions to control the renderer
      *  These should work for ANY renderer
      */
     
-void OE::OE_RestartRenderer(){
+void oe::restart_renderer(){
     assert (OE_Main != nullptr);
     OE_Main->window_mutex.lockMutex();
     if (OE_Main->window != nullptr)
@@ -511,7 +556,7 @@ void OE::OE_RestartRenderer(){
     OE_Main->window_mutex.unlockMutex();
 }
 
-void OE::OE_SetShadingMode(OE_RENDERER_SHADING_MODE shading_mode){
+void oe::set_shading_mode(OE_RENDERER_SHADING_MODE shading_mode){
     assert (OE_Main != nullptr);
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
@@ -520,10 +565,10 @@ void OE::OE_SetShadingMode(OE_RENDERER_SHADING_MODE shading_mode){
         OE_Main->renderer->unlockMutex();
     }
     OE_Main->renderer_mutex.unlockMutex();
-    OE_RestartRenderer();
+    oe::restart_renderer();
 }
 
-OE_RENDERER_SHADING_MODE OE_GetShadingMode(){
+OE_RENDERER_SHADING_MODE oe::get_shading_mode(){
     assert (OE_Main != nullptr);
     OE_RENDERER_SHADING_MODE output = OE_RENDERER_REGULAR_SHADING;
     OE_Main->renderer_mutex.lockMutex();
@@ -536,7 +581,7 @@ OE_RENDERER_SHADING_MODE OE_GetShadingMode(){
     return output;
 }
 
-void OE::OE_RenderWireframe(bool value){
+void oe::render_wireframe(bool value){
     assert (OE_Main != nullptr);
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
@@ -545,7 +590,7 @@ void OE::OE_RenderWireframe(bool value){
     OE_Main->renderer_mutex.unlockMutex();
 }
 
-void OE::OE_ToggleWireframeRendering(){
+void oe::toggle_wireframe_rendering(){
     assert (OE_Main != nullptr);
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
@@ -559,7 +604,7 @@ void OE::OE_ToggleWireframeRendering(){
     OE_Main->renderer_mutex.unlockMutex();
 }
 
-void OE::OE_RenderBoundingBoxes(bool value){
+void oe::render_bounding_boxes(bool value){
     assert (OE_Main != nullptr);
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
@@ -567,7 +612,7 @@ void OE::OE_RenderBoundingBoxes(bool value){
     }
     OE_Main->renderer_mutex.unlockMutex();
 }
-void OE::OE_ToggleBoundingBoxesRendering(){
+void oe::toggle_bounding_boxes_rendering(){
     assert (OE_Main != nullptr);
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){

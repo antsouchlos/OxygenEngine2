@@ -204,6 +204,19 @@ New Lexer and Parser are now done and reasonably optimized. No memory leaks and 
 We now embark on the great journey of actually integrating the new Lexer and Parser into OxygenEngine, i.e. rewriting the Interpreter while leaving
 it's interface unchanged
 
+2020/12/25 - philsegeler
+
+Changed user-facing API of OE to starting with ```oe::``` and using underscores instead of camelCase-like naming conventions + fixes in renderer.
+
+2020/12/28 - philsegeler
+
+Overhauled math library to be easily extensible. 
+Optimized Natrium Renderer by offloading all OpenGL buffer data calls into the ```updateSingleThread()``` method instead of ```updateData```. This would make synchronization between the renderer and the physics engine more performant.
+
+2020/12/29 - philsegeler
+
+NRE: Fixed an OpenGL bug on Windows/Intel. Updated with TODO list for anything but renderer.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -222,6 +235,9 @@ UPDATE 2020/11/12: It was enhanced.
 - ~~Basic Material and Lighting support.~~(DONE)
 - ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
 - ~~Support multiple shaders~~
+- Implement rendering of bounding spheres
+- Implement rendering of cones
+- Implement sorting front-to-back or back-to-front of objects
 - Implement Directional Light rendering pass.
 - Implement Point+Area Light-Indexed rendering pass.
 - Support multiple render targets and framebuffers in the Renderer API
@@ -248,6 +264,14 @@ In the future and in no particular order:
 - Physically-based-rendering(?!)
 - Tesselation (?!)
 - MacOS/iOS support
+
+## TODO list for philsegeler - Anything but renderer
+
+Now that it was decided that C++17 will be the minimum requirement:
+
+- Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.
+- Handle errors in the API properly.
+- Investigate possible optimizations in the Event handler
 
 
 ## TODO list for antsouchlos parser

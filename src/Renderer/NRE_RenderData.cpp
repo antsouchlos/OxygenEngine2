@@ -2,7 +2,12 @@
 #include <OE_API.h>
 
 using namespace std;
-using namespace OE;
+using namespace oe;
+
+std::vector<float> NRE_MeshRenderData::genBoundingBoxVBO(){
+    return OE_GetBoundingBoxVertexBuffer(max_x, min_x, max_y, min_y, max_z, min_z);
+}
+
 
 bool NRE_RenderGroup::operator < (const NRE_RenderGroup& other) const{
     
@@ -99,7 +104,7 @@ bool NRE_Renderer::updateData(){
             if (temp_objects[x]->getType() == "MESH32"){
                 
                 // vbos/ibos must be regenerated
-                auto mesh = static_cast<OE_Mesh32*>(temp_objects[x].get());
+                auto mesh = static_pointer_cast<OE_Mesh32>(temp_objects[x]);
                 mesh->data.vbo_exists = false;
                 mesh->data.ibos_exist = false;
             }
@@ -136,7 +141,10 @@ bool NRE_Renderer::updateData(){
     // PRELIMINARY WORK
     // only handle the first scene for now with 1 camera and -materials
     bool scene_done = false;
+    
     for (auto scene: temp_scenes.getKeys()){
+        
+        if (scene_done) continue;
         
         vector<size_t> obj_ids;
         
@@ -144,20 +152,20 @@ bool NRE_Renderer::updateData(){
         
         for (auto material : temp_scenes(scene)->materials){
             if (temp_materials.hasChanged(material))
-                this->handleMaterialData(material, temp_materials(material).get());
+                this->handleMaterialData(material, temp_materials(material));
         }
         
         // first handle objects and lights
         for (auto obj : temp_scenes(scene)->objects){
             if (temp_objects(obj)->getType() == "MESH32"){
                 if (temp_objects.hasChanged(obj)){
-                    this->handleMeshData(obj, static_cast<OE_Mesh32*>(temp_objects(obj).get()));
+                    this->handleMeshData(obj, static_pointer_cast<OE_Mesh32>(temp_objects(obj)));
                     obj_ids.push_back(obj);
                 }
             }
             else if (temp_objects(obj)->getType() == "LIGHT"){
                 if (temp_objects.hasChanged(obj))
-                    this->handleLightData(obj, static_cast<OE_Light*>(temp_objects(obj).get()));
+                    this->handleLightData(obj, static_pointer_cast<OE_Light>(temp_objects(obj)));
             }
             else{}
         }
@@ -165,36 +173,19 @@ bool NRE_Renderer::updateData(){
         for (auto obj : temp_scenes(scene)->objects){
             if (temp_objects(obj)->getType() == "CAMERA"){
                 if(temp_objects.hasChanged(obj)){
-                    this->handleCameraData(obj, static_cast<OE_Camera*>(temp_objects(obj).get()));
+                    this->handleCameraData(obj, static_pointer_cast<OE_Camera>(temp_objects(obj)));
                     camera_ids.push_back(obj);
                 }
             }
             else{}
-        }
+        }        
         
-        if (scene_done) continue;
-        
-        size_t camera_id = 0;
         if(camera_ids.size() >= 1){
-            camera_id = camera_ids[0];
+            this->camera_id = camera_ids[0];
         } else{
             continue;
         }
         
-        for (auto mesh : this->meshes){
-            for (auto vgroup : this->vgroups){
-                if (vgroup.second.mesh_id == mesh.first){
-                    auto render_data = NRE_RenderGroup();
-                    render_data.camera = camera_id;
-                    render_data.vgroup = vgroup.first;
-                    render_data.mesh = mesh.first;
-                    render_data.material = vgroup.second.material_id;
-                    if (!this->existsRenderGroup(render_data)){
-                        this->render_groups.push_back(render_data);
-                    }
-                }
-            }
-        }
         scene_done = true;
         
     }
@@ -204,7 +195,7 @@ bool NRE_Renderer::updateData(){
 
 //-----------------------------------Pass individual element changes synchronously as fast as possible--------//
 
-void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
+void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mesh){
     if (this->meshes.count(id) == 0){
         
         // make sure all index and vertex buffers are generated
@@ -218,31 +209,12 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         this->meshes[id].uvmaps = mesh->data.vertices.uvmaps.size();
         this->meshes[id].size = mesh->data.vbo.size();
         
-        this->meshes[id].vbo = this->api->newVertexBuffer();
-        //this->api->setVertexBufferMemory(this->meshes[id].vbo, this->meshes[id].size, NRE_GPU_STATIC);
-        //this->api->setVertexBufferData(this->meshes[id].vbo, mesh->data.vbo, 0);
-        this->api->setVertexBufferMemoryData(this->meshes[id].vbo, mesh->data.vbo, NRE_GPU_STATIC);
-        mesh->data.vbo.clear();
-        
-        // setup Vertex Layout Inputs
-        // but offload the actual OpenGL commands for later, since this runs in a performance
-        // critical section
-        this->meshes[id].vao = this->api->newVertexLayout();
-        typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
-        
-        this->meshes[id].vao_input.clear();
-        
-        this->meshes[id].vao_input.push_back(VLI(this->meshes[id].vbo, 0, 3, 6+this->meshes[id].uvmaps*2));
-        this->meshes[id].vao_input.push_back(VLI(this->meshes[id].vbo, 3, 3, 6+this->meshes[id].uvmaps*2));
-        
-        for (size_t i=0; i < this->meshes[id].uvmaps; i++){
-            this->meshes[id].vao_input.push_back(VLI(this->meshes[id].vbo, 6+2*i, 2, 6+this->meshes[id].uvmaps*2));
-        }
+        // store the shared pointer
+        this->meshes[id].mesh = mesh;        
         
         //setup the Uniform buffer holding the model matrix
         // but offload the actual OpenGL commands for later, since this runs in a performance
         // critical section
-        this->meshes[id].ubo = this->api->newUniformBuffer();
         
         auto model_mat = mesh->GetModelMatrix();
         
@@ -252,9 +224,8 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         // handle Vertex (Triangle) groups
         for (auto vgroup : mesh->data.triangle_groups){
             this->handleVGroupData(id, vgroup.first, mesh);
+            this->meshes[id].vgroups.insert(vgroup.first);
         }
-        mesh->data.ibos.clear();
-        
         
         // store bounding box
         
@@ -263,15 +234,15 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
         mesh->calculateProperBoundingBox();
         //---- </TEMPORARY> ---//
         
-        this->meshes[id].vbo_bbox = this->api->newVertexBuffer();
-        this->api->setVertexBufferMemoryData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), NRE_GPU_STREAM);
+        assert (mesh->data.vertices.calculatedBoundingBox);
         
-        this->meshes[id].vao_bbox = this->api->newVertexLayout();
-        std::vector<VLI> vao_bbox_data;
-        vao_bbox_data.push_back(VLI(this->meshes[id].vbo_bbox, 0, 3, 6));
-        vao_bbox_data.push_back(VLI(this->meshes[id].vbo_bbox, 3, 3, 6));
+        this->meshes[id].max_x = mesh->data.vertices.max_x;
+        this->meshes[id].max_y = mesh->data.vertices.max_y;
+        this->meshes[id].max_z = mesh->data.vertices.max_z;
         
-        this->api->setVertexLayoutFormat(this->meshes[id].vao_bbox, vao_bbox_data);
+        this->meshes[id].min_x = mesh->data.vertices.min_x;
+        this->meshes[id].min_y = mesh->data.vertices.min_y;
+        this->meshes[id].min_z = mesh->data.vertices.min_z;
         
     }
     else{
@@ -283,30 +254,34 @@ void NRE_Renderer::handleMeshData(std::size_t id, OE_Mesh32* mesh){
             // This should not be done here but in the physics engine
             mesh->calculateProperBoundingBox();
             //---- </TEMPORARY> ---//
+            
+            assert (mesh->data.vertices.calculatedBoundingBox);
         
-            this->api->setVertexBufferData(this->meshes[id].vbo_bbox, mesh->data.vertices.genBoundingBoxMesh(), 0);
+            this->meshes[id].max_x = mesh->data.vertices.max_x;
+            this->meshes[id].max_y = mesh->data.vertices.max_y;
+            this->meshes[id].max_z = mesh->data.vertices.max_z;
+        
+            this->meshes[id].min_x = mesh->data.vertices.min_x;
+            this->meshes[id].min_y = mesh->data.vertices.min_y;
+            this->meshes[id].min_z = mesh->data.vertices.min_z;
+            
         }
         
         this->meshes[id].changed = true;
     }
 }
 
-void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, OE_Mesh32* mesh){
+void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, std::shared_ptr<OE_Mesh32> mesh){
     if (this->vgroups.count(id) == 0){
         
         this->vgroups[id] = NRE_VGroupRenderData(); this->vgroups[id].id = id; this->vgroups[id].mesh_id = mesh_id;
         this->vgroups[id].bone_mat = OE_Mat4x4(1.0f);
         this->vgroups[id].ibo = this->api->newIndexBuffer();
-        this->vgroups[id].material_id = mesh->data.triangle_groups[id]->material_id;
-        //this->api->setIndexBufferMemory(this->vgroups[id].ibo, mesh->data.ibos[id].data.size(), NRE_GPU_STATIC);
-        //this->api->setIndexBufferData(this->vgroups[id].ibo, mesh->data.ibos[id].data, 0);
-        this->api->setIndexBufferMemoryData(this->vgroups[id].ibo, mesh->data.ibos[id].data, NRE_GPU_STATIC);
-        mesh->data.ibos[id].data.clear();
-        
+        this->vgroups[id].material_id = mesh->data.triangle_groups[id]->material_id;        
     }
 }
 
-void NRE_Renderer::handleMaterialData(std::size_t id, OE_Material* mat){
+void NRE_Renderer::handleMaterialData(std::size_t id, std::shared_ptr<OE_Material> mat){
     if (this->materials.count(id) == 0){
         this->materials[id] = NRE_MaterialRenderData(); this->materials[id].id = id;
         this->materials[id].ubo = this->api->newUniformBuffer();
@@ -319,7 +294,7 @@ void NRE_Renderer::handleMaterialData(std::size_t id, OE_Material* mat){
     }
 }
 
-void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
+void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> camera){
     if (this->cameras.count(id) == 0){
         
         //setup the Uniform buffer holding the perspective/view matrix
@@ -328,9 +303,13 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
         this->cameras[id].ubo = this->api->newUniformBuffer();
 
         auto view_mat = camera->GetViewMatrix();
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+1.0f, (float)camera->far);
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.4f, (float)camera->far);
         
         this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
+        this->cameras[id].data.push_back(camera->current_state.pos_x);
+        this->cameras[id].data.push_back(camera->current_state.pos_y);
+        this->cameras[id].data.push_back(camera->current_state.pos_z);
+        this->cameras[id].data.push_back(1.0f);
         this->cameras[id].changed = true;
         
     }
@@ -340,12 +319,16 @@ void NRE_Renderer::handleCameraData(std::size_t id, OE_Camera* camera){
         auto view_mat = camera->GetViewMatrix();
         
         this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
+        this->cameras[id].data.push_back(camera->current_state.pos_x);
+        this->cameras[id].data.push_back(camera->current_state.pos_y);
+        this->cameras[id].data.push_back(camera->current_state.pos_z);
+        this->cameras[id].data.push_back(1.0f);
         this->cameras[id].changed = true;
         
     }
 }
 
-void NRE_Renderer::handleLightData(std::size_t id, OE_Light* light){
+void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> light){
     
 }
 
@@ -353,18 +336,78 @@ void NRE_Renderer::handleLightData(std::size_t id, OE_Light* light){
 
 void NRE_Renderer::updateMeshGPUData(){
     for (auto mesh: this->meshes){
+        
+        // first time buffer initialization
+        if (!this->meshes[mesh.first].has_init){
+            this->meshes[mesh.first].vbo      = this->api->newVertexBuffer();
+            this->meshes[mesh.first].vao      = this->api->newVertexLayout();
+            this->meshes[mesh.first].ubo      = this->api->newUniformBuffer();
+            this->meshes[mesh.first].vbo_bbox = this->api->newVertexBuffer();
+            this->meshes[mesh.first].vao_bbox = this->api->newVertexLayout();
+            this->meshes[mesh.first].has_init = true;
+        }
+        
+        
+        // initialize data itself
         if (!this->meshes[mesh.first].vao_initialized){
+            
+            /// vertex buffer
+            this->meshes[mesh.first].mesh->data.vbo_mutex.lockMutex();
+            this->api->setVertexBufferMemoryData(this->meshes[mesh.first].vbo, this->meshes[mesh.first].mesh->data.vbo, NRE_GPU_STATIC);
+            this->meshes[mesh.first].mesh->data.vbo.clear();
+            this->meshes[mesh.first].mesh->data.vbo_mutex.unlockMutex();
+            
+            
+            /// index buffers
+            this->meshes[mesh.first].mesh->data.ibos_mutex.lockMutex();
+            for (auto vg : mesh.second.vgroups){
+                this->api->setIndexBufferMemoryData(this->vgroups[vg].ibo, this->meshes[mesh.first].mesh->data.ibos[vg].data, NRE_GPU_STATIC);
+                this->meshes[mesh.first].mesh->data.ibos[vg].data.clear();
+            }
+            
+            this->meshes[mesh.first].mesh->data.ibos_mutex.unlockMutex();
+            
+            /// vertex layout
+            typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
+            
+            this->meshes[mesh.first].mesh->data.ibos.clear();
+            //delete this->meshes[mesh.first].mesh->data.index_buffer;
+            //this->meshes[mesh.first].mesh->data.index_buffer = nullptr;
+            
+            this->meshes[mesh.first].vao_input.clear();
+        
+            this->meshes[mesh.first].vao_input.push_back(VLI(this->meshes[mesh.first].vbo, 0, 3, 6+this->meshes[mesh.first].uvmaps*2));
+            this->meshes[mesh.first].vao_input.push_back(VLI(this->meshes[mesh.first].vbo, 3, 3, 6+this->meshes[mesh.first].uvmaps*2));
+        
+            for (size_t i=0; i < this->meshes[mesh.first].uvmaps; i++){
+                this->meshes[mesh.first].vao_input.push_back(VLI(this->meshes[mesh.first].vbo, 6+2*i, 2, 6+this->meshes[mesh.first].uvmaps*2));
+            }
+            
             this->api->setVertexLayoutFormat(this->meshes[mesh.first].vao, this->meshes[mesh.first].vao_input);
             this->meshes[mesh.first].vao_initialized = true;
+            
+            /// update bounding box data
+            this->api->setVertexBufferMemoryData(this->meshes[mesh.first].vbo_bbox, this->meshes[mesh.first].genBoundingBoxVBO(), NRE_GPU_STREAM);
+            
+            std::vector<VLI> vao_bbox_data;
+            vao_bbox_data.push_back(VLI(this->meshes[mesh.first].vbo_bbox, 0, 3, 6));
+            vao_bbox_data.push_back(VLI(this->meshes[mesh.first].vbo_bbox, 3, 3, 6));
+            this->api->setVertexLayoutFormat(this->meshes[mesh.first].vao_bbox, vao_bbox_data);
         }
+        
+        // update per frame data
         if (this->meshes[mesh.first].changed){
             
             if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
                 this->meshes[mesh.first].size = this->meshes[mesh.first].data.size();
-                this->api->setUniformBufferMemory(this->meshes[mesh.first].ubo, this->meshes[mesh.first].size, NRE_GPU_STREAM);
+                this->api->setUniformBufferMemory(this->meshes[mesh.first].ubo, this->meshes[mesh.first].size, NRE_GPU_DYNAMIC);
             }
             
             this->api->setUniformBufferData(this->meshes[mesh.first].ubo, this->meshes[mesh.first].data, 0);
+            
+            if (this->render_bounding_boxes){
+                this->api->setVertexBufferData(this->meshes[mesh.first].vbo_bbox, this->meshes[mesh.first].genBoundingBoxVBO(), 0);
+            }
             this->meshes[mesh.first].changed = false;
         }
     }
@@ -391,7 +434,7 @@ void NRE_Renderer::updateCameraGPUData(){
             
             if (this->cameras[cam.first].size != this->cameras[cam.first].data.size()){
                 this->cameras[cam.first].size = this->cameras[cam.first].data.size();
-                this->api->setUniformBufferMemory(this->cameras[cam.first].ubo, this->cameras[cam.first].size, NRE_GPU_STREAM);
+                this->api->setUniformBufferMemory(this->cameras[cam.first].ubo, this->cameras[cam.first].size, NRE_GPU_DYNAMIC);
             }
             
             this->api->setUniformBufferData(this->cameras[cam.first].ubo, this->cameras[cam.first].data, 0);

@@ -17,6 +17,21 @@ OE_Texture::OE_Texture(){
     this->id                        = ++OE_Texture::current_id;
 }
 
+
+OE_Texture::OE_Texture(const string &name){
+    
+    this->source                    = 0;
+    this->path                      = "";
+    this->camera                    = 0;
+    this->custom_data               = nullptr;
+    
+    this->id                        = ++OE_Texture::current_id;
+}
+
+OE_Texture::~OE_Texture(){
+
+} 
+
 string OE_Texture::to_str(){
     
     string output = outputTypeTag("Texture", {{"name", "\"" + OE_World::texturesList.id2name[this->id] + "\""}});

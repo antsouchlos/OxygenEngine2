@@ -1,1 +1,0 @@
-[{"name": "sdl2", "version": "2.0.14", "compile_args": ["-I/usr/include/SDL2", "-D_REENTRANT"], "link_args": ["-pthread", "/usr/lib/libSDL2.so"]}]

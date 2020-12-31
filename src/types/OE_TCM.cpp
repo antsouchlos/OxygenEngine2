@@ -40,6 +40,20 @@ OE_TCM::OE_TCM(){
     this->id                        = ++OE_TCM::current_id;
 }
 
+
+OE_TCM::OE_TCM(const string &name){
+
+    this->r                         = 0.0f; this->g = 0.0f; this->b = 0.0f; this->a = 0.0f;
+    this->texture_array             = false;
+    this->combine_mode              = 0;
+    
+    this->id                        = ++OE_TCM::current_id;
+}
+
+OE_TCM::~OE_TCM(){
+
+} 
+ 
 string OE_TCM::to_str() const{
     string output = outputTypeTag("TextureCombineMode", {{"name", "\"" + OE_World::tcmsList.id2name[this->id] + "\""}});
     output.append("\n");

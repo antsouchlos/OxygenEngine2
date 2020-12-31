@@ -7,7 +7,7 @@ using namespace std;
 // These should be empty
 
 OE_IndexBufferWrapperBase::OE_IndexBufferWrapperBase(){
-    
+
 }
 
 OE_IndexBufferWrapperBase::~OE_IndexBufferWrapperBase(){
@@ -41,8 +41,7 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
             for (size_t i=0; i < 2+ mesh->data.num_of_uvs; i++){
                 std::bitset<64> temp(lhs[i]);
                 if (i%4 >= 2){
-					// TODO
-//                    OE_ReverseBitset(temp);
+                    OE_ReverseBitset(temp);
                 }
                 if(i%2 != 0){
                     temp = temp << 32;
@@ -156,6 +155,11 @@ string OE_Triangle32::to_str(const size_t &arraysize) const{
 OE_PolygonStorage32::OE_PolygonStorage32(){
     this->vertices = OE_VertexStorage();
     this->num_of_uvs = 0;
+    
+    this->vbo_mutex.lockMutex();
+    this->vbo_mutex.unlockMutex();
+    this->ibos_mutex.lockMutex();
+    this->ibos_mutex.unlockMutex();
 }
 
 OE_PolygonStorage32::~OE_PolygonStorage32(){
@@ -203,6 +207,8 @@ uint32_t* OE_PolygonStorage32::addTriangle(uint32_t* indices){
 
 std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
     
+    //auto t=clock();
+    
     vector<float> output;
     // do the expensive allocation at the start
     output.reserve(vertex_buffer.size()*(6+this->num_of_uvs*2));
@@ -224,6 +230,8 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
     } 
     
     this->vertices.calculateNaiveBoundingBox();
+    
+    //cout << "NRE VERTEX BUFFER: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     return output;
 }
 
@@ -269,18 +277,28 @@ void OE_PolygonStorage32::initOrderedIB(OE_Mesh32* mesh){
 }
 
 void OE_PolygonStorage32::genVertexBufferInternally(){
-    if (!vbo_exists)
+    if (!vbo_exists){
+        this->vbo_mutex.lockMutex();
         this->vbo = genVertexBuffer();
+        this->vbo_mutex.unlockMutex();
+    }
     vbo_exists = true;
     
 }
 
 void OE_PolygonStorage32::genIndexBuffersInternally(){
+    
     if (!ibos_exist){
+        
+        //auto t=clock();
+        this->ibos_mutex.lockMutex();
         for (auto vgroup : this->triangle_groups){
             this->ibos[vgroup.first] = OE_IndexBufferReady();
             this->ibos[vgroup.first].data = this->genIndexBuffer(vgroup.first);
         }
+        this->ibos_mutex.unlockMutex();
+        
+        //cout << "NRE INDEX BUFFER: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
     ibos_exist = true;
 }

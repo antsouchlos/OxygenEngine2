@@ -14,6 +14,13 @@ bool NRE_Renderer::init(){
     
     
     // make sure there are no stored objects
+    /*cout << "NRE Cameras: " << this->cameras.size() << endl;
+    cout << "NRE Materials: " << this->materials.size() << endl;
+    cout << "NRE Meshes: " << this->meshes.size() << endl;
+    cout << "NRE Vgroups: " << this->vgroups.size() << endl;
+    cout << "NRE Draw calls: " << this->render_groups.size() << endl;*/
+    
+    
     this->cameras.clear();
     this->materials.clear();
     this->vgroups.clear();
@@ -40,6 +47,9 @@ bool NRE_Renderer::init(){
 }
 
 bool NRE_Renderer::updateSingleThread(){
+    
+    // generate draw calls
+    this->generateDrawCalls();
     
     // upload all remaining data to the GPU 
     this->updateMeshGPUData();
@@ -130,8 +140,9 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup *ren_group){
         this->api->setupProgram(ren_group->program);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Camera", 0);
         this->api->setProgramUniformSlot(ren_group->program, "OE_Mesh32", 1);
-        this->api->setProgramUniformSlot(ren_group->program, "OE_Material", 2);
-        
+        if (this->api->getProgramUniformSlot(ren_group->program, "OE_Material") != -2){
+            this->api->setProgramUniformSlot(ren_group->program, "OE_Material", 2);
+        }
     }
     
     this->api->setUniformState(this->meshes[ren_group->mesh].ubo, ren_group->program, 1, 0, 0);
@@ -183,7 +194,25 @@ void NRE_Renderer::setupBoundingBoxProgram(){
     this->api->setupProgram(this->prog_bbox);
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Camera", 0);
     this->api->setProgramUniformSlot(this->prog_bbox, "OE_Mesh32", 1);
-    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+    if (this->api->getProgramUniformSlot(this->prog_bbox, "OE_Material") != -2){
+        this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+    }
+}
+
+void NRE_Renderer::generateDrawCalls(){
+    
+    for (auto mesh : this->meshes){
+        for (auto vgroup : mesh.second.vgroups){
+            auto render_data = NRE_RenderGroup();
+            render_data.camera = this->camera_id;
+            render_data.vgroup = vgroup;
+            render_data.mesh = mesh.first;
+            render_data.material = this->vgroups[vgroup].material_id;
+            if (!this->existsRenderGroup(render_data)){
+                this->render_groups.push_back(render_data);
+            }
+        }
+    }
 }
 
 
