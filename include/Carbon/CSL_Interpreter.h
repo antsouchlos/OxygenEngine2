@@ -62,7 +62,8 @@ namespace csl {
 			std::shared_ptr<OE_World> interpret(std::string& input);
 			std::shared_ptr<OE_World> interpret_file(std::string& path_to_file);
 
-		private:
+
+			// TODO: Make these private
 			OE_SharedIndexMap<OE_Scene>          scene_list_;
 			OE_SharedIndexMap<OE_Object>         object_list_;
 			OE_SharedIndexMap<OE_Material>       material_list_;
@@ -70,7 +71,7 @@ namespace csl {
 			OE_SharedIndexMap<OE_TCM>            tcm_list_;
 			OE_SharedIndexMap<OE_ViewportConfig> viewport_list_;
 
-
+		private:
 			world_ptr		process_world(const element&);
 			scene_ptr		process_scene(const element&);
 			camera_ptr		process_camera(const element&);
