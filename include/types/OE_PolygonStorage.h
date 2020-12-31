@@ -119,14 +119,16 @@ class OE_PolygonStorage32 {
        
 
 	   	// TODO: Does this have to be public?	
-        std::size_t                                 num_of_uvs;
+        std::size_t	            num_of_uvs;
 
 
 
 //    protected:
 		// TODO: Handle internally, remove raw pointer
         uint32_t*	addTriangle(uint32_t* indices);
-		// TODO: Make these private
+
+		// TODO: Make these private (Need the new Interpreter for this)
+		// TODO: Smart pointers
         void		initUnorderedIB(OE_Mesh32*);
         void		initOrderedIB(OE_Mesh32*);
 
@@ -141,7 +143,7 @@ class OE_PolygonStorage32 {
         
 		// TODO: Smart pointers
         std::vector<uint32_t*>                                      vertex_buffer;
-        OE_IndexBufferWrapperBase*                                  index_buffer;
+		std::shared_ptr<OE_IndexBufferWrapperBase>                  index_buffer;
         
 
 
