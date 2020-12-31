@@ -252,12 +252,10 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
         
     }*/
     
-    
     // do the expensive allocation at the start
     output.reserve(vgroup->polygons.size()*3);
     
     for (const auto& tri : vgroup->polygons){
-        
         output.push_back(this->index_buffer[0][this->triangles[tri].v1]);
         output.push_back(this->index_buffer[0][this->triangles[tri].v2]);
         output.push_back(this->index_buffer[0][this->triangles[tri].v3]);

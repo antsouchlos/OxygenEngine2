@@ -20,9 +20,12 @@ void OE_ReverseBitset(std::bitset<64>&);
 // TODO: Make use of RAII in every type class
 // TODO: Everywhere, where num_of* is used, instead just call *.elements.at("*").size(). No extra
 // 		 variable is necessary
+// TODO: Add the option to make members optional
+
 
 // Philipp might kill me for this, but I really think it looks better,
 // so it's a chance I'm willing to take
+// Update: TODO: Don't add this to the oe namespace
 namespace oe {
 	using world			= OE_World;
 	using scene			= OE_Scene;
@@ -46,7 +49,9 @@ namespace csl {
 	using camera_ptr		= std::shared_ptr<oe::camera>;
 	using light_ptr			= std::shared_ptr<oe::light>;
 	using mesh_ptr			= std::shared_ptr<oe::mesh>;
-	using vgroup_ptr		= std::shared_ptr<oe::vgroup>;
+	// TODO: Smart pointers
+	//using vgroup_ptr		= std::shared_ptr<oe::vgroup>;
+	using vgroup_ptr		= oe::vgroup*;
 	using texture_ptr		= std::shared_ptr<oe::texture>;
 	using material_ptr		= std::shared_ptr<oe::material>;
 	using tcm_ptr			= std::shared_ptr<oe::tcm>;
