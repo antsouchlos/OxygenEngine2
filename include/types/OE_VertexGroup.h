@@ -10,7 +10,7 @@
 
 class OE_VertexGroup : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
     
-//    friend class CSL_Interpreter;
+    friend class CSL_Interpreter;
     friend class OE_PolygonStorage32;
     friend class NRE_Renderer;
     
@@ -22,12 +22,12 @@ class OE_VertexGroup : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         std::size_t id;
     
         OE_VertexGroup();
-        OE_VertexGroup(const std::string &name);
+        OE_VertexGroup(const std::string&);
         ~OE_VertexGroup();
         
         std::string to_str() const;
         
-//    protected:
+    protected:
         
         std::vector<uint32_t>       polygons;
         std::size_t                 material_id;

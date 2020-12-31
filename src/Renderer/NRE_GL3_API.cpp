@@ -222,11 +222,18 @@ void NRE_GL3_API::setUniformState(std::size_t id, std::size_t program, int slot,
     assert ((offset + length <= ubos[id].size));
     assert (this->progs.count(program) != 0);
     
-    //glUseProgram(this->progs[program].handle);
     if(length == 0)
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, this->ubos[id].handle);
     else
         glBindBufferRange(GL_UNIFORM_BUFFER, slot, this->ubos[id].handle, static_cast<GLuint>(offset), static_cast<GLuint>(length));
+}
+
+int  NRE_GL3_API::getProgramUniformSlot(std::size_t id, std::string name){
+    assert (this->progs.count(id) != 0);
+    if (this->progs[id].hasUniform(name) != this->progs[id].uniforms.size()){
+        return this->progs[id].uniforms[this->progs[id].hasUniform(name)].slot;
+    }
+    return -2;
 }
 
 void NRE_GL3_API::deleteUniformBuffer(std::size_t id){
@@ -432,7 +439,11 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     
     // Technically a fragment/pixel shader is optional, but it is a must in OpenGL ES
     // This should be the case sometimes (for example in the Z_PREPASS program)
-    glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
+    bool isES = NRE_GPU_ShaderBase::backend == NRE_GPU_GLES;
+    bool isUndefinedFS = this->progs[id].fs.type == NRE_GPU_FS_UNDEFINED;
+    
+    if ( (isES) || (!isES && !isUndefinedFS))
+        glAttachShader(this->progs[id].handle, this->progs[id].fs_handle);
 
     glLinkProgram(this->progs[id].handle);
 

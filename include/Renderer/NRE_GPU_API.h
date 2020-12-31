@@ -2,7 +2,6 @@
 #define NRE_GPU_API_H_INCLUDED
 
 #include <types/OE_TypesBase.h>
-#include <OE_Math.h>
 #include <Renderer/NRE_GPU_Shaders.h>
 
 /** platform-specific namespaces
@@ -72,6 +71,8 @@ public:
     virtual void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     virtual void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
     virtual void setProgramUniformSlot(std::size_t, std::string, int);
+    virtual int  getProgramUniformSlot(std::size_t, std::string);
+    
     virtual void setUniformState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     virtual void deleteUniformBuffer(std::size_t);
     

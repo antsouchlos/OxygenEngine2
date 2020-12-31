@@ -2,7 +2,10 @@
 #define OE_OBJECT_H
 
 #include <types/OE_TypesBase.h>
-#include <OE_Math.h>
+//#include <OE_Math.h>
+
+class OE_Mat4x4;
+class OE_Quat;
 
 // NOTE:  the structure of this struct (yeah i know) is subject to change
 struct OE_ObjectData{
@@ -27,6 +30,8 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         std::size_t id;
         
         OE_Object();
+        OE_Object(const std::string&);
+        virtual ~OE_Object();
         
         virtual std::string getType() const;
         virtual std::string to_str() const;        

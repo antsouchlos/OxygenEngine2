@@ -65,7 +65,7 @@ public:
 class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     
     friend class OE_PolygonStorage32;
-//    friend class CSL_Interpreter;
+    friend class CSL_Interpreter;
     
     public:
         
@@ -74,7 +74,7 @@ class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         
         std::string to_str(const std::size_t&) const;
     
-//    protected:
+    protected:
         uint32_t*   v1{nullptr};
         uint32_t*   v2{nullptr};
         uint32_t*   v3{nullptr};
@@ -100,7 +100,7 @@ class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
 
 class OE_PolygonStorage32 {
     
-//    friend class CSL_Interpreter;
+    friend class CSL_Interpreter;
     friend class OE_Mesh32;
     friend class NRE_Renderer;
     
@@ -127,7 +127,7 @@ class OE_PolygonStorage32 {
         
         bool changed{false};
         
-//    protected:
+    protected:
         
         // Internal but IMPORTANT stuff
         // This is the glue between the physics engine and the renderer
@@ -144,6 +144,9 @@ class OE_PolygonStorage32 {
     private:
         // This stuff is only of interest to the renderer
         // Those vectors should be cleared after first use by the renderer on loading the object
+        // both should be guarded by mutexes
+        OE_THREAD_SAFETY_OBJECT vbo_mutex;
+        OE_THREAD_SAFETY_OBJECT ibos_mutex;
         std::vector<float> vbo;
         std::unordered_map<std::size_t, OE_IndexBufferReady> ibos;
         

@@ -4,7 +4,6 @@
 #define NRE_Shader(src) #src
 
 #include <types/OE_TypesBase.h>
-#include <OE_Math.h>
 
 // possibility to extend with HLSL/Metal etc.
 enum NRE_GPU_SHADER_BACKEND{ 
