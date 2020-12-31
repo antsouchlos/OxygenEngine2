@@ -219,6 +219,8 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
         output.push_back(this->vertices.normals[vertex[1]*3+2]);
         
         for (size_t i=0; i < this->num_of_uvs; i++){
+			//std::cout << "vertices.uvmaps[i]: " << vertices.uvmaps[i] << std::endl;
+
             output.push_back(this->vertices.uvmaps[i].elements[vertex[2+i]*2]);
             output.push_back(this->vertices.uvmaps[i].elements[vertex[2+i]*2+1]);
         }

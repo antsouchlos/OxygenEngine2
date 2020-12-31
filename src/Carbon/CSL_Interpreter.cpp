@@ -278,23 +278,24 @@ namespace csl {
 
 
 		// TODO: Uniform naming convetion
-		result->data.isDynamic	= sv_to_int(mesh_e.attributes.at("isDynamic"));
-		result->data.num_of_uvs	= sv_to_int(mesh_e.attributes.at("num_uvs"));
-		result->visible			= !!sv_to_int(mesh_e.attributes.at("visible"));
+		result->data->isDynamic		= sv_to_int(mesh_e.attributes.at("isDynamic"));
+		// TODO: Do. Not. Fucking. Do. That.
+		result->data->num_of_uvs	= sv_to_int(mesh_e.attributes.at("num_uvs"));
+		//result->data->num_of_uvs	= 0;
+		result->visible				= !!sv_to_int(mesh_e.attributes.at("visible"));
 
-		std::cout << "[DEBUG] Processed Attributes" << std::endl;
 
 		// Single Assignments
 
 
 		auto num_of_vertices = sv_to_int(mesh_e.single_assignments.at("num_of_vertices"));
-		result->data.vertices.positions.reserve(num_of_vertices);
+		result->data->vertices.positions.reserve(num_of_vertices);
 
 		auto num_of_normals = sv_to_int(mesh_e.single_assignments.at("num_of_normals"));
-		result->data.vertices.normals.reserve(num_of_normals);
+		result->data->vertices.normals.reserve(num_of_normals);
 		
 		auto num_of_triangles = sv_to_int(mesh_e.single_assignments.at("num_of_triangles"));
-		result->data.triangles.reserve(num_of_triangles);
+		result->data->triangles.reserve(num_of_triangles);
 
 		auto parent = mesh_e.single_assignments.at("parent");
 		// TODO: Dependency
@@ -302,7 +303,6 @@ namespace csl {
 		result->parent_type		= sv_to_int(mesh_e.single_assignments.at("parent_type"));	
 
 
-		std::cout << "[DEBUG] Processed Single Assignments" << std::endl;
 		// List Assignments
 
 
@@ -331,29 +331,26 @@ namespace csl {
 //		}
 
 		for (const auto& v : mesh_e.list_assignments.at("vertices")) {
-			result->data.vertices.positions.push_back(sv_to_float(v));
+			result->data->vertices.positions.push_back(sv_to_float(v));
 		}
 	
 		for (const auto& n : mesh_e.list_assignments.at("normals")) {
-			result->data.vertices.normals.push_back(sv_to_float(n));
+			result->data->vertices.normals.push_back(sv_to_float(n));
 		}
 		
 		
-		
-		std::cout << "[DEBUG] Processed List Assignments" << std::endl;
-
 		// Child Elements
 
 
 		for (const auto& vgroup_e : mesh_e.elements.at("VertexGroup")) {
 			vgroup_ptr v = process_vgroup(vgroup_e);
-			result->data.triangle_groups[v->id] = v;
+			result->data->triangle_groups[v->id] = v;
 		}
 
 		std::size_t num_of_uvmaps = 0;
 		for (const auto& uvmap_data_e : mesh_e.elements.at("UVMapData")) {
 			oe::uvmap_data u = process_uvmap_data(uvmap_data_e, num_of_uvmaps++);
-			result->data.vertices.uvmaps.push_back(u);
+			result->data->vertices.uvmaps.push_back(u);
 		}
 
 
@@ -362,7 +359,7 @@ namespace csl {
 		// IN THE RIGHT ORDER OR FAIL WITH A SEGFAULT. JESUS.CHRIST.
 
 		std::size_t max_uv_num = 0;
-		for (const auto& n : result->data.vertices.uvmaps) {
+		for (const auto& n : result->data->vertices.uvmaps) {
 			max_uv_num = std::max(max_uv_num, n.elements.size());
 		}
 	
@@ -370,26 +367,25 @@ namespace csl {
 				&& (num_of_triangles*3<=65536) && (num_of_uvmaps<=2) ) {
 
 			// TODO: Make this use std::shared_ptr
-			result->data.initUnorderedIB(result.get());
+			result->data->initUnorderedIB(result.get());
 		} else if (num_of_uvmaps == 0) {
 			// TODO: Make this use std::shared_ptr
-			result->data.initUnorderedIB(result.get());
+			result->data->initUnorderedIB(result.get());
 		} else {
 			// TODO: Make this use std::shared_ptr
-			result->data.initOrderedIB(result.get());
+			result->data->initOrderedIB(result.get());
 		}
 
-		std::cout << "[DEBUG] Initialized Index Buffer" << std::endl;
 		
 
 		for (const auto& triangle_e : mesh_e.elements.at("Triangle")) {
-			oe::triangle t = process_triangle(result, triangle_e, result->data.num_of_uvs);
-			result->data.triangles.push_back(t);
+			oe::triangle t = process_triangle(result, triangle_e, result->data->num_of_uvs);
+			result->data->triangles.push_back(t);
 		}
 		
 		
-		result->data.genVertexBufferInternally();
-		result->data.genIndexBuffersInternally();
+		result->data->genVertexBufferInternally();
+		result->data->genIndexBuffersInternally();
 
 
 		return result;
@@ -398,7 +394,6 @@ namespace csl {
 
 
 	vgroup_ptr Interpreter::process_vgroup(const element& vgroup_e) {
-		vgroup_ptr result = nullptr;
 
 
 		// Attributes
@@ -406,9 +401,7 @@ namespace csl {
 
 		// TODO: std::string
 		auto name = vgroup_e.attributes.at("name");
-		// TODO: Smart pointers
-		//result = std::make_shared<oe::vgroup>(std::string(name));
-		result = new oe::vgroup(std::string(name));
+		vgroup_ptr result = std::make_shared<oe::vgroup>(std::string(name));
 
 		result->visible = !!sv_to_int(vgroup_e.attributes.at("visible"));
 
@@ -675,21 +668,21 @@ namespace csl {
 
 		
 		//TODO: Smart pointers
-		uint32_t* actual_indices = mesh->data.addTriangle(result.v1);
+		uint32_t* actual_indices = mesh->data->addTriangle(result.v1);
 		if (actual_indices != result.v1) {
 			delete[] result.v1;
 			result.v1 = actual_indices;
 		}
 		
 		//TODO: Smart pointers
-		actual_indices = mesh->data.addTriangle(result.v2);
+		actual_indices = mesh->data->addTriangle(result.v2);
 		if (actual_indices != result.v2) {
 			delete[] result.v2;
 			result.v2 = actual_indices;
 		}
 		
 		//TODO: Smart pointers
-		actual_indices = mesh->data.addTriangle(result.v3);
+		actual_indices = mesh->data->addTriangle(result.v3);
 		if (actual_indices != result.v3) {
 			delete[] result.v3;
 			result.v3 = actual_indices;

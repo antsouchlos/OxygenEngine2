@@ -4,18 +4,31 @@ using namespace std;
 using namespace oe;
 
 int main() {
-	csl::Interpreter interpreter;
-	std::string filename = "OE_Demo.csl";
+	std::string input = "";
+	std::string filename = "csl_very_large_object_test.csl";
+	std::ifstream f(filename);
 
-	try {
-		auto w = interpreter.interpret_file(filename);
+	std::string line;
+	while(getline(f, line))
+		input += line;
 
-		std::cout << "[DEBUG] Done interpreting" << std::endl;
-	} catch(csl::unset_object_error& e) {
-		std::cout << "csl::unset_object_error:\n" << '\t' << e.what() << std::endl;
-	}
+	f.close();
 
-	return 0;
+	auto e = csl::parse(input);
+
+
+//	csl::Interpreter interpreter;
+//	std::string filename = "csl_very_large_object_test.csl";
+//
+//	try {
+//		auto w = interpreter.interpret_file(filename);
+//	} catch(csl::unset_object_error& e) {
+//		std::cout << "csl::unset_object_error:\n" << '\t' << e.what() << std::endl;
+//	} catch(csl::semantic_error& e) {
+//		std::cout << "csl::semantic_error:\n" << '\t' << e.what() << std::endl;
+//	}
+//
+//	return 0;
 
 //    CSL_Interpreter* interpreter = new CSL_Interpreter();
 //    auto t = clock();
