@@ -5,10 +5,12 @@ using namespace oe;
 
 int main() {
 	csl::Interpreter interpreter;
-	std::string filename = "challenge_car.csl";
+	std::string filename = "OE_Demo.csl";
 
 	try {
 		auto w = interpreter.interpret_file(filename);
+
+		std::cout << "[DEBUG] Done interpreting" << std::endl;
 	} catch(csl::unset_object_error& e) {
 		std::cout << "csl::unset_object_error:\n" << '\t' << e.what() << std::endl;
 	}
