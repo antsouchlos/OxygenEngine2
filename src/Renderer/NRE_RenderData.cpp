@@ -105,8 +105,8 @@ bool NRE_Renderer::updateData(){
                 
                 // vbos/ibos must be regenerated
                 auto mesh = static_pointer_cast<OE_Mesh32>(temp_objects[x]);
-                mesh->data.vbo_exists = false;
-                mesh->data.ibos_exist = false;
+                mesh->data->vbo_exists = false;
+                mesh->data->ibos_exist = false;
             }
         }
         
@@ -201,13 +201,13 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         // make sure all index and vertex buffers are generated
         // On loading objects from disk they are not generated here
         // But on objects created on the fly they ARE generated here
-        mesh->data.genVertexBufferInternally();
-        mesh->data.genIndexBuffersInternally();
+        mesh->data->genVertexBufferInternally();
+        mesh->data->genIndexBuffersInternally();
         
         // setup the Vertex Buffer
         this->meshes[id] = NRE_MeshRenderData(); this->meshes[id].id = id;
-        this->meshes[id].uvmaps = mesh->data.vertices.uvmaps.size();
-        this->meshes[id].size = mesh->data.vbo.size();
+        this->meshes[id].uvmaps = mesh->data->vertices.uvmaps.size();
+        this->meshes[id].size = mesh->data->vbo.size();
         
         // store the shared pointer
         this->meshes[id].mesh = mesh;        
@@ -222,7 +222,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         this->meshes[id].changed = true;
         
         // handle Vertex (Triangle) groups
-        for (auto vgroup : mesh->data.triangle_groups){
+        for (auto vgroup : mesh->data->triangle_groups){
             this->handleVGroupData(id, vgroup.first, mesh);
             this->meshes[id].vgroups.insert(vgroup.first);
         }
@@ -234,15 +234,15 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         mesh->calculateProperBoundingBox();
         //---- </TEMPORARY> ---//
         
-        assert (mesh->data.vertices.calculatedBoundingBox);
+        assert (mesh->data->vertices.calculatedBoundingBox);
         
-        this->meshes[id].max_x = mesh->data.vertices.max_x;
-        this->meshes[id].max_y = mesh->data.vertices.max_y;
-        this->meshes[id].max_z = mesh->data.vertices.max_z;
+        this->meshes[id].max_x = mesh->data->vertices.max_x;
+        this->meshes[id].max_y = mesh->data->vertices.max_y;
+        this->meshes[id].max_z = mesh->data->vertices.max_z;
         
-        this->meshes[id].min_x = mesh->data.vertices.min_x;
-        this->meshes[id].min_y = mesh->data.vertices.min_y;
-        this->meshes[id].min_z = mesh->data.vertices.min_z;
+        this->meshes[id].min_x = mesh->data->vertices.min_x;
+        this->meshes[id].min_y = mesh->data->vertices.min_y;
+        this->meshes[id].min_z = mesh->data->vertices.min_z;
         
     }
     else{
@@ -255,15 +255,15 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
             mesh->calculateProperBoundingBox();
             //---- </TEMPORARY> ---//
             
-            assert (mesh->data.vertices.calculatedBoundingBox);
+            assert (mesh->data->vertices.calculatedBoundingBox);
         
-            this->meshes[id].max_x = mesh->data.vertices.max_x;
-            this->meshes[id].max_y = mesh->data.vertices.max_y;
-            this->meshes[id].max_z = mesh->data.vertices.max_z;
+            this->meshes[id].max_x = mesh->data->vertices.max_x;
+            this->meshes[id].max_y = mesh->data->vertices.max_y;
+            this->meshes[id].max_z = mesh->data->vertices.max_z;
         
-            this->meshes[id].min_x = mesh->data.vertices.min_x;
-            this->meshes[id].min_y = mesh->data.vertices.min_y;
-            this->meshes[id].min_z = mesh->data.vertices.min_z;
+            this->meshes[id].min_x = mesh->data->vertices.min_x;
+            this->meshes[id].min_y = mesh->data->vertices.min_y;
+            this->meshes[id].min_z = mesh->data->vertices.min_z;
             
         }
         
@@ -277,7 +277,7 @@ void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, std::sh
         this->vgroups[id] = NRE_VGroupRenderData(); this->vgroups[id].id = id; this->vgroups[id].mesh_id = mesh_id;
         this->vgroups[id].bone_mat = OE_Mat4x4(1.0f);
         this->vgroups[id].ibo = this->api->newIndexBuffer();
-        this->vgroups[id].material_id = mesh->data.triangle_groups[id]->material_id;        
+        this->vgroups[id].material_id = mesh->data->triangle_groups[id]->material_id;        
     }
 }
 
@@ -352,27 +352,27 @@ void NRE_Renderer::updateMeshGPUData(){
         if (!this->meshes[mesh.first].vao_initialized){
             
             /// vertex buffer
-            this->meshes[mesh.first].mesh->data.vbo_mutex.lockMutex();
-            this->api->setVertexBufferMemoryData(this->meshes[mesh.first].vbo, this->meshes[mesh.first].mesh->data.vbo, NRE_GPU_STATIC);
-            this->meshes[mesh.first].mesh->data.vbo.clear();
-            this->meshes[mesh.first].mesh->data.vbo_mutex.unlockMutex();
+            this->meshes[mesh.first].mesh->data->vbo_mutex.lockMutex();
+            this->api->setVertexBufferMemoryData(this->meshes[mesh.first].vbo, this->meshes[mesh.first].mesh->data->vbo, NRE_GPU_STATIC);
+            this->meshes[mesh.first].mesh->data->vbo.clear();
+            this->meshes[mesh.first].mesh->data->vbo_mutex.unlockMutex();
             
             
             /// index buffers
-            this->meshes[mesh.first].mesh->data.ibos_mutex.lockMutex();
+            this->meshes[mesh.first].mesh->data->ibos_mutex.lockMutex();
             for (auto vg : mesh.second.vgroups){
-                this->api->setIndexBufferMemoryData(this->vgroups[vg].ibo, this->meshes[mesh.first].mesh->data.ibos[vg].data, NRE_GPU_STATIC);
-                this->meshes[mesh.first].mesh->data.ibos[vg].data.clear();
+                this->api->setIndexBufferMemoryData(this->vgroups[vg].ibo, this->meshes[mesh.first].mesh->data->ibos[vg].data, NRE_GPU_STATIC);
+                this->meshes[mesh.first].mesh->data->ibos[vg].data.clear();
             }
             
-            this->meshes[mesh.first].mesh->data.ibos_mutex.unlockMutex();
+            this->meshes[mesh.first].mesh->data->ibos_mutex.unlockMutex();
             
             /// vertex layout
             typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
             
-            this->meshes[mesh.first].mesh->data.ibos.clear();
-            //delete this->meshes[mesh.first].mesh->data.index_buffer;
-            //this->meshes[mesh.first].mesh->data.index_buffer = nullptr;
+            this->meshes[mesh.first].mesh->data->ibos.clear();
+            //delete this->meshes[mesh.first].mesh->data->index_buffer;
+            //this->meshes[mesh.first].mesh->data->index_buffer = nullptr;
             
             this->meshes[mesh.first].vao_input.clear();
         
