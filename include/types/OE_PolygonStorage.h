@@ -131,17 +131,17 @@ class OE_PolygonStorage32 {
         void		initOrderedIB(OE_Mesh32*);
 
 
-        std::vector<OE_Triangle32>                  triangles;
-        std::map<std::size_t, OE_VertexGroup*>      triangle_groups; 
+        std::vector<OE_Triangle32>                                  triangles;
+        std::map<std::size_t, std::shared_ptr<OE_VertexGroup>>      triangle_groups; 
 
-        OE_VertexStorage                            vertices;
+        OE_VertexStorage                                            vertices;
 
-        bool                                        isDynamic{true};
-        bool										changed{false};
+        bool                                                        isDynamic{true};
+        bool										                changed{false};
         
 		// TODO: Smart pointers
-        std::vector<uint32_t*>                      vertex_buffer;        
-        OE_IndexBufferWrapperBase*                  index_buffer;
+        std::vector<uint32_t*>                                      vertex_buffer;
+        OE_IndexBufferWrapperBase*                                  index_buffer;
         
 
 
