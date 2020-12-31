@@ -36,6 +36,26 @@ namespace csl {
 		return result;
 	}
 
+	world_ptr Interpreter::interpret(std::string& input) {
+		auto world_e = csl::parse(input);
+
+		return process_world(world_e);
+	}
+
+	world_ptr Interpreter::interpret_file(std::string& path_to_file) {
+		// TODO: Read from disk more efficiently
+		
+		std::string input = "";
+		std::ifstream f(path_to_file);
+
+		std::string line;
+		while(getline(f, line))
+			input += line;
+
+		return interpret(input);
+
+	}
+
 
 	world_ptr Interpreter::process_world(const element& world_e) {
 		world_ptr result = std::make_shared<oe::world>();
