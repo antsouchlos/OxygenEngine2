@@ -40,7 +40,7 @@ class OE_UVMapData : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
 
 class OE_VertexStorage{
     
-    friend class CSL_Interpreter;
+//    friend class CSL_Interpreter;
     friend class OE_Mesh32;
     friend class OE_PolygonStorage32;
     friend class NRE_Renderer;
@@ -60,7 +60,7 @@ class OE_VertexStorage{
         
         bool calculatedBoundingBox{false};
         
-    protected:
+//    protected:
         
         std::vector<float>              positions;
         std::vector<float>              normals;
