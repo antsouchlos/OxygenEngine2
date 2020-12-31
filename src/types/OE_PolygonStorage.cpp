@@ -171,9 +171,6 @@ OE_PolygonStorage32::OE_PolygonStorage32(){
 }
 
 OE_PolygonStorage32::~OE_PolygonStorage32(){
-    for (auto &vgroup : this->triangle_groups){
-        delete vgroup.second;
-    }
     this->triangle_groups.clear();
     
     for (auto &index : this->vertex_buffer){
@@ -236,8 +233,9 @@ std::vector<float> OE_PolygonStorage32::genVertexBuffer(){
 }
 
 std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgroup_id){
-    
-    auto vgroup = this->triangle_groups[vgroup_id];    
+	// TODO: Custom error handling
+    auto vgroup = this->triangle_groups.at(vgroup_id);
+
     std::vector<uint32_t> output;
     
     // sort optimizing for vertex cache 
