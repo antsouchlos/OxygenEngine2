@@ -637,7 +637,8 @@ namespace csl {
 			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"vn\").size()");
 
 
-		std::vector<uint32_t> triangle_v(n);
+		std::vector<uint32_t> triangle_v;
+		triangle_v.reserve(n);
 
 		for (const auto& v : v1_v) {
 			triangle_v.push_back(sv_to_int(v));
