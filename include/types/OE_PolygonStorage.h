@@ -125,7 +125,7 @@ class OE_PolygonStorage32 {
 //    protected:
 		// TODO: Handle internally, remove raw pointer (Need the new Interpreter to do this
 		// properly)
-        uint32_t*	addTriangle(uint32_t* indices);
+        void addTriangle(std::vector<uint32_t>& triangle_v);
 
 		// TODO: Make these private (Need the new Interpreter for this)
 		// TODO: Smart pointers
@@ -141,7 +141,7 @@ class OE_PolygonStorage32 {
         bool                                                        isDynamic{true};
         bool										                changed{false};
         
-		// TODO: Smart pointers (Nedd addTriangle fixed to do this properly)
+		// TODO: Smart pointers / Proper containers
         std::vector<uint32_t*>                                      vertex_buffer;
 		std::shared_ptr<OE_IndexBufferWrapperBase>                  index_buffer;
         
