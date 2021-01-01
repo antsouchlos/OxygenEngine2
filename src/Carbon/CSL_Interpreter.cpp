@@ -626,67 +626,86 @@ namespace csl {
 
 		// TODO: Proper naming
 		std::size_t n = 2 + num_of_uvs;
+
+		auto v1_v = triangle_e.list_assignments.at("v1");
+		auto v2_v = triangle_e.list_assignments.at("v2");
+		auto v3_v = triangle_e.list_assignments.at("v3");
+
+
+		// TODO: Proper error message
+		if ( (v1_v.size() != n) || (v2_v.size() != n) || (v3_v.size() != n) )
+			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"vn\").size()");
+
+
+		std::vector<uint32_t> triangle_v(n);
+
+		for (const auto& v : v1_v) {
+			triangle_v.push_back(sv_to_int(v));
+		}
+		mesh->data->addTriangle(triangle_v);
+		triangle_v.clear();
+		
+		for (const auto& v : v1_v) {
+			triangle_v.push_back(sv_to_int(v));
+		}
+		mesh->data->addTriangle(triangle_v);
+		triangle_v.clear();
 		
 
-		if (triangle_e.list_assignments.at("v1").size() != n)
-			// TODO
-			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v1\").size()");
-
-		for (const auto& v : triangle_e.list_assignments.at("v1")) {
-			// TODO: Smart pointers
-			result.v1 = new uint32_t[n];
-			for (std::size_t i = 0; i < n; i++) {
-				result.v1[i] = sv_to_int(v);
-			}
+		for (const auto& v : v1_v) {
+			triangle_v.push_back(sv_to_int(v));
 		}
-		
+		mesh->data->addTriangle(triangle_v);
 
-		if (triangle_e.list_assignments.at("v2").size() != n)
-			// TODO
-			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v2\").size()");
-
-		for (const auto& v : triangle_e.list_assignments.at("v2")) {
-			// TODO: Smart pointers
-			result.v2 = new uint32_t[n];
-			for (std::size_t i = 0; i < n; i++) {
-				result.v2[i] = sv_to_int(v);
-			}
-		}
-		
-
-		if (triangle_e.list_assignments.at("v3").size() != n)
-			// TODO
-			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"v3\").size()");
-
-		for (const auto& v : triangle_e.list_assignments.at("v3")) {
-			// TODO: Smart pointers
-			result.v3 = new uint32_t[n];
-			for (std::size_t i = 0; i < n; i++) {
-				result.v3[i] = sv_to_int(v);
-			}
-		}
-
-		
-		//TODO: Smart pointers
-		uint32_t* actual_indices = mesh->data->addTriangle(result.v1);
-		if (actual_indices != result.v1) {
-			delete[] result.v1;
-			result.v1 = actual_indices;
-		}
-		
-		//TODO: Smart pointers
-		actual_indices = mesh->data->addTriangle(result.v2);
-		if (actual_indices != result.v2) {
-			delete[] result.v2;
-			result.v2 = actual_indices;
-		}
-		
-		//TODO: Smart pointers
-		actual_indices = mesh->data->addTriangle(result.v3);
-		if (actual_indices != result.v3) {
-			delete[] result.v3;
-			result.v3 = actual_indices;
-		}
+//		for (const auto& v : v1_v) {
+//			// TODO: Smart pointers
+//			result.v1 = new uint32_t[n];
+//			for (std::size_t i = 0; i < n; i++) {
+//				result.v1[i] = sv_to_int(v);
+//			}
+//		}
+//		
+//
+//
+//		for (const auto& v : v2_v) {
+//			// TODO: Smart pointers
+//			result.v2 = new uint32_t[n];
+//			for (std::size_t i = 0; i < n; i++) {
+//				result.v2[i] = sv_to_int(v);
+//			}
+//		}
+//		
+//
+//
+//		for (const auto& v : v3_v) {
+//			// TODO: Smart pointers
+//			result.v3 = new uint32_t[n];
+//			for (std::size_t i = 0; i < n; i++) {
+//				result.v3[i] = sv_to_int(v);
+//			}
+//		}
+//
+//		
+//		//TODO: Smart pointers
+//		uint32_t* actual_indices = mesh->data->addTriangle(result.v1);
+//		if (actual_indices != result.v1) {
+//			delete[] result.v1;
+//			result.v1 = actual_indices;
+//		}
+//		
+//		//TODO: Smart pointers
+//		actual_indices = mesh->data->addTriangle(result.v2);
+//		if (actual_indices != result.v2) {
+//			delete[] result.v2;
+//			result.v2 = actual_indices;
+//		}
+//		
+//		//TODO: Smart pointers
+//		actual_indices = mesh->data->addTriangle(result.v3);
+//		if (actual_indices != result.v3) {
+//			delete[] result.v3;
+//			result.v3 = actual_indices;
+//		}
 
 
 		return result;

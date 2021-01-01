@@ -178,24 +178,42 @@ OE_PolygonStorage32::~OE_PolygonStorage32(){
     }
 }
 
-// This should be BLAAAZING FAST
-uint32_t* OE_PolygonStorage32::addTriangle(uint32_t* indices){
-    uint32_t* output = indices;
-    bool isFound = false;
-    if (this->index_buffer->count(indices) != 0){
-        //cout << "IS FOund ";
-        //printArray(this->vertex_buffer[this->index_buffer[indices]], 2+num_of_uvs);
-        //printArray(indices, 2+num_of_uvs);
-        //cout << endl;
-        isFound = true;
-        output = this->vertex_buffer[(*(this->index_buffer))[indices]];
-    }
-    if (!isFound){
-        (*(this->index_buffer))[indices] = this->vertex_buffer.size();
-        this->vertex_buffer.push_back(indices);
-    }
-    return output;
+void OE_PolygonStorage32::addTriangle(std::vector<uint32_t>& triangle_v){
+
+
+	// TODO: Reimplement the whole vertex storage system. There must be some container
+	// available / implementable to not have to use a map of raw pointers to dynamically
+	// allocated memory
+	
+	// -------------------------------- IMPORTANT --------------------------------
+	//
+	// I get the STRONG feeling, that the check, whether or not the vertices are already present
+	// either doesn't work, or does, but by chance:
+	//
+	// Step 1. (CSL_Interpreter.cpp:processMesh): 	uint32* a = new uint32_t[n];
+	// Step 2. (CSL_Interpreter.cpp:processMesh):	addTriangle(a);
+	// Step 3. (OE_PolygonStorage.cpp:addTriangle):	if (this->index_buffer->count(a) != 0) {...}
+	//
+	// M8, at step 1 new memory gets allocated. If the address of the new memory allocation is
+	// already present in the map, there is a serious issue with memory ownership
+	//
+	// ---------------------------------------------------------------------------
+
+
+
+//    uint32_t* output = indices;
+//    bool isFound = false;
+//    if (this->index_buffer->count(indices) != 0){
+//        isFound = true;
+//        output = this->vertex_buffer[(*(this->index_buffer))[indices]];
+//    }
+//    if (!isFound){
+//        (*(this->index_buffer))[indices] = this->vertex_buffer.size();
+//        this->vertex_buffer.push_back(indices);
+//    }
+//    return output;
 }
+
 
 // These two should also be BLAAAZING FAST
 // They are VITAL for good renderer performance
