@@ -178,7 +178,7 @@ OE_PolygonStorage32::~OE_PolygonStorage32(){
     }
 }
 
-void OE_PolygonStorage32::addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint32_t len) {
+uint32_t* OE_PolygonStorage32::addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint32_t len) {
 	// TODO: Check performance loss
 	if (len != num_of_uvs + 2)
 		throw 1;				// TODO: Proper error handling
@@ -186,9 +186,17 @@ void OE_PolygonStorage32::addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint
 
 	if (this->index_buffer->count(vertex_arr) == 0) {
 		uint32_t* new_index_tuple = new uint32_t[num_of_uvs + 2];
+		
+		for (unsigned int i = 0; i < num_of_uvs + 2; ++i) {
+			new_index_tuple[i] = vertex_arr[i];
+		}
 
 		(*(this->index_buffer))[new_index_tuple] = this->vertex_buffer.size();
 		this->vertex_buffer.push_back(new_index_tuple);
+
+		return new_index_tuple;
+	} else {
+		return this->vertex_buffer[(*(this->index_buffer))[vertex_arr]];
 	}
 }
 
@@ -245,7 +253,7 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
     for (size_t i=3; i< vertex_score.size(); i++){
         
     }*/
-    
+
     // do the expensive allocation at the start
     output.reserve(vgroup->polygons.size()*3);
     

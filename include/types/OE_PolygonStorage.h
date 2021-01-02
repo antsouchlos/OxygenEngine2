@@ -125,7 +125,7 @@ class OE_PolygonStorage32 {
 
 
 //    protected:
-        void addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint32_t len);
+        uint32_t* addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint32_t len);
 
 		// TODO: Make these private (Need the new Interpreter for this)
 		// TODO: Smart pointers
