@@ -384,8 +384,8 @@ namespace csl {
 		}
 		
 		
-//		result->data->genVertexBufferInternally();
-//		result->data->genIndexBuffersInternally();
+		result->data->genVertexBufferInternally();
+		result->data->genIndexBuffersInternally();
 
 
 		return result;
@@ -643,17 +643,17 @@ namespace csl {
 		for (int i = 0; i < num_of_indices; ++i) {
 			vertex_arr[i] = sv_to_int(v1_v[i]);
 		}
-		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
+		result.v1 = mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
 		for (int i = 0; i < num_of_indices; ++i) {
 			vertex_arr[i] = sv_to_int(v2_v[i]);
 		}
-		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
+		result.v2 = mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
 		for (int i = 0; i < num_of_indices; ++i) {
 			vertex_arr[i] = sv_to_int(v3_v[i]);
 		}
-		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
+		result.v3 = mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
 
 		return result;
