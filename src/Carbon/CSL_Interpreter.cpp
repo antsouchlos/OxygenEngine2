@@ -1,4 +1,5 @@
 #include <Carbon/CSL_Interpreter.h>
+#include <OE_API.h>
 
 
 // TODO: Don't do that.
@@ -40,26 +41,26 @@ namespace csl {
 //		return result;
 	}
 
-	world_ptr Interpreter::interpret(std::string& input) {
-		auto world_e = csl::parse(input);
+	void Interpreter::interpret(std::string& input) {
+		const csl::element world_e = csl::parse(input);
 
-		return process_world(world_e);
+
+		world_ptr world = process_world(world_e);
+
+
+		oe::OE_Main->lockMutex();
+
+		OE_World::objectsList.extend(object_list_, true);
+		OE_World::materialsList.extend(material_list_, true);
+		OE_World::texturesList.extend(texture_list_, true);
+		OE_World::tcmsList.extend(tcm_list_, true);
+		OE_World::viewportsList.extend(viewport_list_, true);
+		OE_World::scenesList.extend(scene_list_, true);
+
+		oe::OE_Main->pending_world = world;
+		oe::OE_Main->unlockMutex();
+
 	}
-
-	world_ptr Interpreter::interpret_file(std::string& path_to_file) {
-		// TODO: Read from disk more efficiently
-		
-		std::string input = "";
-		std::ifstream f(path_to_file);
-
-		std::string line;
-		while(getline(f, line))
-			input += line;
-
-		return interpret(input);
-
-	}
-
 
 	world_ptr Interpreter::process_world(const element& world_e) {
 		world_ptr result = std::make_shared<oe::world>();
@@ -278,7 +279,11 @@ namespace csl {
 		uint32_t num_of_vertices	= mesh_e.list_assignments.at("vertices").size();
 		uint32_t num_of_normals		= mesh_e.list_assignments.at("normals").size();
 		uint32_t num_of_triangles	= mesh_e.elements.at("Triangle").size();
-		uint32_t num_of_uvs			= mesh_e.elements.at("UVMapData").size();
+		uint32_t num_of_uvs			= 0;
+		
+		if (mesh_e.elements.contains("UVMapData")) {
+			num_of_uvs = mesh_e.elements.at("UVMapData").size();
+		}
 
 		uint32_t max_uv_num			= 0;	// TODO: Just a temp thing, until a proper solution
 											// is found (Need to know the max number of uvs on a
@@ -350,10 +355,12 @@ namespace csl {
 			result->data->triangle_groups[v->id] = v;
 		}
 
-		std::size_t num_of_uvs_counter = 0;
-		for (const auto& uvmap_data_e : mesh_e.elements.at("UVMapData")) {
-			oe::uvmap_data u = process_uvmap_data(uvmap_data_e, num_of_uvs_counter++);
-			result->data->vertices.uvmaps.push_back(u);
+		if (mesh_e.elements.contains("UVMapData")) {
+			std::size_t num_of_uvs_counter = 0;
+			for (const auto& uvmap_data_e : mesh_e.elements.at("UVMapData")) {
+				oe::uvmap_data u = process_uvmap_data(uvmap_data_e, num_of_uvs_counter++);
+				result->data->vertices.uvmaps.push_back(u);
+			}
 		}
 
 
