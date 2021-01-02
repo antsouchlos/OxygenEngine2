@@ -108,6 +108,8 @@ namespace csl {
 	inline void interpret_file(std::string& path_to_file) {
 		// TODO: Read from disk more efficiently
 		
+        auto t=clock();
+        
 		std::string input = "";
 		std::ifstream f(path_to_file);
 
@@ -116,7 +118,9 @@ namespace csl {
 			input += line;
 
 		f.close();
-
+        
+        std::cout << "CSL TEST READ DISK " << (float)(clock()-t)/CLOCKS_PER_SEC << std::endl;
+        
 		interpret(input);
 	}
 }
