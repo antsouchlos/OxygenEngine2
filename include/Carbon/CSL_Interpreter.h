@@ -96,7 +96,13 @@ namespace csl {
 	inline void interpret(std::string& input) {
 		csl::Interpreter interpreter;
 
-		interpreter.interpret(input);
+		try {
+			interpreter.interpret(input);
+		} catch(csl::unset_object_error& e) {
+			std::cout << "csl::unset_object_error:\n" << '\t' << e.what() << std::endl;
+		} catch(csl::semantic_error& e) {
+			std::cout << "csl::semantic_error:\n" << '\t' << e.what() << std::endl;
+		}
 	}
 
 	inline void interpret_file(std::string& path_to_file) {
