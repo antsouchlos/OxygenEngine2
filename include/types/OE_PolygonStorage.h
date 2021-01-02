@@ -118,14 +118,14 @@ class OE_PolygonStorage32 {
        	void genIndexBuffersInternally();
        
 
+		// TODO: Is this necessary the way it is, or is it more logical to store
+		// num_of_indices (being num_of_uvs + 2)?
         std::size_t	            num_of_uvs;
 
 
 
 //    protected:
-		// TODO: Handle internally, remove raw pointer (Need the new Interpreter to do this
-		// properly)
-        void addTriangle(std::vector<uint32_t>& triangle_v);
+        void addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint32_t len);
 
 		// TODO: Make these private (Need the new Interpreter for this)
 		// TODO: Smart pointers

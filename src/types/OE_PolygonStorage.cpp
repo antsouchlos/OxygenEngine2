@@ -178,27 +178,10 @@ OE_PolygonStorage32::~OE_PolygonStorage32(){
     }
 }
 
-void OE_PolygonStorage32::addTriangle(std::vector<uint32_t>& triangle_v){
-
-
-	// TODO: Reimplement the whole vertex storage system. There must be some container
-	// available / implementable to not have to use a map of raw pointers to dynamically
-	// allocated memory
-	
-	// -------------------------------- IMPORTANT --------------------------------
-	//
-	// I get the STRONG feeling, that the check, whether or not the vertices are already present
-	// either doesn't work, or does, but by chance:
-	//
-	// Step 1. (CSL_Interpreter.cpp:processMesh): 	uint32* a = new uint32_t[n];
-	// Step 2. (CSL_Interpreter.cpp:processMesh):	addTriangle(a);
-	// Step 3. (OE_PolygonStorage.cpp:addTriangle):	if (this->index_buffer->count(a) != 0) {...}
-	//
-	// M8, at step 1 new memory gets allocated. If the address of the new memory allocation is
-	// already present in the map, there is a serious issue with memory ownership
-	//
-	// ---------------------------------------------------------------------------
-
+void OE_PolygonStorage32::addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint32_t len) {
+	// TODO: Check performance loss
+	if (len != num_of_uvs + 2)
+		throw 1;				// TODO: Proper error handling
 
 
 //    uint32_t* output = indices;
