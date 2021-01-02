@@ -69,6 +69,9 @@ bool NRE_Renderer::updateData(){
     auto temp_objects = OE_World::objectsList.copy();
     auto temp_materials = OE_World::materialsList.copy();
     
+    
+    
+    
     // DONT copy these clearDeleted() and reset() functions to the physics engine, because it will wreak havoc
     // Copy only those above (of course inside a OE_Main mutex)
     // The renderer is supposed to handle those deletions
@@ -81,6 +84,11 @@ bool NRE_Renderer::updateData(){
     OE_World::materialsList.clearDeleted();
     
     OE_Main->unlockMutex();
+    
+    //cout << temp_scenes.to_str() << endl;
+    //cout << temp_objects.to_str() << endl;
+    //cout << temp_materials.to_str() << endl;
+    
     
     if (this->screen->restart_renderer){
         
@@ -157,6 +165,7 @@ bool NRE_Renderer::updateData(){
         
         // first handle objects and lights
         for (auto obj : temp_scenes(scene)->objects){
+            
             if (temp_objects(obj)->getType() == "MESH32"){
                 if (temp_objects.hasChanged(obj)){
                     this->handleMeshData(obj, static_pointer_cast<OE_Mesh32>(temp_objects(obj)));

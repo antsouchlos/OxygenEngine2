@@ -83,8 +83,8 @@ int test_task1(void*, oe::task task){
         float x = (float)oe::get_delta_mouse_x()/160.0f;
         float y = (float)oe::get_delta_mouse_y()/160.0f;
        
-        oe::change_object_global_rot("Camera", oe::vec4(-x, 0.0f, 0.0f, 1.0f));
-        oe::change_object_rot("Camera", oe::vec4(-y, 1.0f, 0.0f, 0.0f));
+        oe::change_object_global_rot("\"Camera\"", oe::vec4(-x, 0.0f, 0.0f, 1.0f));
+        oe::change_object_rot("\"Camera\"", oe::vec4(-y, 1.0f, 0.0f, 0.0f));
     }
     return task.CONTINUE();
 }
@@ -128,7 +128,7 @@ int main(){
     //oe::load_world("monkeys.csl", &OnLoadObject, nullptr);
     //oe::load_world("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
-    oe::load_world("OE_Demo.csl", &OnLoadObject, nullptr);
+    oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
     //taskMgr.Start();
     oe::start();
     

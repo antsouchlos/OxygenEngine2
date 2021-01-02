@@ -18,8 +18,11 @@ int main() {
 
 
 	csl::Interpreter interpreter;
-	std::string filename = "csl_very_large_object_test.csl";
-
+	std::string filename = "OE_VerySimple.csl";
+    
+    auto t=clock();
+    
+    
 	try {
 		auto w = interpreter.interpret_file(filename);
 	} catch(csl::unset_object_error& e) {
@@ -27,7 +30,9 @@ int main() {
 	} catch(csl::semantic_error& e) {
 		std::cout << "csl::semantic_error:\n" << '\t' << e.what() << std::endl;
 	}
-
+    
+    cout << "CSL TEST WRITER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    
 	return 0;
 
 //    CSL_Interpreter* interpreter = new CSL_Interpreter();

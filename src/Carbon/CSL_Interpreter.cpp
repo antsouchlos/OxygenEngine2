@@ -2,6 +2,7 @@
 
 
 // TODO: Don't do that.
+using namespace std;
 
 // This is a helper function for the interpreter
 void OE_ReverseBitset(std::bitset<64>& bitseta){
@@ -116,7 +117,12 @@ namespace csl {
 			light_ptr l = process_light(light_e);
 			result->objects.insert(l->id);
 		}
-
+        
+        for (const auto& material_e : scene_e.elements.at("Material")) {
+			material_ptr m = process_material(material_e);
+			result->materials.insert(m->id);
+		}
+        
 		for (const auto& mesh_e : scene_e.elements.at("Mesh")) {
 			mesh_ptr m = process_mesh(mesh_e);
 			result->objects.insert(m->id);
@@ -127,10 +133,6 @@ namespace csl {
 //			result->objects.insert(t->id);
 //		}
 
-		for (const auto& material_e : scene_e.elements.at("Material")) {
-			material_ptr m = process_material(material_e);
-			result->objects.insert(m->id);
-		}
 
 //		for (const auto& tcm_e : scene_e.elements.at("TextureCombineMode")) {
 //			tcm_ptr t = process_tcm(tcm_e);
@@ -282,7 +284,7 @@ namespace csl {
 
 		mesh_ptr result = std::make_shared<oe::mesh>(num_of_vertices, num_of_normals,
 										num_of_triangles, num_of_uvs, max_uv_num);
-
+        object_list_.append(std::string(mesh_e.attributes.at("name")), result);
 	
 		// Attributes
 
@@ -392,8 +394,7 @@ namespace csl {
 		// TODO: Dependency
 		// TODO: std::string
 		result->material_id = material_list_.name2id(std::string(material_id));
-
-
+        cout << material_list_.name2id(std::string(material_id)) << " what the fuck is happening here" << endl;
 		// List Assignments
 
 
@@ -433,10 +434,9 @@ namespace csl {
 
 
 		// Attributes
-
 		
 		// TODO: Remove name from the csl format
-		
+		material_list_.append(std::string(material_e.attributes.at("name")), result);
 
 		// Single Assignments
 
