@@ -10,18 +10,9 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
     string filename = *static_cast<string*>(file);
     delete static_cast<string*>(file);
     
-	csl::Interpreter interpreter;
-    shared_ptr<OE_World> loaded_world = interpreter.interpret_file(filename);
-    
-    OE_Main->lockMutex();
-    OE_World::objectsList.extend(interpreter.object_list_, true);
-    OE_World::materialsList.extend(interpreter.material_list_, true);
-    OE_World::texturesList.extend(interpreter.texture_list_, true);
-    OE_World::tcmsList.extend(interpreter.tcm_list_, true);
-    OE_World::viewportsList.extend(interpreter.viewport_list_, true);
-    OE_World::scenesList.extend(interpreter.scene_list_, true);
-    OE_Main->pending_world = loaded_world;
-    OE_Main->unlockMutex();
+
+	csl::interpret_file(filename);
+
     oe::broadcast_event("loaded-" + filename, nullptr);
     
 	return 0;
