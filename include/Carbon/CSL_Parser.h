@@ -379,6 +379,10 @@ namespace csl {
 					throw unset_object_error(t);
 				}
 			}
+
+			bool contains(const T& t) const {
+				return (map_.count(t) > 0);
+			}
 		private:
 			std::map<T, U> map_;
 	};
