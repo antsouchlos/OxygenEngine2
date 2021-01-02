@@ -624,39 +624,36 @@ namespace csl {
 		// List Assignments
 	
 
-		// TODO: Proper naming
-		std::size_t n = 2 + num_of_uvs;
+		std::size_t num_of_indices = 2 + num_of_uvs;
 
 		auto v1_v = triangle_e.list_assignments.at("v1");
 		auto v2_v = triangle_e.list_assignments.at("v2");
 		auto v3_v = triangle_e.list_assignments.at("v3");
 
 
-		// TODO: Proper error message
-		if ( (v1_v.size() != n) || (v2_v.size() != n) || (v3_v.size() != n) )
-			throw semantic_error("2 + num_of_uvs != triangle_e.list_assignments.at(\"vn\").size()");
+		if ( (v1_v.size() != num_of_indices) || (v2_v.size() != num_of_indices)
+				|| (v3_v.size() != num_of_indices) )
+
+			throw semantic_error("The v1, v2 and v3 list member variables must hold exactly 2 more"
+									" values than the number of uvmaps");
 
 
-		std::vector<uint32_t> triangle_v;
-		triangle_v.reserve(n);
-
-		for (const auto& v : v1_v) {
-			triangle_v.push_back(sv_to_int(v));
+		uint32_t vertex_arr[num_of_indices];
+	
+		for (int i = 0; i < num_of_indices; ++i) {
+			vertex_arr[i] = sv_to_int(v1_v[i]);
 		}
-		mesh->data->addTriangle(triangle_v);
-		triangle_v.clear();
-		
-		for (const auto& v : v1_v) {
-			triangle_v.push_back(sv_to_int(v));
-		}
-		mesh->data->addTriangle(triangle_v);
-		triangle_v.clear();
-		
+		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
-		for (const auto& v : v1_v) {
-			triangle_v.push_back(sv_to_int(v));
+		for (int i = 0; i < num_of_indices; ++i) {
+			vertex_arr[i] = sv_to_int(v2_v[i]);
 		}
-		mesh->data->addTriangle(triangle_v);
+		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
+
+		for (int i = 0; i < num_of_indices; ++i) {
+			vertex_arr[i] = sv_to_int(v3_v[i]);
+		}
+		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
 //		for (const auto& v : v1_v) {
 //			// TODO: Smart pointers
