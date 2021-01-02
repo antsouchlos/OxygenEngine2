@@ -265,6 +265,7 @@ public:
         if (this->elements.count(id) == 1){
             output = this->elements[id];
             this->changed[id] = true;
+            
         }
         unlockMutex();
         return output;

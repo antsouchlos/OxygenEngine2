@@ -1,4 +1,4 @@
-project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++17', 'buildtype=debug'])
+project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++17', 'buildtype=debugoptimized'])
 
 src = ['src/OE_SDL_WindowSystem.cpp',
        'src/Renderer/glad.c',
