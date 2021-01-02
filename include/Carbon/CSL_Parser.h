@@ -15,7 +15,7 @@
 #endif
 
 
-/*
+/* TODO: Fix this grammar. It is not the exact grammar the parser recognizes
 * -------------------------- Grammar ------------------------
 *
 * S						= element
@@ -27,18 +27,18 @@
 *
 * elementContent		= element | genericAssignment
 *
-* openTag				= "<" IDENTIFIER genericAssignment* ">" 
+* openTag				= "<" IDENTIFIER generic* ">" 
 * closeTag				= "</" IDENTIFIER ">"
 *
 * genericAssignment		= IDENTIFIER "=" signleAssignmentTail
 * 						| IDENTIFIER "=" listAssignmentTail
 *
 * singleAssignmentTail	= VALUE
-* 																	
+*
 * listAssignmentTail	= "{" NUMBER "}"
-* 						| "{" NUMBER (";" NUMBER)* "}"	    	// TODO: Remove semicolon. This
-* 						    		    						// will require a rewrite of
-*                                                               // the blender plugin
+* 						| "{" NUMBER (";" NUMBER)* "}" 
+*
+*
 * value					= NUMBER | STRING
 */
 
