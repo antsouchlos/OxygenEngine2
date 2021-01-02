@@ -2,6 +2,7 @@
 #define CSL_INTERPRETER_H_
 
 #include <types/OE_World.h>
+#include <OE_TaskManager.h>
 
 #include <Carbon/CSL_Exceptions.h>
 #include <Carbon/CSL_Parser.h>
@@ -10,6 +11,9 @@
 #include <memory>
 #include <string>
 #include <string_view>
+
+
+class OE_TaskManager;
 
 
 // TODO: Don't do that.
@@ -61,20 +65,17 @@ namespace csl {
 			static int		sv_to_int(std::string_view sv);
 			static float	sv_to_float(std::string_view sv);
 
-
-			std::shared_ptr<OE_World> interpret(std::string& input);
-			std::shared_ptr<OE_World> interpret_file(std::string& path_to_file);
-
-
-			// TODO: Make these private
-			OE_SharedIndexMap<OE_Scene>          scene_list_;
-			OE_SharedIndexMap<OE_Object>         object_list_;
-			OE_SharedIndexMap<OE_Material>       material_list_;
-			OE_SharedIndexMap<OE_Texture>        texture_list_;
-			OE_SharedIndexMap<OE_TCM>            tcm_list_;
-			OE_SharedIndexMap<OE_ViewportConfig> viewport_list_;
+			void interpret(std::string& input);
 
 		private:
+			OE_SharedIndexMap<OE_Scene>				scene_list_;
+			OE_SharedIndexMap<OE_Object>			object_list_;
+			OE_SharedIndexMap<OE_Material>			material_list_;
+			OE_SharedIndexMap<OE_Texture>			texture_list_;
+			OE_SharedIndexMap<OE_TCM>				tcm_list_;
+			OE_SharedIndexMap<OE_ViewportConfig>	viewport_list_;
+			
+			
 			world_ptr		process_world(const element&);
 			scene_ptr		process_scene(const element&);
 			camera_ptr		process_camera(const element&);
@@ -91,6 +92,27 @@ namespace csl {
 
 			oe::triangle	process_triangle(mesh_ptr, const element&, std::size_t);
 	};
+
+	inline void interpret(std::string& input) {
+		csl::Interpreter interpreter;
+
+		interpreter.interpret(input);
+	}
+
+	inline void interpret_file(std::string& path_to_file) {
+		// TODO: Read from disk more efficiently
+		
+		std::string input = "";
+		std::ifstream f(path_to_file);
+
+		std::string line;
+		while(getline(f, line))
+			input += line;
+
+		f.close();
+
+		interpret(input);
+	}
 }
 
 

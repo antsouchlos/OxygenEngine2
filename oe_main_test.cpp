@@ -125,7 +125,7 @@ int main(){
     oe::pause(20);
     //oe::load_world("OE_Mat_light_test.csl", &OnLoadObject, nullptr);
     //oe::load_world("challenge_car.csl", &OnLoadObject, nullptr);
-    oe::load_world("monkeys.csl", &OnLoadObject, nullptr);
+  	oe::load_world("monkeys.csl", &OnLoadObject, nullptr);
     //oe::load_world("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
     //oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
     //oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
