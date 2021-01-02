@@ -67,7 +67,6 @@ namespace csl {
 
 		// Child Elements
 
-
 		for (const auto& scene_e : world_e.elements.at("Scene")) {
 			scene_ptr scene = process_scene(scene_e);
 			result->scenes.insert(scene->id);
