@@ -271,7 +271,17 @@ namespace csl {
 
 
 	mesh_ptr Interpreter::process_mesh(const element& mesh_e) {
-		mesh_ptr result = std::make_shared<oe::mesh>();
+		uint32_t num_of_vertices	= mesh_e.list_assignments.at("vertices").size();
+		uint32_t num_of_normals		= mesh_e.list_assignments.at("normals").size();
+		uint32_t num_of_triangles	= mesh_e.elements.at("Triangle").size();
+		uint32_t num_of_uvs			= mesh_e.elements.at("UVMapData").size();
+
+		uint32_t max_uv_num			= 0;	// TODO: Just a temp thing, until a proper solution
+											// is found (Need to know the max number of uvs on a
+											// vertex, before vertices are loaded)
+
+		mesh_ptr result = std::make_shared<oe::mesh>(num_of_vertices, num_of_normals,
+										num_of_triangles, num_of_uvs, max_uv_num);
 
 	
 		// Attributes
@@ -279,23 +289,12 @@ namespace csl {
 
 		// TODO: Uniform naming convetion
 		result->data->isDynamic		= sv_to_int(mesh_e.attributes.at("isDynamic"));
-		// TODO: Do. Not. Fucking. Do. That.
-		result->data->num_of_uvs	= sv_to_int(mesh_e.attributes.at("num_uvs"));
 		//result->data->num_of_uvs	= 0;
 		result->visible				= !!sv_to_int(mesh_e.attributes.at("visible"));
 
 
 		// Single Assignments
 
-
-		auto num_of_vertices = sv_to_int(mesh_e.single_assignments.at("num_of_vertices"));
-		result->data->vertices.positions.reserve(num_of_vertices);
-
-		auto num_of_normals = sv_to_int(mesh_e.single_assignments.at("num_of_normals"));
-		result->data->vertices.normals.reserve(num_of_normals);
-		
-		auto num_of_triangles = sv_to_int(mesh_e.single_assignments.at("num_of_triangles"));
-		result->data->triangles.reserve(num_of_triangles);
 
 		auto parent = mesh_e.single_assignments.at("parent");
 		// TODO: Dependency
@@ -347,39 +346,15 @@ namespace csl {
 			result->data->triangle_groups[v->id] = v;
 		}
 
-		std::size_t num_of_uvmaps = 0;
+		std::size_t num_of_uvs_counter = 0;
 		for (const auto& uvmap_data_e : mesh_e.elements.at("UVMapData")) {
-			oe::uvmap_data u = process_uvmap_data(uvmap_data_e, num_of_uvmaps++);
+			oe::uvmap_data u = process_uvmap_data(uvmap_data_e, num_of_uvs_counter++);
 			result->data->vertices.uvmaps.push_back(u);
 		}
 
 
-		// Perform operations depending on parsed values
-		// TODO: FOR THE FUCKIG LOVE OF I DON'T KNOW WHO: YOU CAN'T DEPEND ON ME CALLING EVERYTHIN
-		// IN THE RIGHT ORDER OR FAIL WITH A SEGFAULT. JESUS.CHRIST.
-
-		std::size_t max_uv_num = 0;
-		for (const auto& n : result->data->vertices.uvmaps) {
-			max_uv_num = std::max(max_uv_num, n.elements.size());
-		}
-	
-		if ( (num_of_vertices<=65536) && (num_of_normals<=65536) && (max_uv_num<=65536)
-				&& (num_of_triangles*3<=65536) && (num_of_uvmaps<=2) ) {
-
-			// TODO: Make this use std::shared_ptr
-			result->data->initUnorderedIB(result.get());
-		} else if (num_of_uvmaps == 0) {
-			// TODO: Make this use std::shared_ptr
-			result->data->initUnorderedIB(result.get());
-		} else {
-			// TODO: Make this use std::shared_ptr
-			result->data->initOrderedIB(result.get());
-		}
-
-		
-
 		for (const auto& triangle_e : mesh_e.elements.at("Triangle")) {
-			oe::triangle t = process_triangle(result, triangle_e, result->data->num_of_uvs);
+			oe::triangle t = process_triangle(result, triangle_e, num_of_uvs);
 			result->data->triangles.push_back(t);
 		}
 		
@@ -640,17 +615,17 @@ namespace csl {
 
 		uint32_t vertex_arr[num_of_indices];
 	
-		for (int i = 0; i < num_of_indices; ++i) {
+		for (uint32_t i = 0; i < num_of_indices; ++i) {
 			vertex_arr[i] = sv_to_int(v1_v[i]);
 		}
 		result.v1 = mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
-		for (int i = 0; i < num_of_indices; ++i) {
+		for (uint32_t i = 0; i < num_of_indices; ++i) {
 			vertex_arr[i] = sv_to_int(v2_v[i]);
 		}
 		result.v2 = mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
 
-		for (int i = 0; i < num_of_indices; ++i) {
+		for (uint32_t i = 0; i < num_of_indices; ++i) {
 			vertex_arr[i] = sv_to_int(v3_v[i]);
 		}
 		result.v3 = mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);

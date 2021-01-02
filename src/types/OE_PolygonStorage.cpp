@@ -30,15 +30,15 @@ std::size_t OE_IndexBufferWrapperBase::size(){
     
 // These should NOT by empty
 
-OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
-    auto lambda_hash = [mesh](const uint32_t* lhs){
+OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(uint32_t num_of_indices){
+    auto lambda_hash = [num_of_indices](const uint32_t* lhs){
         
             // Make sure we are in a 64 bit system
             static_assert(sizeof(size_t) == 8, "Not in 64 bit? What is this? An ancient system?"); 
         
             std::bitset<64> lhs_bits;
         
-            for (size_t i=0; i < 2+ mesh->data->num_of_uvs; i++){
+            for (size_t i=0; i < num_of_indices; i++){
                 std::bitset<64> temp(lhs[i]);
                 if (i%4 >= 2){
                     OE_ReverseBitset(temp);
@@ -51,8 +51,8 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(OE_Mesh32* mesh){
             return lhs_bits.to_ullong();
     };
     
-    auto lambda_equals = [mesh](const uint32_t* lhs, const uint32_t* rhs){
-        for (size_t i=0; i < 2+ mesh->data->num_of_uvs; i++){
+    auto lambda_equals = [num_of_indices](const uint32_t* lhs, const uint32_t* rhs){
+        for (size_t i=0; i < num_of_indices; i++){
             if(lhs[i] != rhs[i])
                 return false;
         }
@@ -79,9 +79,9 @@ std::size_t OE_IndexBufferUnorderedMap::size(){
     return this->data.size();
 }
 
-OE_IndexBufferMap::OE_IndexBufferMap(OE_Mesh32* mesh){
-    auto lambda_func = [mesh](const uint32_t* lhs, const uint32_t* rhs) {
-        for(size_t i=0; i< 2+ mesh->data->num_of_uvs; i++){
+OE_IndexBufferMap::OE_IndexBufferMap(uint32_t num_of_indices){
+    auto lambda_func = [num_of_indices](const uint32_t* lhs, const uint32_t* rhs) {
+        for(size_t i=0; i< num_of_indices; i++){
             if(lhs[i] < rhs[i]){
                 return true;
             }
@@ -160,14 +160,26 @@ void printArray(const uint32_t* x, const uint32_t& arrsize){
 }
 
 
-OE_PolygonStorage32::OE_PolygonStorage32(){
+OE_PolygonStorage32::OE_PolygonStorage32(uint32_t num_of_vertices, uint32_t num_of_normals,
+						uint32_t num_of_triangles, uint32_t num_of_uvmaps, uint32_t max_uv_num) {
+
     this->vertices = OE_VertexStorage();
-    this->num_of_uvs = 0;
+    this->num_of_uvs = num_of_uvmaps;
     
-    this->vbo_mutex.lockMutex();
-    this->vbo_mutex.unlockMutex();
-    this->ibos_mutex.lockMutex();
-    this->ibos_mutex.unlockMutex();
+//    this->vbo_mutex.lockMutex();
+//    this->vbo_mutex.unlockMutex();
+//    this->ibos_mutex.lockMutex();
+//    this->ibos_mutex.unlockMutex();
+		
+	if ( (num_of_vertices<=65536) && (num_of_normals<=65536)  && (num_of_triangles*3<=65536)
+			&& (num_of_uvmaps<=2) && (max_uv_num<=65536) ) {
+
+		initUnorderedIB(num_of_uvmaps + 2);
+	} else if (num_of_uvs == 0) {
+		initUnorderedIB(num_of_uvmaps + 2);
+	} else {
+		initOrderedIB(num_of_uvmaps + 2);
+	}
 }
 
 OE_PolygonStorage32::~OE_PolygonStorage32(){
@@ -268,12 +280,12 @@ std::vector<uint32_t> OE_PolygonStorage32::genIndexBuffer(const std::size_t &vgr
         
 /*********************************************/
         
-void OE_PolygonStorage32::initUnorderedIB(OE_Mesh32* mesh){
-    this->index_buffer = std::make_shared<OE_IndexBufferUnorderedMap>(mesh);
+void OE_PolygonStorage32::initUnorderedIB(uint32_t num_of_indices){
+    this->index_buffer = std::make_shared<OE_IndexBufferUnorderedMap>(num_of_indices);
 }
 
-void OE_PolygonStorage32::initOrderedIB(OE_Mesh32* mesh){
-    this->index_buffer = std::make_shared<OE_IndexBufferMap>(mesh);
+void OE_PolygonStorage32::initOrderedIB(uint32_t num_of_indices){
+    this->index_buffer = std::make_shared<OE_IndexBufferMap>(num_of_indices);
 }
 
 void OE_PolygonStorage32::genVertexBufferInternally(){
