@@ -350,9 +350,11 @@ namespace csl {
 		// Child Elements
 
 
-		for (const auto& vgroup_e : mesh_e.elements.at("VertexGroup")) {
-			vgroup_ptr v = process_vgroup(vgroup_e);
-			result->data->triangle_groups[v->id] = v;
+		if (mesh_e.elements.contains("VertexGroup")) {
+			for (const auto& vgroup_e : mesh_e.elements.at("VertexGroup")) {
+				vgroup_ptr v = process_vgroup(vgroup_e);
+				result->data->triangle_groups[v->id] = v;
+			}
 		}
 
 		if (mesh_e.elements.contains("UVMapData")) {
@@ -395,7 +397,7 @@ namespace csl {
 		// Single Assignments
 
 
-		// TODO: WHY?
+		// TODO
 		result->bone_id = 0;
 
 		// TODO: Is this an id or a name? Change the identifier in the file accordingly
@@ -407,8 +409,11 @@ namespace csl {
 		// List Assignments
 
 
-		for (const auto& p : vgroup_e.list_assignments.at("polygons")) {
-			result->polygons.push_back(sv_to_int(p));
+		// TODO: This is NOT optional. It may just be an empty list. Fix the writer
+		if (vgroup_e.list_assignments.contains("polygons")) {
+			for (const auto& p : vgroup_e.list_assignments.at("polygons")) {
+				result->polygons.push_back(sv_to_int(p));
+			}
 		}
 
 
@@ -507,10 +512,10 @@ namespace csl {
 		// Child Elements
 		
 
-		for (const auto& tcm_texture_e : tcm_e.elements.at("TCM_Texture")) {
-			// TODO: Is emplace_back an option?
-			result->textures.push_back(process_tcm_texture(tcm_texture_e));
-		}
+//		for (const auto& tcm_texture_e : tcm_e.elements.at("TCM_Texture")) {
+//			// TODO: Is emplace_back an option?
+//			result->textures.push_back(process_tcm_texture(tcm_texture_e));
+//		}
 
 
 		return result;
