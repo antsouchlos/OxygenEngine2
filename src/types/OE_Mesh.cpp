@@ -2,18 +2,16 @@
 #include <types/OE_World.h>
 #include <OE_Math.h>
 
+
 using namespace std;
 
-OE_Mesh32::OE_Mesh32(){
+
+OE_Mesh32::OE_Mesh32(uint32_t num_of_vertices, uint32_t num_of_normals,
+						uint32_t num_of_triangles, uint32_t num_of_uvs, uint32_t max_uv_num) {
     
    this->physics_data     = nullptr;
-   this->data = std::make_shared<OE_PolygonStorage32>();
-}
-
-OE_Mesh32::OE_Mesh32(const string& name) : OE_Object(name){
-    
-    this->physics_data     = nullptr;
-	this->data = std::make_shared<OE_PolygonStorage32>();
+   this->data = std::make_shared<OE_PolygonStorage32>(num_of_vertices, num_of_normals,
+		   												num_of_triangles, num_of_uvs, max_uv_num);
 }
 
 OE_Mesh32::~OE_Mesh32(){

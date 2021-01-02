@@ -14,9 +14,9 @@ class OE_Mesh32 : public OE_Object{
     
     public:
     
-        OE_Mesh32();
-        OE_Mesh32(const std::string&);
-        ~OE_Mesh32();
+        OE_Mesh32(uint32_t num_of_vertices, uint32_t num_of_normals,
+						uint32_t num_of_triangles, uint32_t num_of_uvs, uint32_t max_uv_num);
+		~OE_Mesh32();
         
         // This takes into account rotation as well
         void calculateProperBoundingBox();
