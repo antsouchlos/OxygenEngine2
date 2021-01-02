@@ -24,17 +24,20 @@ namespace csl {
 	}
 
 	float Interpreter::sv_to_float(std::string_view sv) {
-		float result = 0;
+		// TODO: Find a better solution, because this probably kills performance completely
+		return stof(std::string(sv));
 
-		int temp1;
-		auto [p1, ec1] = std::from_chars(sv.begin(), sv.end(), temp1);
-
-		int temp2;
-		auto [p2, ec2] = std::from_chars(p1+1, sv.end(), temp2);
-
-		result = temp1 + temp2 / static_cast<float>(std::pow(10, (p2-p1 - 1)));
-
-		return result;
+//		float result = 0;
+//
+//		int temp1;
+//		auto [p1, ec1] = std::from_chars(sv.begin(), sv.end(), temp1);
+//
+//		int temp2;
+//		auto [p2, ec2] = std::from_chars(p1+1, sv.end(), temp2);
+//
+//		result = temp1 + temp2 / static_cast<float>(std::pow(10, (p2-p1 - 1)));
+//
+//		return result;
 	}
 
 	world_ptr Interpreter::interpret(std::string& input) {
