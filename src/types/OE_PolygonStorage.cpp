@@ -184,17 +184,12 @@ void OE_PolygonStorage32::addTriangleVertexIndexTuple(uint32_t* vertex_arr, uint
 		throw 1;				// TODO: Proper error handling
 
 
-//    uint32_t* output = indices;
-//    bool isFound = false;
-//    if (this->index_buffer->count(indices) != 0){
-//        isFound = true;
-//        output = this->vertex_buffer[(*(this->index_buffer))[indices]];
-//    }
-//    if (!isFound){
-//        (*(this->index_buffer))[indices] = this->vertex_buffer.size();
-//        this->vertex_buffer.push_back(indices);
-//    }
-//    return output;
+	if (this->index_buffer->count(vertex_arr) == 0) {
+		uint32_t* new_index_tuple = new uint32_t[num_of_uvs + 2];
+
+		(*(this->index_buffer))[new_index_tuple] = this->vertex_buffer.size();
+		this->vertex_buffer.push_back(new_index_tuple);
+	}
 }
 
 

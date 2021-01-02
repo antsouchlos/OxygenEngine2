@@ -384,8 +384,8 @@ namespace csl {
 		}
 		
 		
-		result->data->genVertexBufferInternally();
-		result->data->genIndexBuffersInternally();
+//		result->data->genVertexBufferInternally();
+//		result->data->genIndexBuffersInternally();
 
 
 		return result;
@@ -654,56 +654,6 @@ namespace csl {
 			vertex_arr[i] = sv_to_int(v3_v[i]);
 		}
 		mesh->data->addTriangleVertexIndexTuple(vertex_arr, num_of_indices);
-
-//		for (const auto& v : v1_v) {
-//			// TODO: Smart pointers
-//			result.v1 = new uint32_t[n];
-//			for (std::size_t i = 0; i < n; i++) {
-//				result.v1[i] = sv_to_int(v);
-//			}
-//		}
-//		
-//
-//
-//		for (const auto& v : v2_v) {
-//			// TODO: Smart pointers
-//			result.v2 = new uint32_t[n];
-//			for (std::size_t i = 0; i < n; i++) {
-//				result.v2[i] = sv_to_int(v);
-//			}
-//		}
-//		
-//
-//
-//		for (const auto& v : v3_v) {
-//			// TODO: Smart pointers
-//			result.v3 = new uint32_t[n];
-//			for (std::size_t i = 0; i < n; i++) {
-//				result.v3[i] = sv_to_int(v);
-//			}
-//		}
-//
-//		
-//		//TODO: Smart pointers
-//		uint32_t* actual_indices = mesh->data->addTriangle(result.v1);
-//		if (actual_indices != result.v1) {
-//			delete[] result.v1;
-//			result.v1 = actual_indices;
-//		}
-//		
-//		//TODO: Smart pointers
-//		actual_indices = mesh->data->addTriangle(result.v2);
-//		if (actual_indices != result.v2) {
-//			delete[] result.v2;
-//			result.v2 = actual_indices;
-//		}
-//		
-//		//TODO: Smart pointers
-//		actual_indices = mesh->data->addTriangle(result.v3);
-//		if (actual_indices != result.v3) {
-//			delete[] result.v3;
-//			result.v3 = actual_indices;
-//		}
 
 
 		return result;
