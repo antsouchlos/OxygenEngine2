@@ -5,19 +5,19 @@ using namespace std;
 
 int update_monkey_rot(void*, oe::task*, string event_name){
 
-    oe::change_object_local_pos("Camera", oe::vec3(0.0f, 0.0f, -0.1f));
+    oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.0f, -0.1f));
     return 0;
 }
 
 int update_monkey_rot_neg(void*, oe::task*, string event_name){
 
-    oe::change_object_local_pos("Camera", oe::vec3(0.0f, 0.0f, 0.1f));
+    oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.0f, 0.1f));
     return 0;
 }
 
 int update_monkey_rot_x(void*, oe::task*, string event_name){
 
-    oe::change_object_local_pos("Camera", oe::vec3(0.0f, 0.1f, 0.0f));
+    oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.1f, 0.0f));
     //oe::ChangeObjectRot("Suzanne", oe::vec4(0.1f, 1.0f, 0.0f, 0.0f));
     //oe::ChangeObjectScale("Suzanne", oe::vec3(0.0f, 0.1f, 0.0f));
     return 0;
@@ -25,7 +25,7 @@ int update_monkey_rot_x(void*, oe::task*, string event_name){
 
 int update_monkey_rot_neg_x(void*, oe::task*, string event_name){
 
-    oe::change_object_local_pos("Camera", oe::vec3(0.0f, -0.1f, 0.0f));
+    oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, -0.1f, 0.0f));
     //oe::ChangeObjectRot("Suzanne", oe::vec4(-0.1f, 1.0f, 0.0f, 0.0f));
     //oe::ChangeObjectScale("Suzanne", oe::vec3(0.0f, -0.1f, 0.0f));
     return 0;
@@ -33,13 +33,13 @@ int update_monkey_rot_neg_x(void*, oe::task*, string event_name){
 
 int update_monkey_rot_z(void*, oe::task*, string event_name){
 
-    oe::change_object_local_pos("Camera", oe::vec3(-0.1f, 0.0f, 0.0f));
+    oe::change_object_local_pos("\"Camera\"", oe::vec3(-0.1f, 0.0f, 0.0f));
     return 0;
 }
 
 int update_monkey_rot_neg_z(void*, oe::task*, string event_name){
 
-    oe::change_object_local_pos("Camera", oe::vec3(0.1f, 0.0f, 0.0f));
+    oe::change_object_local_pos("\"Camera\"", oe::vec3(0.1f, 0.0f, 0.0f));
     return 0;
 }
 
@@ -125,11 +125,11 @@ int main(){
     oe::pause(20);
 
 	//oe::load_world("OE_Mat_light_test.csl", &OnLoadObject, nullptr);
-	oe::load_world("challenge_car.csl", &OnLoadObject, nullptr);
+	//oe::load_world("challenge_car.csl", &OnLoadObject, nullptr);
 	//oe::load_world("monkeys.csl", &OnLoadObject, nullptr);
 	//oe::load_world("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
 	//oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
-	//oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
+	oe::load_world("OE_Demo.csl", &OnLoadObject, nullptr);
 	
 	//taskMgr.Start();
     oe::start();

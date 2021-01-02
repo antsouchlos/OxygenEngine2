@@ -42,12 +42,16 @@ namespace csl {
 	}
 
 	void Interpreter::interpret(std::string& input) {
+        
+        auto t=clock();
 		const csl::element world_e = csl::parse(input);
-
-
+        cout << "CSL TEST PARSER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+        
+        auto t1=clock();
 		world_ptr world = process_world(world_e);
-
-
+        cout << "CSL TEST INTERPRETER " << (float)(clock()-t1)/CLOCKS_PER_SEC << endl;
+        
+        
 		oe::OE_Main->lockMutex();
 
 		OE_World::objectsList.extend(object_list_, true);
@@ -59,7 +63,6 @@ namespace csl {
 
 		oe::OE_Main->pending_world = world;
 		oe::OE_Main->unlockMutex();
-
 	}
 
 	world_ptr Interpreter::process_world(const element& world_e) {
@@ -405,7 +408,6 @@ namespace csl {
 		// TODO: Dependency
 		// TODO: std::string
 		result->material_id = material_list_.name2id(std::string(material_id));
-        cout << material_list_.name2id(std::string(material_id)) << " what the fuck is happening here" << endl;
 		// List Assignments
 
 
