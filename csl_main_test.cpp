@@ -3,6 +3,7 @@
 using namespace std;
 using namespace oe;
 
+
 int main() {
 //	std::string input = "";
 //	std::string filename = "csl_very_large_object_test.csl";
@@ -21,25 +22,19 @@ int main() {
 	std::string filename = "csl_very_large_object_test.csl";
     
     
-    
     oe::init();
     
-    auto t=clock();
+    auto t = clock();
     
-	try {
-		csl::interpret_file(filename);
-	} catch(csl::unset_object_error& e) {
-		std::cout << "csl::unset_object_error:\n" << '\t' << e.what() << std::endl;
-	} catch(csl::semantic_error& e) {
-		std::cout << "csl::semantic_error:\n" << '\t' << e.what() << std::endl;
-	}
+	csl::interpret_file(filename);
     
-    cout << "CSL TEST EVERYTHING " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    cout << "[Performance] The whole thing:  " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     
     oe::finish();
     oe::step();
     oe::destroy();
-    
+   
+
 	return 0;
 
 //    CSL_Interpreter* interpreter = new CSL_Interpreter();
