@@ -272,6 +272,8 @@ Now that it was decided that C++17 will be the minimum requirement:
 - Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.
 - Handle errors in the API properly.
 - Investigate possible optimizations in the Event handler
+- Refactor ```OE_SharedIndexMap``` (again!) to remove previous defects and optimize with iterators and custom internal containers.
+- Use the following naming convention ```this->member_``` (with underscore at the end) for class member variables.
 
 
 ## TODO list for antsouchlos parser
