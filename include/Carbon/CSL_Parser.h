@@ -8,6 +8,10 @@
 
 #include <Carbon/CSL_Exceptions.h>
 
+
+#define CPP20
+
+
 #ifdef CPP20
 	#include <Carbon/CSL_Lexer_cpp20.h>
 #else
