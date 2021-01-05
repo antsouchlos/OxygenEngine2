@@ -32,7 +32,7 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     
     // execute detached threads
     OE_UnsyncThreadData* actual_data = static_cast<OE_UnsyncThreadData*>(data);
-    int output = actual_data->func(actual_data->data, OE_Task());
+    int output = actual_data->func(OE_Task());
     actual_data->taskMgr->lockMutex();
     actual_data->taskMgr->finished_unsync_threadIDs.insert(actual_data->name);
     actual_data->taskMgr->unlockMutex();
@@ -512,7 +512,7 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             #ifdef FE_DEBUG
             try{
                 if (this->threads[name].functions[task] != nullptr)
-                    output =  this->threads[name].functions[task](this->threads[name].task_data[task], this->threads[name].tasks[task]);
+                    output =  this->threads[name].functions[task](this->threads[name].tasks[task]);
             } 
             catch(runtime_error& exc){
                 /// universal error handling. will catch any error inherited from std::runtime_error
@@ -523,7 +523,7 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             }
             #else
             if (this->threads[name].functions[task] != nullptr)
-                output = this->threads[name].functions[task](this->threads[name].task_data[task], this->threads[name].tasks[task]);
+                output = this->threads[name].functions[task](this->threads[name].tasks[task]);
             #endif
             //cout << name << endl;
             switch(output){

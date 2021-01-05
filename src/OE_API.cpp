@@ -209,7 +209,7 @@ void oe::load_world(std::string filename, const OE_EVENTFUNC func, void* data){
     oe::set_event_func("loaded-" + filename, func, data);
     string* argument = new string();
     *argument = filename;
-    oe::create_unsync_thread("loading-" + filename, &OE_API_Helpers::load_world, (void*)argument);
+    oe::create_unsync_thread("loading-" + filename, std::bind(&OE_API_Helpers::load_world, (void*)argument, std::placeholders::_1), (void*)argument);
 }
 
 /** API functions for manipulating objects and basic types

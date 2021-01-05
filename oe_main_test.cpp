@@ -114,7 +114,7 @@ int OnLoadObject(void* data, oe::task* event_task, string event_name){
     oe::set_event_func("keyboard-f7+", &renderer_toggle_wireframe, nullptr);
     oe::set_event_func("keyboard-f8+", &renderer_toggle_bounding_boxes, nullptr);
     
-    oe::add_task("test_task1", test_task1, nullptr);
+    oe::add_task("test_task1", std::bind(&test_task1, nullptr, std::placeholders::_1), nullptr);
     
     return 0;
 }
