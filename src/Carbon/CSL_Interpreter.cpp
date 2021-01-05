@@ -45,11 +45,11 @@ namespace csl {
         
         auto t=clock();
 		const csl::element world_e = csl::parse(input);
-        cout << "CSL TEST PARSER " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+        cout << "[Performance] Time parsing: " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
         
         auto t1=clock();
 		world_ptr world = process_world(world_e);
-        cout << "CSL TEST INTERPRETER " << (float)(clock()-t1)/CLOCKS_PER_SEC << endl;
+        cout << "[Performance] Time interpreting: " << (float)(clock()-t1)/CLOCKS_PER_SEC << endl;
         
         
 		oe::OE_Main->lockMutex();
