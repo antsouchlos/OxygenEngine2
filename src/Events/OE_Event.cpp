@@ -13,28 +13,20 @@ OE_Event::OE_Event(){
 }
 OE_Event::~OE_Event(){}
 
-void OE_Event::setFunc(const OE_EVENTFUNC a_func, void* data){
+void OE_Event::setFunc(const OE_EVENTFUNC a_func){
     lockMutex();
     func = a_func;
-    user_data = data;
     unlockMutex();
 }
 
-void OE_Event::setFuncData(void* data){
-    lockMutex();
-	if(data != nullptr)
-		user_data = data;
-    unlockMutex();
-}
-int OE_Event::internal_call(OE_Task* task, void* data){
+int OE_Event::internal_call(OE_Task* task){
 	/***************************/
 	///generic handling
 	
-	if( data == nullptr)
-    	func(user_data, task, name);
-    else{
-    	user_data = data;
-        func(user_data, task, name);
+	try {
+        func(task, name);
+    }
+    catch(...){
         
     }
     return 0;
@@ -47,9 +39,9 @@ OE_KeyboardEvent::OE_KeyboardEvent(){
 }
 OE_KeyboardEvent::~OE_KeyboardEvent(){}
 
-int OE_KeyboardEvent::call(OE_Task* task, void* data){
+int OE_KeyboardEvent::call(OE_Task* task){
 	
-	return internal_call(task, data);
+	return internal_call(task);
 }
 
 //mouse
@@ -67,9 +59,9 @@ OE_MouseEvent::OE_MouseEvent(){
 }
 OE_MouseEvent::~OE_MouseEvent(){}
 
-int OE_MouseEvent::call(OE_Task* task, void* data){
+int OE_MouseEvent::call(OE_Task* task){
 	
-	return internal_call(task, data);
+	return internal_call(task);
 }
 
 //gamepad
@@ -79,9 +71,9 @@ OE_GamepadEvent::OE_GamepadEvent(){
 }
 OE_GamepadEvent::~OE_GamepadEvent(){}
 
-int OE_GamepadEvent::call(OE_Task* task, void* data){
+int OE_GamepadEvent::call(OE_Task* task){
     
-    return internal_call(task, data);
+    return internal_call(task);
 }
 
 //custom
@@ -90,9 +82,9 @@ OE_CustomEvent::OE_CustomEvent(){
 }
 OE_CustomEvent::~OE_CustomEvent(){}
 
-int OE_CustomEvent::call(OE_Task* task, void* data){
+int OE_CustomEvent::call(OE_Task* task){
 
-	return internal_call(task, data);
+	return internal_call(task);
 }
 
 //error
@@ -101,18 +93,13 @@ OE_ErrorEvent::OE_ErrorEvent(){
 }
 OE_ErrorEvent::~OE_ErrorEvent(){}
 
-int OE_ErrorEvent::call(OE_Task* task, void* data){
+int OE_ErrorEvent::call(OE_Task* task){
 	
 	/***************************/
 	///non-generic handling
 	if( this->importance == OE_FATAL) finished = true;
 	
-    if( data == nullptr)
-    	func(user_data, task, name);
-    else{
-        user_data = data;
-        func(user_data, task, name);
-    }
+    this->internal_call(task);
     
     return 0;
 }
@@ -123,7 +110,7 @@ OE_EventCombo::OE_EventCombo(){
 }
 OE_EventCombo::~OE_EventCombo(){}
 
-int OE_EventCombo::call(OE_Task* task, void* data){
+int OE_EventCombo::call(OE_Task* task){
 	
-	return internal_call(task, data);
+	return internal_call(task);
 }

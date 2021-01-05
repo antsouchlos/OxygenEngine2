@@ -40,8 +40,10 @@ enum OE_ERROR_IMPORTANCE{
 };
 
 class OE_Task;
-typedef int(*OE_EVENTFUNC)(void*, OE_Task*, std::string);
-int template_event_func(void*, OE_Task*, std::string);
+//typedef int(*OE_EVENTFUNC)(void*, OE_Task*, std::string);
+typedef std::function<int(OE_Task*, std::string)> OE_EVENTFUNC;
+
+int template_event_func(OE_Task*, std::string);
 
 /* general event type */
 class OE_Event: public OE_THREAD_SAFETY_OBJECT{
@@ -51,14 +53,13 @@ class OE_Event: public OE_THREAD_SAFETY_OBJECT{
         static bool finished;
         OE_Event();
         virtual ~OE_Event();
-        virtual int call(OE_Task*, void*)=0;
+        virtual int call(OE_Task*)=0;
     
     protected:
     	
-    	int internal_call(OE_Task*, void*);
+    	int internal_call(OE_Task*);
         /// internal functions (2020: yeah no shit)
-        void setFunc(const OE_EVENTFUNC, void*);
-        void setFuncData(void*);
+        void setFunc(const OE_EVENTFUNC);
         /// variables (2020: yeah no shit)
         int times_invoked;
         bool active;
@@ -67,13 +68,7 @@ class OE_Event: public OE_THREAD_SAFETY_OBJECT{
         OE_EVENT_TYPE type;
         OE_EVENTFUNC func;
         
-        void* user_data;
         std::set<std::string> sub_events;
-        
-        //SDL-specific 
-        // 2020: We probably do not need that, since events are handled in a single thread
-        // with the new design
-		//SDL_cond* condition;
 };
 
 /*button event used in keyboard/mouse/gamepad*/
@@ -94,7 +89,7 @@ class OE_KeyboardEvent : public OE_Event{
     
 	    OE_KeyboardEvent();
 	    ~OE_KeyboardEvent();
-	    int call(OE_Task*, void*);
+	    int call(OE_Task*);
 
 	protected:
     
@@ -111,7 +106,7 @@ class OE_MouseEvent : public OE_Event{
     
 	    OE_MouseEvent();
 	    ~OE_MouseEvent();
-	    int call(OE_Task*, void*);
+	    int call(OE_Task*);
 		
 		static int x, y, delta_x, delta_y, mouse_wheel;
 		static bool mousemoved;
@@ -135,7 +130,7 @@ class OE_GamepadEvent : public OE_Event{
     
 	    OE_GamepadEvent();
 	    ~OE_GamepadEvent();
-	    int call(OE_Task*, void*);
+	    int call(OE_Task*);
 
 	protected:
     
@@ -155,7 +150,7 @@ class OE_CustomEvent : public OE_Event{
     
     OE_CustomEvent();
     ~OE_CustomEvent();
-    int call(OE_Task*, void*);
+    int call(OE_Task*);
 
 	protected:
 };
@@ -168,7 +163,7 @@ class OE_ErrorEvent : public OE_Event{
     
     	OE_ErrorEvent();
     	~OE_ErrorEvent();
-    	int call(OE_Task*, void*);
+    	int call(OE_Task*);
 
 	protected:
 		OE_ERROR_IMPORTANCE importance;
@@ -186,7 +181,7 @@ class OE_EventCombo : public OE_Event{
     
 	    OE_EventCombo();
 	    ~OE_EventCombo();
-	    int call(OE_Task*, void*);
+	    int call(OE_Task*);
 
 	protected:
 		std::vector<std::string> event_list;

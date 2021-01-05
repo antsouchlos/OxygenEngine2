@@ -18,13 +18,13 @@ public:
     std::shared_ptr<OE_Event> getIEventUNSAFE(std::string);
     
     void createUserEvent(std::string);
-    void setIEventFunc(std::string, const OE_EVENTFUNC, void*);
-    void broadcastIEvent(std::string, void*);
+    void setIEventFunc(std::string, const OE_EVENTFUNC);
+    void broadcastIEvent(std::string);
     
     void broadcastIEventWait(std::string, int); // TODO
     void mapIEvent(std::string, std::string);
     void unmapIEvent(std::string, std::string);
-    int callIEvent(std::string, OE_Task*, void*);
+    int callIEvent(std::string, OE_Task*);
     void destroyIEvent(std::string);
     
     std::size_t getEventActivations(std::string);

@@ -7,7 +7,7 @@ namespace OE_API_Helpers{
     
     int load_world(void*, OE_Task);
     
-    int manage_mouse(void*, OE_Task*, std::string);
+    int manage_mouse(OE_Task*, std::string);
 };
 
 #endif

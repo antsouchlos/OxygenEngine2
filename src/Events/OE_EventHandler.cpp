@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int template_event_func(void* data, OE_Task* task, string event_name){ cout << event_name << endl; return 0;}
+int template_event_func(OE_Task* task, string event_name){ cout << event_name << endl; return 0;}
 
 OE_EventHandler::OE_EventHandler(){
 	done = false;
@@ -45,7 +45,7 @@ void OE_EventHandler::createUserEvent(string a_name){
 
 	std::shared_ptr<OE_CustomEvent> event = std::make_shared<OE_CustomEvent>();
 	event->name = a_name;
-	event->setFunc(&template_event_func, nullptr);
+	event->setFunc(&template_event_func);
 	
 	lockMutex();
     if (internal_events.count(a_name) == 0){
@@ -66,10 +66,10 @@ void OE_EventHandler::destroyIEvent(string a_name){
    //return output;
 
 }
-void OE_EventHandler::setIEventFunc(string a_name, const OE_EVENTFUNC func, void* data){
+void OE_EventHandler::setIEventFunc(string a_name, const OE_EVENTFUNC func){
     lockMutex();
     if (getIEventUNSAFE(a_name) != nullptr){
-        getIEventUNSAFE(a_name)->setFunc(func, data);
+        getIEventUNSAFE(a_name)->setFunc(func);
     }
     else{
         
@@ -102,14 +102,13 @@ void OE_EventHandler::unmapIEvent(string upper, string target){
 	unlockMutex();
 }
 /// so simple
-void OE_EventHandler::broadcastIEvent(string a_name, void* data){
+void OE_EventHandler::broadcastIEvent(string a_name){
     
     set<string> tobecalled_events;
 	lockMutex();
     
     if (getIEventUNSAFE(a_name) != nullptr){
         this->pending_events.push_back(a_name);
-        this->getIEventUNSAFE(a_name)->setFuncData(data);
         tobecalled_events = this->getIEventUNSAFE(a_name)->sub_events;
     }
     
@@ -117,14 +116,14 @@ void OE_EventHandler::broadcastIEvent(string a_name, void* data){
     
     /// broadcast any sub events (which in turn broadcast their sub events etc.)
     for(auto &x : tobecalled_events)
-    	this->broadcastIEvent(x, nullptr);
+    	this->broadcastIEvent(x);
 }
 
 // TODO
 void OE_EventHandler::broadcastIEventWait(string a_name, int milliseconds){}
 
 /// so simple
-int OE_EventHandler::callIEvent(string a_name, OE_Task* task, void* data){
+int OE_EventHandler::callIEvent(string a_name, OE_Task* task){
 
     /// generic event management
     auto event = getIEvent(a_name);
@@ -132,7 +131,7 @@ int OE_EventHandler::callIEvent(string a_name, OE_Task* task, void* data){
         
         event->lockMutex();
         event->times_invoked++;
-        event->call(task, data);
+        event->call(task);
         event->unlockMutex();
     } 
     else{
@@ -203,7 +202,7 @@ int OE_EventHandler::handleAllEvents(OE_Task* task){
         unlockMutex();
         
         for (auto a_event: happened_events)
-            callIEvent(a_event, task, nullptr);
+            callIEvent(a_event, task);
         
     }
     return 0;
