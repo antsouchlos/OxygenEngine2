@@ -77,14 +77,14 @@ int renderer_toggle_bounding_boxes(void*, oe::task*, string event_name){
     return 0;
 }
 
-int test_task1(void*, oe::task task){
+int test_task1(oe::task task, std::string obj_name){
     
     if (oe::is_mouse_moved() && oe::is_mouse_locked()){
         float x = (float)oe::get_delta_mouse_x()/160.0f;
         float y = (float)oe::get_delta_mouse_y()/160.0f;
        
-        oe::change_object_global_rot("\"Camera\"", oe::vec4(-x, 0.0f, 0.0f, 1.0f));
-        oe::change_object_rot("\"Camera\"", oe::vec4(-y, 1.0f, 0.0f, 0.0f));
+        oe::change_object_global_rot(obj_name, oe::vec4(-x, 0.0f, 0.0f, 1.0f));
+        oe::change_object_rot(obj_name, oe::vec4(-y, 1.0f, 0.0f, 0.0f));
     }
     return task.CONTINUE();
 }
@@ -114,7 +114,7 @@ int OnLoadObject(void* data, oe::task* event_task, string event_name){
     oe::set_event_func("keyboard-f7+", &renderer_toggle_wireframe, nullptr);
     oe::set_event_func("keyboard-f8+", &renderer_toggle_bounding_boxes, nullptr);
     
-    oe::add_task("test_task1", std::bind(&test_task1, nullptr, std::placeholders::_1), nullptr);
+    oe::add_task_func("test_task1", &test_task1, "\"Camera\"");
     
     return 0;
 }
@@ -122,14 +122,14 @@ int OnLoadObject(void* data, oe::task* event_task, string event_name){
 int main(){
     
     oe::init("Oxygen Engine Demo", 1280, 720, false);
-    oe::pause(20);
+    //oe::pause(20);
 
-	//oe::load_world("OE_Mat_light_test.csl", &OnLoadObject, nullptr);
-	//oe::load_world("challenge_car.csl", &OnLoadObject, nullptr);
-	//oe::load_world("monkeys.csl", &OnLoadObject, nullptr);
-	//oe::load_world("csl_very_large_object_test.csl", &OnLoadObject, nullptr);
-	//oe::load_world("OE_VerySimple.csl", &OnLoadObject, nullptr);
-	oe::load_world("OE_Demo.csl", &OnLoadObject, nullptr);
+	//oe::load_world("OE_Mat_light_test.csl", &OnLoadObject);
+	//oe::load_world("challenge_car.csl", &OnLoadObject);
+	//oe::load_world("monkeys.csl", &OnLoadObject);
+	//oe::load_world("csl_very_large_object_test.csl", &OnLoadObject);
+	//oe::load_world("OE_VerySimple.csl", &OnLoadObject);
+	oe::load_world("OE_Demo.csl", &OnLoadObject);
 	
 	//taskMgr.Start();
     oe::start();

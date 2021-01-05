@@ -30,7 +30,6 @@ struct OE_ThreadData{
 
 struct OE_UnsyncThreadData{
     OE_METHOD func;
-    void* data;
     OE_TaskManager* taskMgr;
     std::string name;
 };
@@ -49,12 +48,10 @@ struct OE_ThreadStruct {
     std::vector<OE_Task>        tasks;
     std::vector<OE_METHOD>      functions;
     std::vector<unsigned int>   task_queue;
-    std::vector<void*>          task_data;
     
     // for new tasks to be run after the next frame
     std::vector<OE_Task>        pending_tasks;
     std::vector<OE_METHOD>      pending_functions;
-    std::vector<void*>          pending_task_data;
     
     // for tasks to be removed
     std::queue<std::string>    to_be_removed;
@@ -127,19 +124,19 @@ class OE_TaskManager: public OE_MutexCondition
         * - priority (int) higher number => lower priority
         * - the name of the thread to be run, if omitted uses the default thread
         */
-        void AddTask(std::string, const OE_METHOD, void*);
-        void AddTask(std::string, const OE_METHOD, int, void*);
-        void AddTask(std::string, const OE_METHOD, int, std::string, void*);
-        void AddTask(std::string, const OE_METHOD, std::string, void*);
+        void AddTask(std::string, const OE_METHOD);
+        void AddTask(std::string, const OE_METHOD, int);
+        void AddTask(std::string, const OE_METHOD, int, std::string);
+        void AddTask(std::string, const OE_METHOD, std::string);
         // similar to do-task, but only executes the function once after certain time has passed
-        void DoOnce( std::string, const OE_METHOD, int, void*);
+        void DoOnce( std::string, const OE_METHOD, int);
         OE_Task GetTaskInfo(std::string, std::string);
         
         
         // Main functions
         int Init(std::string, int, int, bool);
         void CreateNewThread(std::string);
-        void CreateUnsyncThread(std::string, const OE_METHOD, void*);
+        void CreateUnsyncThread(std::string, const OE_METHOD);
         void Step();
         void Start();
         void Destroy();
