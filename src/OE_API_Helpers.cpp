@@ -5,11 +5,7 @@ using namespace oe;
 using namespace OE_API_Helpers;
 using namespace std;
 
-int OE_API_Helpers::load_world(void* file, OE_Task task){
-    
-    string filename = *static_cast<string*>(file);
-    delete static_cast<string*>(file);
-    
+int OE_API_Helpers::load_world(OE_Task task, string filename){
 
 	csl::interpret_file(filename);
 

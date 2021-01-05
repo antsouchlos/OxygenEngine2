@@ -65,10 +65,6 @@ void oe::create_event(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.createUserEvent(name);
 }
-void oe::set_event_func(std::string name, const OE_EVENTFUNC func){
-    assert (OE_Main != nullptr);
-    OE_Main->window->event_handler.setIEventFunc(name, func);
-}
 
 size_t oe::get_event_activations(std::string name){
     assert (OE_Main != nullptr);
@@ -174,24 +170,7 @@ void oe::create_new_thread(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->CreateNewThread(name);
 }
-
-void oe::create_unsync_thread(std::string name, const OE_METHOD func){
-    assert (OE_Main != nullptr);
-    OE_Main->CreateUnsyncThread(name, func);
-}
     
-/** API functions for loading worlds/scenes/objects/etc.
- */
-    
-void oe::load_world(std::string filename, const OE_EVENTFUNC func){
-    
-    oe::create_event("loaded-" + filename);
-    oe::set_event_func("loaded-" + filename, func);
-    string* argument = new string();
-    *argument = filename;
-    oe::create_unsync_thread("loading-" + filename, std::bind(&OE_API_Helpers::load_world, (void*)argument, std::placeholders::_1));
-}
-
 /** API functions for manipulating objects and basic types
      * to be vastly extended when the physics engine comes
      */
