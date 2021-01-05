@@ -25,14 +25,22 @@ OE_Task::OE_Task(string name, int countera, int priority, int init_ticks, int ti
     this->init_ticks = init_ticks;
 }
 
-OE_Task::~OE_Task(){
-    //dtor
+bool OE_Task::operator > (const OE_Task& other) const {
+    if (this->priority > other.priority){
+        return true;
+    }
+    else if (this->priority < other.priority){
+        return false;
+    }
+    else {
+        return this->name > other.name;
+    }
 }
+
 void OE_Task::update(){
     this->counter +=1;
     this->ticks = SDL_GetTicks()-this->delta_ticks;
     this->delta_ticks = SDL_GetTicks();
-    //cout << "success" << endl;
 }
 
 int OE_Task::CONTINUE(){

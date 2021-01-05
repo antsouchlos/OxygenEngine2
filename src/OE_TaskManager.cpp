@@ -46,16 +46,22 @@ void OE_ThreadStruct::updateTaskList(){
         for (size_t i=0; i < this->tasks.size(); i++){
             if (this->tasks[i].GetName() == this->to_be_removed.front()){
                 this->tasks.erase(this->tasks.begin() + i);
-                this->functions.erase(this->functions.begin() + i);
+                this->functions.erase(this->tasks[i].name);
             }
         }
         this->to_be_removed.pop();
     }
     
-    for (auto x: std::exchange(this->pending_tasks, {}))
+    for (auto x: std::exchange(this->pending_tasks, {})){
+        if (this->task_names.count(x.name) == 1){
+            cout << "OE Task Manager WARNING: Already existing task: " << x.name << endl;
+            continue;
+        }
         this->tasks.push_back(x);
-    for (auto x: std::exchange(this->pending_functions, {}))
-        this->functions.push_back(x);
+        this->task_names.insert(x.name);
+        this->functions[x.name] = this->pending_functions[x.name];
+    }
+    this->pending_functions.clear();
 }
 
 
@@ -416,7 +422,7 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func){
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
     lockMutex();
     this->threads["default"].pending_tasks.push_back(task);
-    this->threads["default"].pending_functions.push_back(func);
+    this->threads["default"].pending_functions[name] = func;
     this->threads["default"].changed = true;
     unlockMutex();
 
@@ -427,7 +433,7 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority){
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
     lockMutex();
     this->threads["default"].pending_tasks.push_back(task);
-    this->threads["default"].pending_functions.push_back(func);
+    this->threads["default"].pending_functions[name] = func;
     this->threads["default"].changed = true;
     unlockMutex();
 }
@@ -437,7 +443,7 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, st
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
     lockMutex();
     this->threads[threadname].pending_tasks.push_back(task);
-    this->threads[threadname].pending_functions.push_back(func);
+    this->threads[threadname].pending_functions[name] = func;
     this->threads[threadname].changed = true;
     unlockMutex();
 }
@@ -447,7 +453,7 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func, string threadnam
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
     lockMutex();
     this->threads[threadname].pending_tasks.push_back(task);
-    this->threads[threadname].pending_functions.push_back(func);
+    this->threads[threadname].pending_functions[name] = func;
     this->threads[threadname].changed = true;
     unlockMutex();
 }
@@ -457,7 +463,7 @@ void OE_TaskManager::DoOnce(string name, const OE_METHOD func , int delay){
     OE_Task task = OE_Task(name, 0, delay, this->getTicks());
     lockMutex();
     this->threads["default"].pending_tasks.push_back(task);
-    this->threads["default"].pending_functions.push_back(func);
+    this->threads["default"].pending_functions[name] = func;
     this->threads["default"].changed = true;
     unlockMutex();
 }
@@ -486,47 +492,42 @@ OE_Task OE_TaskManager::GetTaskInfo(string threadname, string name){
 void OE_TaskManager::runThreadTasks(const std::string& name){
     unsigned int tasks_size = this->threads[name].functions.size();
     
-	//this->event_handler.updateEventThreads(nullptr);
     // after updating the task queue start executing the functions
     if( tasks_size != 0){
         
         vector<unsigned int> obsolete_tasks;
-        for(unsigned int task= 0; task< this->threads[name].task_queue.size(); task++){
+        
+        unsigned int task_index = 0;
+        for(auto &&task: this->threads[name].tasks){
             
-            auto temp = this->threads[name];
-            //OE_ThreadStruct temp = this->threads[name];
             // store active task
-            this->active_tasks[name] = this->threads[name].tasks[task].GetName();
-            this->threads[name].tasks[task].update();
+            this->active_tasks[name] = task.GetName();
+            task.update();
             // call the task
             int output = 0;
-            #ifdef FE_DEBUG
             try{
-                if (this->threads[name].functions[task] != nullptr)
-                    output =  this->threads[name].functions[task](this->threads[name].tasks[task]);
+                if (this->threads[name].functions[task.name] != nullptr)
+                    output =  this->threads[name].functions[task.name](task);
             } 
             catch(runtime_error& exc){
                 /// universal error handling. will catch any error inherited from std::runtime_error
-                string outputa = string(exc.what()) + "\n Task: " + this->threads[name].tasks[task].GetName() + "\n Thread: " + name;
+                string outputa = string(exc.what()) + "\n Task: " + task.name + "\n Thread: " + name;
+                outputa += "\n Invocation: " + std::to_string(task.counter);
                 cout << outputa << endl;
                 OE_WriteToLog(outputa);
                 output = 1;
             }
-            #else
-            if (this->threads[name].functions[task] != nullptr)
-                output = this->threads[name].functions[task](this->threads[name].tasks[task]);
-            #endif
-            //cout << name << endl;
             switch(output){
-                case 1: obsolete_tasks.push_back(task); break;
+                case 1: obsolete_tasks.push_back(task_index); break;
             }
-            //this->event_handler.updateEventThreads(nullptr);
+            
+            task_index++;
         }
         
         
         
         for(auto task : obsolete_tasks){
-            this->threads[name].functions.erase(this->threads[name].functions.begin()+task);
+            this->threads[name].functions.erase(this->threads[name].tasks[task].name);
             this->threads[name].tasks.erase(this->threads[name].tasks.begin()+task);
         }
         obsolete_tasks.clear();
@@ -539,23 +540,5 @@ void OE_TaskManager::sortThreadTasks(const std::string& name){
     this->threads[name].updateTaskList();
     unlockMutex();
     
-    this->threads[name].task_queue.clear();
-
-    /// make a new list to store the succession the tasks should be called
-    list<int> task_priority_list = {};
-        
-    for (unsigned int i=0; i<this->threads[name].tasks.size(); i++)
-        task_priority_list.push_back(this->threads[name].tasks[i].GetPriority());
-
-    task_priority_list.sort(greater<int>());
-    /// update the threads task queue so that the succession doesn't
-    /// have to be calculated every frame
-    /// for every task priority
-    for(auto task_index : task_priority_list){
-        for(unsigned int i=0; i<this->threads[name].tasks.size(); i++){
-            // if the tasks corresponds to the priority
-            if (this->threads[name].tasks[i].GetPriority() == task_index)
-                this->threads[name].task_queue.push_back(i);
-        }
-    }
+    std::sort(this->threads[name].tasks.begin(), this->threads[name].tasks.end(), std::greater<OE_Task>()); 
 }

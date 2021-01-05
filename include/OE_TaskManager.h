@@ -11,11 +11,11 @@
 
 class OE_TaskManager;
 
+
 /* this is a shortcut type definition
  * to make code clearer.
  * It stores a pointer of a method of OE_TaskManager-derived classes
  */
-//typedef int(*OE_METHOD)(void*, OE_Task);
 typedef std::function<int(OE_Task)> OE_METHOD;
 
 struct OE_ThreadData{
@@ -37,21 +37,23 @@ struct OE_UnsyncThreadData{
 struct OE_ThreadStruct {
     /* this struct is used to store a thread. More specifically it stores:
      * - the threadID as an SDL_Thread pointer
-     * - the tasks to execute which are represented as an FTask
-     * - the pointer methods to execute which represent an FTask
+     * - the tasks to execute which are represented as an OE_Task
+     * - the pointer methods to execute which represent an OE_METHOD
      * - a boolean to make the thread asynchronous
      */
     
     OE_ThreadStruct();
     virtual ~OE_ThreadStruct();
-
-    std::vector<OE_Task>        tasks;
-    std::vector<OE_METHOD>      functions;
-    std::vector<unsigned int>   task_queue;
+    
+    
+    std::set<std::string>               task_names;
+    std::vector<OE_Task>                tasks;
+    std::map<std::string, OE_METHOD>    functions;
+    //std::vector<unsigned int>   task_queue;
     
     // for new tasks to be run after the next frame
-    std::vector<OE_Task>        pending_tasks;
-    std::vector<OE_METHOD>      pending_functions;
+    std::vector<OE_Task>                pending_tasks;
+    std::map<std::string, OE_METHOD>    pending_functions;
     
     // for tasks to be removed
     std::queue<std::string>    to_be_removed;

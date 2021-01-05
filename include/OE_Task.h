@@ -3,15 +3,21 @@
 
 #include <types/OE_Libs.h>
 #include <Events/OE_EventHandler.h>
+#include <OE_Error.h>
 
 class OE_Task
 {
+    
+    friend class OE_TaskManager;
+    friend struct OE_ThreadStruct;
+        
     public:
-        friend class OE_TaskManager;
+       
         OE_Task();
         OE_Task(std::string, int, int, int);
         OE_Task(std::string, int, int, int, int);
-        ~OE_Task();
+
+        bool operator > (const OE_Task&) const;
 
         int CONTINUE();
         int FINISHED();
