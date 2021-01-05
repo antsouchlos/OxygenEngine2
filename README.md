@@ -217,6 +217,10 @@ Optimized Natrium Renderer by offloading all OpenGL buffer data calls into the `
 
 NRE: Fixed an OpenGL bug on Windows/Intel. Updated with TODO list for anything but renderer.
 
+2021/01/05 - philsegeler
+
+API: Added variadic templates and removed all ```void*``` and ```nullptr``` unless absolutely necessary (such as in SDL). BTW Andreas will you finally update the parser readme????
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -269,7 +273,7 @@ In the future and in no particular order:
 
 Now that it was decided that C++17 will be the minimum requirement:
 
-- Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.
+- ~~Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.~~(DONE using ```std::bind```)
 - Handle errors in the API properly.
 - Investigate possible optimizations in the Event handler
 - Refactor ```OE_SharedIndexMap``` (again!) to remove previous defects and optimize with iterators and custom internal containers.
