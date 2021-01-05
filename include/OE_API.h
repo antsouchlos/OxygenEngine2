@@ -229,7 +229,38 @@ namespace oe{
     
     void broadcast_event(std::string);
     void create_event(std::string);
-    void set_event_func(std::string, const oe::event_func_type);
+    
+    template<typename T, typename... Args>
+    void set_event_func(std::string name, T func, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::event_func_type func_copy = std::bind(func,  std::placeholders::_1, std::placeholders::_2, std::forward<Args...>(arguments...));
+        OE_Main->window->event_handler.setIEventFunc(name, func_copy);
+    }
+    
+    template<typename T>
+    void set_event_func(std::string name, T func){
+        
+        assert (OE_Main != nullptr);
+        oe::event_func_type func_copy = std::bind(func,  std::placeholders::_1, std::placeholders::_2);
+        OE_Main->window->event_handler.setIEventFunc(name, func_copy);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void set_event_method(std::string name, T func, A instance, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::event_func_type func_copy = std::bind(func,  instance, std::placeholders::_1, std::placeholders::_2, std::forward<Args...>(arguments...));
+        OE_Main->window->event_handler.setIEventFunc(name, func_copy);
+    }
+    
+    template<typename T, typename A>
+    void set_event_method(std::string name, T func, A instance){
+        
+        assert (OE_Main != nullptr);
+        oe::event_func_type func_copy = std::bind(func,  instance, std::placeholders::_1, std::placeholders::_2);
+        OE_Main->window->event_handler.setIEventFunc(name, func_copy);
+    }
     
     void destroy_event(std::string);
     
@@ -263,12 +294,69 @@ namespace oe{
     OE_Task get_task_info(std::string, std::string);
     
     void create_new_thread(std::string);
-    void create_unsync_thread(std::string, const oe::method_type);
+    
+    template<typename T, typename... Args>
+    void create_unsync_thread_func(std::string name, T func, Args... arguments){
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func, std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->CreateUnsyncThread(name, func_copy);
+    }
+    
+    template<typename T>
+    void create_unsync_thread_func(std::string name, T func){
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func, std::placeholders::_1);
+        OE_Main->CreateUnsyncThread(name, func_copy);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void create_unsync_thread_method(std::string name, T func, A instance, Args... arguments){
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func, instance, std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->CreateUnsyncThread(name, func_copy);
+    }
+    
+    template<typename T, typename A>
+    void create_unsync_thread_method(std::string name, T func, A instance){
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1);
+        OE_Main->CreateUnsyncThread(name, func_copy);
+    }
     
     /** API functions for loading worlds/scenes/objects/etc.
      */
     
-    void load_world(std::string, const oe::event_func_type);
+    template<typename T, typename... Args>
+    void load_world_func(std::string filename, T func, Args... arguments){
+        
+        oe::create_event("loaded-" + filename);
+        oe::set_event_func("loaded-" + filename, func, std::forward<Args...>(arguments...));
+        oe::create_unsync_thread_func("loading-" + filename, &OE_API_Helpers::load_world, filename);
+    }
+    
+    template<typename T>
+    void load_world_func(std::string filename, T func){
+        
+        oe::create_event("loaded-" + filename);
+        oe::set_event_func("loaded-" + filename, func);
+        oe::create_unsync_thread_func("loading-" + filename, &OE_API_Helpers::load_world, filename);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void load_world_method(std::string filename, T func, A instance, Args... arguments){
+        
+        oe::create_event("loaded-" + filename);
+        oe::set_event_method("loaded-" + filename, func, instance, std::forward<Args...>(arguments...));
+        oe::create_unsync_thread_func("loading-" + filename, &OE_API_Helpers::load_world, filename);
+    }
+    
+    template<typename T, typename A>
+    void load_world_method(std::string filename, T func, A instance){
+        
+        oe::create_event("loaded-" + filename);
+        oe::set_event_method("loaded-" + filename, func, instance);
+        oe::create_unsync_thread_func("loading-" + filename, &OE_API_Helpers::load_world, filename);
+    }
     
     /** API functions for manipulating objects and basic types
      * to be vastly extended when the physics engine comes
