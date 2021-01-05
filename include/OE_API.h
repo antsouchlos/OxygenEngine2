@@ -227,9 +227,9 @@ namespace oe{
     void remove_task(std::string);
     void remove_task(std::string, std::string);
     
-    void broadcast_event(std::string, void*);
+    void broadcast_event(std::string);
     void create_event(std::string);
-    void set_event_func(std::string, const oe::event_func_type, void*);
+    void set_event_func(std::string, const oe::event_func_type);
     
     void destroy_event(std::string);
     
