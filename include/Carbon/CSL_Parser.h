@@ -9,7 +9,9 @@
 #include <Carbon/CSL_Exceptions.h>
 
 
-#define CPP20
+#if (__cplusplus > 201703L)
+    #define CPP20
+#endif
 
 
 #ifdef CPP20

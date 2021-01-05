@@ -15,7 +15,8 @@ class OE_TaskManager;
  * to make code clearer.
  * It stores a pointer of a method of OE_TaskManager-derived classes
  */
-typedef int(*OE_METHOD)(void*, OE_Task);
+//typedef int(*OE_METHOD)(void*, OE_Task);
+typedef std::function<int(OE_Task)> OE_METHOD;
 
 struct OE_ThreadData{
     /* This struct is passed to the update_thread function
