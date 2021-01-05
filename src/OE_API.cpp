@@ -47,26 +47,6 @@ void oe::finish(){
 // The API functions inside this block are the only ones that are 
 // safe to be called on an unsynchronized thread
     
-void oe::add_task(std::string name, const OE_METHOD func, void* data){
-    assert (OE_Main != nullptr);
-    OE_Main->AddTask(name, func, data);
-}
-
-void oe::add_task(std::string name, const OE_METHOD func, int priority, void* data){
-    assert (OE_Main != nullptr);
-    OE_Main->AddTask(name, func, data);
-}
-
-void oe::add_task(std::string name, const OE_METHOD func, int priority, std::string threadname, void* data){
-    assert (OE_Main != nullptr);
-    OE_Main->AddTask(name, func, priority, threadname, data);
-}
-
-void oe::add_task(std::string name, const OE_METHOD func, std::string threadname, void* data){
-    assert (OE_Main != nullptr);
-    OE_Main->AddTask(name, func, threadname, data);
-}
-    
 void oe::remove_task(std::string task){
     assert (OE_Main != nullptr);
     OE_Main->RemoveTask(task);
@@ -77,7 +57,7 @@ void oe::remove_task(std::string task, std::string thread){
     OE_Main->RemoveTask(task, thread);
 }
     
-void oe::broadcast_event(std::string name, void* data){
+void oe::broadcast_event(std::string name, void* data ){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.broadcastIEvent(name, data);
 }
@@ -195,21 +175,21 @@ void oe::create_new_thread(std::string name){
     OE_Main->CreateNewThread(name);
 }
 
-void oe::create_unsync_thread(std::string name, const OE_METHOD func, void* data){
+void oe::create_unsync_thread(std::string name, const OE_METHOD func){
     assert (OE_Main != nullptr);
-    OE_Main->CreateUnsyncThread(name, func, data);
+    OE_Main->CreateUnsyncThread(name, func);
 }
     
 /** API functions for loading worlds/scenes/objects/etc.
  */
     
-void oe::load_world(std::string filename, const OE_EVENTFUNC func, void* data){
+void oe::load_world(std::string filename, const OE_EVENTFUNC func){
     
     oe::create_event("loaded-" + filename);
-    oe::set_event_func("loaded-" + filename, func, data);
+    oe::set_event_func("loaded-" + filename, func, nullptr);
     string* argument = new string();
     *argument = filename;
-    oe::create_unsync_thread("loading-" + filename, std::bind(&OE_API_Helpers::load_world, (void*)argument, std::placeholders::_1), (void*)argument);
+    oe::create_unsync_thread("loading-" + filename, std::bind(&OE_API_Helpers::load_world, (void*)argument, std::placeholders::_1));
 }
 
 /** API functions for manipulating objects and basic types

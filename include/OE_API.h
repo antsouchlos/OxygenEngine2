@@ -92,10 +92,137 @@ namespace oe{
     // The API functions inside this block are the only ones that are 
     // safe to be called on an unsynchronized thread together with all the get* functions
     
-    void add_task(std::string, const oe::method_type, void*);
-    void add_task(std::string, const oe::method_type, int, void*);
-    void add_task(std::string, const oe::method_type, int, std::string, void*);
-    void add_task(std::string, const oe::method_type, std::string, void*);
+    // plain add task
+    template<typename T, typename... Args>
+    void add_task_func(std::string name, T func, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy);
+    }
+    
+    template<typename T>
+    void add_task_func(std::string name, T func){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void add_task_method(std::string name, T func, A instance, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy);
+    }
+    
+    template<typename T,typename A>
+    void add_task_method(std::string name, T func, A instance){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy);
+    }
+    
+    // with priority
+    template<typename T, typename... Args>
+    void add_task_func(std::string name, int priority, T func, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy, priority);
+    }
+    
+    template<typename T>
+    void add_task_func(std::string name, int priority, T func){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy, priority);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void add_task_method(std::string name, int priority, T func, A instance, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy, priority);
+    }
+    
+    template<typename T,typename A>
+    void add_task_method(std::string name, int priority, T func, A instance){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy, priority);
+    }
+    
+    // with priority and threadname
+    template<typename T, typename... Args>
+    void add_task_func(std::string name, std::string threadname, int priority, T func, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy, priority, threadname);
+    }
+    
+    template<typename T>
+    void add_task_func(std::string name, std::string threadname, int priority, T func){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy, priority, threadname);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void add_task_method(std::string name, std::string threadname, int priority, T func, A instance, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy, priority, threadname);
+    }
+    
+    template<typename T,typename A>
+    void add_task_method(std::string name, std::string threadname,  int priority, T func, A instance){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy, priority, threadname);
+    }
+    
+    // with threadname
+    template<typename T, typename... Args>
+    void add_task_func(std::string name, std::string threadname, T func, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy, threadname);
+    }
+    
+    template<typename T>
+    void add_task_func(std::string name, std::string threadname, T func){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy, threadname);
+    }
+    
+    template<typename T, typename A, typename... Args>
+    void add_task_method(std::string name, std::string threadname, T func, A instance, Args... arguments){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1, std::forward<Args...>(arguments...));
+        OE_Main->AddTask(name, func_copy, threadname);
+    }
+    
+    template<typename T,typename A>
+    void add_task_method(std::string name, std::string threadname, T func, A instance){
+        
+        assert (OE_Main != nullptr);
+        oe::method_type func_copy = std::bind(func,  instance, std::placeholders::_1);
+        OE_Main->AddTask(name, func_copy, threadname);
+    }
     
     void remove_task(std::string);
     void remove_task(std::string, std::string);
@@ -136,12 +263,12 @@ namespace oe{
     OE_Task get_task_info(std::string, std::string);
     
     void create_new_thread(std::string);
-    void create_unsync_thread(std::string, const oe::method_type, void*);
+    void create_unsync_thread(std::string, const oe::method_type);
     
     /** API functions for loading worlds/scenes/objects/etc.
      */
     
-    void load_world(std::string, const oe::event_func_type, void*);
+    void load_world(std::string, const oe::event_func_type);
     
     /** API functions for manipulating objects and basic types
      * to be vastly extended when the physics engine comes
