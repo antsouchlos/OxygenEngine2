@@ -3,9 +3,9 @@
 using namespace std;
 //using namespace OE;
 
-int update_monkey_rot( oe::task*, string event_name){
+int update_monkey_rot( oe::task*, string event_name, string obj_name){
 
-    oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.0f, -0.1f));
+    oe::change_object_local_pos(obj_name, oe::vec3(0.0f, 0.0f, -0.1f));
     return 0;
 }
 
@@ -92,14 +92,14 @@ int test_task1(oe::task task, std::string obj_name){
 int OnLoadObject(oe::task* event_task, string event_name){
     cout << "SUCCESSFULLY loaded '" << event_name << "'" << endl;
     
-    oe::set_event_func("keyboard-w", &update_monkey_rot);
+    oe::set_event_func("keyboard-w", &update_monkey_rot, "\"Camera\"");
     oe::set_event_func("keyboard-s", &update_monkey_rot_neg);
     oe::set_event_func("keyboard-q", &update_monkey_rot_x);
     oe::set_event_func("keyboard-e", &update_monkey_rot_neg_x);
     oe::set_event_func("keyboard-a", &update_monkey_rot_z);
     oe::set_event_func("keyboard-d", &update_monkey_rot_neg_z);
     
-    oe::set_event_func("keyboard-w+", &update_monkey_rot);
+    oe::set_event_func("keyboard-w+", &update_monkey_rot,  "\"Camera\"");
     oe::set_event_func("keyboard-s+", &update_monkey_rot_neg);
     oe::set_event_func("keyboard-q+", &update_monkey_rot_x);
     oe::set_event_func("keyboard-e+", &update_monkey_rot_neg_x);
@@ -124,12 +124,12 @@ int main(){
     oe::init("Oxygen Engine Demo", 1280, 720, false);
     //oe::pause(20);
 
-	//oe::load_world("OE_Mat_light_test.csl", &OnLoadObject);
-	//oe::load_world("challenge_car.csl", &OnLoadObject);
-	//oe::load_world("monkeys.csl", &OnLoadObject);
-	//oe::load_world("csl_very_large_object_test.csl", &OnLoadObject);
-	//oe::load_world("OE_VerySimple.csl", &OnLoadObject);
-	oe::load_world("OE_Demo.csl", &OnLoadObject);
+	//oe::load_world_func("OE_Mat_light_test.csl", &OnLoadObject);
+	//oe::load_world_func("challenge_car.csl", &OnLoadObject);
+	//oe::load_world_func("monkeys.csl", &OnLoadObject);
+	//oe::load_world_func("csl_very_large_object_test.csl", &OnLoadObject);
+	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
+	oe::load_world_func("OE_Demo.csl", &OnLoadObject);
 	
 	//taskMgr.Start();
     oe::start();
