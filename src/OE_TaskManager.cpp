@@ -47,7 +47,6 @@ void OE_ThreadStruct::updateTaskList(){
             if (this->tasks[i].GetName() == this->to_be_removed.front()){
                 this->tasks.erase(this->tasks.begin() + i);
                 this->functions.erase(this->functions.begin() + i);
-                this->task_data.erase(this->task_data.begin() + i);
             }
         }
         this->to_be_removed.pop();
@@ -57,8 +56,6 @@ void OE_ThreadStruct::updateTaskList(){
         this->tasks.push_back(x);
     for (auto x: std::exchange(this->pending_functions, {}))
         this->functions.push_back(x);
-    for (auto x: std::exchange(this->pending_task_data, {}))
-        this->task_data.push_back(x);
 }
 
 
@@ -118,11 +115,10 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     return 0;
 }
 
-void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func, void* params){
+void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func){
     
     OE_UnsyncThreadData* threaddata = new OE_UnsyncThreadData();
     threaddata->func = func;
-    threaddata->data = params;
     threaddata->name = thread_name;
     threaddata->taskMgr = this;
     lockMutex();
@@ -415,58 +411,53 @@ void OE_TaskManager::SetFrameRate(unsigned int frametarget){
     unlockMutex();
 }
 
-void OE_TaskManager::AddTask(string name, const OE_METHOD func, void* data){
+void OE_TaskManager::AddTask(string name, const OE_METHOD func){
 
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
     lockMutex();
     this->threads["default"].pending_tasks.push_back(task);
     this->threads["default"].pending_functions.push_back(func);
-    this->threads["default"].pending_task_data.push_back(data);
     this->threads["default"].changed = true;
     unlockMutex();
 
 }
 
-void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, void* data){
+void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority){
 
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
     lockMutex();
     this->threads["default"].pending_tasks.push_back(task);
     this->threads["default"].pending_functions.push_back(func);
-    this->threads["default"].pending_task_data.push_back(data);
     this->threads["default"].changed = true;
     unlockMutex();
 }
 
-void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, string threadname, void* data){
+void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, string threadname){
 
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
     lockMutex();
     this->threads[threadname].pending_tasks.push_back(task);
     this->threads[threadname].pending_functions.push_back(func);
-    this->threads[threadname].pending_task_data.push_back(data);
     this->threads[threadname].changed = true;
     unlockMutex();
 }
 
-void OE_TaskManager::AddTask(string name, const OE_METHOD func, string threadname, void* data){
+void OE_TaskManager::AddTask(string name, const OE_METHOD func, string threadname){
 
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
     lockMutex();
     this->threads[threadname].pending_tasks.push_back(task);
     this->threads[threadname].pending_functions.push_back(func);
-    this->threads[threadname].pending_task_data.push_back(data);
     this->threads[threadname].changed = true;
     unlockMutex();
 }
 
-void OE_TaskManager::DoOnce(string name, const OE_METHOD func , int delay, void* data){
+void OE_TaskManager::DoOnce(string name, const OE_METHOD func , int delay){
 
     OE_Task task = OE_Task(name, 0, delay, this->getTicks());
     lockMutex();
     this->threads["default"].pending_tasks.push_back(task);
     this->threads["default"].pending_functions.push_back(func);
-    this->threads["default"].pending_task_data.push_back(data);
     this->threads["default"].changed = true;
     unlockMutex();
 }
@@ -537,7 +528,6 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
         for(auto task : obsolete_tasks){
             this->threads[name].functions.erase(this->threads[name].functions.begin()+task);
             this->threads[name].tasks.erase(this->threads[name].tasks.begin()+task);
-            this->threads[name].task_data.erase(this->threads[name].task_data.begin()+task);
         }
         obsolete_tasks.clear();
     }
