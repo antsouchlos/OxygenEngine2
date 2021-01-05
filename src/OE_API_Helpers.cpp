@@ -13,12 +13,12 @@ int OE_API_Helpers::load_world(void* file, OE_Task task){
 
 	csl::interpret_file(filename);
 
-    oe::broadcast_event("loaded-" + filename, nullptr);
+    oe::broadcast_event("loaded-" + filename);
     
 	return 0;
 }
 
-int OE_API_Helpers::manage_mouse(void* data, OE_Task* task, std::string event_name){
+int OE_API_Helpers::manage_mouse(OE_Task* task, std::string event_name){
     
     if (event_name == "mouse-lock"){
         OE_Main->window->lockMouse();

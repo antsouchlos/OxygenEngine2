@@ -57,17 +57,17 @@ void oe::remove_task(std::string task, std::string thread){
     OE_Main->RemoveTask(task, thread);
 }
     
-void oe::broadcast_event(std::string name, void* data ){
+void oe::broadcast_event(std::string name){
     assert (OE_Main != nullptr);
-    OE_Main->window->event_handler.broadcastIEvent(name, data);
+    OE_Main->window->event_handler.broadcastIEvent(name);
 }
 void oe::create_event(std::string name){
     assert (OE_Main != nullptr);
     OE_Main->window->event_handler.createUserEvent(name);
 }
-void oe::set_event_func(std::string name, const OE_EVENTFUNC func, void* data){
+void oe::set_event_func(std::string name, const OE_EVENTFUNC func){
     assert (OE_Main != nullptr);
-    OE_Main->window->event_handler.setIEventFunc(name, func, data);
+    OE_Main->window->event_handler.setIEventFunc(name, func);
 }
 
 size_t oe::get_event_activations(std::string name){
@@ -153,14 +153,14 @@ bool oe::is_mouse_locked(){
 void oe::mouse_lock(){
     
     oe::create_event("mouse-lock");
-    oe::set_event_func("mouse-lock", &OE_API_Helpers::manage_mouse, nullptr);
-    oe::broadcast_event("mouse-lock", nullptr);
+    oe::set_event_func("mouse-lock", &OE_API_Helpers::manage_mouse);
+    oe::broadcast_event("mouse-lock");
     
 }
 void oe::mouse_unlock(){
     oe::create_event("mouse-unlock");
-    oe::set_event_func("mouse-unlock", &OE_API_Helpers::manage_mouse, nullptr);
-    oe::broadcast_event("mouse-unlock", nullptr);
+    oe::set_event_func("mouse-unlock", &OE_API_Helpers::manage_mouse);
+    oe::broadcast_event("mouse-unlock");
 }
 
 //------------------------BLOCK-------------------------//
@@ -186,7 +186,7 @@ void oe::create_unsync_thread(std::string name, const OE_METHOD func){
 void oe::load_world(std::string filename, const OE_EVENTFUNC func){
     
     oe::create_event("loaded-" + filename);
-    oe::set_event_func("loaded-" + filename, func, nullptr);
+    oe::set_event_func("loaded-" + filename, func);
     string* argument = new string();
     *argument = filename;
     oe::create_unsync_thread("loading-" + filename, std::bind(&OE_API_Helpers::load_world, (void*)argument, std::placeholders::_1));

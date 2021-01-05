@@ -196,7 +196,7 @@ bool OE_SDL_WindowSystem::update(){
         SDL_GetMouseState(&OE_MouseEvent::x, &OE_MouseEvent::y);
         SDL_GetRelativeMouseState(&OE_MouseEvent::delta_x, &OE_MouseEvent::delta_y);
         this->event_handler.unlockMutex();
-        this->event_handler.broadcastIEvent("mouse-motion", nullptr);
+        this->event_handler.broadcastIEvent("mouse-motion");
     }
 
     // This is needed to support things like OE_Finish()
@@ -271,7 +271,7 @@ bool OE_SDL_WindowSystem::updateEvents(){
             SDL_GetRelativeMouseState(&OE_MouseEvent::delta_x, &OE_MouseEvent::delta_y);
             this->event_handler.unlockMutex();
             
-            this->event_handler.broadcastIEvent("mouse-wheel", nullptr);
+            this->event_handler.broadcastIEvent("mouse-wheel");
             break;
 	}
 	
