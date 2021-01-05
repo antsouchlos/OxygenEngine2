@@ -119,7 +119,8 @@ namespace csl {
 
 		f.close();
         
-        std::cout << "CSL TEST READ DISK " << (float)(clock()-t)/CLOCKS_PER_SEC << std::endl;
+        std::cout << "[Performance] Time reading from file: " << (float)(clock()-t)/CLOCKS_PER_SEC
+					<< std::endl;
         
 		interpret(input);
 	}
