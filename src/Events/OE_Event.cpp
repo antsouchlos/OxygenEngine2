@@ -18,46 +18,6 @@ void OE_Event::setFunc(const OE_EVENTFUNC a_func){
     unlockMutex();
 }
 
-int OE_Event::internal_call(){
-	/***************************/
-	///generic handling
-	
-	if (!this->has_init_){
-        
-        this->task_ = OE_Task(this->name_, 0, 0, SDL_GetTicks());
-        this->has_init_ = true;
-    }
-	
-	task_.update();
-	try {
-        func_(task_, name_);
-    }
-    catch(oe::api_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter()) + "\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch(csl::parser_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter()) + "\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch(csl::interpreter_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter()) + "\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch(...){
-        std::string error_str = "OE: Exception thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter());
-        cout << error_str << endl;
-        OE_WriteToLog(error_str  + "\n");
-    }
-    return 0;
-    /**************************/
-}
 //keyboard
 OE_KeyboardEvent::OE_KeyboardEvent(){
     type_ = OE_KEYBOARD_EVENT;

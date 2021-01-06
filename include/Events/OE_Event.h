@@ -55,10 +55,11 @@ class OE_Event: public OE_THREAD_SAFETY_OBJECT{
     
     protected:
     	
+        // internal_call() is implemented in OE_Error.cpp
     	int internal_call();
-        /// internal functions (2020: yeah no shit)
+        
         void setFunc(const OE_EVENTFUNC);
-        /// variables (2020: yeah no shit)
+
         bool active_{false};
         std::string name_;
         
