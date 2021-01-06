@@ -344,11 +344,14 @@ void OE_TaskManager::updateThread(const string name){
         this->runThreadTasks(name);
         
         if(this->threads[name].synchronize == true){
+            
+            // for physics engine
+            int comp_threads_copy = 0;
+            
             /// synchronize threads to N fps initially
             this->lockMutex();
             unsigned int local_framerate = framerate;
             unsigned int current_ticks = this->getTicks()-ticks;
-            int comp_threads_copy = completed_threads;
             this->unlockMutex();
 
             if( (local_framerate) > current_ticks ){
@@ -365,17 +368,40 @@ void OE_TaskManager::updateThread(const string name){
             // SYNCHRONIZE PHYSICS
             lockMutex();
             physics_threads++;
+            comp_threads_copy = physics_threads;
             if(physics_threads > (getReadyThreads()-1)){
                 physics_threads=0;
                 condBroadcast(3);
             }
             else{
+                
                 condWait(3);
             }
             unlockMutex();
             
+            /**************************/
+            // This is where physics are run
             this->threads[name].physics_task.update();
-            this->physics->updateMultiThread(&this->threads[name].physics_task, comp_threads_copy);
+            try{
+                this->physics->updateMultiThread(&this->threads[name].physics_task, comp_threads_copy);
+            }
+            catch(oe::physics_error& e){
+                std::string error_str = "OE: " + e.name_ + " thrown in thread: '" + name + "', thread_num: " + std::to_string(comp_threads_copy);
+                error_str += ", invocation: " + std::to_string(this->threads[name].physics_task.counter) + "\n";
+                error_str += "\t" + e.what() + "\n";
+                cout << error_str;
+                OE_WriteToLog(error_str);
+            }
+            catch(...){
+                /// universal error handling. will catch any exception
+                /// feel free to add specific handling for specific errors
+                auto task = this->threads[name].physics_task;
+                string outputa = string("OE: Physics exception thrown in thread: '" + name  + "', thread_num: " + std::to_string(comp_threads_copy));
+                outputa += ", invocation: " + std::to_string(task.counter);
+                cout << outputa << endl;
+                OE_WriteToLog(outputa + "\n");
+            }
+            /**************************/
             
             /// add this thread to already
             /// finished-thread counter
