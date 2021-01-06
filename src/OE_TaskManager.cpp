@@ -37,20 +37,14 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     try{
         output = actual_data->func(unsync_task);
     }
-    catch(csl::unexpected_symbol_error& e){
-        std::string error_str = "OE: csl::unexpected_symbol_error thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+    catch(csl::parser_error& e){
+        std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
         error_str += "\t" + e.what() + "\n";
         cout << error_str;
         OE_WriteToLog(error_str);
     }
-    catch(csl::unset_object_error& e){
-        std::string error_str = "OE: csl::unset_object_error thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch(csl::semantic_error& e){
-        std::string error_str = "OE: csl::semantic_error thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+    catch(csl::interpreter_error& e){
+        std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
         error_str += "\t" + e.what() + "\n";
         cout << error_str;
         OE_WriteToLog(error_str);
@@ -536,6 +530,22 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
                 if (this->threads[name].functions[task.name] != nullptr)
                     output =  this->threads[name].functions[task.name](task);
             } 
+            catch(csl::parser_error& e){
+                std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
+                error_str += "', invocation: " + std::to_string(task.counter) + "\n";
+                error_str += "\t" + e.what() + "\n";
+                cout << error_str;
+                OE_WriteToLog(error_str);
+                output = 1;
+            }
+            catch(csl::interpreter_error& e){
+                std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
+                error_str += "', invocation: " + std::to_string(task.counter) + "\n";
+                error_str += "\t" + e.what() + "\n";
+                cout << error_str;
+                OE_WriteToLog(error_str);
+                output = 1;
+            }
             catch(...){
                 /// universal error handling. will catch any exception
                 /// feel free to add specific handling for specific errors

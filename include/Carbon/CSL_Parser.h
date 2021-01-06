@@ -304,14 +304,19 @@ namespace csl {
 		public:
 			virtual std::string what() const throw() = 0;
 			virtual ~parser_error() = default;
+            
+            std::string name_;
 	};
 
-	class unexpected_symbol_error : parser_error {
+	class unexpected_symbol_error : public parser_error {
 		public:
 			unexpected_symbol_error(std::string unexpected, std::string expected,
 									std::size_t line_num, std::size_t col_num)
 				: unexpected_(unexpected), expected_(expected), line_num_(line_num),
-					col_num_(col_num) {};
+					col_num_(col_num) {
+                        name_ = "csl::unexpected_symbol_error";
+                    };
+                    
 
 			std::string what() const throw() {
 				std::stringstream result_ss;
@@ -335,11 +340,15 @@ namespace csl {
 		public:
 			virtual std::string what() const throw() = 0;
 			virtual ~interpreter_error() = default;
+            std::string name_;
 	};
 
-	class unset_object_error : interpreter_error {
+	class unset_object_error : public interpreter_error {
 		public:
-			unset_object_error(std::string_view object) : object_(object) {}
+			unset_object_error(std::string_view object) : object_(object){
+                name_ = "csl::unset_object_error";
+            }
+            
 
 			std::string what() const throw() {
 				std::stringstream result_ss;
@@ -354,9 +363,15 @@ namespace csl {
 	};
 	
 	// TODO: Somehow show line and col nmber 
-	class semantic_error : parser_error, interpreter_error {
-		public:
-			semantic_error(const char* msg) : msg_(msg){}
+    // Choose ONE of the two to inherit from... this breaks error handling
+	//class semantic_error : parser_error, interpreter_error {
+	class semantic_error : public parser_error {
+        public:
+			semantic_error(const char* msg) : msg_(msg){
+                name_ = "csl::semantic_error";
+            }
+            
+            
 			std::string what() const throw() { return msg_; }
 		private:
 			const char* msg_;
