@@ -1,7 +1,6 @@
 #include <OE_API.h>
 
 using namespace std;
-//using namespace OE;
 
 int update_monkey_rot( oe::task, string event_name, string obj_name){
 
@@ -88,12 +87,36 @@ int test_task1(oe::task task, std::string obj_name){
         oe::change_object_rot(obj_name, oe::vec4(-y, 1.0f, 0.0f, 0.0f));
     }
     
-    //if (oe::is_key_just_pressed("keyboard-p")){
-    //    throw 5;
-    //}
+    //cout << " task1 " << endl;
     
     return task.CONTINUE();
 }
+
+int test_task0(oe::task task){
+    
+    //cout << " task0";
+    if (oe::is_key_just_pressed("keyboard-p")){
+        throw 5;
+    }
+    
+    
+    return task.CONTINUE();
+}
+
+int test_task2(oe::task task){
+    
+    //cout << " task2";
+    
+    return task.CONTINUE();
+}
+
+int test_task3(oe::task task){
+    
+    //cout << " task3";
+    
+    return task.CONTINUE();
+}
+
 
 int OnLoadObject(oe::task load_event_task, string event_name){
     cout << "SUCCESSFULLY loaded '" << event_name << "'" << endl;
@@ -121,6 +144,9 @@ int OnLoadObject(oe::task load_event_task, string event_name){
     oe::set_event_func("keyboard-f8+", &renderer_toggle_bounding_boxes);
     
     oe::add_task_func("test_task1", &test_task1, "\"Camera\"");
+    oe::add_task_func("test_task0", 2, &test_task0);
+    oe::add_task_func("test_task2", 3, &test_task2);
+    oe::add_task_func("test_task3", 4, &test_task3);
     
     return 0;
 }

@@ -348,6 +348,35 @@ public:
     std::vector<std::size_t>        deleted;
 };
 
+namespace oe{
+    
+    // base error classes
+    class api_error {
+        public:
+            virtual std::string what() const throw() = 0;
+            virtual ~api_error() = default;
+            std::string name_;
+    };
+    
+    class physics_error {
+        public:
+            virtual std::string what() const throw() = 0;
+            virtual ~physics_error() = default;
+            std::string name_;
+    };
+    
+    class renderer_error {
+        public:
+            virtual std::string what() const throw() = 0;
+            virtual ~renderer_error() = default;
+            std::string name_;
+    };
+    
+    // sub classes
+}
+
+
+
 /// general function to write to the OE log file (OE_log.txt)
 
 void OE_WriteToLog(std::string);

@@ -15,7 +15,7 @@ class OE_TaskManager;
 
 /* this is a shortcut type definition
  * to make code clearer.
- * It stores a pointer of a method of OE_TaskManager-derived classes
+ * It stores an std::function that is executed as tasks in different threads
  */
 typedef std::function<int(OE_Task)> OE_METHOD;
 
@@ -37,10 +37,9 @@ struct OE_UnsyncThreadData{
 
 struct OE_ThreadStruct {
     /* this struct is used to store a thread. More specifically it stores:
-     * - the threadID as an SDL_Thread pointer
      * - the tasks to execute which are represented as an OE_Task
      * - the pointer methods to execute which represent an OE_METHOD
-     * - a boolean to make the thread asynchronous
+     * - a boolean to make the thread asynchronous (relic from 2016, not usable)
      */
     
     OE_ThreadStruct();

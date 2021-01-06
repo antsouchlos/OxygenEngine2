@@ -363,7 +363,7 @@ namespace csl {
 	};
 	
 	// TODO: Somehow show line and col nmber 
-    // Choose ONE of the two to inherit from... this breaks error handling
+    // Choose ONE of the two to inherit from... this breaks error handling otherwise
 	//class semantic_error : parser_error, interpreter_error {
 	class semantic_error : public parser_error {
         public:
