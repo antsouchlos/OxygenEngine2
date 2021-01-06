@@ -1,7 +1,6 @@
 #ifndef OE_EVENT_HANDLER_H
 #define OE_EVENT_HANDLER_H
 
-
 #include <Events/OE_InputEventHandler.h>
 
 class OE_EventHandler: public OE_THREAD_SAFETY_OBJECT{
@@ -24,7 +23,7 @@ public:
     void broadcastIEventWait(std::string, int); // TODO
     void mapIEvent(std::string, std::string);
     void unmapIEvent(std::string, std::string);
-    int callIEvent(std::string, OE_Task*);
+    int callIEvent(std::string);
     void destroyIEvent(std::string);
     
     std::size_t getEventActivations(std::string);
@@ -32,7 +31,7 @@ public:
     
     void updateInput();
     void cleanup();
-    int handleAllEvents(OE_Task*);
+    int handleAllEvents();
     
     
     void updatePostInputLoop();

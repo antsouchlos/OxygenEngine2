@@ -1,13 +1,13 @@
 #ifndef OE_EVENT_H
 #define OE_EVENT_H
 
-
+#include <OE_Task.h>
 #include <Events/OE_EventParser.h>
 
 
 /** Temporary documentation: (OUTDATED)
   *
-  * OE_Event::call(Ftask*, void*):
+  * OE_Event::call(OE_Task*):
   * Return values:
   *  0: successfully run
   *  1: event is executed in another thread
@@ -39,11 +39,9 @@ enum OE_ERROR_IMPORTANCE{
 	OE_FATAL=2
 };
 
-class OE_Task;
-//typedef int(*OE_EVENTFUNC)(void*, OE_Task*, std::string);
-typedef std::function<int(OE_Task*, std::string)> OE_EVENTFUNC;
+typedef std::function<int(OE_Task, std::string)> OE_EVENTFUNC;
 
-int template_event_func(OE_Task*, std::string);
+int template_event_func(OE_Task, std::string);
 
 /* general event type */
 class OE_Event: public OE_THREAD_SAFETY_OBJECT{
@@ -53,22 +51,24 @@ class OE_Event: public OE_THREAD_SAFETY_OBJECT{
         static bool finished;
         OE_Event();
         virtual ~OE_Event();
-        virtual int call(OE_Task*)=0;
+        virtual int call()=0;
     
     protected:
     	
-    	int internal_call(OE_Task*);
+    	int internal_call();
         /// internal functions (2020: yeah no shit)
         void setFunc(const OE_EVENTFUNC);
         /// variables (2020: yeah no shit)
-        int times_invoked;
-        bool active;
-        std::string name;
+        bool active_{false};
+        std::string name_;
         
-        OE_EVENT_TYPE type;
-        OE_EVENTFUNC func;
+        OE_EVENT_TYPE type_;
+        OE_EVENTFUNC func_;
         
-        std::set<std::string> sub_events;
+        OE_Task task_;
+        
+        bool has_init_{false};
+        std::set<std::string> sub_events_;
 };
 
 /*button event used in keyboard/mouse/gamepad*/
@@ -89,7 +89,7 @@ class OE_KeyboardEvent : public OE_Event{
     
 	    OE_KeyboardEvent();
 	    ~OE_KeyboardEvent();
-	    int call(OE_Task*);
+	    int call();
 
 	protected:
     
@@ -106,7 +106,7 @@ class OE_MouseEvent : public OE_Event{
     
 	    OE_MouseEvent();
 	    ~OE_MouseEvent();
-	    int call(OE_Task*);
+	    int call();
 		
 		static int x, y, delta_x, delta_y, mouse_wheel;
 		static bool mousemoved;
@@ -130,7 +130,7 @@ class OE_GamepadEvent : public OE_Event{
     
 	    OE_GamepadEvent();
 	    ~OE_GamepadEvent();
-	    int call(OE_Task*);
+	    int call();
 
 	protected:
     
@@ -150,7 +150,7 @@ class OE_CustomEvent : public OE_Event{
     
     OE_CustomEvent();
     ~OE_CustomEvent();
-    int call(OE_Task*);
+    int call();
 
 	protected:
 };
@@ -163,7 +163,7 @@ class OE_ErrorEvent : public OE_Event{
     
     	OE_ErrorEvent();
     	~OE_ErrorEvent();
-    	int call(OE_Task*);
+    	int call();
 
 	protected:
 		OE_ERROR_IMPORTANCE importance;
@@ -181,7 +181,7 @@ class OE_EventCombo : public OE_Event{
     
 	    OE_EventCombo();
 	    ~OE_EventCombo();
-	    int call(OE_Task*);
+	    int call();
 
 	protected:
 		std::vector<std::string> event_list;
