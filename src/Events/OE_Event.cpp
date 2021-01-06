@@ -1,4 +1,5 @@
 #include <Events/OE_Event.h>
+#include <Carbon/CSL_Interpreter.h>
 
 using namespace std;
  
@@ -30,6 +31,18 @@ int OE_Event::internal_call(){
 	task_.update();
 	try {
         func_(task_, name_);
+    }
+    catch(csl::parser_error& e){
+        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', Invocation: " + std::to_string(this->task_.GetCounter()) + "\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
+    catch(csl::interpreter_error& e){
+        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', Invocation: " + std::to_string(this->task_.GetCounter()) + "\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
     }
     catch(...){
         std::string error_str = "OE: Exception thrown in event: '" + this->name_ + "', Invocation: " + std::to_string(this->task_.GetCounter());
