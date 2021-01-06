@@ -79,8 +79,11 @@ extern "C" int oxygen_engine_update_unsync_thread(void*data);
 
 class OE_TaskManager: public OE_MutexCondition
 {
+    
+    friend int oxygen_engine_update_unsync_thread(void*);
+    
     public:
-
+        
         OE_TaskManager();
         ~OE_TaskManager();
 
@@ -166,6 +169,21 @@ class OE_TaskManager: public OE_MutexCondition
         void updateWorld();
         void runThreadTasks(const std::string&);
         void sortThreadTasks(const std::string&);
+        
+        // error handling functions
+        // those are implemented in OE_Error.cpp
+        // in order to have all non-core-engine error handling at one place
+        int tryRun_unsync_thread(OE_UnsyncThreadData*);
+        int tryRun_task(const std::string&, OE_Task&);
+        
+        void tryRun_physics_updateMultiThread(const std::string&, const int&);
+        bool tryRun_renderer_updateSingleThread();
+        void tryRun_renderer_updateData();
+        bool tryRun_winsys_update();
+        
+        void tryRun_winsys_init(int, int, std::string, bool, void*);
+        void tryRun_physics_init();
+        void tryRun_renderer_init();
 };
 
 #endif

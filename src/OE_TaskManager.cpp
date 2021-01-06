@@ -32,34 +32,9 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     
     // execute detached threads
     OE_UnsyncThreadData* actual_data = static_cast<OE_UnsyncThreadData*>(data);
-    int output = 0;
-    OE_Task unsync_task = OE_Task(actual_data->name, 0, 0, actual_data->taskMgr->getTicks());
-    try{
-        output = actual_data->func(unsync_task);
-    }
-    catch(oe::api_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch(csl::parser_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch(csl::interpreter_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
-        error_str += "\t" + e.what() + "\n";
-        cout << error_str;
-        OE_WriteToLog(error_str);
-    }
-    catch (...){
-        std::string error_str = "OE: Exception thrown in unsync thread: '" + unsync_task.GetName() + "'";
-        cout << error_str << endl;
-        OE_WriteToLog(error_str + "\n");
-    }
+    
+    int output = actual_data->taskMgr->tryRun_unsync_thread(actual_data);
+    
     actual_data->taskMgr->lockMutex();
     actual_data->taskMgr->finished_unsync_threadIDs.insert(actual_data->name);
     actual_data->taskMgr->unlockMutex();
@@ -116,25 +91,22 @@ OE_TaskManager::~OE_TaskManager()
 
 int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
-    
-    this->window = new OE_SDL_WindowSystem();
-    
-    // the lock and unlockMutexes are for making sure the mutexes are initialized
     this->window_mutex.lockMutex();
+    this->window = new OE_SDL_WindowSystem();
+    this->tryRun_winsys_init(x, y, titlea, fullscreen, nullptr);
     this->window_mutex.unlockMutex();
     
     this->renderer_mutex.lockMutex();
     this->renderer = new NRE_Renderer();
     this->renderer->screen = this->window;
+    this->tryRun_renderer_init();
     this->renderer_mutex.unlockMutex();
     
     this->physics_mutex.lockMutex();
     this->physics = new OE_PhysicsEngineBase();
+    this->tryRun_physics_init();
     this->physics_mutex.unlockMutex();
-    
-    this->window->init(x, y, titlea, fullscreen, nullptr);
-    this->renderer->init();
-    
+
     this->createCondition();
     this->createCondition();
     this->createCondition();
@@ -211,28 +183,10 @@ void OE_TaskManager::Step(){
         condWait(1);
     }
     unlockMutex();
-    try{
-        this->renderer->updateSingleThread();
-    }
-    catch(oe::api_error &e){
-        std::string error_str = "OE: " + e.name_ + " thrown in updateSingleThread, invocation: " + std::to_string(this->countar);
-        error_str += "\n\t" + e.what();
-        cout << error_str << endl;
-        OE_WriteToLog(error_str + "\n");
-    }
-    catch(oe::renderer_error &e){
-        std::string error_str = "OE: " + e.name_ + " thrown in updateSingleThread, invocation: " + std::to_string(this->countar);
-        error_str += "\n\t" + e.what();
-        cout << error_str << endl;
-        OE_WriteToLog(error_str + "\n");
-    }
-    catch(...){
-        std::string error_str = "OE: Renderer exception thrown in updateSingleThread, invocation: " + std::to_string(this->countar);
-        cout << error_str << endl;
-        OE_WriteToLog(error_str + "\n");
-    }
     
-    done = this->window->update();
+    this->tryRun_renderer_updateSingleThread();
+    
+    done = this->tryRun_winsys_update();
     // count how many times the step function has been called
     countar++;
     
@@ -282,26 +236,7 @@ void OE_TaskManager::Step(){
         this->physics->world = this->world;
         this->renderer->world = this->world;
         //auto t=clock();
-        try{
-            this->renderer->updateData();
-        }
-        catch(oe::api_error &e){
-            std::string error_str =  "OE: " + e.name_ + " thrown in updateData, invocation: " + std::to_string(this->countar);
-            error_str += "\n\t" + e.what();
-            cout << error_str << endl;
-            OE_WriteToLog(error_str + "\n");
-        }
-        catch(oe::renderer_error &e){
-            std::string error_str =  "OE: " + e.name_ + " thrown in updateData, invocation: " + std::to_string(this->countar);
-            error_str += "\n\t" + e.what();
-            cout << error_str << endl;
-            OE_WriteToLog(error_str + "\n");
-        }
-        catch(...){
-            std::string error_str = "OE: Renderer exception thrown in updateData, invocation: " + std::to_string(this->countar);
-            cout << error_str << endl;
-            OE_WriteToLog(error_str + "\n");
-        }
+        this->tryRun_renderer_updateData();
         //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
     
@@ -426,32 +361,7 @@ void OE_TaskManager::updateThread(const string name){
             /**************************/
             // This is where physics are run
             this->threads[name].physics_task.update();
-            try{
-                this->physics->updateMultiThread(&this->threads[name].physics_task, comp_threads_copy);
-            }
-            catch(oe::api_error& e){
-                std::string error_str = "OE: " + e.name_ + " thrown in updateMultiThread in thread: '" + name + "', thread_num: " + std::to_string(comp_threads_copy);
-                error_str += ", invocation: " + std::to_string(this->threads[name].physics_task.counter) + "\n";
-                error_str += "\t" + e.what() + "\n";
-                cout << error_str;
-                OE_WriteToLog(error_str);
-            }
-            catch(oe::physics_error& e){
-                std::string error_str = "OE: " + e.name_ + " thrown in updateMultiThread in thread: '" + name + "', thread_num: " + std::to_string(comp_threads_copy);
-                error_str += ", invocation: " + std::to_string(this->threads[name].physics_task.counter) + "\n";
-                error_str += "\t" + e.what() + "\n";
-                cout << error_str;
-                OE_WriteToLog(error_str);
-            }
-            catch(...){
-                /// universal error handling. will catch any exception
-                /// feel free to add specific handling for specific errors
-                auto task = this->threads[name].physics_task;
-                string outputa = string("OE: Physics exception thrown in updateMultiThread in thread: '" + name  + "', thread_num: " + std::to_string(comp_threads_copy));
-                outputa += ", invocation: " + std::to_string(task.counter);
-                cout << outputa << endl;
-                OE_WriteToLog(outputa + "\n");
-            }
+            this->tryRun_physics_updateMultiThread(name, comp_threads_copy);
             /**************************/
             
             /// add this thread to already
@@ -603,43 +513,7 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             task.update();
             // call the task
             int output = 0;
-            try{
-                if (this->threads[name].functions[task.name] != nullptr)
-                    output =  this->threads[name].functions[task.name](task);
-            } 
-            catch(oe::api_error& e){
-                std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
-                error_str += "', invocation: " + std::to_string(task.counter) + "\n";
-                error_str += "\t" + e.what() + "\n";
-                cout << error_str;
-                OE_WriteToLog(error_str);
-                output = 1;
-            }
-            catch(csl::parser_error& e){
-                std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
-                error_str += "', invocation: " + std::to_string(task.counter) + "\n";
-                error_str += "\t" + e.what() + "\n";
-                cout << error_str;
-                OE_WriteToLog(error_str);
-                output = 1;
-            }
-            catch(csl::interpreter_error& e){
-                std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
-                error_str += "', invocation: " + std::to_string(task.counter) + "\n";
-                error_str += "\t" + e.what() + "\n";
-                cout << error_str;
-                OE_WriteToLog(error_str);
-                output = 1;
-            }
-            catch(...){
-                /// universal error handling. will catch any exception
-                /// feel free to add specific handling for specific errors
-                string outputa = string("OE: Exception thrown in task: '" + task.name + "', thread: '" + name);
-                outputa += "', invocation: " + std::to_string(task.counter);
-                cout << outputa << endl;
-                OE_WriteToLog(outputa + "\n");
-                output = 1;
-            }
+            output = this->tryRun_task(name, task);
             switch(output){
                 case 1: obsolete_tasks.push_back(task_index); break;
             }
