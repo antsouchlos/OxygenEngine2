@@ -2,6 +2,7 @@
 #define OE_TASKMANAGER_H
 
 #include <OE_Task.h>
+#include <Events/OE_EventHandler.h>
 #include <types/OE_World.h>
 #include <Carbon/CSL_Interpreter.h>
 #include <OE_SDL_WindowSystem.h>
@@ -111,8 +112,6 @@ class OE_TaskManager: public OE_MutexCondition
         std::shared_ptr<OE_World>   world{nullptr};
         
         std::shared_ptr<OE_World>   pending_world{nullptr}; // for loading a world
-        
-        OE_Task                             events_task;
         
         
         unsigned int GetFrameRate();

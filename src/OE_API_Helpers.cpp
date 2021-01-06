@@ -14,7 +14,7 @@ int OE_API_Helpers::load_world(OE_Task task, string filename){
 	return 0;
 }
 
-int OE_API_Helpers::manage_mouse(OE_Task* task, std::string event_name){
+int OE_API_Helpers::manage_mouse(OE_Task task, std::string event_name){
     
     if (event_name == "mouse-lock"){
         OE_Main->window->lockMouse();

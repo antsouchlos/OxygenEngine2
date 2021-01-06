@@ -1,9 +1,6 @@
 #ifndef OE_ERROR_INCLUDED
 #define OE_ERROR_INCLUDED
 
-#include <iostream>
-#include <stdexcept>
-#include <string>
-#include <cstring>
+#include <types/OE_TypesBase.h>
 
 #endif

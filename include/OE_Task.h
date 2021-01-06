@@ -2,7 +2,6 @@
 #define OE_TASK_H
 
 #include <types/OE_Libs.h>
-#include <Events/OE_EventHandler.h>
 #include <OE_Error.h>
 
 class OE_Task

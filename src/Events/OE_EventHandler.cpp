@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int template_event_func(OE_Task* task, string event_name){ cout << event_name << endl; return 0;}
+int template_event_func(OE_Task task, string event_name){ cout << event_name << endl; return 0;}
 
 OE_EventHandler::OE_EventHandler(){
 	done = false;
@@ -44,7 +44,7 @@ std::shared_ptr<OE_Event> OE_EventHandler::getIEventUNSAFE(string a_name){
 void OE_EventHandler::createUserEvent(string a_name){
 
 	std::shared_ptr<OE_CustomEvent> event = std::make_shared<OE_CustomEvent>();
-	event->name = a_name;
+	event->name_ = a_name;
 	event->setFunc(&template_event_func);
 	
 	lockMutex();
@@ -81,7 +81,7 @@ void OE_EventHandler::setIEventFunc(string a_name, const OE_EVENTFUNC func){
 void OE_EventHandler::mapIEvent(string upper, string target){
 	lockMutex();
     if (getIEventUNSAFE(target) != nullptr){
-        getIEventUNSAFE(target)->sub_events.insert(upper);
+        getIEventUNSAFE(target)->sub_events_.insert(upper);
     }
     else{
         
@@ -93,7 +93,7 @@ void OE_EventHandler::mapIEvent(string upper, string target){
 void OE_EventHandler::unmapIEvent(string upper, string target){
 	lockMutex();
     if (getIEventUNSAFE(target) != nullptr){
-        getIEventUNSAFE(target)->sub_events.erase(getIEventUNSAFE(target)->sub_events.find(upper));
+        getIEventUNSAFE(target)->sub_events_.erase(getIEventUNSAFE(target)->sub_events_.find(upper));
     }
     else{
         
@@ -109,7 +109,7 @@ void OE_EventHandler::broadcastIEvent(string a_name){
     
     if (getIEventUNSAFE(a_name) != nullptr){
         this->pending_events.push_back(a_name);
-        tobecalled_events = this->getIEventUNSAFE(a_name)->sub_events;
+        tobecalled_events = this->getIEventUNSAFE(a_name)->sub_events_;
     }
     
     unlockMutex();
@@ -123,19 +123,19 @@ void OE_EventHandler::broadcastIEvent(string a_name){
 void OE_EventHandler::broadcastIEventWait(string a_name, int milliseconds){}
 
 /// so simple
-int OE_EventHandler::callIEvent(string a_name, OE_Task* task){
+int OE_EventHandler::callIEvent(string a_name){
 
     /// generic event management
     auto event = getIEvent(a_name);
     if (event != nullptr){
         
         event->lockMutex();
-        event->times_invoked++;
-        event->call(task);
+        event->call();
         event->unlockMutex();
     } 
     else{
-        // TODO: handle error
+        cout << "OE Event is nullptr: '" + a_name + "'" << endl;
+        OE_WriteToLog("OE Event is nullptr: '" + a_name + "'" + "\n");
     }
 
     return 0;
@@ -156,7 +156,7 @@ std::size_t OE_EventHandler::getEventCounter(std::string a_name){
     auto event = getIEvent(a_name);
     if (event != nullptr){
         event->lockMutex();
-        output = event->times_invoked;
+        output = event->task_.GetCounter();
         event->unlockMutex();
     }
     return output;
@@ -173,7 +173,7 @@ bool OE_EventHandler::havePendingEvents(){
 /*IMPORTANT
  * this function is run in the main thread only in the 2020 version
  */
-int OE_EventHandler::handleAllEvents(OE_Task* task){
+int OE_EventHandler::handleAllEvents(){
     
     lockMutex();
     for (auto x : this->happened_events_counter){
@@ -202,7 +202,7 @@ int OE_EventHandler::handleAllEvents(OE_Task* task){
         unlockMutex();
         
         for (auto a_event: happened_events)
-            callIEvent(a_event, task);
+            callIEvent(a_event);
         
     }
     return 0;

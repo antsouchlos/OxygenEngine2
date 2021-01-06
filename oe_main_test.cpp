@@ -3,19 +3,19 @@
 using namespace std;
 //using namespace OE;
 
-int update_monkey_rot( oe::task*, string event_name, string obj_name){
+int update_monkey_rot( oe::task, string event_name, string obj_name){
 
     oe::change_object_local_pos(obj_name, oe::vec3(0.0f, 0.0f, -0.1f));
     return 0;
 }
 
-int update_monkey_rot_neg( oe::task*, string event_name){
+int update_monkey_rot_neg( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.0f, 0.1f));
     return 0;
 }
 
-int update_monkey_rot_x( oe::task*, string event_name){
+int update_monkey_rot_x( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.1f, 0.0f));
     //oe::ChangeObjectRot("Suzanne", oe::vec4(0.1f, 1.0f, 0.0f, 0.0f));
@@ -23,7 +23,7 @@ int update_monkey_rot_x( oe::task*, string event_name){
     return 0;
 }
 
-int update_monkey_rot_neg_x( oe::task*, string event_name){
+int update_monkey_rot_neg_x( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, -0.1f, 0.0f));
     //oe::ChangeObjectRot("Suzanne", oe::vec4(-0.1f, 1.0f, 0.0f, 0.0f));
@@ -31,19 +31,19 @@ int update_monkey_rot_neg_x( oe::task*, string event_name){
     return 0;
 }
 
-int update_monkey_rot_z( oe::task*, string event_name){
+int update_monkey_rot_z( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(-0.1f, 0.0f, 0.0f));
     return 0;
 }
 
-int update_monkey_rot_neg_z( oe::task*, string event_name){
+int update_monkey_rot_neg_z( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(0.1f, 0.0f, 0.0f));
     return 0;
 }
 
-int toggle_mouse_locked_state( oe::task*, string event_name){
+int toggle_mouse_locked_state( oe::task, string event_name){
     
     if (oe::is_mouse_locked()){
         oe::mouse_unlock();
@@ -53,27 +53,28 @@ int toggle_mouse_locked_state( oe::task*, string event_name){
     return 0;
 }
 
-int set_renderer_mode_normals( oe::task*, string event_name){
+int set_renderer_mode_normals( oe::task, string event_name){
     
     oe::set_shading_mode(oe::renderer::shading_mode::normals);
     return 0;
 }
 
-int set_renderer_mode_regular( oe::task*, string event_name){
+int set_renderer_mode_regular( oe::task, string event_name){
     
     oe::set_shading_mode(oe::renderer::shading_mode::regular);
     return 0;
 }
 
-int renderer_toggle_wireframe( oe::task*, string event_name){
+int renderer_toggle_wireframe( oe::task, string event_name){
     
     oe::toggle_wireframe_rendering();
     return 0;
 }
 
-int renderer_toggle_bounding_boxes( oe::task*, string event_name){
+int renderer_toggle_bounding_boxes( oe::task, string event_name){
     
     oe::toggle_bounding_boxes_rendering();
+    //throw 5;
     return 0;
 }
 
@@ -86,10 +87,15 @@ int test_task1(oe::task task, std::string obj_name){
         oe::change_object_global_rot(obj_name, oe::vec4(-x, 0.0f, 0.0f, 1.0f));
         oe::change_object_rot(obj_name, oe::vec4(-y, 1.0f, 0.0f, 0.0f));
     }
+    
+    //if (oe::is_key_just_pressed("keyboard-p")){
+    //    throw 5;
+    //}
+    
     return task.CONTINUE();
 }
 
-int OnLoadObject(oe::task* event_task, string event_name){
+int OnLoadObject(oe::task load_event_task, string event_name){
     cout << "SUCCESSFULLY loaded '" << event_name << "'" << endl;
     
     oe::set_event_func("keyboard-w", &update_monkey_rot, "\"Camera\"");
@@ -129,7 +135,7 @@ int main(){
 	//oe::load_world_func("monkeys.csl", &OnLoadObject);
 	//oe::load_world_func("csl_very_large_object_test.csl", &OnLoadObject);
 	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
-	oe::load_world_func("OE_Demo.csl", &OnLoadObject);
+	oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
 	
 	//taskMgr.Start();
     oe::start();
