@@ -372,6 +372,13 @@ namespace oe{
             std::string name_;
     };
     
+    class winsys_error {
+        public:
+            virtual std::string what() const throw() = 0;
+            virtual ~winsys_error() = default;
+            std::string name_;
+    };
+    
     // sub classes
 }
 

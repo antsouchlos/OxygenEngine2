@@ -88,15 +88,17 @@ int test_task1(oe::task task, std::string obj_name){
     }
     
     //cout << " task1 " << endl;
-    
     return task.CONTINUE();
 }
 
 int test_task0(oe::task task){
     
     //cout << " task0";
+    std::map<int, int> empty_test_map;
+    
     if (oe::is_key_just_pressed("keyboard-p")){
-        throw 5;
+        int a = empty_test_map.at(1);
+        cout << a << endl;
     }
     
     
