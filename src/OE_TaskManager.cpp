@@ -21,7 +21,7 @@ extern "C" int oxygen_engine_update_thread(void* data){
     OE_ThreadData* actual_data = static_cast<OE_ThreadData*>(data);
     
     // update physics task
-    OE_ThreadData::taskMgr->threads[actual_data->name].physics_task = OE_Task("OE_Physics", 0, 0, OE_ThreadData::taskMgr->getTicks());
+    OE_ThreadData::taskMgr->threads[actual_data->name].physics_task = OE_Task(actual_data->name + "-physics", 0, 0, OE_ThreadData::taskMgr->getTicks());
     
     OE_ThreadData::taskMgr->updateThread(actual_data->name);
     delete actual_data;
@@ -32,7 +32,34 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     
     // execute detached threads
     OE_UnsyncThreadData* actual_data = static_cast<OE_UnsyncThreadData*>(data);
-    int output = actual_data->func(OE_Task());
+    int output = 0;
+    OE_Task unsync_task = OE_Task(actual_data->name, 0, 0, actual_data->taskMgr->getTicks());
+    try{
+        output = actual_data->func(unsync_task);
+    }
+    catch(csl::unexpected_symbol_error& e){
+        std::string error_str = "OE: csl::unexpected_symbol_error thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
+    catch(csl::unset_object_error& e){
+        std::string error_str = "OE: csl::unset_object_error thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
+    catch(csl::semantic_error& e){
+        std::string error_str = "OE: csl::semantic_error thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
+    catch (...){
+        std::string error_str = "OE: Exception thrown in unsync thread: '" + unsync_task.GetName() + "'";
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
     actual_data->taskMgr->lockMutex();
     actual_data->taskMgr->finished_unsync_threadIDs.insert(actual_data->name);
     actual_data->taskMgr->unlockMutex();
@@ -42,6 +69,7 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
 
 void OE_ThreadStruct::updateTaskList(){
     
+    // erase all unneeded tasks in the beginning
     for (size_t x=0; x < this->to_be_removed.size(); x++){
         for (size_t i=0; i < this->tasks.size(); i++){
             if (this->tasks[i].GetName() == this->to_be_removed.front()){
@@ -52,9 +80,11 @@ void OE_ThreadStruct::updateTaskList(){
         this->to_be_removed.pop();
     }
     
+    // add all tasks of the previous frame
     for (auto x: std::exchange(this->pending_tasks, {})){
         if (this->task_names.count(x.name) == 1){
-            cout << "OE Task Manager WARNING: Already existing task: " << x.name << endl;
+            cout << "OE: Task Manager WARNING: Already existing task: " << x.name << endl;
+            OE_WriteToLog("OE: Task Manager WARNING: Already existing task: " + x.name);
             continue;
         }
         this->tasks.push_back(x);
@@ -109,8 +139,6 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     this->createCondition();
     this->createCondition();
     this->createCondition();
-    
-    this->events_task = OE_Task("OE_Physics", 0, 0, this->getTicks());
     
     this->SetFrameRate(200);
     this->done = false;
@@ -240,8 +268,7 @@ void OE_TaskManager::Step(){
     }
     
     this->updateWorld();
-    this->events_task.update();
-    this->window->event_handler.handleAllEvents(&events_task);
+    this->window->event_handler.handleAllEvents();
 }
 
 void OE_TaskManager::Start(){
@@ -509,12 +536,13 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
                 if (this->threads[name].functions[task.name] != nullptr)
                     output =  this->threads[name].functions[task.name](task);
             } 
-            catch(runtime_error& exc){
-                /// universal error handling. will catch any error inherited from std::runtime_error
-                string outputa = string(exc.what()) + "\n Task: " + task.name + "\n Thread: " + name;
-                outputa += "\n Invocation: " + std::to_string(task.counter);
+            catch(...){
+                /// universal error handling. will catch any exception
+                /// feel free to add specific handling for specific errors
+                string outputa = string("OE: Exception thrown in task: '" + task.name + "', thread: '" + name);
+                outputa += "', invocation: " + std::to_string(task.counter);
                 cout << outputa << endl;
-                OE_WriteToLog(outputa);
+                OE_WriteToLog(outputa + "\n");
                 output = 1;
             }
             switch(output){
