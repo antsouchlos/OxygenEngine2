@@ -32,20 +32,26 @@ int OE_Event::internal_call(){
 	try {
         func_(task_, name_);
     }
+    catch(oe::api_error& e){
+        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter()) + "\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
     catch(csl::parser_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', Invocation: " + std::to_string(this->task_.GetCounter()) + "\n";
+        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter()) + "\n";
         error_str += "\t" + e.what() + "\n";
         cout << error_str;
         OE_WriteToLog(error_str);
     }
     catch(csl::interpreter_error& e){
-        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', Invocation: " + std::to_string(this->task_.GetCounter()) + "\n";
+        std::string error_str = "OE: " + e.name_ + " thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter()) + "\n";
         error_str += "\t" + e.what() + "\n";
         cout << error_str;
         OE_WriteToLog(error_str);
     }
     catch(...){
-        std::string error_str = "OE: Exception thrown in event: '" + this->name_ + "', Invocation: " + std::to_string(this->task_.GetCounter());
+        std::string error_str = "OE: Exception thrown in event: '" + this->name_ + "', event invocation counter: " + std::to_string(this->task_.GetCounter());
         cout << error_str << endl;
         OE_WriteToLog(error_str  + "\n");
     }
