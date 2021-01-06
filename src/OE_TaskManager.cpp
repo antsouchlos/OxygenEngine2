@@ -37,6 +37,12 @@ extern "C" int oxygen_engine_update_unsync_thread(void* data){
     try{
         output = actual_data->func(unsync_task);
     }
+    catch(oe::api_error& e){
+        std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
     catch(csl::parser_error& e){
         std::string error_str = "OE: " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
         error_str += "\t" + e.what() + "\n";
@@ -205,8 +211,27 @@ void OE_TaskManager::Step(){
         condWait(1);
     }
     unlockMutex();
-
-    this->renderer->updateSingleThread();
+    try{
+        this->renderer->updateSingleThread();
+    }
+    catch(oe::api_error &e){
+        std::string error_str = "OE: " + e.name_ + " thrown in updateSingleThread, invocation: " + std::to_string(this->countar);
+        error_str += "\n\t" + e.what();
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
+    catch(oe::renderer_error &e){
+        std::string error_str = "OE: " + e.name_ + " thrown in updateSingleThread, invocation: " + std::to_string(this->countar);
+        error_str += "\n\t" + e.what();
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
+    catch(...){
+        std::string error_str = "OE: Renderer exception thrown in updateSingleThread, invocation: " + std::to_string(this->countar);
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
+    
     done = this->window->update();
     // count how many times the step function has been called
     countar++;
@@ -257,7 +282,26 @@ void OE_TaskManager::Step(){
         this->physics->world = this->world;
         this->renderer->world = this->world;
         //auto t=clock();
-        this->renderer->updateData();
+        try{
+            this->renderer->updateData();
+        }
+        catch(oe::api_error &e){
+            std::string error_str =  "OE: " + e.name_ + " thrown in updateData, invocation: " + std::to_string(this->countar);
+            error_str += "\n\t" + e.what();
+            cout << error_str << endl;
+            OE_WriteToLog(error_str + "\n");
+        }
+        catch(oe::renderer_error &e){
+            std::string error_str =  "OE: " + e.name_ + " thrown in updateData, invocation: " + std::to_string(this->countar);
+            error_str += "\n\t" + e.what();
+            cout << error_str << endl;
+            OE_WriteToLog(error_str + "\n");
+        }
+        catch(...){
+            std::string error_str = "OE: Renderer exception thrown in updateData, invocation: " + std::to_string(this->countar);
+            cout << error_str << endl;
+            OE_WriteToLog(error_str + "\n");
+        }
         //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     }
     
@@ -385,8 +429,15 @@ void OE_TaskManager::updateThread(const string name){
             try{
                 this->physics->updateMultiThread(&this->threads[name].physics_task, comp_threads_copy);
             }
+            catch(oe::api_error& e){
+                std::string error_str = "OE: " + e.name_ + " thrown in updateMultiThread in thread: '" + name + "', thread_num: " + std::to_string(comp_threads_copy);
+                error_str += ", invocation: " + std::to_string(this->threads[name].physics_task.counter) + "\n";
+                error_str += "\t" + e.what() + "\n";
+                cout << error_str;
+                OE_WriteToLog(error_str);
+            }
             catch(oe::physics_error& e){
-                std::string error_str = "OE: " + e.name_ + " thrown in thread: '" + name + "', thread_num: " + std::to_string(comp_threads_copy);
+                std::string error_str = "OE: " + e.name_ + " thrown in updateMultiThread in thread: '" + name + "', thread_num: " + std::to_string(comp_threads_copy);
                 error_str += ", invocation: " + std::to_string(this->threads[name].physics_task.counter) + "\n";
                 error_str += "\t" + e.what() + "\n";
                 cout << error_str;
@@ -396,7 +447,7 @@ void OE_TaskManager::updateThread(const string name){
                 /// universal error handling. will catch any exception
                 /// feel free to add specific handling for specific errors
                 auto task = this->threads[name].physics_task;
-                string outputa = string("OE: Physics exception thrown in thread: '" + name  + "', thread_num: " + std::to_string(comp_threads_copy));
+                string outputa = string("OE: Physics exception thrown in updateMultiThread in thread: '" + name  + "', thread_num: " + std::to_string(comp_threads_copy));
                 outputa += ", invocation: " + std::to_string(task.counter);
                 cout << outputa << endl;
                 OE_WriteToLog(outputa + "\n");
@@ -556,6 +607,14 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
                 if (this->threads[name].functions[task.name] != nullptr)
                     output =  this->threads[name].functions[task.name](task);
             } 
+            catch(oe::api_error& e){
+                std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
+                error_str += "', invocation: " + std::to_string(task.counter) + "\n";
+                error_str += "\t" + e.what() + "\n";
+                cout << error_str;
+                OE_WriteToLog(error_str);
+                output = 1;
+            }
             catch(csl::parser_error& e){
                 std::string error_str = "OE: " + e.name_ + " thrown in task: '" + task.name + "', thread: '" + name;
                 error_str += "', invocation: " + std::to_string(task.counter) + "\n";
