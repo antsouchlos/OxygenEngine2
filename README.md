@@ -221,6 +221,10 @@ NRE: Fixed an OpenGL bug on Windows/Intel. Updated with TODO list for anything b
 
 API: Added variadic templates and removed all ```void*``` and ```nullptr``` unless absolutely necessary (such as in SDL). BTW Andreas will you finally update the parser readme????
 
+2021/01/08 - philsegeler
+
+Finalized implementation of error handling. Now everything apart form core OE (User-facing API functions, custom tasks, custom events, custom unsynchronized threads, renderer, physics) are wrapped in ```try{...}catch{...}``` blocks and the engine now should never crash unless a segfault happens.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -274,7 +278,7 @@ In the future and in no particular order:
 Now that it was decided that C++17 will be the minimum requirement:
 
 - ~~Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.~~(DONE using ```std::bind```)
-- Handle errors in the API properly.
+- ~~Handle errors in the API properly.~~ (DONE)
 - Investigate possible optimizations in the Event handler
 - Refactor ```OE_SharedIndexMap``` (again!) to remove previous defects and optimize with iterators and custom internal containers.
 - Use the following naming convention ```this->member_``` (with underscore at the end) for class member variables.
