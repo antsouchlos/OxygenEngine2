@@ -21,7 +21,6 @@ int main() {
 //	csl::Interpreter interpreter;
 	std::string filename = "csl_very_large_object_test.csl";
     
-    
     oe::init();
     
     auto t = clock();

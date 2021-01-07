@@ -24,3 +24,15 @@ int OE_API_Helpers::manage_mouse(OE_Task task, std::string event_name){
     }
     return 0;
 }
+
+void OE_API_Helpers::checkIfInit(){
+    
+    if (OE_Main != nullptr){
+        return;
+    }
+    else {
+        throw oe::not_initialized();
+    }
+    
+    
+}
