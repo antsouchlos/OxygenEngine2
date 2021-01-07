@@ -96,7 +96,7 @@ int test_task0(oe::task task){
     //cout << " task0";
     std::map<int, int> empty_test_map;
     
-    if (oe::is_key_just_pressed("keyboard-p")){
+    if (oe::is_key_just_pressed("keyboard-par")){
         int a = empty_test_map.at(1);
         cout << a << endl;
     }
@@ -109,12 +109,20 @@ int test_task2(oe::task task){
     
     //cout << " task2";
     
+    auto a = oe::get_task_info("default", "paparounes");
+    cout << a.GetCounter() << endl;
+    
     return task.CONTINUE();
 }
 
 int test_task3(oe::task task){
     
     //cout << " task3";
+    if (oe::is_key_just_pressed("keyboard-va")){
+        //int a = empty_test_map.at(1);
+        cout << 2 << endl;
+    }
+    
     
     return task.CONTINUE();
 }

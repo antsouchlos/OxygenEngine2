@@ -23,12 +23,18 @@ OE_EventHandler::~OE_EventHandler(){
 
 // THIS IS VERY USEFUL
 std::shared_ptr<OE_Event> OE_EventHandler::getIEvent(string a_name){
-   /// wraps getIEventUNSAFE in a mutex, (now in 2020: like... seriously????)
-   lockMutex();
+    /// wraps getIEventUNSAFE in a mutex, (now in 2020: like... seriously????)
+    lockMutex();
 
-   std::shared_ptr<OE_Event> output = getIEventUNSAFE(a_name);
-   unlockMutex();
-   return output;
+    std::shared_ptr<OE_Event> output = getIEventUNSAFE(a_name);
+   
+    if (output == nullptr){
+        unlockMutex();
+        throw oe::invalid_event(a_name);
+    }
+   
+    unlockMutex();
+    return output;
 }
 
 std::shared_ptr<OE_Event> OE_EventHandler::getIEventUNSAFE(string a_name){
@@ -72,7 +78,8 @@ void OE_EventHandler::setIEventFunc(string a_name, const OE_EVENTFUNC func){
         getIEventUNSAFE(a_name)->setFunc(func);
     }
     else{
-        
+        unlockMutex();
+        throw oe::invalid_event(a_name);
     }
         
     unlockMutex();
@@ -84,7 +91,8 @@ void OE_EventHandler::mapIEvent(string upper, string target){
         getIEventUNSAFE(target)->sub_events_.insert(upper);
     }
     else{
-        
+        unlockMutex();
+        throw oe::invalid_event(upper);
     }
 	
 	unlockMutex();
@@ -96,7 +104,8 @@ void OE_EventHandler::unmapIEvent(string upper, string target){
         getIEventUNSAFE(target)->sub_events_.erase(getIEventUNSAFE(target)->sub_events_.find(upper));
     }
     else{
-        
+        unlockMutex();
+        throw oe::invalid_event(upper);
     }
 	
 	unlockMutex();
@@ -110,6 +119,10 @@ void OE_EventHandler::broadcastIEvent(string a_name){
     if (getIEventUNSAFE(a_name) != nullptr){
         this->pending_events.push_back(a_name);
         tobecalled_events = this->getIEventUNSAFE(a_name)->sub_events_;
+    }
+    else {
+        unlockMutex();
+        throw oe::invalid_event(a_name);
     }
     
     unlockMutex();
@@ -146,6 +159,10 @@ std::size_t OE_EventHandler::getEventActivations(std::string a_name){
     lockMutex();
     if (this->happened_events_counter.count(a_name) == 1){
         output = this->happened_events_counter[a_name];
+    }
+    else {
+        unlockMutex();
+        throw oe::invalid_event(a_name);
     }
     unlockMutex();
     return output;
