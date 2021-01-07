@@ -137,6 +137,22 @@ protected:
     std::map<NRE_GPU_VertexShader,  GLuint> vs_db;
     std::map<NRE_GPU_PixelShader,   GLuint> fs_db;
     std::map<NRE_GL3_Program,       GLuint> prog_db;
+    
+private:
+    
+    void check_vbo_id_(std::size_t, const std::string&);
+    void check_ubo_id_(std::size_t, const std::string&);
+    void check_ibo_id_(std::size_t, const std::string&);
+    
+    void check_vbo_offset_length_(std::size_t, std::size_t, const std::string&);
+    void check_ubo_offset_length_(std::size_t, std::size_t, const std::string&);
+    void check_ibo_offset_length_(std::size_t, std::size_t, const std::string&);
+    
+    void check_vao_id_(std::size_t, const std::string&);
+    void check_prog_id_(std::size_t, const std::string&);
+    
+    void check_prog_uniform_(std::size_t, const std::string&, const std::string&);
+    void check_vao_vbo_(std::size_t, std::size_t, const std::string&);
 };
 
 
