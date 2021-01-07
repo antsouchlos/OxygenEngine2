@@ -37,6 +37,14 @@ bool OE_Task::operator > (const OE_Task& other) const {
     }
 }
 
+bool OE_Task::operator == (const OE_Task& other) const {
+    bool output = true;
+    output = output && this->name == other.name;
+    output = output && this->counter == other.counter;
+    return output;
+}
+
+
 void OE_Task::update(){
     this->counter +=1;
     this->ticks = SDL_GetTicks()-this->delta_ticks;

@@ -17,6 +17,7 @@ class OE_Task
         OE_Task(std::string, int, int, int, int);
 
         bool operator > (const OE_Task&) const;
+        bool operator == (const OE_Task&) const;
 
         int CONTINUE();
         int FINISHED();

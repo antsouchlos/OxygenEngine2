@@ -429,6 +429,7 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func){
 
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
     lockMutex();
+    
     this->threads["default"].pending_tasks.push_back(task);
     this->threads["default"].pending_functions[name] = func;
     this->threads["default"].changed = true;
@@ -449,7 +450,14 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority){
 void OE_TaskManager::AddTask(string name, const OE_METHOD func, int priority, string threadname){
 
     OE_Task task = OE_Task(name, priority, 0, this->getTicks());
+    
     lockMutex();
+    
+    if (this->threads.count(threadname) < 1){
+        unlockMutex();
+        throw oe::invalid_thread_name(threadname);
+    }
+    
     this->threads[threadname].pending_tasks.push_back(task);
     this->threads[threadname].pending_functions[name] = func;
     this->threads[threadname].changed = true;
@@ -460,6 +468,12 @@ void OE_TaskManager::AddTask(string name, const OE_METHOD func, string threadnam
 
     OE_Task task = OE_Task(name, 0, 0, this->getTicks());
     lockMutex();
+    
+    if (this->threads.count(threadname) < 1){
+        unlockMutex();
+        throw oe::invalid_thread_name(threadname);
+    }
+    
     this->threads[threadname].pending_tasks.push_back(task);
     this->threads[threadname].pending_functions[name] = func;
     this->threads[threadname].changed = true;
@@ -482,19 +496,42 @@ void OE_TaskManager::RemoveTask(std::string name){
     unlockMutex();
 }
 
-void OE_TaskManager::RemoveTask(std::string name, std::string threadname){
+void OE_TaskManager::RemoveTask(std::string threadname, std::string name){
     lockMutex();
+    
+    if (this->threads.count(threadname) < 1){
+        unlockMutex();
+        throw oe::invalid_thread_name(threadname);
+    }
+    
     this->threads[threadname].to_be_removed.push(name);
     unlockMutex();
 }
 
 OE_Task OE_TaskManager::GetTaskInfo(string threadname, string name){
-
-    for(auto task : this->threads[threadname].tasks){
-        if(task.GetName() == name)
-            return OE_Task(task.name, task.counter, task.priority, task.init_ticks, task.ticks);
+    
+    OE_Task result;
+    lockMutex();
+    
+    if (this->threads.count(threadname) < 1){
+        unlockMutex();
+        throw oe::invalid_thread_name(threadname);
     }
-    return OE_Task("NONE", 0, 0, 0);
+    
+    if (this->threads[threadname].task_names.count(name) < 1){
+        unlockMutex();
+        throw oe::invalid_task_name(name, threadname);
+    }
+    
+    for(auto task : this->threads[threadname].tasks){
+        if(task.GetName() == name){
+            result =  task;
+            break;
+        }
+    }
+    
+    unlockMutex();
+    return result;
 }
 
 void OE_TaskManager::runThreadTasks(const std::string& name){
@@ -503,7 +540,7 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
     // after updating the task queue start executing the functions
     if( tasks_size != 0){
         
-        vector<unsigned int> obsolete_tasks;
+        std::set<OE_Task, std::greater<OE_Task>> obsolete_tasks;
         
         unsigned int task_index = 0;
         for(auto &&task: this->threads[name].tasks){
@@ -515,7 +552,7 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
             int output = 0;
             output = this->tryRun_task(name, task);
             switch(output){
-                case 1: obsolete_tasks.push_back(task_index); break;
+                case 1: obsolete_tasks.insert(task); break;
             }
             
             task_index++;
@@ -524,8 +561,9 @@ void OE_TaskManager::runThreadTasks(const std::string& name){
         
         
         for(auto task : obsolete_tasks){
-            this->threads[name].functions.erase(this->threads[name].tasks[task].name);
-            this->threads[name].tasks.erase(this->threads[name].tasks.begin()+task);
+            this->threads[name].functions.erase(task.name);
+            auto task_id = std::find(this->threads[name].tasks.begin(), this->threads[name].tasks.end(), task);
+            this->threads[name].tasks.erase(task_id);
         }
         obsolete_tasks.clear();
     }

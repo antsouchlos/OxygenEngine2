@@ -18,26 +18,26 @@ size_t oe::init(std::string title, int x, int y, bool fullscreen){
     return OE_Main->Init(title, x, y, fullscreen);
 }
 void oe::step(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->Step();
 }
 void oe::start(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->Start();
 }
 void oe::destroy(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->Destroy();
     delete OE_Main;
     OE_Main = nullptr;
 }
 bool oe::is_done(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return OE_Main->done;
 }
 // ?? Where do i even need this ??? UPDATE: Now I remember
 void oe::finish(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.done = true;
 } 
 
@@ -48,51 +48,51 @@ void oe::finish(){
 // safe to be called on an unsynchronized thread
     
 void oe::remove_task(std::string task){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->RemoveTask(task);
 }
 
 void oe::remove_task(std::string task, std::string thread){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->RemoveTask(task, thread);
 }
     
 void oe::broadcast_event(std::string name){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.broadcastIEvent(name);
 }
 void oe::create_event(std::string name){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.createUserEvent(name);
 }
 
 size_t oe::get_event_activations(std::string name){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return OE_Main->window->event_handler.getEventActivations(name);
 }
 
 size_t oe::get_event_counter(std::string name){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return OE_Main->window->event_handler.getEventCounter(name);
 }
 
 bool oe::is_key_just_pressed(std::string key){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return oe::get_event_activations(key+"+") > 0;
 }
 
 bool oe::is_key_just_released(std::string key){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return oe::get_event_activations(key+"-") > 0;
 }
     
 bool oe::is_key_held(std::string key){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return oe::get_event_activations(key) > 0;
 }
 
 bool oe::is_key_pressed(std::string key){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return (oe::get_event_activations(key) > 0) || (oe::get_event_activations(key+"+") > 0);
 }
 
@@ -101,7 +101,7 @@ bool oe::is_mouse_moved(){
 }
 
 int oe::get_delta_mouse_x(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::delta_x;
     OE_Main->window->event_handler.unlockMutex();
@@ -109,7 +109,7 @@ int oe::get_delta_mouse_x(){
 }
 
 int oe::get_delta_mouse_y(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::delta_y;
     OE_Main->window->event_handler.unlockMutex();
@@ -117,7 +117,7 @@ int oe::get_delta_mouse_y(){
 }
     
 int oe::get_mouse_x(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::x;
     OE_Main->window->event_handler.unlockMutex();
@@ -125,7 +125,7 @@ int oe::get_mouse_x(){
 }
 
 int oe::get_mouse_y(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.lockMutex();
     int output = OE_MouseEvent::y;
     OE_Main->window->event_handler.unlockMutex();
@@ -133,12 +133,12 @@ int oe::get_mouse_y(){
 }
 
 void oe::destroy_event(std::string name){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window->event_handler.destroyIEvent(name);
 }
 
 void oe::pause(int x){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->pause(x);
 }
 
@@ -162,12 +162,12 @@ void oe::mouse_unlock(){
 //------------------------BLOCK-------------------------//
 
 OE_Task oe::get_task_info(std::string thread, std::string task){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     return OE_Main->GetTaskInfo(thread, task);
 }
     
 void oe::create_new_thread(std::string name){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->CreateNewThread(name);
 }
     
@@ -508,7 +508,7 @@ void oe::change_object_scale(std::string name, OE_Vec3 sca){
      */
     
 void oe::restart_renderer(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->window_mutex.lockMutex();
     if (OE_Main->window != nullptr)
         OE_Main->window->restart_renderer = true;
@@ -516,7 +516,7 @@ void oe::restart_renderer(){
 }
 
 void oe::set_shading_mode(OE_RENDERER_SHADING_MODE shading_mode){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->lockMutex();
@@ -528,7 +528,7 @@ void oe::set_shading_mode(OE_RENDERER_SHADING_MODE shading_mode){
 }
 
 OE_RENDERER_SHADING_MODE oe::get_shading_mode(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_RENDERER_SHADING_MODE output = OE_RENDERER_REGULAR_SHADING;
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
@@ -541,7 +541,7 @@ OE_RENDERER_SHADING_MODE oe::get_shading_mode(){
 }
 
 void oe::render_wireframe(bool value){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->use_wireframe = value;
@@ -550,7 +550,7 @@ void oe::render_wireframe(bool value){
 }
 
 void oe::toggle_wireframe_rendering(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->lockMutex();
@@ -564,7 +564,7 @@ void oe::toggle_wireframe_rendering(){
 }
 
 void oe::render_bounding_boxes(bool value){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->render_bounding_boxes = value;
@@ -572,7 +572,7 @@ void oe::render_bounding_boxes(bool value){
     OE_Main->renderer_mutex.unlockMutex();
 }
 void oe::toggle_bounding_boxes_rendering(){
-    assert (OE_Main != nullptr);
+    OE_API_Helpers::checkIfInit();
     OE_Main->renderer_mutex.lockMutex();
     if (OE_Main->renderer != nullptr){
         OE_Main->renderer->lockMutex();
