@@ -45,8 +45,7 @@ bool NRE_GL3_Program::operator< (const NRE_GL3_Program& other) const{
 // ------------------------ API ---------------------- //
 
 std::size_t NRE_GL3_API::getVAOSize(std::size_t id){
-    assert (this->vaos.count(id) != 0);
-    assert (this->vaos[id].layout.size() > 0);
+    this->check_vao_id_(id, "getVAOSize");
     return this->vbos[this->vaos[id].layout[0].vertex_buffer].size;
 }
 
@@ -80,7 +79,73 @@ void NRE_GL3_API::destroy(){
 }
 
 std::string NRE_GL3_API::getRenderingAPI(){
-    return "OpenGL";
+    if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES)
+        return "OpenGL ES 3";
+    else if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
+        return "OpenGL 3";
+    else{
+        return "Unknown";
+    }
+}
+
+//-------------------Handle errors--------------------------------//
+
+void NRE_GL3_API::check_vbo_id_(std::size_t id, const std::string& func){
+    if(this->vbos.count(id) == 0){
+        throw nre::invalid_vertex_buffer(id, func);
+    }
+}
+void NRE_GL3_API::check_ubo_id_(std::size_t id, const std::string& func){
+    if(this->ubos.count(id) == 0){
+        throw nre::invalid_uniform_buffer(id, func);
+    }
+}
+void NRE_GL3_API::check_ibo_id_(std::size_t id, const std::string& func){
+    if(this->ibos.count(id) == 0){
+        throw nre::invalid_index_buffer(id, func);
+    }
+}
+    
+void NRE_GL3_API::check_vbo_offset_length_(std::size_t id, std::size_t off_len, const std::string& func){
+    if (off_len > this->vbos[id].size){
+        throw nre::invalid_buffer_offset_length(id, off_len, "vertex", func);
+    }
+}
+
+void NRE_GL3_API::check_ubo_offset_length_(std::size_t id, std::size_t off_len, const std::string& func){
+    if (off_len > this->ubos[id].size){
+        throw nre::invalid_buffer_offset_length(id, off_len, "uniform", func);
+    }
+}
+
+void NRE_GL3_API::check_ibo_offset_length_(std::size_t id, std::size_t off_len, const std::string& func){
+    if (off_len > this->ibos[id].size){
+        throw nre::invalid_buffer_offset_length(id, off_len, "index", func);
+    }
+}
+    
+void NRE_GL3_API::check_vao_id_(std::size_t id, const std::string& func){
+    if(this->vaos.count(id) == 0){
+        throw nre::invalid_vertex_layout(id, func);
+    }
+}
+
+void NRE_GL3_API::check_prog_id_(std::size_t id, const std::string& func){
+    if(this->progs.count(id) == 0){
+        throw nre::invalid_program_id(id, func);
+    }
+}
+    
+void NRE_GL3_API::check_prog_uniform_(std::size_t id, const std::string& name, const std::string& func){
+    if (this->progs[id].hasUniform(name) == this->progs[id].uniforms.size()){
+        throw nre::invalid_program_uniform(id, name, func);
+    }
+}
+
+void NRE_GL3_API::check_vao_vbo_(std::size_t id , std::size_t vbo_id, const std::string& func){
+     if(this->vbos.count(vbo_id) == 0){
+        throw nre::invalid_vertex_layout_buffer(id, vbo_id, func);
+    }
 }
 
 //---------------------Create Objects-----------------------------//
@@ -121,7 +186,8 @@ std::size_t NRE_GL3_API::newUniformBuffer(){
 
 void NRE_GL3_API::setVertexBufferMemory(std::size_t id, std::size_t memory_size, NRE_GPU_BUFFER_USAGE buf_usage){
     
-    assert (this->vbos.count(id) != 0);
+    this->check_vbo_id_(id, "setVertexBufferMemory");
+    
     this->vbos[id].size = memory_size;
     this->vbos[id].usage = buf_usage;
     glBindBuffer(GL_ARRAY_BUFFER, this->vbos[id].handle);
@@ -129,14 +195,17 @@ void NRE_GL3_API::setVertexBufferMemory(std::size_t id, std::size_t memory_size,
 }
 void NRE_GL3_API::setVertexBufferData(std::size_t id, const std::vector<float>& v, std::size_t offset){
     
-    assert (this->vbos.count(id) != 0);
-    assert ((offset + v.size() <= vbos[id].size));
+    this->check_vbo_id_(id, "setVertexBufferData");
+    this->check_vbo_offset_length_(id, offset + v.size(), "setVertexBufferData");
+    
     glBindBuffer(GL_ARRAY_BUFFER, this->vbos[id].handle);
     glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLuint>(offset)*sizeof(float), v.size()*sizeof(float), &v[0]);
 }
 
 void NRE_GL3_API::setVertexBufferMemoryData(std::size_t id, const std::vector<float>& v, NRE_GPU_BUFFER_USAGE buf_usage){
-    assert (this->vbos.count(id) != 0);
+    
+    this->check_vbo_id_(id, "setVertexBufferMemoryData");
+    
     this->vbos[id].size = v.size();
     this->vbos[id].usage = buf_usage;
     glBindBuffer(GL_ARRAY_BUFFER, this->vbos[id].handle);
@@ -144,7 +213,8 @@ void NRE_GL3_API::setVertexBufferMemoryData(std::size_t id, const std::vector<fl
 }
 
 void NRE_GL3_API::deleteVertexBuffer(std::size_t id){
-    assert (this->vbos.count(id) != 0);
+    this->check_vbo_id_(id, "deleteVertexBuffer");
+    
     glDeleteBuffers(1, &this->vbos[id].handle);
     this->vbos.erase(id);
 }
@@ -153,7 +223,8 @@ void NRE_GL3_API::deleteVertexBuffer(std::size_t id){
 
 void NRE_GL3_API::setIndexBufferMemory(std::size_t id, std::size_t memory_size, NRE_GPU_BUFFER_USAGE buf_usage){
     
-    assert (this->ibos.count(id) != 0);
+    this->check_ibo_id_(id, "setIndexBufferMemory");
+    
     this->ibos[id].size = memory_size;
     this->ibos[id].usage = buf_usage;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[id].handle);
@@ -162,14 +233,17 @@ void NRE_GL3_API::setIndexBufferMemory(std::size_t id, std::size_t memory_size, 
 
 void NRE_GL3_API::setIndexBufferData(std::size_t id, const std::vector<uint32_t>& v, std::size_t offset){
     
-    assert (this->ibos.count(id) != 0);
-    assert ((offset + v.size() <= ibos[id].size));
+    this->check_ibo_id_(id, "setIndexBufferData");
+    this->check_ibo_offset_length_(id, offset + v.size(), "setIndexBufferData");
+    
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[id].handle);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLuint>(offset)*sizeof(uint32_t), v.size()*sizeof(uint32_t), &v[0]);
 }
 
 void NRE_GL3_API::setIndexBufferMemoryData(std::size_t id, const std::vector<uint32_t>& v, NRE_GPU_BUFFER_USAGE buf_usage){
-    assert (this->ibos.count(id) != 0);
+    
+    this->check_ibo_id_(id, "setIndexBufferMemoryData");
+    
     this->ibos[id].size = v.size();
     this->ibos[id].usage = buf_usage;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[id].handle);
@@ -177,7 +251,9 @@ void NRE_GL3_API::setIndexBufferMemoryData(std::size_t id, const std::vector<uin
 }
 
 void NRE_GL3_API::deleteIndexBuffer(std::size_t id){
-    assert (this->ibos.count(id) != 0);
+    
+    this->check_ibo_id_(id, "deleteIndexBuffer");
+    
     glDeleteBuffers(1, &this->ibos[id].handle);
     this->ibos.erase(id);
 }
@@ -185,7 +261,9 @@ void NRE_GL3_API::deleteIndexBuffer(std::size_t id){
 //--------------------Uniform Buffer-----------------------------//
 
 void NRE_GL3_API::setUniformBufferMemory(std::size_t id, std::size_t memory_size, NRE_GPU_BUFFER_USAGE buf_usage){
-    assert (this->ubos.count(id) != 0);
+    
+    this->check_ubo_id_(id, "setUniformBufferMemory");
+
     this->ubos[id].size = memory_size;
     this->ubos[id].usage = buf_usage;
     glBindBuffer(GL_UNIFORM_BUFFER, this->ubos[id].handle);
@@ -193,23 +271,27 @@ void NRE_GL3_API::setUniformBufferMemory(std::size_t id, std::size_t memory_size
 }
 
 void NRE_GL3_API::setUniformBufferData(std::size_t id, const std::vector<float>& v, std::size_t offset){
-    assert (this->ubos.count(id) != 0);
-    assert ((offset + v.size() <= ubos[id].size));
+    
+    this->check_ubo_id_(id, "setUniformBufferData");
+    this->check_ubo_offset_length_(id, offset + v.size(), "setUniformBufferData");
+    
     glBindBuffer(GL_UNIFORM_BUFFER, this->ubos[id].handle);
     glBufferSubData(GL_UNIFORM_BUFFER, static_cast<GLuint>(offset)*sizeof(float), v.size()*sizeof(float), &v[0]);
 }
 
 void NRE_GL3_API::setUniformBufferData(std::size_t id, const std::vector<uint32_t>& v, std::size_t offset){
-    assert (this->ubos.count(id) != 0);
-    assert ((offset + v.size() <= ubos[id].size));
+    
+    this->check_ubo_id_(id, "setUniformBufferData");
+    this->check_ubo_offset_length_(id, offset + v.size(), "setUniformBufferData");
+    
     glBindBuffer(GL_UNIFORM_BUFFER, this->ubos[id].handle);
     glBufferSubData(GL_UNIFORM_BUFFER, static_cast<GLuint>(offset)*sizeof(uint32_t), v.size()*sizeof(uint32_t), &v[0]);
 }
 
 void NRE_GL3_API::setProgramUniformSlot(std::size_t id, std::string name, int slot){
     
-    assert (this->progs.count(id) != 0);
-    assert (this->progs[id].hasUniform(name) != this->progs[id].uniforms.size());
+    this->check_prog_id_(id, "setProgramUniformSlot");
+    this->check_prog_uniform_(id, name, "setProgramUniformSlot");
     
     this->progs[id].uniforms[this->progs[id].hasUniform(name)].slot = slot;
     
@@ -218,9 +300,9 @@ void NRE_GL3_API::setProgramUniformSlot(std::size_t id, std::string name, int sl
 
 void NRE_GL3_API::setUniformState(std::size_t id, std::size_t program, int slot, std::size_t offset, std::size_t length){
     
-    assert (this->ubos.count(id) != 0);
-    assert ((offset + length <= ubos[id].size));
-    assert (this->progs.count(program) != 0);
+    this->check_ubo_id_(id, "setUniformState");
+    this->check_ubo_offset_length_(id, offset + length, "setUniformState");
+    this->check_prog_id_(program, "setUniformState");
     
     if(length == 0)
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, this->ubos[id].handle);
@@ -229,7 +311,7 @@ void NRE_GL3_API::setUniformState(std::size_t id, std::size_t program, int slot,
 }
 
 int  NRE_GL3_API::getProgramUniformSlot(std::size_t id, std::string name){
-    assert (this->progs.count(id) != 0);
+    this->check_prog_id_(id, "getProgramUniformSlot");
     if (this->progs[id].hasUniform(name) != this->progs[id].uniforms.size()){
         return this->progs[id].uniforms[this->progs[id].hasUniform(name)].slot;
     }
@@ -238,7 +320,8 @@ int  NRE_GL3_API::getProgramUniformSlot(std::size_t id, std::string name){
 
 void NRE_GL3_API::deleteUniformBuffer(std::size_t id){
     
-    assert (this->ubos.count(id) != 0);
+    this->check_ubo_id_(id, "deleteUniformBuffer");
+    
     glDeleteBuffers(1, &this->ubos[id].handle);
     this->ubos.erase(id);
 }
@@ -246,12 +329,15 @@ void NRE_GL3_API::deleteUniformBuffer(std::size_t id){
 //---------------------Vertex Layout-----------------------------//
 
 void NRE_GL3_API::setVertexLayoutFormat(std::size_t id, std::vector<NRE_GPU_VertexLayoutInput> inputs){ 
-    assert (this->vaos.count(id) != 0);
+    
+    this->check_vao_id_(id, "setVertexlayoutFormat");
+    
     this->vaos[id].layout = inputs;
     glBindVertexArray(this->vaos[id].handle);
     for(size_t x=0; x < inputs.size(); x++){
-
-        assert (this->vbos.count(inputs[x].vertex_buffer) != 0);
+        
+        this->check_vao_vbo_(id, inputs[x].vertex_buffer, "setVertexLayoutFormat");
+        
         glBindBuffer(GL_ARRAY_BUFFER, this->vbos[inputs[x].vertex_buffer].handle);
         glVertexAttribPointer(x, inputs[x].amount, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*inputs[x].stride, NRE_GL3_VERTEXL_LAYOUT_OFFSET(sizeof(GLfloat)*static_cast<GLuint>(inputs[x].offset)));
         glEnableVertexAttribArray(x);
@@ -259,7 +345,7 @@ void NRE_GL3_API::setVertexLayoutFormat(std::size_t id, std::vector<NRE_GPU_Vert
 }
 
 void NRE_GL3_API::deleteVertexLayout(std::size_t id){
-    assert (this->vaos.count(id) != 0);
+    this->check_vao_id_(id, "deleteVertexLayout");
     glDeleteVertexArrays(1, &this->vaos[id].handle);
     this->vaos.erase(id);
 }
@@ -267,14 +353,14 @@ void NRE_GL3_API::deleteVertexLayout(std::size_t id){
 //---------------------Shader Programs-----------------------------//
 
 void NRE_GL3_API::setProgramVS(std::size_t id, NRE_GPU_VertexShader vs){
-    assert (this->progs.count(id) != 0);
+    this->check_prog_id_(id, "setProgramVS");
     
     this->progs[id].vs_setup = false;
     this->progs[id].setup = false;
     this->progs[id].vs = vs;
 }
 void NRE_GL3_API::setProgramFS(std::size_t id, NRE_GPU_PixelShader fs){
-    assert (this->progs.count(id) != 0);
+    this->check_prog_id_(id, "setProgramFS");
     
     this->progs[id].fs_setup = false;
     this->progs[id].setup = false;
@@ -284,7 +370,7 @@ void NRE_GL3_API::setProgramFS(std::size_t id, NRE_GPU_PixelShader fs){
 void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
     
     data = data + "";
-    assert (this->progs.count(id) != 0);
+    this->check_prog_id_(id, "setProgramVS - internal");
     GLuint shader_id;
     if(! this->progs[id].vs_setup)
         shader_id = glCreateShader(GL_VERTEX_SHADER);
@@ -320,7 +406,7 @@ void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
 void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
     
     data = data + "";
-    assert (this->progs.count(id) != 0);
+    this->check_prog_id_(id, "setProgramFS - internal");
     GLuint shader_id;
     if(! this->progs[id].fs_setup)
         shader_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -356,7 +442,7 @@ void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
 
 void NRE_GL3_API::setupProgram(std::size_t id){
     
-    assert (this->progs.count(id) != 0);
+    this->check_prog_id_(id, "setupProgram");
     
     // ignore if the program is already setup
     if (this->progs[id].setup) return;
@@ -498,7 +584,9 @@ void NRE_GL3_API::setupProgram(std::size_t id){
 }
 
 void NRE_GL3_API::deleteProgram(std::size_t id){
-    assert (this->progs.count(id) != 0);
+    
+    this->check_prog_id_(id, "deleteProgram");
+    
     this->progs.erase(id);
 }
 
@@ -506,28 +594,33 @@ void NRE_GL3_API::deleteProgram(std::size_t id){
 
 void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, int offset, int count){
     
-    assert (this->progs.count(prog_id) != 0);
-    assert (this->vaos.count(vao_id) != 0);
+    this->check_prog_id_(prog_id, "draw");
+    this->check_vao_id_(vao_id, "draw");
     this->setupProgram(prog_id);
+    
     glUseProgram(this->progs[prog_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
     glDrawArrays(GL_TRIANGLES, offset, count);
 }
 
 void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id){
-    assert (this->progs.count(prog_id) != 0);
-    assert (this->vaos.count(vao_id) != 0);
+    
+    this->check_prog_id_(prog_id, "draw");
+    this->check_vao_id_(vao_id, "draw");
     this->setupProgram(prog_id);
+    
     glUseProgram(this->progs[prog_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
     glDrawArrays(GL_TRIANGLES, 0, this->getVAOSize(vao_id));
 }
     
 void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_id, int offset, int count){
-    assert (this->progs.count(prog_id) != 0);
-    assert (this->vaos.count(vao_id) != 0);
-    assert (this->ibos.count(ibo_id) != 0);
+    
+    this->check_prog_id_(prog_id, "draw");
+    this->check_vao_id_(vao_id, "draw");
+    this->check_ibo_id_(ibo_id, "draw");
     this->setupProgram(prog_id);
+    
     glUseProgram(this->progs[prog_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
@@ -535,10 +628,12 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
 }
 
 void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_id){
-    assert (this->progs.count(prog_id) != 0);
-    assert (this->vaos.count(vao_id) != 0);
-    assert (this->ibos.count(ibo_id) != 0);
+    
+    this->check_prog_id_(prog_id, "draw");
+    this->check_vao_id_(vao_id, "draw");
+    this->check_ibo_id_(ibo_id, "draw");
     this->setupProgram(prog_id);
+    
     glUseProgram(this->progs[prog_id].handle);
     glBindVertexArray(this->vaos[vao_id].handle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
