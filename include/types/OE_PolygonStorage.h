@@ -147,7 +147,7 @@ class OE_PolygonStorage32 {
 		
 
 
-	private:
+	protected:
 		// This stuff is only of interest to the renderer
 		// Those vectors should be cleared after first use by the renderer on loading the object
 		// both should be guarded by mutexes
