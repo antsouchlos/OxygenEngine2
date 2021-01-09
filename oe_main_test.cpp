@@ -96,7 +96,7 @@ int test_task0(oe::task task){
     //cout << " task0";
     std::map<int, int> empty_test_map;
     
-    if (oe::is_key_just_pressed("keyboard-par")){
+    if (oe::is_key_just_pressed("keyboard-p")){
         int a = empty_test_map.at(1);
         cout << a << endl;
     }
