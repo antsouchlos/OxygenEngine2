@@ -58,7 +58,7 @@ public:
     friend class Changed;
     friend class Element;
     
-     SharedIndexMap(){ changed_ = Changed(this);};
+     SharedIndexMap(){ changed_ = Changed(this); deleted_ = Deleted(this);};
     ~SharedIndexMap(){};
     
     //*******************************************/
@@ -74,6 +74,11 @@ public:
         void flag_as_changed(){
             db_->change(this->id_);
         }
+        
+        bool is_valid(){
+            return p_ == nullptr;
+        }
+        
         
     protected:
         SharedIndexMap<T>* db_{nullptr};
@@ -99,15 +104,26 @@ public:
         return output;
     }
     
-     void reset_changed(){
-        
+    void reset_changed(){
+        this->changed_.clear();
     }
     
     void synchronize(){
+        
+        for (auto x : deleted_.indices_){
+            if (elements_.count(x) != 0) continue;
+            elements_.erase(x);
+            names_.erase(id2name_[x]);
+            id2name_.erase(x);
+        }
+        
+        deleted_.clear();
+        
         for (auto x: pending_elements_){
             elements_[x.first] = x.second;
             id2name_[x.first] = pending_id2name_[x.first];
             names_.insert(pending_id2name_[x.first]);
+            changed_.add(x.first);
         }
         
         pending_elements_.clear();
@@ -127,6 +143,10 @@ public:
 
     }
     
+    void remove(const std::size_t& index){
+        this->deleted_.add(index);
+    }
+    
     
     //*******************************************/
     // Regular iterator for interfacing ALL elements
@@ -144,7 +164,7 @@ public:
         Iterator& operator++() { iter++; return *this; }  
         Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
         
-        Element operator * () {return Element(db_, (*iter).first, (*iter).second);}
+        Element operator * () {return db_[0][(*iter).first];}
         
         friend bool operator== (const Iterator& a, const Iterator& b) { return a.iter == b.iter; };
         friend bool operator!= (const Iterator& a, const Iterator& b) { return a.iter != b.iter; };  
@@ -192,7 +212,8 @@ public:
             ChangedIter& operator++() { iter++; return *this; }  
             ChangedIter operator++(int) { ChangedIter tmp = *this; ++(*this); return tmp; }
             
-            Element operator * () {return Element(db_, (*iter), db_->elements_.at(*iter));}
+            // This needs robust error handling in multiple threads
+            Element operator * () {return db_[0][*iter];}
             
             friend bool operator== (const ChangedIter& a, const ChangedIter& b) { return a.iter == b.iter; };
             friend bool operator!= (const ChangedIter& a, const ChangedIter& b) { return a.iter != b.iter; };  
@@ -222,6 +243,67 @@ public:
         return this->changed_;
     }
     
+    //*******************************************/
+    // Deleted class for storing all element indices that changed the previous frame
+    
+    class Deleted{
+    public:
+        
+        Deleted(){}
+        Deleted(SharedIndexMap<T>* inputa) : db_(inputa) {}
+        
+        void add(const std::size_t &index){
+            indices_.insert(index);
+        }
+            
+        void clear(){
+            this->indices_.clear();
+        }
+        
+        //*******************************************/
+        // Deleted iterator for getting only the objects that changed
+        class DeletedIter{
+        public:
+            typedef std::set<std::size_t, std::greater<std::size_t>>::iterator set_iter_t; 
+            
+            using iterator_category = std::input_iterator_tag;
+            using difference_type   = int;
+            
+            DeletedIter(SharedIndexMap<T>* db, set_iter_t beginning) : iter(beginning), db_(db){}
+            
+            DeletedIter& operator++() { iter++; return *this; }  
+            DeletedIter operator++(int) { DeletedIter tmp = *this; ++(*this); return tmp; }
+            
+            Element operator * () {return db_[0][*iter];}
+            
+            friend bool operator== (const DeletedIter& a, const DeletedIter& b) { return a.iter == b.iter; };
+            friend bool operator!= (const DeletedIter& a, const DeletedIter& b) { return a.iter != b.iter; };  
+            
+        protected:
+            
+            set_iter_t iter;
+            SharedIndexMap<T>* db_{nullptr};
+        };
+        
+        DeletedIter begin(){
+            return DeletedIter(this->db_, this->indices_.begin());
+        }
+        
+        DeletedIter end(){
+            return DeletedIter(this->db_, this->indices_.end());
+        }
+        
+        SharedIndexMap<T>* db_{nullptr};
+        std::set<std::size_t, std::greater<std::size_t>> indices_;
+        
+    };
+    
+    Deleted deleted_;
+    
+    Deleted deleted(){
+        return this->deleted_;
+    }
+    
 };
 
 
@@ -229,18 +311,38 @@ int main(){
     
     SharedIndexMap<Object> objects;
     
-    for (int i=0; i < 8; i++){
-        objects.append("no " + std::to_string(i*2), std::make_shared<Object>());
-        objects.append("no " + std::to_string(i*2 +1), std::make_shared<Object>());
+    auto t=clock();
+    
+    for (int i=0; i < 3; i++){
+        objects.append("number " + std::to_string(i*2), std::make_shared<Object>());
+        objects.append("nummer " + std::to_string(i*2 +1), std::make_shared<Object>());
     }
+    
+    
     objects.synchronize();
+    objects.reset_changed();
+    
+    // START OF FRAME
+    
+    // papara is only visible in frame 2 onwards
+    objects.append("papara ", std::make_shared<Object>());
+    
+    
+    objects[5].p_->data+= 100;
+    
+    if (objects[46].is_valid()){
+        std::cout << "This is success" << std::endl;
+    }
+    
+    
     
     std::cout << objects.to_str() << std::endl << "BEGIN INDICES" << std::endl;
     
     for (auto elem : objects){
-        elem.p_->data++;
+        
         std::cout << elem.p_->data << " " << elem.id_ << std::endl;
         if (elem.id_ % 2 == 0){
+            elem.p_->data*=100;
             elem.flag_as_changed();
         }
     }
@@ -248,9 +350,45 @@ int main(){
     std::cout << "BEGIN CHANGED" << std::endl;
     
     for (auto elem : objects.changed()){
-        elem.p_->data++;
         std::cout << elem.p_->data << " " << elem.id_ << std::endl;
     }
+    
+    
+    
+    std::cout << "BEGIN DELETED" << std::endl;
+    
+    objects.remove(2);
+    
+    for (auto elem : objects.deleted()){
+        std::cout << elem.p_->data << " " << elem.id_ << std::endl;
+    }
+    
+    objects.reset_changed();
+    objects.synchronize();
+    
+    // END OF FRAME
+    
+    // FRAME 2
+    
+    std::cout << "BEGIN 2" << std::endl;
+    std::cout << objects.to_str() << std::endl << "BEGIN INDICES 2" << std::endl;
+    
+    for (auto elem : objects){
+        std::cout << elem.p_->data << " " << elem.id_ << std::endl;
+    }
+    
+    std::cout << "BEGIN CHANGED 2" << std::endl;
+    
+    for (auto elem : objects.changed()){
+        std::cout << elem.p_->data << " " << elem.id_ << std::endl;
+    }
+    
+    objects.reset_changed();
+    objects.synchronize();
+    
+    // END OF FRAME 2
+    
+    std::cout << "[Performance] " << (float)(clock()-t)/CLOCKS_PER_SEC << std::endl;
     
     return 0;
 }
