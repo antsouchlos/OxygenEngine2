@@ -3,6 +3,7 @@
 
 #include <types/OE_Scene.h>
 #include <types/OE_ViewportConfig.h>
+#include <types/OE_SharedIndexMap.h>
 
 class OE_World : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
     

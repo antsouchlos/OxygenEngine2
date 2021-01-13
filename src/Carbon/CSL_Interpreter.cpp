@@ -63,6 +63,7 @@ namespace csl {
 
 		oe::OE_Main->pending_world = world;
 		oe::OE_Main->unlockMutex();
+        
 	}
 
 	world_ptr Interpreter::process_world(const element& world_e) {
@@ -108,7 +109,7 @@ namespace csl {
 		
 
 		// TODO: Is it smart to make this use string_view? Maybe a const char* would be better
-		scene_list_.append(std::string(scene_e.attributes.at("name")), result);
+		scene_list_.append_now(std::string(scene_e.attributes.at("name")), result);
 
 
 		// Child Elements
@@ -162,7 +163,7 @@ namespace csl {
 		
 
 		// TODO: Is it smart to make this use string_view? Maybe a const char* would be better
-		object_list_.append(std::string(camera_e.attributes.at("name")), result);
+		object_list_.append_now(std::string(camera_e.attributes.at("name")), result);
 
 		result->visible = !!sv_to_int(camera_e.attributes.at("visible"));
 
@@ -217,7 +218,7 @@ namespace csl {
 
 		// TODO: Is it smart to make this use string_view? Maybe a const char* would be better
 		// TODO: Actually set the name of the light
-		object_list_.append(std::string(light_e.attributes.at("name")), result);
+		object_list_.append_now(std::string(light_e.attributes.at("name")), result);
 
 		result->visible = !!sv_to_int(light_e.attributes.at("visible"));
 
@@ -294,7 +295,7 @@ namespace csl {
 
 		mesh_ptr result = std::make_shared<oe::mesh>(num_of_vertices, num_of_normals,
 										num_of_triangles, num_of_uvs, max_uv_num);
-        object_list_.append(std::string(mesh_e.attributes.at("name")), result);
+        object_list_.append_now(std::string(mesh_e.attributes.at("name")), result);
 	
 		// Attributes
 
@@ -427,7 +428,7 @@ namespace csl {
 	texture_ptr Interpreter::process_texture(const element& texture_e) {
 		texture_ptr result = std::make_shared<oe::texture>();
 	
-
+        texture_list_.append_now(std::string(texture_e.attributes.at("name")), result);
 		// Single Assignments
 
 
@@ -452,7 +453,7 @@ namespace csl {
 		// Attributes
 		
 		// TODO: Remove name from the csl format
-		material_list_.append(std::string(material_e.attributes.at("name")), result);
+		material_list_.append_now(std::string(material_e.attributes.at("name")), result);
 
 		// Single Assignments
 
@@ -497,7 +498,7 @@ namespace csl {
 	tcm_ptr Interpreter::process_tcm(const element& tcm_e) {
 		tcm_ptr result = std::make_shared<oe::tcm>();
 
-
+        tcm_list_.append_now(std::string(tcm_e.attributes.at("name")), result);
 		// Single Assignments
 
 
@@ -528,7 +529,8 @@ namespace csl {
 	vpconfig_ptr Interpreter::process_vpconfig(const element& vpconfig_e) {
 		vpconfig_ptr result = std::make_shared<oe::vpconfig>();
 
-
+        viewport_list_.append_now(std::string(vpconfig_e.attributes.at("name")), result);
+		// Single Assignments
 		// List Assignments
 
 
@@ -614,7 +616,8 @@ namespace csl {
 		
 		// List Assignments
 	
-
+        //cout << "processing triangle" << endl;
+        
 		std::size_t num_of_indices = 2 + num_of_uvs;
 
 		auto v1_v = triangle_e.list_assignments.at("v1");

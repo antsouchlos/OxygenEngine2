@@ -65,65 +65,67 @@ bool NRE_Renderer::updateData(){
     
     // add/change any missing world data
     OE_Main->lockMutex();
-    auto temp_scenes = OE_World::scenesList.copy();
-    auto temp_objects = OE_World::objectsList.copy();
-    auto temp_materials = OE_World::materialsList.copy();
     
-    
-    
-    
-    // DONT copy these clearDeleted() and reset() functions to the physics engine, because it will wreak havoc
-    // Copy only those above (of course inside a OE_Main mutex)
-    // The renderer is supposed to handle those deletions
-    OE_World::scenesList.reset();
-    OE_World::objectsList.reset();
-    OE_World::materialsList.reset();
-    
-    OE_World::scenesList.clearDeleted();
-    OE_World::objectsList.clearDeleted();
-    OE_World::materialsList.clearDeleted();
-    
-    OE_Main->unlockMutex();
-    
-    //cout << temp_scenes.to_str() << endl;
-    //cout << temp_objects.to_str() << endl;
-    //cout << temp_materials.to_str() << endl;
-    
+    vector<size_t> camera_ids;
     
     if (this->screen->restart_renderer){
         
         // this also resets the GPU API resources
         this->init();
         
-        
-        // all objects must be gone through one time
-        // regardless if they have been changed or not
-        // in order to initialize GPU resources again
-        for (auto x: temp_scenes.getKeys()){
-            temp_scenes.changed[x] = true;
+        for (auto mat : OE_World::materialsList){
+            cout << mat.get_name() << endl;
+            mat.flag_as_changed();
         }
         
-        for (auto x: temp_materials.getKeys()){
-            temp_materials.changed[x] = true;
-        }
-        
-        for (auto x: temp_objects.getKeys()){
-            temp_objects.changed[x] = true;
-            if (temp_objects[x]->getType() == "MESH32"){
-                
-                // vbos/ibos must be regenerated
-                auto mesh = static_pointer_cast<OE_Mesh32>(temp_objects[x]);
+        for (auto obj : OE_World::objectsList){
+            if (obj.p_->getType() == "MESH32"){
+                auto mesh = static_pointer_cast<OE_Mesh32>(obj.p_);
                 mesh->data->vbo_exists = false;
                 mesh->data->ibos_exist = false;
             }
+            obj.flag_as_changed();
         }
         
+        for (auto sce : OE_World::scenesList){
+            cout << sce.get_name() << endl;
+            sce.flag_as_changed();
+        }
         
         this->screen->restart_renderer = false;
         this->setup_bbox_prog = false;
     }
     
+    for (auto mat : OE_World::materialsList.changed()){
+        this->handleMaterialData(mat.id_, mat.p_);
+    }
+        
+    for (auto obj : OE_World::objectsList.changed()){
+        if (obj.p_->getType() == "MESH32"){
+           this->handleMeshData(obj.id_, static_pointer_cast<OE_Mesh32>(obj.p_));
+        }
+        else if (obj.p_->getType() == "LIGHT"){
+            this->handleLightData(obj.id_, static_pointer_cast<OE_Light>(obj.p_));
+        }
+    }
     
+    for (auto obj : OE_World::objectsList.changed()){
+        if (obj.p_->getType() == "CAMERA"){
+           this->handleCameraData(obj.id_, static_pointer_cast<OE_Camera>(obj.p_));
+           camera_ids.push_back(obj.id_);
+        }
+    }
+    
+    for (auto sce : OE_World::scenesList){
+        sce.flag_as_changed();
+    }
+    
+    if(camera_ids.size() >= 1){
+        this->camera_id = camera_ids[0];
+    }
+        
+    OE_Main->unlockMutex();
+    /*
     
     // remove any obsolete draw commands
     std::set<std::size_t, std::greater<std::size_t>> to_be_removed;
@@ -146,59 +148,7 @@ bool NRE_Renderer::updateData(){
     //    
     //}    
     
-    // PRELIMINARY WORK
-    // only handle the first scene for now with 1 camera and -materials
-    bool scene_done = false;
-    
-    for (auto scene: temp_scenes.getKeys()){
-        
-        if (scene_done) continue;
-        
-        vector<size_t> obj_ids;
-        
-        vector<size_t> camera_ids;
-        
-        for (auto material : temp_scenes(scene)->materials){
-            if (temp_materials.hasChanged(material))
-                this->handleMaterialData(material, temp_materials(material));
-        }
-        
-        // first handle objects and lights
-        for (auto obj : temp_scenes(scene)->objects){
-            
-            if (temp_objects(obj)->getType() == "MESH32"){
-                if (temp_objects.hasChanged(obj)){
-                    this->handleMeshData(obj, static_pointer_cast<OE_Mesh32>(temp_objects(obj)));
-                    obj_ids.push_back(obj);
-                }
-            }
-            else if (temp_objects(obj)->getType() == "LIGHT"){
-                if (temp_objects.hasChanged(obj))
-                    this->handleLightData(obj, static_pointer_cast<OE_Light>(temp_objects(obj)));
-            }
-            else{}
-        }
-        // THEN handle cameras
-        for (auto obj : temp_scenes(scene)->objects){
-            if (temp_objects(obj)->getType() == "CAMERA"){
-                if(temp_objects.hasChanged(obj)){
-                    this->handleCameraData(obj, static_pointer_cast<OE_Camera>(temp_objects(obj)));
-                    camera_ids.push_back(obj);
-                }
-            }
-            else{}
-        }        
-        
-        if(camera_ids.size() >= 1){
-            this->camera_id = camera_ids[0];
-        } else{
-            continue;
-        }
-        
-        scene_done = true;
-        
-    }
-    
+    //*/
     return true;
 }
 
@@ -239,7 +189,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         // store bounding box
         
         //---- <TEMPORARY> ----//
-        // This should not be done here but in the physics engine
+        // This should not be done here but in the physics engine or interpreter
         mesh->calculateProperBoundingBox();
         //---- </TEMPORARY> ---//
         
