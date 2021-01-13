@@ -41,7 +41,8 @@ public:
         this->name2id = OE_Name2ID(&this->id2name_);
         unlockMutex();
     };
-
+    
+    OE_SharedIndexMap(const OE_SharedIndexMap&) = delete;
     
     ~OE_SharedIndexMap(){}
     
