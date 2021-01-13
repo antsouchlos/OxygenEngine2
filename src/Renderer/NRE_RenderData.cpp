@@ -64,9 +64,11 @@ bool NRE_Renderer::updateData(){
     assert (this->world != nullptr);
     
     // add/change any missing world data
-    OE_Main->lockMutex();
+    //OE_Main->lockMutex();
     
     vector<size_t> camera_ids;
+    
+    // this regenerates the renderer database
     
     if (this->screen->restart_renderer){
         
@@ -74,7 +76,6 @@ bool NRE_Renderer::updateData(){
         this->init();
         
         for (auto mat : OE_World::materialsList){
-            cout << mat.get_name() << endl;
             mat.flag_as_changed();
         }
         
@@ -88,13 +89,14 @@ bool NRE_Renderer::updateData(){
         }
         
         for (auto sce : OE_World::scenesList){
-            cout << sce.get_name() << endl;
             sce.flag_as_changed();
         }
         
         this->screen->restart_renderer = false;
         this->setup_bbox_prog = false;
     }
+    
+    // Update element data
     
     for (auto mat : OE_World::materialsList.changed()){
         this->handleMaterialData(mat.id_, mat.p_);
@@ -124,7 +126,7 @@ bool NRE_Renderer::updateData(){
         this->camera_id = camera_ids[0];
     }
         
-    OE_Main->unlockMutex();
+    //OE_Main->unlockMutex();
     /*
     
     // remove any obsolete draw commands
