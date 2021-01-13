@@ -42,7 +42,7 @@ string OE_VertexGroup::to_str() const{
     
     string temp4;
     if (this->material_id != 0)
-        temp4 = outputVar("material_id", "\"" + OE_World::materialsList.id2name[this->material_id] + "\"");
+        temp4 = outputVar("material_id", "\"" + OE_World::materialsList.id2name_[this->material_id] + "\"");
     else{
         temp4 = outputVar("material_id", "\"\"");
     }

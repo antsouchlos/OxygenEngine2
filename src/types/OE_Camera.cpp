@@ -28,14 +28,14 @@ string OE_Camera::getType() const{
 }
 
 string OE_Camera::to_str() const{
-    string output = outputTypeTag("Camera", {{"name", "\"" + OE_World::objectsList.id2name[this->id] + "\""}, {"visible", convert((int)visible)}});
+    string output = outputTypeTag("Camera", {{"name", "\"" + OE_World::objectsList.id2name_[this->id] + "\""}, {"visible", convert((int)visible)}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
     output.append(outputList("current_state", this->current_state.to_arr()));
     output.append("\n");
     
-    output.append(outputVar("parent", "\"" + OE_World::objectsList.id2name[this->parent] + "\""));
+    output.append(outputVar("parent", "\"" + OE_World::objectsList.id2name_[this->parent] + "\""));
     output.append("\n");
     
     output.append(outputVar("parent_type", convert(this->parent_type)));

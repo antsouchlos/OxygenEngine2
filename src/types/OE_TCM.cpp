@@ -11,7 +11,7 @@ std::string OE_TCM_Texture::to_str() const{
     string output = outputTypeTag("TCM_Texture", {});
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
-    output.append(outputVar("textureID", "\"" + OE_World::texturesList.id2name[this->textureID] + "\""));
+    output.append(outputVar("textureID", "\"" + OE_World::texturesList.id2name_[this->textureID] + "\""));
     output.append("\n");
     
     output.append(outputVar("mode", convert(this->mode)));
@@ -55,7 +55,7 @@ OE_TCM::~OE_TCM(){
 } 
  
 string OE_TCM::to_str() const{
-    string output = outputTypeTag("TextureCombineMode", {{"name", "\"" + OE_World::tcmsList.id2name[this->id] + "\""}});
+    string output = outputTypeTag("TextureCombineMode", {{"name", "\"" + OE_World::tcmsList.id2name_[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     

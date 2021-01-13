@@ -88,7 +88,7 @@ public:
     
     
     
-    void append(std::string name, std::shared_ptr<T> element){
+    void append(const std::string& name, std::shared_ptr<T> element){
         this->pending_elements_[element->id] = element;
         this->pending_id2name_[element->id] = name;
     }
@@ -110,7 +110,7 @@ public:
     void synchronize(){
         
         for (auto x : deleted_.indices_){
-            if (elements_.count(x) != 0) continue;
+            if (elements_.count(x) == 0) continue;
             elements_.erase(x);
             names_.erase(id2name_[x]);
             id2name_.erase(x);
@@ -313,7 +313,7 @@ int main(){
     
     SharedIndexMap<Object> objects;
     
-    //auto t=clock();
+    auto t=clock();
     
     for (int i=0; i < 3000; i++){
         objects.append("number " + std::to_string(i*2), std::make_shared<Object>());
@@ -324,7 +324,7 @@ int main(){
     objects.synchronize();
     objects.reset_changed();
     
-    auto t=clock();
+    //auto t=clock();
     
     // START OF FRAME
     

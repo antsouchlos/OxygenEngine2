@@ -46,13 +46,13 @@ std::vector<float> OE_Material::GetRendererData(){
 }
 
 string OE_Material::to_str(){
-    string output = outputTypeTag("Material", {{"name", "\"" + OE_World::materialsList.id2name[this->id] + "\""}});
+    string output = outputTypeTag("Material", {{"name", "\"" + OE_World::materialsList.id2name_[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
 
     vector<string> tcm_strs;
     for(const auto &x: this->textureCM_IDs){
-        tcm_strs.push_back("\"" + OE_World::tcmsList.id2name[x] + "\"");
+        tcm_strs.push_back("\"" + OE_World::tcmsList.id2name_[x] + "\"");
     }
     if(tcm_strs.size() != 0){
         output.append(outputList("textureCM_IDs", tcm_strs));

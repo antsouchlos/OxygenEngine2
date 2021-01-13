@@ -17,7 +17,7 @@ OE_Scene::OE_Scene(const string &name){
 }
 
 OE_Scene::~OE_Scene(){
-    for (auto object : this->objects){
+    /*for (auto object : this->objects){
         OE_World::objectsList.remove(object);
     }
     this->objects.clear();
@@ -35,45 +35,45 @@ OE_Scene::~OE_Scene(){
     for (auto texture : this->textures){
         OE_World::texturesList.remove(texture);
     }
-    this->textures.clear();
+    this->textures.clear();*/
 }
 
 string OE_Scene::to_str(){
     
-    string output = outputTypeTag("Scene", {{"name", "\"" + OE_World::scenesList.id2name[this->id] + "\""}});
+    string output = outputTypeTag("Scene", {{"name", "\"" + OE_World::scenesList.id2name_[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
     for (const auto& x: this->textures){
-        output.append(OE_World::texturesList[x]->to_str());
+        output.append(OE_World::texturesList[x].p_->to_str());
         output.append("\n");
     }
     
     for (const auto& x: this->texture_CMs){
-        output.append(OE_World::tcmsList[x]->to_str());
+        output.append(OE_World::tcmsList[x].p_->to_str());
         output.append("\n");
     }
     
     for (const auto& x: this->materials){
-        output.append(OE_World::materialsList[x]->to_str());
+        output.append(OE_World::materialsList[x].p_->to_str());
         output.append("\n");
     }
     
     for (const auto& x: this->objects){
-        if(OE_World::objectsList[x]->getType() == "MESH32"){
-            output.append(OE_World::objectsList[x]->to_str());
+        if(OE_World::objectsList[x].p_->getType() == "MESH32"){
+            output.append(OE_World::objectsList[x].p_->to_str());
             output.append("\n");
         }
     }
     for (const auto& x: this->objects){
-        if(OE_World::objectsList[x]->getType() == "LIGHT"){
-            output.append(OE_World::objectsList[x]->to_str());
+        if(OE_World::objectsList[x].p_->getType() == "LIGHT"){
+            output.append(OE_World::objectsList[x].p_->to_str());
             output.append("\n");
         }
     }
     for (const auto& x: this->objects){
-        if(OE_World::objectsList[x]->getType() == "CAMERA"){
-            output.append(OE_World::objectsList[x]->to_str());
+        if(OE_World::objectsList[x].p_->getType() == "CAMERA"){
+            output.append(OE_World::objectsList[x].p_->to_str());
             output.append("\n");
         }
     }

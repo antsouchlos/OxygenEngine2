@@ -34,7 +34,7 @@ OE_Texture::~OE_Texture(){
 
 string OE_Texture::to_str(){
     
-    string output = outputTypeTag("Texture", {{"name", "\"" + OE_World::texturesList.id2name[this->id] + "\""}});
+    string output = outputTypeTag("Texture", {{"name", "\"" + OE_World::texturesList.id2name_[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
@@ -49,7 +49,7 @@ string OE_Texture::to_str(){
         output.append("\n");
     }
     else{
-        output.append(outputVar("camera", "\"" + OE_World::objectsList.id2name[this->camera] + "\""));
+        output.append(outputVar("camera", "\"" + OE_World::objectsList.id2name_[this->camera] + "\""));
         output.append("\n");
     }
     
