@@ -27,5 +27,5 @@ subprojects/packagecache/
 callgrind*
 massif.out*
 .vim_session
-new_shared_index_map/sharedIMTest
+new_shared_index_map/*
 some_car.csl

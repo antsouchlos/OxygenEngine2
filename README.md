@@ -225,6 +225,10 @@ API: Added variadic templates and removed all ```void*``` and ```nullptr``` unle
 
 Finalized implementation of error handling. Now everything apart form core OE (User-facing API functions, custom tasks, custom events, custom unsynchronized threads, renderer, physics) are wrapped in ```try{...}catch{...}``` blocks and the engine now should never crash unless a segfault happens.
 
+2021/01/14 - philsegeler
+
+Finalized rewrite of ```OE_SharedIndexMap```. Now supports iterators, asynchronous ```append``` and ```extend```, specialized iterators only for changed and deleted objects ```.changed()```, ```.deleted()```, per-frame synchronization (```synchronize()```), error handling and warnings. Performance improvements could still be made though. ```renderer->updateData()``` is can now be much cleaner and straightforward as well.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -280,7 +284,7 @@ Now that it was decided that C++17 will be the minimum requirement:
 - ~~Investigate possibility of using variadic templates in the API task and event function type arguments. Either by storing function parameters directly or using ```std::bind``` are two possibilities.~~(DONE using ```std::bind```)
 - ~~Handle errors in the API properly.~~ (DONE)
 - Investigate possible optimizations in the Event handler
-- Refactor ```OE_SharedIndexMap``` (again!) to remove previous defects and optimize with iterators and custom internal containers.
+- ~~Refactor ```OE_SharedIndexMap``` (again!) to remove previous defects and optimize with iterators and custom internal containers.~~(DONE)
 - Use the following naming convention ```this->member_``` (with underscore at the end) for class member variables.
 
 

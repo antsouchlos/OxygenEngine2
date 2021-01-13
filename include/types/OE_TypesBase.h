@@ -152,4 +152,6 @@ namespace oe{
 void OE_WriteToLog(std::string);
 void OE_WriteToLog(const char*);
 
+void OE_Warn(std::string);
+
 #endif
