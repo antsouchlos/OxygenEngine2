@@ -165,3 +165,7 @@ void OE_WriteToLog(const char* log){
     SDL_RWclose(logfile);
 }
 
+void OE_Warn(std::string arg){
+    cout << "[OE Warning] " <<arg << endl;
+    OE_WriteToLog("[OE Warning] " + arg + "\n");
+}

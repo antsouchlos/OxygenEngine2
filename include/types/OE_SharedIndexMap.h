@@ -9,8 +9,6 @@
 /** New General class intended to optimize and properly parallelize accesing of
  * individual meshes/materials/etc. Stores ids and names. Only stores one name per element and one id per element.
  * Supports input iterators. Everything apart from iterators is 100% thread-safe.
- * TODO: append_now and force_append_now for adding elements on the fly synchronously
- * TODO: Error handling: make proper exceptions
  * [Enhancement TODO for Andreas]: Add a custom container in place of std::set in Changed/Deleted
  */
 
@@ -107,6 +105,40 @@ public:
         return output;
     }
     
+    bool is_pending(std::size_t index){
+        int output = 0;
+        lockMutex();
+        if (this->pending_elements_.count(index) == 1){
+            output = 1;
+        }
+        unlockMutex();
+        return output;
+    }
+    
+    // TODO: Add referemce count
+    int count(const std::string &name){
+        int output = 0;
+        lockMutex();
+        if (this->names_.count(name) == 1){
+            output = 1;
+        }
+        unlockMutex();
+        return output;
+    }
+    
+    bool is_pending(const std::string &name){
+        int output = 0;
+        lockMutex();
+        for (auto x : this->pending_id2name_){
+            if (x.second == name){
+                output = 1;
+                break;
+            }
+        }
+        unlockMutex();
+        return output;
+    }
+    
     std::string get_name(const std::size_t& index){
         if (id2name_.count(index) != 0)
             return id2name_[index];
@@ -125,7 +157,7 @@ public:
             this->pending_id2name_[element->id] = name;
         }
         else {
-            //TODO: Error handling
+            OE_Warn("Element with ID: '" + std::to_string(element->id) + "' and name: '" + name +"' already exists in SharedIndexMap<" + typeid(T).name() + ">.");
         }
     }
     
@@ -153,7 +185,7 @@ public:
             this->names_.insert(name);
         }
         else {
-            //TODO: Error handling
+            OE_Warn("Element with ID: '" + std::to_string(element->id) + "' and name: '" + name +"' already exists in SharedIndexMap<" + typeid(T).name() + ">.");
         }
     }
     
@@ -190,7 +222,7 @@ public:
         this->changed_.clear();
     }
     
-    void synchronize(){
+    void synchronize() noexcept {
         
         lockMutex();
         
@@ -242,6 +274,10 @@ public:
             output = Element(this, index, nullptr);
         unlockMutex();
         
+        if (!output.is_valid()){
+            OE_Warn("Element with ID: '" + std::to_string(output.id_) + "' does not exist in SharedIndexMap<" + typeid(T).name() + ">.");
+        }
+        
         return output;
     }
     
@@ -255,6 +291,10 @@ public:
         else
             output = Element(this, name2id[name], nullptr);
         unlockMutex();
+        
+        if (!output.is_valid()){
+            OE_Warn("Element with name: '" + name + "' does not exist in SharedIndexMap<" + typeid(T).name() + ">.");
+        }
         
         return output;
     }
@@ -332,7 +372,8 @@ public:
         Changed(OE_SharedIndexMap<T>& inputa) : db_(inputa) {}
         
         void add(const std::size_t &index){
-            indices_.insert(index);
+            if (db_.elements_.count(index) != 0)
+                indices_.insert(index);
         }
         
         void remove(const std::size_t &index){
@@ -400,7 +441,16 @@ public:
         Deleted(OE_SharedIndexMap<T>& inputa) : db_(inputa) {}
         
         void add(const std::size_t &index){
-            indices_.insert(index);
+            if (db_.elements_.count(index) != 0){
+                indices_.insert(index);
+                db_.changed_.remove(index);
+            }
+        }
+        
+        void remove(const std::size_t &index){
+            if (indices_.count(index) != 0){
+                indices_.erase(index);
+            }
         }
             
         void clear(){
@@ -451,249 +501,5 @@ public:
         return this->deleted_;
     }
 };
-
-
-/*template<typename T>
-class OE_SharedIndexMap : public OE_THREAD_SAFETY_OBJECT{
-public:
-    OE_SharedIndexMap(){
-        this->name2id = OE_Name2ID(&this->id2name);
-    }
-    
-    OE_SharedIndexMap copy(){
-        OE_SharedIndexMap output;
-        lockMutex();
-        for (auto x: elements){
-            output.changed[x.first] = this->changed[x.first];
-            output.elements[x.first] = x.second;
-            output.id2name[x.first] = this->id2name[x.first];
-            
-        }
-        output.names = this->names;
-        output.deleted = this->deleted;
-        unlockMutex();
-        return output;
-    }
-    
-    std::string to_str(){
-        lockMutex();
-        std::string output = "[\n";
-        for (auto x : elements){
-            output.append(std::to_string(x.first));
-            output.append(" ");
-            output.append(this->id2name[x.first]);
-            output.append(" ");
-            output.append(std::to_string(this->changed[x.first]));
-            output.append("\n");
-        }
-        
-        output.append("]");
-        unlockMutex();
-        return output;
-    }
-    
-    
-    void appendUNSAFE(std::string name, std::shared_ptr<T> element){
-        if (this->names.count(name) == 0){
-            
-            auto current_id = element->id;
-            this->elements[current_id] = element;
-            this->id2name[current_id] = name;
-            
-            this->names.insert(name);
-            this->changed[current_id] = true;
-        }
-    }
-    void append(std::string name, std::shared_ptr<T> element){
-        lockMutex();
-        this->appendUNSAFE(name, element);
-        unlockMutex();
-    }
-    
-    // overrides object with the same name
-    void force_appendUNSAFE(std::string name, std::shared_ptr<T> element){
-        if (this->names.count(name) == 0){
-            
-            auto current_id = element->id;
-            this->elements[current_id] = element;
-            this->id2name[current_id] = name;
-            
-            this->names.insert(name);
-            this->changed[current_id] = true;
-        }
-        else {
-            auto current_id = element->id;
-            this->elements[current_id] = element;
-            this->id2name[current_id] = name;
-            
-            this->changed[current_id] = true;
-        }
-    }
-    
-    void force_append(std::string name, std::shared_ptr<T> element){
-        lockMutex();
-        force_appendUNSAFE(name, element);
-        unlockMutex();
-    }
-    
-    void remove(std::size_t id){
-        lockMutex();
-        if (this->elements.count(id) == 1){
-            this->elements.erase(id);
-            this->names.erase(this->id2name[id]);
-            this->id2name.erase(id);
-            this->changed.erase(id);
-            this->deleted.push_back(id);
-        }
-        unlockMutex();
-    }
-    
-    void remove(std::string name){
-        lockMutex();
-        if (this->names.count(name) == 1){
-            std::size_t id = this->name2id[name];
-            this->elements.erase(id);
-            this->names.erase(name);
-            this->id2name.erase(id);
-            this->changed.erase(id);
-            this->deleted.push_back(id);
-        }
-        unlockMutex();
-    }
-    
-    bool existsID(std::size_t id){
-        lockMutex();
-        bool output = this->elements.count(id) == 1;
-        unlockMutex();
-        return output;
-        
-    }
-    
-    bool existsName(std::string name){
-        lockMutex();
-        bool output = this->names.count(name) == 1;
-        unlockMutex();
-        return output;
-    }
-    
-    bool hasChanged(std::size_t id){
-        lockMutex();
-        bool output = false;
-        if (this->changed.count(id) == 1){
-            output = this->changed[id];
-        }
-        unlockMutex();
-        return output;
-    }
-    
-    // NOTE: read-only
-    std::shared_ptr<T> operator()(std::size_t id){
-        std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
-        lockMutex();
-        if (this->elements.count(id) == 1)
-            output = this->elements[id];
-        unlockMutex();
-        return output;
-    }
-    
-    // NOTE: read-only, slower
-    std::shared_ptr<T> operator()(std::string name){
-        std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
-        lockMutex();
-        if (this->names.count(name) == 1)
-            output = this->elements[this->name2id[name]];
-        unlockMutex();
-        return output;
-    }
-    
-    // NOTE: for changing the object
-    std::shared_ptr<T> operator[](std::size_t id){
-        std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
-        lockMutex();
-        if (this->elements.count(id) == 1){
-            output = this->elements[id];
-            this->changed[id] = true;
-            
-        }
-        unlockMutex();
-        return output;
-    }
-    
-    // NOTE: for changing the object, slower
-    std::shared_ptr<T> operator[](std::string name){
-        std::shared_ptr<T> output = std::shared_ptr<T>(nullptr);
-        lockMutex();
-        if (this->names.count(name) == 1){
-            output = this->elements[this->name2id[name]];
-            this->changed[this->name2id[name]] = true;
-        }
-        unlockMutex();
-        return output;
-    }
-    
-    // This is for facilitating easy iterating
-    std::vector<std::size_t> getKeys(){
-        std::vector<std::size_t> output;
-        lockMutex();
-        output.reserve(this->elements.size());
-        for (auto x : this->elements){
-            output.push_back(x.first);
-        }
-        unlockMutex();
-        return output;
-    }
-    
-    void extend(OE_SharedIndexMap<T>& other, bool override_names){
-        lockMutex();
-        if (!override_names){
-            for (auto x: other.getKeys()){
-                this->appendUNSAFE(other.id2name[x], other.elements[x]);
-            }
-        }
-        else {
-            for (auto x: other.getKeys()){
-                this->force_appendUNSAFE(other.id2name[x], other.elements[x]);
-            }
-        }
-        unlockMutex();
-    }
-    
-    void clearAll(){
-        lockMutex();
-        this->id2name.clear();
-        this->elements.clear();
-        this->names.clear();
-        this->changed.clear();
-        this->deleted.clear();
-        unlockMutex();
-    }
-    
-    void reset(){
-        lockMutex();
-        for (auto x : this->changed){
-            this->changed[x.first] = false;
-        }
-        unlockMutex();
-    }
-    
-    void clearDeleted(){
-        lockMutex();
-        this->deleted.clear();
-        unlockMutex();
-    }
-    
-    std::map<std::size_t, std::shared_ptr<T>>       elements;
-    
-    std::unordered_map<std::size_t, std::string>    id2name;
-    OE_Name2ID                                      name2id;
-    std::set<std::string>                           names;
-    
-    /// This is for the renderer and the physics engine
-    /// Every time a new object is being added or is being changed
-    /// This map boolean should be set to true
-    /// In case an object was deleted it should be added here as well
-    std::map<std::size_t, bool>     changed;
-    std::vector<std::size_t>        deleted;
-};*/
 
 #endif
