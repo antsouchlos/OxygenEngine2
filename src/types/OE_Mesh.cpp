@@ -88,14 +88,14 @@ std::string OE_Mesh32::to_str() const{
     //vector<string> output_list;
     //output_list.reserve(9+ this->textureCM_IDs.size() + this->data->vertices.uvmaps.size() + this->data->triangles.size() + this->data.triangle_groups.size()+1);
     
-    output.append(outputTypeTag("Mesh", {{"name", "\"" + OE_World::objectsList.id2name[this->id] + "\""}, {"visible", convert((int)visible)}, {"num_uvs", convert(data->vertices.uvmaps.size())}, {"isDynamic", convert((int)this->data->isDynamic)}}));
+    output.append(outputTypeTag("Mesh", {{"name", "\"" + OE_World::objectsList.id2name_[this->id] + "\""}, {"visible", convert((int)visible)}, {"num_uvs", convert(data->vertices.uvmaps.size())}, {"isDynamic", convert((int)this->data->isDynamic)}}));
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     output.append("\n");
     
     output.append(outputList("current_state", this->current_state.to_arr()));
     output.append("\n");
     
-    output.append(outputVar("parent", "\"" + OE_World::objectsList.id2name[this->parent] + "\""));
+    output.append(outputVar("parent", "\"" + OE_World::objectsList.id2name_[this->parent] + "\""));
     output.append("\n");
     
     output.append(outputVar("parent_type", convert(this->parent_type)));
@@ -116,7 +116,7 @@ std::string OE_Mesh32::to_str() const{
     output.append(outputList("normals", this->data->vertices.normals));
     vector<string> tcm_strs;
     for(const auto &x: this->textureCM_IDs){
-        tcm_strs.push_back("\"" + OE_World::tcmsList.id2name[x] + "\"");
+        tcm_strs.push_back("\"" + OE_World::tcmsList.id2name_[x] + "\"");
     }
     if(tcm_strs.size() != 0){
         output.append(outputList("textureCM_IDs", tcm_strs));

@@ -24,7 +24,7 @@ OE_ViewportConfig::~OE_ViewportConfig(){
  
 std::string OE_ViewportConfig::to_str() const{
     
-    string output = outputTypeTag("ViewportConfig", {{"name", "\"" + OE_World::viewportsList.id2name[this->id] + "\""}});
+    string output = outputTypeTag("ViewportConfig", {{"name", "\"" + OE_World::viewportsList.id2name_[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;
     
@@ -33,7 +33,7 @@ std::string OE_ViewportConfig::to_str() const{
     
     vector<string> camera_strs;
     for(const auto &x: this->cameras){
-        camera_strs.push_back("\"" + OE_World::objectsList.id2name[x] + "\"");
+        camera_strs.push_back("\"" + OE_World::objectsList.id2name_[x] + "\"");
     }
     output.append(outputList("cameras", camera_strs));
     output.append("\n");

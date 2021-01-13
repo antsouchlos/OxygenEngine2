@@ -2,16 +2,36 @@
 
 using namespace std;
 
-OE_THREAD_SAFETY_OBJECT::OE_THREAD_SAFETY_OBJECT(){this->wmutex = nullptr; changed = false;}
-OE_THREAD_SAFETY_OBJECT::~OE_THREAD_SAFETY_OBJECT(){
-    if (this->wmutex != nullptr)
-        SDL_DestroyMutex(wmutex);
-    this->wmutex = nullptr;
-    
+//OE_THREAD_SAFETY_OBJECT::OE_THREAD_SAFETY_OBJECT(){this->wmutex = nullptr; changed = false;}
+OE_THREAD_SAFETY_OBJECT::OE_THREAD_SAFETY_OBJECT(){this->wmutex = SDL_CreateMutex(); changed = false;}
+
+OE_THREAD_SAFETY_OBJECT::OE_THREAD_SAFETY_OBJECT(const OE_THREAD_SAFETY_OBJECT& copy_from) {
+    this->changed = copy_from.changed;
+    this->wmutex = SDL_CreateMutex();
+}
+OE_THREAD_SAFETY_OBJECT::OE_THREAD_SAFETY_OBJECT(OE_THREAD_SAFETY_OBJECT&& move_from) {
+    this->changed = move_from.changed;
+    this->wmutex = move_from.wmutex;
+    move_from.wmutex = nullptr;
 }
 
+OE_THREAD_SAFETY_OBJECT& OE_THREAD_SAFETY_OBJECT::operator = (const OE_THREAD_SAFETY_OBJECT& other){
+    if (wmutex != nullptr)
+        SDL_DestroyMutex(wmutex);
+    this->wmutex = SDL_CreateMutex();
+    this->changed = other.changed;
+    return *this;
+}
+
+OE_THREAD_SAFETY_OBJECT::~OE_THREAD_SAFETY_OBJECT(){
+    if (wmutex != nullptr)
+        SDL_DestroyMutex(wmutex);
+    wmutex = nullptr;
+}
+
+
+
 void OE_THREAD_SAFETY_OBJECT::lockMutex(){
-    if(this->wmutex == nullptr) this->wmutex = SDL_CreateMutex();
     SDL_LockMutex(this->wmutex);
 }
 
@@ -93,7 +113,9 @@ std::string CSL_WriterBase::outputTypeTag(const std::string& name, const std::ma
 OE_Name2ID::OE_Name2ID(){
     
 }
-
+OE_Name2ID::~OE_Name2ID() {
+    
+}
 OE_Name2ID::OE_Name2ID(std::unordered_map<std::size_t, std::string>* arg){
     this->id2name = arg;
 }

@@ -29,18 +29,35 @@ namespace oe{
             std::string data_;
     };
     
-    /*class invalid_key_event: public api_error {
+    class invalid_element_id: public api_error {
         public:
             
-            invalid_key_event(std::string arg){
-                name_ = "oe::invalid_key_event";
+            invalid_element_id(std::string arg, std::size_t id){
+                name_ = "oe::invalid_element_id";
                 data_ = arg;
+                id_ = id;
             }
             std::string what() const throw() {
-                return "Key: '" + data_ + "' does not constitute a valid keyboard/mouse/gamepad/touch event.";
+                return "ID: '" + id_ + "' is not a valid ID for an element of '" + data_ + "'.";
             };
             std::string data_;
-    };//*/
+            std::string id_;
+    };
+    
+    class invalid_element_name: public api_error {
+        public:
+            
+            invalid_element_name(std::string arg, std::string id){
+                name_ = "oe::invalid_element_name";
+                data_ = arg;
+                name_ = id;
+            }
+            std::string what() const throw() {
+                return "Name: '" + name_ + "' is not a valid name for an element of '" + data_ + "'.";
+            };
+            std::string data_;
+            std::string name_;
+    };
     
     class invalid_event: public api_error {
         public:
