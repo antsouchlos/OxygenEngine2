@@ -264,7 +264,7 @@ public:
         unlockMutex();
     }
     
-    Element operator [](const std::size_t& index){
+    Element operator [](const std::size_t& index) noexcept{
         
         auto output = Element();
         
@@ -282,7 +282,7 @@ public:
         return output;
     }
     
-    Element operator [](const std::string& name){
+    Element operator [](const std::string& name) noexcept{
         
         auto output = Element();
         
@@ -373,7 +373,7 @@ public:
         Changed(OE_SharedIndexMap<T>& inputa) : db_(inputa) {}
         
         void add(const std::size_t &index){
-            if (db_.elements_.count(index) != 0)
+            if ((db_.elements_.count(index) != 0) && (db_.deleted_.count(index) == 0))
                 indices_.insert(index);
         }
         
@@ -452,6 +452,10 @@ public:
             if (indices_.count(index) != 0){
                 indices_.erase(index);
             }
+        }
+        
+        int count(const std::size_t &index){
+            return this->indices_.count(index);
         }
             
         void clear(){
