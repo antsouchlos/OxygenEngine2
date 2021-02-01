@@ -229,6 +229,10 @@ Finalized implementation of error handling. Now everything apart form core OE (U
 
 Finalized rewrite of ```OE_SharedIndexMap```. Now supports iterators, asynchronous ```append``` and ```extend```, specialized iterators only for changed and deleted objects ```.changed()```, ```.deleted()```, per-frame synchronization (```synchronize()```), error handling and warnings. Performance improvements could still be made though. ```renderer->updateData()``` is can now be much cleaner and straightforward as well.
 
+2021/02/01 - philsegeler
+
+Two fixes, because i was bored.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
