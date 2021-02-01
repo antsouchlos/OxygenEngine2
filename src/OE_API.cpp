@@ -27,6 +27,12 @@ void oe::start(){
 }
 void oe::destroy(){
     OE_API_Helpers::checkIfInit();
+    
+    if (!oe::is_done()){
+        oe::finish();
+        oe::step();
+    }
+    
     OE_Main->Destroy();
     delete OE_Main;
     OE_Main = nullptr;

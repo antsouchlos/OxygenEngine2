@@ -29,8 +29,6 @@ int main() {
     
     cout << "[Performance] The whole thing:  " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
     
-    oe::finish();
-    oe::step();
     oe::destroy();
    
 
