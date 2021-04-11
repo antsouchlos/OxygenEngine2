@@ -20,7 +20,8 @@ public:
     NRE_GPU_API* api{nullptr};
     
     
-    std::size_t camera_id{0};
+    //std::size_t camera_id{0};
+    std::size_t loaded_viewport{0};
     std::map<std::size_t, NRE_CameraRenderData> cameras;
     std::map<std::size_t, NRE_MaterialRenderData> materials;
     std::map<std::size_t, NRE_VGroupRenderData> vgroups;
@@ -28,7 +29,7 @@ public:
     std::map<std::size_t, NRE_LightRenderData> lights;
     std::map<std::size_t, NRE_SceneRenderData> scenes;
     std::map<std::size_t, NRE_ViewportRenderData> viewports;
-    std::vector<NRE_RenderGroup> render_groups;
+    //std::vector<NRE_RenderGroup> render_groups;
     
     
     // bounding box data

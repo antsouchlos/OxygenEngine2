@@ -16,6 +16,7 @@ struct NRE_BaseObject{
 struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
     
+    std::size_t     scene_id{0};
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
@@ -85,7 +86,7 @@ struct NRE_LightRenderData : public NRE_BaseObject{
 
 struct NRE_RenderGroup;
 
-struct NRE_SceneRenderData : NRE_BaseObject{
+struct NRE_SceneRenderData : public NRE_BaseObject{
     
     std::set<std::size_t> cameras;
     std::set<std::size_t> meshes;
@@ -98,7 +99,7 @@ struct NRE_SceneRenderData : NRE_BaseObject{
     
 };
 
-struct NRE_ViewportRenderData : NRE_BaseObject{
+struct NRE_ViewportRenderData : public NRE_BaseObject{
     
     std::vector<std::size_t>    layers;
     std::vector<std::size_t>    cameras;
