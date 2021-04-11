@@ -28,6 +28,11 @@ public:
     std::map<std::size_t, NRE_SceneRenderData> scenes;
     std::map<std::size_t, NRE_ViewportRenderData> viewports;    
     
+    std::set<std::size_t> deleted_meshes;
+    std::set<std::size_t> deleted_materials;
+    std::set<std::size_t> deleted_cameras;
+    
+    
     // bounding box data
     std::size_t prog_bbox;
     bool setup_bbox_prog{false};
@@ -48,6 +53,10 @@ protected:
     void updateMeshGPUData();
     void updateMaterialGPUData();
     void updateCameraGPUData();
+    
+    void deleteCamera(std::size_t);
+    void deleteMaterial(std::size_t);
+    void deleteMesh(std::size_t);
     
     void generateDrawCalls();
     

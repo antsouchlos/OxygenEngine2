@@ -17,8 +17,7 @@ bool NRE_Renderer::init(){
     /*cout << "NRE Cameras: " << this->cameras.size() << endl;
     cout << "NRE Materials: " << this->materials.size() << endl;
     cout << "NRE Meshes: " << this->meshes.size() << endl;
-    cout << "NRE Vgroups: " << this->vgroups.size() << endl;
-    cout << "NRE Draw calls: " << this->render_groups.size() << endl;*/
+    cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
     
     
     this->cameras.clear();
@@ -54,11 +53,18 @@ bool NRE_Renderer::updateSingleThread(){
     this->generateDrawCalls();
     
     // upload all remaining data to the GPU 
+    // and clean up any unused data
     this->updateMeshGPUData();
     this->updateMaterialGPUData();
     this->updateCameraGPUData();
     
+    // render viewport
     this->api->use_wireframe = this->use_wireframe.load(std::memory_order_relaxed);
+    
+    /*cout << "NRE Cameras: " << this->cameras.size() << endl;
+    cout << "NRE Materials: " << this->materials.size() << endl;
+    cout << "NRE Meshes: " << this->meshes.size() << endl;
+    cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
     
     if (this->loaded_viewport != 0){
         
@@ -82,16 +88,22 @@ bool NRE_Renderer::updateSingleThread(){
         // draw everything required for the z prepass, which also populates the depth buffer
         this->api->setRenderMode(NRE_GPU_Z_PREPASS_BACKFACE);
         for (auto x: this->scenes[scene_id].render_groups){
-            if (x.camera == camera_id)
+            if (x.camera == camera_id){
                 this->drawRenderGroupZPrePass(&x);
+                this->scenes[scene_id].render_groups.replace(x);
+            }
         }
+        this->scenes[scene_id].render_groups.update();
     
         // draw everything normally
         this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
         for (auto x: this->scenes[scene_id].render_groups){
-            if (x.camera == camera_id)
+            if (x.camera == camera_id){
                 this->drawRenderGroup(&x);
+                this->scenes[scene_id].render_groups.replace(x);
+            }
         }
+        this->scenes[scene_id].render_groups.update();
     
         // optionally draw a bounding box for each object (in wireframe mode)
         bool temp = this->api->use_wireframe;
@@ -106,9 +118,12 @@ bool NRE_Renderer::updateSingleThread(){
                 this->setup_bbox_prog = true;
             }
             for (auto x: this->scenes[scene_id].render_groups){
-                if (x.camera == camera_id)
+                if (x.camera == camera_id){
                     this->drawRenderGroupBoundingBox(&x);
+                    this->scenes[scene_id].render_groups.replace(x);
+                }
             }
+            this->scenes[scene_id].render_groups.update();
         }
         this->api->use_wireframe = temp;
     }

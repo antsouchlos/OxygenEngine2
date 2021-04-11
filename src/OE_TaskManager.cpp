@@ -60,6 +60,16 @@ void OE_ThreadStruct::updateTaskList(){
         if (this->task_names.count(x.name) == 1){
             cout << "OE: Task Manager WARNING: Already existing task: " << x.name << endl;
             OE_WriteToLog("OE: Task Manager WARNING: Already existing task: " + x.name);
+            
+            // reset previous task
+            for (size_t i=0; i<this->tasks.size(); i++){
+                if (this->tasks[i].name == x.name){
+                    this->tasks[i] = x;
+                    this->functions[x.name] = this->pending_functions[x.name];
+                    break;
+                }
+            }
+            
             continue;
         }
         this->tasks.push_back(x);

@@ -121,41 +121,63 @@ bool NRE_Renderer::updateData(){
         }
     }
     
-    for (auto sce : OE_World::scenesList){
+    for (auto sce : OE_World::scenesList.changed()){
         this->handleSceneData(sce.id_, sce.p_);
     }
     
-    for (auto vpc : OE_World::viewportsList){
+    for (auto vpc : OE_World::viewportsList.changed()){
         this->handleViewportData(vpc.id_, vpc.p_);
         this->loaded_viewport = OE_Main->world->loaded_viewport;
     }
     
+    // handle deleted elements (should look if the element exists first)
+    
+    // PRELIMINARY/INCOMPLETE
+    // TODO: Add proper OpenGL deletions
+    for (auto mat : OE_World::materialsList.deleted()){
+        if (this->materials.count(mat.id_) == 1){
+            this->scenes[this->materials[mat.id_].scene_id].render_groups.removeMaterial(mat.id_);
+            this->deleted_materials.insert(mat.id_);
+        }
+    }
         
+    for (auto obj : OE_World::objectsList.deleted()){
+        
+        if (this->meshes.count(obj.id_) == 1){
+                
+            this->scenes[this->meshes[obj.id_].scene_id].render_groups.removeMesh(obj.id_);
+            this->deleted_meshes.insert(obj.id_);
+        }
+        
+        if (this->lights.count(obj.id_) == 1){
+            this->lights.erase(obj.id_);
+        }
+
+        if (this->cameras.count(obj.id_) == 1){
+            this->scenes[this->cameras[obj.id_].scene_id].render_groups.removeCamera(obj.id_);
+            this->deleted_cameras.insert(obj.id_);
+        }
+    }
+
+    
+    for (auto sce : OE_World::scenesList.deleted()){
+        if (this->scenes.count(sce.id_) == 1){
+            this->scenes.erase(sce.id_);
+        }
+    }
+    
+    for (auto vpc : OE_World::viewportsList.deleted()){
+        if (this->viewports.count(vpc.id_) == 1){
+            this->viewports.erase(vpc.id_);
+            if (this->loaded_viewport == vpc.id_){
+                this->loaded_viewport = 0;
+            }
+        }
+    }
+    
+    
+    
     //OE_Main->unlockMutex();
-    /*
-    
-    // remove any obsolete draw commands
-    std::set<std::size_t, std::greater<std::size_t>> to_be_removed;
-    for (size_t i=0; i<this->render_groups.size(); i++){
-        if (!temp_materials.existsID(this->render_groups[i].material)){
-            to_be_removed.insert(i);
-        }
-        if (!temp_objects.existsID(this->render_groups[i].camera)){
-            to_be_removed.insert(i);
-        }
-        if (!temp_objects.existsID(this->render_groups[i].mesh)){
-            to_be_removed.insert(i);
-        }
-    }
-    for (auto x: to_be_removed){
-        this->render_groups.erase(render_groups.begin() + x);
-    }
-    //TODO: remove any obsolete objects themselves
-    //for (auto x : std::exchange(temp_objects.deleted, {})){
-    //    
-    //}    
-    
-    //*/
     return true;
 }
 
@@ -321,6 +343,16 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
             this->cameras[cam].scene_id = id;
             this->cameras[cam].changed = true;
         }
+        // store the scene each mesh is in
+        for (auto mat : this->scenes[id].materials){
+            this->materials[mat].scene_id = id;
+            this->materials[mat].changed = true;
+        }
+        // store the scene each material is in
+        for (auto mesh : this->scenes[id].meshes){
+            this->meshes[mesh].scene_id = id;
+            this->meshes[mesh].changed = true;
+        }
         
         this->scenes[id].materials = scene->materials;
         this->scenes[id].changed = true;
@@ -456,6 +488,11 @@ void NRE_Renderer::updateMeshGPUData(){
             this->meshes[mesh.first].changed = false;
         }
     }
+    
+    for (auto cam: this->deleted_meshes){
+        this->deleteMesh(cam);
+    }
+    this->deleted_meshes.clear();    
 }
 
 void NRE_Renderer::updateMaterialGPUData(){
@@ -471,6 +508,11 @@ void NRE_Renderer::updateMaterialGPUData(){
             this->materials[mat.first].changed = false;
         }
     }
+    
+    for (auto cam: this->deleted_materials){
+        this->deleteMaterial(cam);
+    }
+    this->deleted_materials.clear();
 }
 
 void NRE_Renderer::updateCameraGPUData(){
@@ -486,5 +528,61 @@ void NRE_Renderer::updateCameraGPUData(){
             this->cameras[cam.first].changed = false;
         }
     }
+    
+    for (auto cam: this->deleted_cameras){
+        this->deleteCamera(cam);
+    }
+    this->deleted_cameras.clear();
 }
+
+void NRE_Renderer::deleteCamera(std::size_t id){
+    
+    if (this->cameras[id].ubo != 0){
+        this->api->deleteUniformBuffer(this->cameras[id].ubo);
+    }
+    
+    this->cameras.erase(id);
+}
+
+void NRE_Renderer::deleteMaterial(std::size_t id){
+    
+    if (this->materials[id].ubo != 0){
+        this->api->deleteUniformBuffer(this->materials[id].ubo);
+    }
+    
+    this->materials.erase(id);
+}
+
+void NRE_Renderer::deleteMesh(std::size_t id){
+    
+    // delete all buffers
+    if (this->meshes[id].vbo !=0){
+        this->api->deleteVertexBuffer(this->meshes[id].vbo);
+    }
+    if (this->meshes[id].vao !=0){
+        this->api->deleteVertexLayout(this->meshes[id].vao);
+    }
+    if (this->meshes[id].ubo !=0){
+        this->api->deleteUniformBuffer(this->meshes[id].ubo);
+    }
+    if (this->meshes[id].vbo_bbox !=0){
+        this->api->deleteVertexBuffer(this->meshes[id].vbo_bbox);
+    }
+    if (this->meshes[id].vao_bbox !=0){
+        this->api->deleteVertexLayout(this->meshes[id].vao_bbox);
+    }
+    
+    // delete buffers of vertex groups
+    for (auto vgroup : this->meshes[id].vgroups){
+        if (this->vgroups[vgroup].ibo != 0){
+            this->api->deleteIndexBuffer(this->vgroups[vgroup].ibo);
+        }
+        this->vgroups.erase(vgroup);
+    }    
+    this->meshes.erase(id);
+}
+
+
+
+
 
