@@ -83,6 +83,34 @@ struct NRE_LightRenderData : public NRE_BaseObject{
     unsigned int    size{0};
 };
 
+struct NRE_RenderGroup;
+
+struct NRE_SceneRenderData : NRE_BaseObject{
+    
+    std::set<std::size_t> cameras;
+    std::set<std::size_t> meshes;
+    std::set<std::size_t> lights;
+    std::set<std::size_t> materials;
+    
+    std::vector<NRE_RenderGroup> render_groups;
+    
+    bool existsRenderGroup(NRE_RenderGroup);
+    
+};
+
+struct NRE_ViewportRenderData : NRE_BaseObject{
+    
+    std::vector<std::size_t>    layers;
+    std::vector<std::size_t>    cameras;
+    
+    std::vector<int>            camera_modes; 
+    
+    std::vector<int>            layer_combine_modes;
+        // two floats for each layer, but only useful when there is a split screen in eye coordinates
+    std::vector<float>          split_screen_positions;
+    
+};
+
 struct NRE_RenderGroup{
     
     // data for the z prepass

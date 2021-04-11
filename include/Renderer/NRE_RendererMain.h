@@ -26,6 +26,8 @@ public:
     std::map<std::size_t, NRE_VGroupRenderData> vgroups;
     std::map<std::size_t, NRE_MeshRenderData> meshes;
     std::map<std::size_t, NRE_LightRenderData> lights;
+    std::map<std::size_t, NRE_SceneRenderData> scenes;
+    std::map<std::size_t, NRE_ViewportRenderData> viewports;
     std::vector<NRE_RenderGroup> render_groups;
     
     
@@ -42,6 +44,9 @@ protected:
     void handleLightData(std::size_t, std::shared_ptr<OE_Light>);
     void handleVGroupData(std::size_t, std::size_t, std::shared_ptr<OE_Mesh32>);
     
+    void handleSceneData(std::size_t, std::shared_ptr<OE_Scene>);
+    void handleViewportData(std::size_t,std::shared_ptr<OE_ViewportConfig>);
+    
     
     void updateMeshGPUData();
     void updateMaterialGPUData();
@@ -51,6 +56,7 @@ protected:
     
     void drawRenderGroup(NRE_RenderGroup*);
     void drawRenderGroupZPrePass(NRE_RenderGroup*);
+    void drawRenderGroupBoundingBox(NRE_RenderGroup*);
     
     bool existsRenderGroup(NRE_RenderGroup);
     
