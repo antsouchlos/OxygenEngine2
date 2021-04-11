@@ -29,3 +29,4 @@ massif.out*
 .vim_session
 new_shared_index_map/*
 some_car.csl
+vgcore*
