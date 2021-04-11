@@ -1,17 +1,14 @@
 #include <Renderer/NRE_RenderData.h>
 
-NRE_DrawCallContainer::NRE_DrawCallContainer(){
-    
-    auto comp_lambda = [] (const NRE_RenderGroup& r1, const NRE_RenderGroup& r2) -> bool { return r1 < r2; };
-    
-    this->data_ = std::set<NRE_RenderGroup, std::function<bool(const NRE_RenderGroup&, const NRE_RenderGroup&)>>(comp_lambda);
+NRE_DrawCallContainer::NRE_DrawCallContainer(){    
+    this->data_ = std::set<NRE_RenderGroup>();
 }
 
 NRE_DrawCallContainer::~NRE_DrawCallContainer(){
     
 }
 
-NRE_DrawCallContainer::Iterator::Iterator(set_iter_t beginning): iter(beginning){}
+NRE_DrawCallContainer::Iterator::Iterator(NRE_DrawCallContainer &db, set_iter_t beginning): iter(beginning), db_(db) {}
         
 NRE_DrawCallContainer::Iterator& NRE_DrawCallContainer::Iterator::operator++(){ 
     iter++; return *this; 
@@ -31,11 +28,11 @@ bool operator!= (const NRE_DrawCallContainer::Iterator& a, const NRE_DrawCallCon
 };
 
 NRE_DrawCallContainer::Iterator NRE_DrawCallContainer::begin(){
-    return Iterator(this->data_.begin());
+    return Iterator(*this, this->data_.begin());
 }
     
 NRE_DrawCallContainer::Iterator NRE_DrawCallContainer::end(){
-    return Iterator(this->data_.end());
+    return Iterator(*this, this->data_.end());
 }
 
 bool NRE_DrawCallContainer::contains(const NRE_RenderGroup& ren_group){
@@ -44,4 +41,77 @@ bool NRE_DrawCallContainer::contains(const NRE_RenderGroup& ren_group){
 
 void NRE_DrawCallContainer::insert(NRE_RenderGroup ren_group){
     this->data_.insert(ren_group);
+}
+
+void NRE_DrawCallContainer::replace(NRE_RenderGroup ren_group){
+    this->pending_rengroups_.insert(ren_group);
+}
+
+void NRE_DrawCallContainer::update(){
+    
+    for (auto ren_group : this->pending_rengroups_){
+        if (this->contains(ren_group)){
+    
+            this->data_.erase(ren_group);
+            this->data_.insert(ren_group);
+        }
+    }
+    this->pending_rengroups_.clear();
+}
+
+void NRE_DrawCallContainer::removeCamera(std::size_t cam){
+    
+    std::set<NRE_RenderGroup> to_be_deleted;
+    for (auto ren_group : this->data_){
+        if (ren_group.camera == cam){
+            to_be_deleted.insert(ren_group);
+        }
+    }
+    
+    for (auto ren_group : to_be_deleted){
+        this->data_.erase(ren_group);
+    }
+    
+}
+void NRE_DrawCallContainer::removeMaterial(std::size_t mat){
+    
+    std::set<NRE_RenderGroup> to_be_deleted;
+    for (auto ren_group : this->data_){
+        if (ren_group.material == mat){
+            to_be_deleted.insert(ren_group);
+        }
+    }
+    
+    for (auto ren_group : to_be_deleted){
+        this->data_.erase(ren_group);
+    }
+    
+}
+void NRE_DrawCallContainer::removeMesh(std::size_t mesh){
+    
+    std::set<NRE_RenderGroup> to_be_deleted;
+    for (auto ren_group : this->data_){
+        if (ren_group.mesh == mesh){
+            to_be_deleted.insert(ren_group);
+        }
+    }
+    
+    for (auto ren_group : to_be_deleted){
+        this->data_.erase(ren_group);
+    }
+    
+}
+void NRE_DrawCallContainer::removeVertexGroup(std::size_t mesh, std::size_t vgroup){
+    
+    std::set<NRE_RenderGroup> to_be_deleted;
+    for (auto ren_group : this->data_){
+        if (ren_group.vgroup == vgroup){
+            to_be_deleted.insert(ren_group);
+        }
+    }
+    
+    for (auto ren_group : to_be_deleted){
+        this->data_.erase(ren_group);
+    }
+    
 }

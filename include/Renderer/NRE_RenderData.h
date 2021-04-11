@@ -24,7 +24,9 @@ struct NRE_CameraRenderData : public NRE_BaseObject{
 };
 
 struct NRE_MaterialRenderData : public NRE_BaseObject{
-
+    
+    std::size_t     scene_id{0};
+    
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
@@ -44,6 +46,9 @@ struct NRE_VGroupRenderData{
 };
 
 struct NRE_MeshRenderData : public NRE_BaseObject{
+    
+    std::size_t     scene_id{0};
+    
     OE_Mat4x4       model_mat;
     
     unsigned int    uvmaps{0};

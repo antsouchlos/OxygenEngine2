@@ -254,10 +254,10 @@ public:
             // That means that the old element should be deleted.
             // There can never be two elements with the same name
             if (names_.count(pending_id2name_[x.first]) == 1){
+                changed_.remove(this->name2id[pending_id2name_[x.first]]);
+                deleted_.add(this->name2id[pending_id2name_[x.first]]);
                 this->elements_.erase(this->name2id[pending_id2name_[x.first]]);
                 this->id2name_.erase(this->name2id[pending_id2name_[x.first]]);
-                changed_.remove(x.first);
-                deleted_.add(x.first);
             }
             
             elements_[x.first] = x.second;
@@ -449,8 +449,8 @@ public:
         Deleted(OE_SharedIndexMap<T>& inputa) : db_(inputa) {}
         
         void add(const std::size_t &index){
+            indices_.insert(index);
             if (db_.elements_.count(index) != 0){
-                indices_.insert(index);
                 db_.changed_.remove(index);
             }
         }

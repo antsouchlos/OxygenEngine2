@@ -64,6 +64,8 @@ int set_renderer_mode_regular( oe::task, string event_name){
     return 0;
 }
 
+int OnLoadObject(oe::task, string);
+
 int renderer_toggle_wireframe( oe::task, string event_name){
     
     oe::toggle_wireframe_rendering();
@@ -118,11 +120,15 @@ int test_task2(oe::task task){
 int test_task3(oe::task task){
     
     //cout << " task3";
-    if (oe::is_key_just_pressed("keyboard-va")){
-        //int a = empty_test_map.at(1);
-        cout << 2 << endl;
+    if (oe::is_key_just_pressed("keyboard-1")){
+        oe::load_world_func("challenge_car.csl", &OnLoadObject);
     }
-    
+    else if (oe::is_key_just_pressed("keyboard-2")){
+        oe::load_world_func("OE_Demo.csl", &OnLoadObject);
+    }
+    else {
+        
+    }
     
     return task.CONTINUE();
 }
@@ -167,12 +173,12 @@ int main(){
     //oe::pause(20);
 
 	//oe::load_world_func("OE_Mat_light_test.csl", &OnLoadObject);
-	//oe::load_world_func("challenge_car.csl", &OnLoadObject);
+	oe::load_world_func("challenge_car.csl", &OnLoadObject);
 	//oe::load_world_func("monkeys.csl", &OnLoadObject);
 	//oe::load_world_func("csl_very_large_object_test.csl", &OnLoadObject);
 	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
 	//oe::load_world_func("some_car.csl", &OnLoadObject);
-    oe::load_world_func("OE_Demo.csl", &OnLoadObject);
+    //oe::load_world_func("OE_Demo.csl", &OnLoadObject);
 	
 	//taskMgr.Start();
     oe::start();

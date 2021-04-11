@@ -248,6 +248,10 @@ This should get the project started again with the basics working, so as to be a
 Added scene and (basic, one fullscreen camera at any given time) viewport config handling to renderer.
 Now if a viewport is undefined, it will generate one automatically, named "default".
 
+2021/04/12 - philsegeler
+
+One can now swap worlds in the demo with keys 1 and 2. Swapping between 'challenge_car.csl' and 'OE_Demo.csl' leak-free and gracefully!
+
 ## TODO list for philsegeler - Renderer
 
 Finally the initial TODO list is ready and done! Now i can start working on the renderer properly!
