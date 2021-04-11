@@ -132,8 +132,6 @@ bool NRE_Renderer::updateData(){
     
     // handle deleted elements (should look if the element exists first)
     
-    // PRELIMINARY/INCOMPLETE
-    // TODO: Add proper OpenGL deletions
     for (auto mat : OE_World::materialsList.deleted()){
         if (this->materials.count(mat.id_) == 1){
             this->scenes[this->materials[mat.id_].scene_id].render_groups.removeMaterial(mat.id_);
