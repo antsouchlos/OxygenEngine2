@@ -59,59 +59,43 @@ void NRE_DrawCallContainer::update(){
     this->pending_rengroups_.clear();
 }
 
+void NRE_DrawCallContainer::cleanupPrograms(){
+    for (auto ren_group : to_be_deleted_){        
+        this->data_.erase(ren_group);
+    }
+    this->to_be_deleted_.clear();
+}
+
 void NRE_DrawCallContainer::removeCamera(std::size_t cam){
-    
-    std::set<NRE_RenderGroup> to_be_deleted;
+
     for (auto ren_group : this->data_){
         if (ren_group.camera == cam){
-            to_be_deleted.insert(ren_group);
+            to_be_deleted_.insert(ren_group);
         }
     }
-    
-    for (auto ren_group : to_be_deleted){
-        this->data_.erase(ren_group);
-    }
-    
 }
+
 void NRE_DrawCallContainer::removeMaterial(std::size_t mat){
-    
-    std::set<NRE_RenderGroup> to_be_deleted;
+
     for (auto ren_group : this->data_){
         if (ren_group.material == mat){
-            to_be_deleted.insert(ren_group);
+            to_be_deleted_.insert(ren_group);
         }
-    }
-    
-    for (auto ren_group : to_be_deleted){
-        this->data_.erase(ren_group);
-    }
-    
+    }    
 }
 void NRE_DrawCallContainer::removeMesh(std::size_t mesh){
     
-    std::set<NRE_RenderGroup> to_be_deleted;
     for (auto ren_group : this->data_){
         if (ren_group.mesh == mesh){
-            to_be_deleted.insert(ren_group);
+            to_be_deleted_.insert(ren_group);
         }
     }
-    
-    for (auto ren_group : to_be_deleted){
-        this->data_.erase(ren_group);
-    }
-    
 }
 void NRE_DrawCallContainer::removeVertexGroup(std::size_t mesh, std::size_t vgroup){
     
-    std::set<NRE_RenderGroup> to_be_deleted;
     for (auto ren_group : this->data_){
         if (ren_group.vgroup == vgroup){
-            to_be_deleted.insert(ren_group);
+            to_be_deleted_.insert(ren_group);
         }
     }
-    
-    for (auto ren_group : to_be_deleted){
-        this->data_.erase(ren_group);
-    }
-    
 }

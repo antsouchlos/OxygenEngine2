@@ -242,6 +242,15 @@ void NRE_Renderer::generateDrawCalls(){
     
     for (auto &scene: scenes){
         
+        for (auto ren_group : scene.second.render_groups.to_be_deleted_){
+        
+            if (ren_group.z_prepass_program != 0)
+                this->api->deleteProgram(ren_group.z_prepass_program);
+            if (ren_group.program != 0)
+                this->api->deleteProgram(ren_group.program);
+        }
+        scene.second.render_groups.cleanupPrograms();
+        
         for (auto cam : scene.second.cameras){
             for (auto mesh : scene.second.meshes){
                 for (auto vgroup : this->meshes[mesh].vgroups){
