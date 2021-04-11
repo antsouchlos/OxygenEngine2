@@ -26,7 +26,9 @@ bool NRE_Renderer::init(){
     this->vgroups.clear();
     this->meshes.clear();
     this->lights.clear();
-    this->render_groups.clear();
+    this->scenes.clear();
+    this->viewports.clear();
+    //this->render_groups.clear();
     
     // reset all GPU data
     if (api != nullptr){
@@ -56,42 +58,65 @@ bool NRE_Renderer::updateSingleThread(){
     this->updateMaterialGPUData();
     this->updateCameraGPUData();
     
-    // sort draw calls
-    auto comp_lambda = [] (const NRE_RenderGroup& r1, const NRE_RenderGroup& r2) -> bool { return r1 < r2; };
-    std::sort(this->render_groups.begin(), this->render_groups.end(), comp_lambda);
-    
+    for (auto &scene : this->scenes){
+        // sort draw calls
+        auto comp_lambda = [] (const NRE_RenderGroup& r1, const NRE_RenderGroup& r2) -> bool { return r1 < r2; };
+        std::sort(scene.second.render_groups.begin(), scene.second.render_groups.end(), comp_lambda);
+    }
     this->api->use_wireframe = this->use_wireframe.load(std::memory_order_relaxed);
     
-    // draw everything required for the z prepass, which also populates the depth buffer
-    this->api->setRenderMode(NRE_GPU_Z_PREPASS_BACKFACE);
-    for (auto &x: this->render_groups){
-        this->drawRenderGroupZPrePass(&x);
-    }
-    
-    // draw everything normally
-    this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
-    for (auto &x: this->render_groups){
-        this->drawRenderGroup(&x);
-    }
-    
-    // optionally draw a bounding box for each object (in wireframe mode)
-    bool temp = this->api->use_wireframe;
-    bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
-    this->api->use_wireframe = true;
-    
-    if (render_bboxes){
-        this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
-        if (!this->setup_bbox_prog){
+    if (this->loaded_viewport != 0){
         
-            this->setupBoundingBoxProgram();
-            this->setup_bbox_prog = true;
+        auto lv = this->loaded_viewport;
+        
+        if (this->viewports[lv].cameras.size() == 0){
+            throw nre::incomplete_viewport(lv);
         }
-        for (auto &x: this->render_groups){
-            this->drawRenderGroupBoundingBox(&x);
+        // TEMPORARY until multiple layers and cameras support is implemented
+        else if (this->viewports[lv].cameras.size() > 1){
+            throw nre::unsupported_viewport(lv, "Too many (" + to_string(this->viewports[lv].cameras.size()) + ") cameras");
         }
-    }
-    this->api->use_wireframe = temp;
+        else{
+            
+        }
+        
+        // only one fullscreen camera is supported for now
+        auto camera_id = this->viewports[lv].cameras[0];
+        auto scene_id = this->cameras[camera_id].scene_id;
+        
+        // draw everything required for the z prepass, which also populates the depth buffer
+        this->api->setRenderMode(NRE_GPU_Z_PREPASS_BACKFACE);
+        for (auto &x: this->scenes[scene_id].render_groups){
+            if (x.camera == camera_id)
+                this->drawRenderGroupZPrePass(&x);
+        }
     
+        // draw everything normally
+        this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
+        for (auto &x: this->scenes[scene_id].render_groups){
+            if (x.camera == camera_id)
+                this->drawRenderGroup(&x);
+        }
+    
+        // optionally draw a bounding box for each object (in wireframe mode)
+        bool temp = this->api->use_wireframe;
+        bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
+        this->api->use_wireframe = true;
+    
+        if (render_bboxes){
+            this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
+            if (!this->setup_bbox_prog){
+        
+                this->setupBoundingBoxProgram();
+                this->setup_bbox_prog = true;
+            }
+            for (auto &x: this->scenes[scene_id].render_groups){
+                if (x.camera == camera_id)
+                    this->drawRenderGroupBoundingBox(&x);
+            }
+        }
+        this->api->use_wireframe = temp;
+    }
     return true;
 }
 
@@ -205,7 +230,7 @@ void NRE_Renderer::setupBoundingBoxProgram(){
 
 void NRE_Renderer::generateDrawCalls(){
     
-    for (auto mesh : this->meshes){
+    /*for (auto mesh : this->meshes){
         for (auto vgroup : mesh.second.vgroups){
             auto render_data = NRE_RenderGroup();
             render_data.camera = this->camera_id;
@@ -214,6 +239,23 @@ void NRE_Renderer::generateDrawCalls(){
             render_data.material = this->vgroups[vgroup].material_id;
             if (!this->existsRenderGroup(render_data)){
                 this->render_groups.push_back(render_data);
+            }
+        }
+    }*/
+    for (auto &scene: scenes){
+        
+        for (auto cam : scene.second.cameras){
+            for (auto mesh : scene.second.meshes){
+                for (auto vgroup : this->meshes[mesh].vgroups){
+                    auto render_data = NRE_RenderGroup();
+                    render_data.camera = cam;
+                    render_data.vgroup = vgroup;
+                    render_data.mesh = mesh;
+                    render_data.material = this->vgroups[vgroup].material_id;
+                    if (!scene.second.existsRenderGroup(render_data)){
+                        scene.second.render_groups.push_back(render_data);
+                    }
+                }
             }
         }
     }

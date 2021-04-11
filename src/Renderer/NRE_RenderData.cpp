@@ -59,14 +59,14 @@ bool NRE_SceneRenderData::existsRenderGroup(NRE_RenderGroup ren_group){
     return false;
 }
 
-bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
+/*bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
     for (auto x: this->render_groups){
         if ((x.camera == ren_group.camera) && (x.material == ren_group.material) && (x.vgroup == ren_group.vgroup) && (x.mesh == ren_group.mesh)){
             return true;
         }
     }
     return false;
-}
+}*/
 
 
 bool NRE_Renderer::updateData(){
@@ -140,11 +140,11 @@ bool NRE_Renderer::updateData(){
     for (auto vpc : OE_World::viewportsList){
         this->handleViewportData(vpc.id_, vpc.p_);
     }
+    this->loaded_viewport = OE_Main->world->loaded_viewport;
     
-    
-    if(camera_ids.size() >= 1){
+    /*if(camera_ids.size() >= 1){
         this->camera_id = camera_ids[0];
-    }
+    }*/
         
     //OE_Main->unlockMutex();
     /*
@@ -318,6 +318,7 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
     if (this->scenes.count(id) == 0){
         this->scenes[id] = NRE_SceneRenderData(); this->scenes[id].id = id;
         
+        // group objects
         for (auto x: scene->objects){
             if (this->cameras.count(x) != 0){
                 this->scenes[id].cameras.insert(x);
@@ -329,6 +330,13 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
                 this->scenes[id].lights.insert(x);
             }
         }
+        
+        // store the scene each camera is in
+        for (auto cam : this->scenes[id].cameras){
+            this->cameras[cam].scene_id = id;
+            this->cameras[cam].changed = true;
+        }
+        
         this->scenes[id].materials = scene->materials;
         this->scenes[id].changed = true;
     } 
@@ -338,6 +346,7 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
         this->scenes[id].lights.clear();
         this->scenes[id].meshes.clear();
         
+        // group objects
         for (auto x: scene->objects){
             if (this->cameras.count(x) != 0){
                 this->scenes[id].cameras.insert(x);
@@ -348,6 +357,12 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
             else if (this->lights.count(x) != 0){
                 this->scenes[id].lights.insert(x);
             }
+        }
+        
+        // store the scene each camera is in
+        for (auto cam : this->scenes[id].cameras){
+            this->cameras[cam].scene_id = id;
+            this->cameras[cam].changed = true;
         }
         
         this->scenes[id].materials = scene->materials;

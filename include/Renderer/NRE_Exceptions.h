@@ -152,6 +152,38 @@ namespace nre {
             std::string buf_type_;
     };
     
+    class incomplete_viewport: public oe::renderer_error {
+        public:
+            
+            incomplete_viewport(std::size_t id){
+                name_ = "nre::incomplete_viewport";
+                id_ = std::to_string(id);
+            }
+            std::string what() const throw() {
+                return "loaded_viewport with ID: '" + id_ + "' is incomplete. No cameras are defined.";
+            };
+            
+            std::string id_;
+            std::string func_;
+    };
+    
+    class unsupported_viewport: public oe::renderer_error {
+        public:
+            
+            unsupported_viewport(std::size_t id, std::string msg){
+                name_ = "nre::unsupported_viewport";
+                id_ = std::to_string(id);
+                msg_ = msg;
+            }
+            std::string what() const throw() {
+                return "loaded_viewport with ID: '" + id_ + "' is not possible to display. " + msg_ + ".";
+            };
+            
+            std::string id_;
+            std::string func_;
+            std::string msg_;
+    };
+    
 };
 
 #endif
