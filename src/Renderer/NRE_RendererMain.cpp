@@ -86,11 +86,8 @@ bool NRE_Renderer::updateSingleThread(){
             this->setupBoundingBoxProgram();
             this->setup_bbox_prog = true;
         }
-        for (auto &x: this->meshes){
-        
-            this->api->setUniformState(x.second.ubo, this->prog_bbox, 1, 0, 0);
-            this->api->setUniformState(this->cameras[this->render_groups[0].camera].ubo, this->prog_bbox, 0, 0, 0);        
-            this->api->draw(this->prog_bbox, x.second.vao_bbox);
+        for (auto &x: this->render_groups){
+            this->drawRenderGroupBoundingBox(&x);
         }
     }
     this->api->use_wireframe = temp;
@@ -174,6 +171,13 @@ void NRE_Renderer::drawRenderGroupZPrePass(NRE_RenderGroup* ren_group){
     this->api->setUniformState(this->cameras[ren_group->camera].ubo, ren_group->z_prepass_program, 0, 0, 0);
     this->api->draw(ren_group->z_prepass_program, this->meshes[ren_group->mesh].vao, this->vgroups[ren_group->vgroup].ibo);
     
+}
+
+void NRE_Renderer::drawRenderGroupBoundingBox(NRE_RenderGroup* ren_group){
+     
+    this->api->setUniformState(this->meshes[ren_group->mesh].ubo, this->prog_bbox, 1, 0, 0);
+    this->api->setUniformState(this->cameras[ren_group->camera].ubo, this->prog_bbox, 0, 0, 0);        
+    this->api->draw(this->prog_bbox, this->meshes[ren_group->mesh].vao_bbox);
 }
 
 void NRE_Renderer::setupBoundingBoxProgram(){

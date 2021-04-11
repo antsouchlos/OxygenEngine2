@@ -226,10 +226,7 @@ void OE_TaskManager::Step(){
         condWait(2);
     }
     unlockMutex();
-    
-    //this->updateWorld();
-    //this->events_task.update();
-    //this->window->event_handler.handleAllEvents(&events_task);
+
     
     if (this->world != nullptr){
         
@@ -417,6 +414,7 @@ void OE_TaskManager::updateWorld(){
         if (this->world != nullptr)
             this->world = nullptr;
         this->world = this->pending_world;
+        this->world->setup();
     }
     this->pending_world = nullptr;
     unlockMutex();

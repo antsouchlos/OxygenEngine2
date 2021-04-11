@@ -50,6 +50,15 @@ bool NRE_RenderGroup::operator < (const NRE_RenderGroup& other) const{
     return false;
 }
 
+bool NRE_SceneRenderData::existsRenderGroup(NRE_RenderGroup ren_group){
+    for (auto x: this->render_groups){
+        if ((x.camera == ren_group.camera) && (x.material == ren_group.material) && (x.vgroup == ren_group.vgroup) && (x.mesh == ren_group.mesh)){
+            return true;
+        }
+    }
+    return false;
+}
+
 bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
     for (auto x: this->render_groups){
         if ((x.camera == ren_group.camera) && (x.material == ren_group.material) && (x.vgroup == ren_group.vgroup) && (x.mesh == ren_group.mesh)){
@@ -72,6 +81,8 @@ bool NRE_Renderer::updateData(){
     
     if (this->screen->restart_renderer){
         
+        //cout << OE_Main->world->to_str() << endl;
+        
         // this also resets the GPU API resources
         this->init();
         
@@ -90,6 +101,10 @@ bool NRE_Renderer::updateData(){
         
         for (auto sce : OE_World::scenesList){
             sce.flag_as_changed();
+        }
+        
+        for (auto vpc : OE_World::viewportsList){
+            vpc.flag_as_changed();
         }
         
         this->screen->restart_renderer = false;
@@ -119,8 +134,13 @@ bool NRE_Renderer::updateData(){
     }
     
     for (auto sce : OE_World::scenesList){
-        sce.flag_as_changed();
+        this->handleSceneData(sce.id_, sce.p_);
     }
+    
+    for (auto vpc : OE_World::viewportsList){
+        this->handleViewportData(vpc.id_, vpc.p_);
+    }
+    
     
     if(camera_ids.size() >= 1){
         this->camera_id = camera_ids[0];
@@ -261,6 +281,7 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
         //setup the Uniform buffer holding the perspective/view matrix
         // but offload the actual OpenGL commands for later, since this runs in a performance
         // critical section
+        this->cameras[id] = NRE_CameraRenderData(); this->cameras[id].id = id;
         this->cameras[id].ubo = this->api->newUniformBuffer();
 
         auto view_mat = camera->GetViewMatrix();
@@ -291,6 +312,68 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
 
 void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> light){
     
+}
+
+void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> scene){
+    if (this->scenes.count(id) == 0){
+        this->scenes[id] = NRE_SceneRenderData(); this->scenes[id].id = id;
+        
+        for (auto x: scene->objects){
+            if (this->cameras.count(x) != 0){
+                this->scenes[id].cameras.insert(x);
+            }
+            else if (this->meshes.count(x) != 0){
+                this->scenes[id].meshes.insert(x);
+            }
+            else if (this->lights.count(x) != 0){
+                this->scenes[id].lights.insert(x);
+            }
+        }
+        this->scenes[id].materials = scene->materials;
+        this->scenes[id].changed = true;
+    } 
+    else {
+        
+        this->scenes[id].cameras.clear();
+        this->scenes[id].lights.clear();
+        this->scenes[id].meshes.clear();
+        
+        for (auto x: scene->objects){
+            if (this->cameras.count(x) != 0){
+                this->scenes[id].cameras.insert(x);
+            }
+            else if (this->meshes.count(x) != 0){
+                this->scenes[id].meshes.insert(x);
+            }
+            else if (this->lights.count(x) != 0){
+                this->scenes[id].lights.insert(x);
+            }
+        }
+        
+        this->scenes[id].materials = scene->materials;
+        this->scenes[id].changed = true;
+    }
+}
+
+void NRE_Renderer::handleViewportData(std::size_t id, std::shared_ptr<OE_ViewportConfig> vp_config){
+    if (this->viewports.count(id) == 0){
+        this->viewports[id] = NRE_ViewportRenderData(); this->viewports[id].id = id;
+        
+        this->viewports[id].layers = vp_config->layers;
+        this->viewports[id].cameras = vp_config->cameras;
+        this->viewports[id].camera_modes = vp_config->camera_modes;
+        this->viewports[id].layer_combine_modes = vp_config->layer_combine_modes;
+        this->viewports[id].split_screen_positions = vp_config->split_screen_positions;
+        this->viewports[id].changed = true;
+    }
+    else {
+        this->viewports[id].layers = vp_config->layers;
+        this->viewports[id].cameras = vp_config->cameras;
+        this->viewports[id].camera_modes = vp_config->camera_modes;
+        this->viewports[id].layer_combine_modes = vp_config->layer_combine_modes;
+        this->viewports[id].split_screen_positions = vp_config->split_screen_positions;
+        this->viewports[id].changed = true;
+    }
 }
 
 //---------------------------------Update actual GPU data------------------------------//

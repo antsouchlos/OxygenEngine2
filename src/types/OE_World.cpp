@@ -1,4 +1,5 @@
 #include <types/OE_World.h>
+#include <OE_API.h>
 
 using namespace std;
 
@@ -24,6 +25,42 @@ OE_World::~OE_World(){
         OE_World::viewportsList.remove(x);
     
 }
+
+void OE_World::setup(){
+    
+    lockMutex();
+    
+    
+    // if no viewport config is defined, then use the default viewport config,
+    // where the first scene and first camera are only defined
+    if (this->viewports.size() == 0){
+        
+        for (auto scene : OE_World::scenesList){
+            
+            for (auto obj : scene.p_->objects){
+                if (OE_World::objectsList[obj].p_->getType() == "CAMERA"){
+                    
+                    // create and store default viewport config
+                    std::shared_ptr<OE_ViewportConfig> vp_config = std::make_shared<OE_ViewportConfig>();
+                    OE_World::viewportsList.force_append_now("default", vp_config);
+                    this->viewports.insert(vp_config->id);
+                    this->loaded_viewport = vp_config->id;
+                    
+                    
+                    // add first found camera to default (0) layer
+                    auto cam = OE_World::objectsList[obj];
+                    vp_config->lockMutex();
+                    vp_config->addCamera(cam.id_, 0); 
+                    vp_config->unlockMutex();
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    unlockMutex();
+}
+
 
 string OE_World::to_str() const{
     
