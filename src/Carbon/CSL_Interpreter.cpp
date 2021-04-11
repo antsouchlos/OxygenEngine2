@@ -76,12 +76,12 @@ namespace csl {
 			scene_ptr scene = process_scene(scene_e);
 			result->scenes.insert(scene->id);
 		}
-
-//		for (const auto& vpconfig_e : world_e.elements.at("ViewportConfig")) {
-//			vpconfig_ptr vpconfig = process_vpconfig(vpconfig_e);
-//			result->viewports.insert(vpconfig->id);
-//		}
-		
+        if (world_e.elements.contains("ViewportConfig")){
+            for (const auto& vpconfig_e : world_e.elements.at("ViewportConfig")) {
+                vpconfig_ptr vpconfig = process_vpconfig(vpconfig_e);
+                result->viewports.insert(vpconfig->id);
+            }
+        }
 		
 		// Single Assignments
 

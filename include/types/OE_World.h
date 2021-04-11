@@ -24,6 +24,8 @@ class OE_World : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         OE_World();
         ~OE_World();
         
+        void setup();
+        
         std::string to_str() const;
         
     //protected:

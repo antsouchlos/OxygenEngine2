@@ -46,6 +46,13 @@ public:
     
     ~OE_SharedIndexMap(){}
     
+    std::size_t size(){
+        lockMutex();
+        std::size_t output = this->elements_.size();
+        unlockMutex();
+        return output;
+    }
+    
     //*******************************************/
     // interfacing class
     
