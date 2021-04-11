@@ -13,6 +13,7 @@ public:
     
     std::set<NRE_RenderGroup> data_;
     std::set<NRE_RenderGroup> pending_rengroups_;
+    std::set<NRE_RenderGroup> to_be_deleted_;
     
     class Iterator{
     public:
@@ -43,6 +44,7 @@ public:
     void insert(NRE_RenderGroup);
     void replace(NRE_RenderGroup);
     void update();
+    void cleanupPrograms();
     
     void removeCamera(std::size_t);
     void removeMaterial(std::size_t);

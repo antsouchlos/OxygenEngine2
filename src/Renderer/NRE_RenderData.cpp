@@ -175,8 +175,6 @@ bool NRE_Renderer::updateData(){
         }
     }
     
-    
-    
     //OE_Main->unlockMutex();
     return true;
 }
