@@ -58,11 +58,6 @@ bool NRE_Renderer::updateSingleThread(){
     this->updateMaterialGPUData();
     this->updateCameraGPUData();
     
-    for (auto &scene : this->scenes){
-        // sort draw calls
-        auto comp_lambda = [] (const NRE_RenderGroup& r1, const NRE_RenderGroup& r2) -> bool { return r1 < r2; };
-        std::sort(scene.second.render_groups.begin(), scene.second.render_groups.end(), comp_lambda);
-    }
     this->api->use_wireframe = this->use_wireframe.load(std::memory_order_relaxed);
     
     if (this->loaded_viewport != 0){
@@ -86,14 +81,14 @@ bool NRE_Renderer::updateSingleThread(){
         
         // draw everything required for the z prepass, which also populates the depth buffer
         this->api->setRenderMode(NRE_GPU_Z_PREPASS_BACKFACE);
-        for (auto &x: this->scenes[scene_id].render_groups){
+        for (auto x: this->scenes[scene_id].render_groups){
             if (x.camera == camera_id)
                 this->drawRenderGroupZPrePass(&x);
         }
     
         // draw everything normally
         this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
-        for (auto &x: this->scenes[scene_id].render_groups){
+        for (auto x: this->scenes[scene_id].render_groups){
             if (x.camera == camera_id)
                 this->drawRenderGroup(&x);
         }
@@ -110,7 +105,7 @@ bool NRE_Renderer::updateSingleThread(){
                 this->setupBoundingBoxProgram();
                 this->setup_bbox_prog = true;
             }
-            for (auto &x: this->scenes[scene_id].render_groups){
+            for (auto x: this->scenes[scene_id].render_groups){
                 if (x.camera == camera_id)
                     this->drawRenderGroupBoundingBox(&x);
             }
@@ -230,18 +225,6 @@ void NRE_Renderer::setupBoundingBoxProgram(){
 
 void NRE_Renderer::generateDrawCalls(){
     
-    /*for (auto mesh : this->meshes){
-        for (auto vgroup : mesh.second.vgroups){
-            auto render_data = NRE_RenderGroup();
-            render_data.camera = this->camera_id;
-            render_data.vgroup = vgroup;
-            render_data.mesh = mesh.first;
-            render_data.material = this->vgroups[vgroup].material_id;
-            if (!this->existsRenderGroup(render_data)){
-                this->render_groups.push_back(render_data);
-            }
-        }
-    }*/
     for (auto &scene: scenes){
         
         for (auto cam : scene.second.cameras){
@@ -253,7 +236,7 @@ void NRE_Renderer::generateDrawCalls(){
                     render_data.mesh = mesh;
                     render_data.material = this->vgroups[vgroup].material_id;
                     if (!scene.second.existsRenderGroup(render_data)){
-                        scene.second.render_groups.push_back(render_data);
+                        scene.second.render_groups.insert(render_data);
                     }
                 }
             }

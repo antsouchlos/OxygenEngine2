@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int template_event_func(OE_Task task, string event_name){ cout << event_name << endl; return 0;}
+int template_event_func(OE_Task task, string event_name){ /*cout << event_name << endl;*/ return 0;}
 
 OE_EventHandler::OE_EventHandler(){
 	done = false;

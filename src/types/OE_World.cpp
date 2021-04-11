@@ -42,16 +42,16 @@ void OE_World::setup(){
                     
                     // create and store default viewport config
                     std::shared_ptr<OE_ViewportConfig> vp_config = std::make_shared<OE_ViewportConfig>();
-                    OE_World::viewportsList.force_append_now("default", vp_config);
-                    this->viewports.insert(vp_config->id);
-                    this->loaded_viewport = vp_config->id;
-                    
                     
                     // add first found camera to default (0) layer
                     auto cam = OE_World::objectsList[obj];
                     vp_config->lockMutex();
                     vp_config->addCamera(cam.id_, 0); 
                     vp_config->unlockMutex();
+                    
+                    OE_World::viewportsList.force_append_now("default", vp_config);
+                    this->viewports.insert(vp_config->id);
+                    this->loaded_viewport = vp_config->id;
                     break;
                 }
             }
