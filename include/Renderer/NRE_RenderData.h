@@ -3,6 +3,7 @@
 
 #include <types/OE_World.h>
 #include <Renderer/NRE_GPU_API.h>
+#include <Renderer/NRE_DrawCallContainer.h>
 #include <OE_Math.h>
 
 struct NRE_BaseObject{
@@ -93,9 +94,9 @@ struct NRE_SceneRenderData : public NRE_BaseObject{
     std::set<std::size_t> lights;
     std::set<std::size_t> materials;
     
-    std::vector<NRE_RenderGroup> render_groups;
+    NRE_DrawCallContainer render_groups;
     
-    bool existsRenderGroup(NRE_RenderGroup);
+    bool existsRenderGroup(const NRE_RenderGroup&);
     
 };
 
