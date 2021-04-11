@@ -50,23 +50,11 @@ bool NRE_RenderGroup::operator < (const NRE_RenderGroup& other) const{
     return false;
 }
 
-bool NRE_SceneRenderData::existsRenderGroup(NRE_RenderGroup ren_group){
-    for (auto x: this->render_groups){
-        if ((x.camera == ren_group.camera) && (x.material == ren_group.material) && (x.vgroup == ren_group.vgroup) && (x.mesh == ren_group.mesh)){
-            return true;
-        }
-    }
-    return false;
+bool NRE_SceneRenderData::existsRenderGroup(const NRE_RenderGroup& ren_group){
+    return this->render_groups.contains(ren_group);
 }
 
-/*bool NRE_Renderer::existsRenderGroup(NRE_RenderGroup ren_group){
-    for (auto x: this->render_groups){
-        if ((x.camera == ren_group.camera) && (x.material == ren_group.material) && (x.vgroup == ren_group.vgroup) && (x.mesh == ren_group.mesh)){
-            return true;
-        }
-    }
-    return false;
-}*/
+
 
 
 bool NRE_Renderer::updateData(){
@@ -139,12 +127,9 @@ bool NRE_Renderer::updateData(){
     
     for (auto vpc : OE_World::viewportsList){
         this->handleViewportData(vpc.id_, vpc.p_);
+        this->loaded_viewport = OE_Main->world->loaded_viewport;
     }
-    this->loaded_viewport = OE_Main->world->loaded_viewport;
     
-    /*if(camera_ids.size() >= 1){
-        this->camera_id = camera_ids[0];
-    }*/
         
     //OE_Main->unlockMutex();
     /*
@@ -373,6 +358,7 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
 void NRE_Renderer::handleViewportData(std::size_t id, std::shared_ptr<OE_ViewportConfig> vp_config){
     if (this->viewports.count(id) == 0){
         this->viewports[id] = NRE_ViewportRenderData(); this->viewports[id].id = id;
+        this->viewports[id].has_init = true;
         
         this->viewports[id].layers = vp_config->layers;
         this->viewports[id].cameras = vp_config->cameras;

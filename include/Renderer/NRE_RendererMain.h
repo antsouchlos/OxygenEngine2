@@ -19,8 +19,6 @@ public:
 
     NRE_GPU_API* api{nullptr};
     
-    
-    //std::size_t camera_id{0};
     std::size_t loaded_viewport{0};
     std::map<std::size_t, NRE_CameraRenderData> cameras;
     std::map<std::size_t, NRE_MaterialRenderData> materials;
@@ -28,9 +26,7 @@ public:
     std::map<std::size_t, NRE_MeshRenderData> meshes;
     std::map<std::size_t, NRE_LightRenderData> lights;
     std::map<std::size_t, NRE_SceneRenderData> scenes;
-    std::map<std::size_t, NRE_ViewportRenderData> viewports;
-    //std::vector<NRE_RenderGroup> render_groups;
-    
+    std::map<std::size_t, NRE_ViewportRenderData> viewports;    
     
     // bounding box data
     std::size_t prog_bbox;
@@ -58,8 +54,6 @@ protected:
     void drawRenderGroup(NRE_RenderGroup*);
     void drawRenderGroupZPrePass(NRE_RenderGroup*);
     void drawRenderGroupBoundingBox(NRE_RenderGroup*);
-    
-    bool existsRenderGroup(NRE_RenderGroup);
     
     void setupBoundingBoxProgram();
 };
