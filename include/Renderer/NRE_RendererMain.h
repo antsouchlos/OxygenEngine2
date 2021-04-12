@@ -31,6 +31,7 @@ public:
     std::set<std::size_t> deleted_meshes;
     std::set<std::size_t> deleted_materials;
     std::set<std::size_t> deleted_cameras;
+    std::set<std::size_t> deleted_scenes;
     
     
     // bounding box data

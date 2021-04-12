@@ -240,8 +240,22 @@ void NRE_Renderer::setupBoundingBoxProgram(){
 
 void NRE_Renderer::generateDrawCalls(){
     
+    // delete all remaining draw call programs from deleted scenes
+    for (auto &sce : deleted_scenes){
+        for (auto ren_group : this->scenes[sce].render_groups){
+        
+            if (ren_group.z_prepass_program != 0)
+                this->api->deleteProgram(ren_group.z_prepass_program);
+            if (ren_group.program != 0)
+                this->api->deleteProgram(ren_group.program);
+        }
+        this->scenes.erase(sce);
+    }
+    this->deleted_scenes.clear();
+    
     for (auto &scene: scenes){
         
+        // delete remaining draw call programs from existing scenes
         for (auto ren_group : scene.second.render_groups.to_be_deleted_){
         
             if (ren_group.z_prepass_program != 0)
@@ -251,6 +265,7 @@ void NRE_Renderer::generateDrawCalls(){
         }
         scene.second.render_groups.cleanupPrograms();
         
+        // gemerate draw calls anew
         for (auto cam : scene.second.cameras){
             for (auto mesh : scene.second.meshes){
                 for (auto vgroup : this->meshes[mesh].vgroups){
