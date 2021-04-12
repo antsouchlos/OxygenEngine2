@@ -160,7 +160,7 @@ bool NRE_Renderer::updateData(){
     
     for (auto sce : OE_World::scenesList.deleted()){
         if (this->scenes.count(sce.id_) == 1){
-            this->scenes.erase(sce.id_);
+            this->deleted_scenes.insert(sce.id_);
         }
     }
     
