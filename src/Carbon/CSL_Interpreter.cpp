@@ -1,5 +1,7 @@
+#include <OE_Math.h>
 #include <Carbon/CSL_Interpreter.h>
 #include <OE_API.h>
+
 
 
 // TODO: Don't do that.

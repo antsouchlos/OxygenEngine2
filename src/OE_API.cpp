@@ -1,3 +1,4 @@
+#include <OE_Math.h>
 #include <OE_API.h>
 
 using namespace oe;

@@ -3,7 +3,10 @@
 
 #include <OE_Task.h>
 #include <Events/OE_EventParser.h>
-
+#include <functional>
+#include <atomic>
+#include <memory>
+#include <set>
 
 /** Temporary documentation: (OUTDATED)
   *

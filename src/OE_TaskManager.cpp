@@ -1,4 +1,8 @@
+#include <OE_Math.h>
+#include <types/OE_Libs.h>
 #include <OE_TaskManager.h>
+#include <Renderer/NRE_RendererMain.h>
+#include <OE_SDL_WindowSystem.h>
 
 
 using namespace std;

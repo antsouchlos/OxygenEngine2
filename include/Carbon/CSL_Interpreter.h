@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
-
+#include <bitset>
 
 class OE_TaskManager;
 

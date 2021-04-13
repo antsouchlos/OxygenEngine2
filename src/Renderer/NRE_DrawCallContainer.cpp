@@ -1,4 +1,6 @@
+#include <OE_Math.h>
 #include <Renderer/NRE_RenderData.h>
+
 
 NRE_DrawCallContainer::NRE_DrawCallContainer(){    
     this->data_ = std::set<NRE_RenderGroup>();
