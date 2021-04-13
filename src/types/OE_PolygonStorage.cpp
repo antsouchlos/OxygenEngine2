@@ -1,3 +1,4 @@
+#include <OE_Math.h>
 #include <types/OE_PolygonStorage.h>
 #include <Carbon/CSL_Interpreter.h>
 

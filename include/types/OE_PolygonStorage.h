@@ -3,6 +3,8 @@
 
 #include <types/OE_VertexStorage.h>
 #include <types/OE_VertexGroup.h>
+#include <memory>
+#include <functional>
 
 class OE_Mesh32;
 

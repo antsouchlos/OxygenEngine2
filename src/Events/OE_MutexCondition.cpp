@@ -1,4 +1,5 @@
 #include <Events/OE_MutexCondition.h>
+#include <types/OE_Libs.h>
 
 OE_MutexCondition::OE_MutexCondition(){
     

@@ -4,6 +4,8 @@
 #include <types/OE_Object.h>
 #include <types/OE_PolygonStorage.h>
 #include <types/OE_TCM.h>
+#include <atomic>
+#include <memory>
 
 /* OE_Mesh32 represents a mesh with 32-bit index, which means more than 65535 unique vertex combinations are allowed.
  */

@@ -1,6 +1,7 @@
 #include <OE_Error.h>
 #include <OE_TaskManager.h>
 #include <Events/OE_Event.h>
+#include <types/OE_Libs.h>
 
 using namespace std;
 

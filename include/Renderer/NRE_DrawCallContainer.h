@@ -2,6 +2,8 @@
 #define NRE_DRAWCALLCONTAINER_H 
 
 #include <Renderer/NRE_Exceptions.h>
+#include <set>
+#include <iterator>
 
 class NRE_RenderGroup;
 

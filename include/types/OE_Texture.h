@@ -2,6 +2,7 @@
 #define OE_TEXTURE_H
 
 #include <types/OE_TypesBase.h>
+#include <atomic>
 
 /* OE_Texture represents a simple texture.
  * It can be assigned a camera or an image or video as the source

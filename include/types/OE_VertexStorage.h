@@ -2,6 +2,7 @@
 #define OE_VERTEXSTORAGE_H
 
 #include <types/OE_TypesBase.h>
+#include <cassert>
 
 
 struct OE_UVMapElement{
