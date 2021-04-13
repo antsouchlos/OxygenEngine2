@@ -3,6 +3,10 @@
 
 #include <types/OE_TypesBase.h>
 
+extern "C" {
+    struct SDL_cond;
+}
+
 /* This class abstracts away the SDL part of locking mutexes
  * and conditions
  */ 

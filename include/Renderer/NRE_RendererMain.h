@@ -68,6 +68,4 @@ protected:
     void setupBoundingBoxProgram();
 };
 
-
-
 #endif

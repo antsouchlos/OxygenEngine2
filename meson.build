@@ -47,5 +47,5 @@ oe_lib = static_library('OxygenEngine', sources : src, dependencies : [sdl2_dep]
 
 oe_dep = declare_dependency(link_with : oe_lib, include_directories : internal_inc)
 
-executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : [oe_dep, sdl2_dep], win_subsystem: 'windows')
-executable('OE_Test', sources : 'oe_main_test.cpp', dependencies : [oe_dep, sdl2_dep], win_subsystem: 'windows')
+executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')
+executable('OE_Test', sources : 'oe_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')

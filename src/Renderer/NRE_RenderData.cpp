@@ -1,3 +1,4 @@
+#include <OE_Math.h>
 #include <Renderer/NRE_RendererMain.h>
 #include <OE_API.h>
 

@@ -5,9 +5,9 @@
 #include <Events/OE_EventHandler.h>
 #include <types/OE_World.h>
 #include <Carbon/CSL_Interpreter.h>
-#include <OE_SDL_WindowSystem.h>
 #include <Events/OE_MutexCondition.h>
-#include <Renderer/NRE_RendererMain.h>
+#include <OE_DummyClasses.h>
+#include <queue>
 
 
 class OE_TaskManager;
@@ -76,6 +76,9 @@ struct OE_ThreadStruct {
 extern "C" int oxygen_engine_update_thread(void*data);
 extern "C" int oxygen_engine_update_unsync_thread(void*data);
 
+extern "C"{
+    struct SDL_Thread;
+}
 
 class OE_TaskManager: public OE_MutexCondition
 {

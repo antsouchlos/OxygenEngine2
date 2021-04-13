@@ -1,3 +1,4 @@
+#include <OE_Math.h>
 #include <Events/OE_Event.h>
 #include <Carbon/CSL_Interpreter.h>
 

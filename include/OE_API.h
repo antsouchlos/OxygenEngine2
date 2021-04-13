@@ -1,9 +1,10 @@
 #ifndef OE_API_H_INCLUDED
 #define OE_API_H_INCLUDED
 
+#include <OE_Math.h>
 #include <OE_TaskManager.h>
 #include <OE_API_Helpers.h>
-#include <OE_Math.h>
+
 
 /*enum OE_OS : int{
     OE_UNDEFINED=0,

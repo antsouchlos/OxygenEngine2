@@ -4,7 +4,9 @@
 #include <types/OE_World.h>
 #include <Renderer/NRE_GPU_API.h>
 #include <Renderer/NRE_DrawCallContainer.h>
-#include <OE_Math.h>
+#include <memory>
+
+class OE_Mat4x4;
 
 struct NRE_BaseObject{
     

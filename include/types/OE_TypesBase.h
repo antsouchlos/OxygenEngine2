@@ -1,7 +1,18 @@
 #ifndef OE_TYPESBASE_H
 #define OE_TYPESBASE_H
 
-#include <types/OE_Libs.h>
+//#include <types/OE_Libs.h>
+
+#include <string>
+#include <vector>
+#include <sstream>
+#include <unordered_map>
+#include <map>
+#include <iomanip>
+
+extern "C" {
+    struct SDL_mutex;
+};
 
 /** This class is the basis of all the 'types' in OE.
  *  It provides every class with a mutex, so as to ensure safe
