@@ -8,14 +8,12 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/gtc/constants.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <glm/gtc/constants.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 
 //#include <glm/ext/vector_trigonometric.hpp>
 //#include <glm/gtc/matrix_inverse.hpp>
 //#include <glm/gtc/matrix_access.hpp>
-#include <glm/ext/matrix_float4x4.hpp>             
-#include <glm/ext/matrix_transform.hpp> 
 //#include <glm/ext/matrix_clip_space.hpp>
 //#include <glm/ext/matrix_projection.hpp>
 
@@ -73,7 +71,7 @@ public:
 
 
 
-#define OE_Pi2         glm::half_pi
+/*#define OE_Pi2         glm::half_pi
 
 #define OE_Abs         glm::abs
 #define OE_Pow         glm::pow
@@ -87,7 +85,7 @@ public:
 
 #define OE_Identity     glm::identity
 #define OE_Det          glm::determinant
-#define OE_Transpose    glm::transpose
+#define OE_Transpose    glm::transpose*/
 
 OE_Mat4x4 OE_Translate(OE_Mat4x4, OE_Vec3);
 OE_Mat4x4 OE_Scale(OE_Mat4x4, OE_Vec3);
@@ -96,9 +94,9 @@ OE_Mat4x4 OE_Quat2Mat4x4(OE_Quat);
 OE_Vec4 OE_Normalize(OE_Vec4);
 OE_Quat OE_Normalize(OE_Quat);
 
-#define OE_Mat2Euler       glm::eulerAngles
+/*#define OE_Mat2Euler       glm::eulerAngles
 #define OE_Slerp        glm::slerp
-#define OE_Lerp         glm::lerp
+#define OE_Lerp         glm::lerp*/
 
 std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4);
 OE_Mat4x4 OE_Perspective(float, float, float, float);
