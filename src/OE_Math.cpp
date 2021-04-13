@@ -1,5 +1,9 @@
 #include <OE_Math.h>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/ext/matrix_float4x4.hpp>             
+#include <glm/ext/matrix_transform.hpp> 
+#include <glm/gtc/constants.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
