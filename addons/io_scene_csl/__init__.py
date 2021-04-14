@@ -331,14 +331,43 @@ class ExportOxygenEngine(bpy.types.Operator, ExportHelper):
         if self.use_selection:
             final_scene = handle_scene(progress, context.scene, context.selected_objects)
             cur_world.scenes.append(final_scene)
-            writeToFile(self.filepath, str(cur_world))
         
             # handle all objects in all scenes
         else:
             for scene in bpy.data.scenes:
                 cur_world.scenes.append(handle_scene(progress, scene, scene.objects))
+        
+        # add viewport config
+        # if a camera is the active object, then it goes to the viewport
+        # else the exporter just uses the first camera it finds
+        # It is the exact same default as the default viewport config generated in C++
+        vp_config = f.OE_ViewportConfig("default")
+        vp_config.layer_combine_modes.append(1)
+        vp_config.split_screen_positions.append(0.5)
+        vp_config.split_screen_positions.append(0.5)
+        
+        vp_config.camera_modes.append(1)
+        vp_config.layers.append(0)
+        camera_name = ""
+        
+        if type(context.active_object.data) == bpy.types.Camera:
+            camera_name = context.active_object.name
+            
+        else:
+            foundCam = False
+            for scene in cur_world.scenes:
+                if foundCam: break
                 
-            writeToFile(self.filepath, str(cur_world))
+                for camera in scene.cameras:
+                    camera_name = camera.name
+                    foundCam = True
+                    break
+        
+        vp_config.cameras.append(camera_name)
+            
+        cur_world.viewports.append(vp_config)
+        cur_world.loaded_viewport = "default"
+        writeToFile(self.filepath, str(cur_world))
         
         return {"FINISHED"}
 
