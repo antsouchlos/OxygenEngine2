@@ -261,22 +261,29 @@ def handle_material(progress, cur_scene, material):
     nodes = material.node_tree.nodes
     
     for node in nodes:
-        if node.name == "Specular":
+        if "Base Color" in node.inputs:
             mat.dif_r = node.inputs['Base Color'].default_value[0]
             mat.dif_g = node.inputs['Base Color'].default_value[1]
             mat.dif_b = node.inputs['Base Color'].default_value[2]
             
+        elif "Color" in node.inputs:
+            mat.dif_r = node.inputs['Color'].default_value[0]
+            mat.dif_g = node.inputs['Color'].default_value[1]
+            mat.dif_b = node.inputs['Color'].default_value[2]
+        else:
+            pass
+        
+        if node.name == "Specular":            
             mat.scol_r = node.inputs['Specular'].default_value[0]
             mat.scol_g = node.inputs['Specular'].default_value[1]
             mat.scol_b = node.inputs['Specular'].default_value[2]
-            
+        
+        if "Roughness" in node.inputs:    
             mat.specular_hardness = node.inputs['Roughness'].default_value
-            mat.specular_intensity = 1.0
-            #print(mat.dif_r)
-            #print(mat.dif_g)
-            #print(mat.dif_b)
+        
+        mat.specular_intensity = 1.0
             
-            mat.alpha = 1.0
+        mat.alpha = 1.0
     
     return mat
 
