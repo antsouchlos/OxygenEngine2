@@ -1,9 +1,9 @@
 <World>
 	<Scene name="Scene">
-		<Material name="car_black">
-			dif_r=0.16264221
-			dif_g=0.16264221
-			dif_b=0.16264221
+		<Material name="car_body">
+			dif_r=0.00000000
+			dif_g=0.49700871
+			dif_b=0.80000007
 			dif_a=1.00000000
 			scol_r=0.03000000
 			scol_g=0.03000000
@@ -42,38 +42,10 @@
 			specular_hardness=0.50000000
 			specular_intensity=1.00000000
 		</Material>
-		<Material name="Material.001">
-			dif_r=0.80000007
-			dif_g=0.60108060
-			dif_b=0.00000000
-			dif_a=1.00000000
-			scol_r=0.00000000
-			scol_g=0.00000000
-			scol_b=0.00000000
-			alpha=1.00000000
-			translucency=0.00000000
-			illuminosity=0.00000000
-			specular_hardness=0.30139723
-			specular_intensity=1.00000000
-		</Material>
 		<Material name="shiny_car_elements">
 			dif_r=0.61517811
 			dif_g=0.61517811
 			dif_b=0.61517811
-			dif_a=1.00000000
-			scol_r=0.03000000
-			scol_g=0.03000000
-			scol_b=0.03000000
-			alpha=1.00000000
-			translucency=0.00000000
-			illuminosity=0.00000000
-			specular_hardness=0.50000000
-			specular_intensity=1.00000000
-		</Material>
-		<Material name="rear-lights">
-			dif_r=0.22142857
-			dif_g=0.00000000
-			dif_b=0.00000000
 			dif_a=1.00000000
 			scol_r=0.03000000
 			scol_g=0.03000000
@@ -98,10 +70,24 @@
 			specular_hardness=0.50000000
 			specular_intensity=1.00000000
 		</Material>
-		<Material name="car_inside">
-			dif_r=0.02197937
-			dif_g=0.02197937
-			dif_b=0.02197937
+		<Material name="car_black">
+			dif_r=0.16264221
+			dif_g=0.16264221
+			dif_b=0.16264221
+			dif_a=1.00000000
+			scol_r=0.03000000
+			scol_g=0.03000000
+			scol_b=0.03000000
+			alpha=1.00000000
+			translucency=0.00000000
+			illuminosity=0.00000000
+			specular_hardness=0.50000000
+			specular_intensity=1.00000000
+		</Material>
+		<Material name="rear-lights">
+			dif_r=0.22142857
+			dif_g=0.00000000
+			dif_b=0.00000000
 			dif_a=1.00000000
 			scol_r=0.03000000
 			scol_g=0.03000000
@@ -140,6 +126,20 @@
 			specular_hardness=0.50000000
 			specular_intensity=1.00000000
 		</Material>
+		<Material name="Material.001">
+			dif_r=0.80000007
+			dif_g=0.60108060
+			dif_b=0.00000000
+			dif_a=1.00000000
+			scol_r=0.00000000
+			scol_g=0.00000000
+			scol_b=0.00000000
+			alpha=1.00000000
+			translucency=0.00000000
+			illuminosity=0.00000000
+			specular_hardness=0.30139723
+			specular_intensity=1.00000000
+		</Material>
 		<Material name="seat">
 			dif_r=0.14285713
 			dif_g=0.08571428
@@ -154,10 +154,10 @@
 			specular_hardness=0.50000000
 			specular_intensity=1.00000000
 		</Material>
-		<Material name="car_body">
-			dif_r=0.00000000
-			dif_g=0.49700871
-			dif_b=0.80000007
+		<Material name="car_inside">
+			dif_r=0.02197937
+			dif_g=0.02197937
+			dif_b=0.02197937
 			dif_a=1.00000000
 			scol_r=0.03000000
 			scol_g=0.03000000
