@@ -14,7 +14,7 @@ bl_info = {"name": "Export Oxygen Engine (.csl)",
 import bpy
 from bpy_extras.io_utils import ExportHelper
 #from bpy.props import *
-import sys, os, math
+import sys, os, math, mathutils
 
 from bpy_extras.wm_utils.progress_report import (
     ProgressReport,
@@ -38,6 +38,17 @@ def mesh_triangulate(me):
 
 def round_floats(lista):
     return [f.convert(i) for i in lista]
+
+# always returns a quaternion
+def handleObjectRotation(obj):
+    if "X" in obj.rotation_mode and "Y" in obj.rotation_mode and "Z" in obj.rotation_mode:
+        return obj.rotation_euler.to_quaternion()
+    elif obj.rotation_mode == "QUATERNION":
+        return obj.rotation_quaternion
+    elif obj.rotation_mode == "AXIS_ANGLE":
+        return mathutils.Quaternion(mathutils.Vector(obj.rotation_axis_angle[1:4]), obj.rotation_axis_angle[0])
+    else:
+        return [2.0, 0.0, 0.0, 0.0]
 
 #########################################
 #handle all different blender objects
@@ -75,8 +86,7 @@ def handle_scene(progress, scene, allowed_objects):
 def handle_light(progress, cur_scene, obj):
     light = f.OE_Light(obj.name)
     light.current_state.extend(list(obj.location))
-    light.rotation_mode = "QUATERNION"
-    light.current_state.extend(list(obj.rotation_quaternion))
+    light.current_state.extend(list(handleObjectRotation(obj)))
     light.current_state.extend(list(obj.scale))
     
     if obj.parent != None:
@@ -101,8 +111,7 @@ def handle_mesh(progress, cur_scene, obj):
     
     mesh = f.OE_Mesh(obj.name)
     mesh.current_state.extend(list(obj.location))
-    mesh.rotation_mode = "QUATERNION"
-    mesh.current_state.extend(list(obj.rotation_quaternion))
+    mesh.current_state.extend(list(handleObjectRotation(obj)))
     mesh.current_state.extend(list(obj.scale))
     
     if obj.parent != None:
@@ -230,8 +239,7 @@ def handle_mesh(progress, cur_scene, obj):
 def handle_camera(progress, cur_scene, obj):
     camera = f.OE_Camera(obj.name)
     camera.current_state.extend(list(obj.location))
-    camera.rotation_mode = "QUATERNION"
-    camera.current_state.extend(list(obj.rotation_quaternion))
+    camera.current_state.extend(list(handleObjectRotation(obj)))
     camera.current_state.extend(list(obj.scale))
     
     if obj.parent != None:
@@ -264,9 +272,9 @@ def handle_material(progress, cur_scene, material):
             
             mat.specular_hardness = node.inputs['Roughness'].default_value
             mat.specular_intensity = 1.0
-            print(mat.dif_r)
-            print(mat.dif_g)
-            print(mat.dif_b)
+            #print(mat.dif_r)
+            #print(mat.dif_g)
+            #print(mat.dif_b)
             
             mat.alpha = 1.0
     
