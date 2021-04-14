@@ -249,9 +249,9 @@ class OE_Material(OE_WriterBase):
         self.classname = "Material"
         
         self.name               = name_
-        self.dif_r              = 0.0
-        self.dif_g              = 0.0
-        self.dif_b              = 0.0
+        self.dif_r              = 0.5
+        self.dif_g              = 0.5
+        self.dif_b              = 0.5
         self.dif_a              = 1.0
         self.scol_r             = 0.0
         self.scol_g             = 0.0
