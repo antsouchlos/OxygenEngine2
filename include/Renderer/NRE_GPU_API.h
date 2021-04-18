@@ -49,6 +49,7 @@ public:
     NRE_GPU_API();
     virtual ~NRE_GPU_API();
     
+    virtual void update();
     virtual void destroy();
     
     virtual std::string getRenderingAPI();
