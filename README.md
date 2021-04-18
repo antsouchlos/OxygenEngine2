@@ -94,7 +94,7 @@ To export scenes/objects to .csl format:
 
 In order for the objects to be exported and then displayed correctly in the engine: 
 
-- Each object that should be visible MUST have a material.
+- Each object that should be visible MUST have a material. 'Use Nodes' must be on (the default).
 - The camera should preferably be named "Camera". This way upon import in ```oe_main_test.cpp``` and the ```builddir/OE_Test``` executable, it is possible to move around the camera using WASD +Q/E and mouse movement with spacebar to freely take a look around the scene.
 
 ## State of the project
