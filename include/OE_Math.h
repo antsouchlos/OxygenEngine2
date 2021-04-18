@@ -70,7 +70,7 @@ public:
 };//*/
 
 
-
+// gen PI : glm::pi<float>()
 /*#define OE_Pi2         glm::half_pi
 
 #define OE_Abs         glm::abs

@@ -3,7 +3,7 @@
 
 #include <Renderer/NRE_RenderData.h>
 #include <OE_DummyClasses.h>
-#include <Renderer/NRE_GL3_API.h>
+#include <Renderer/NRE_GPU_API.h>
 
 class NRE_Renderer : public OE_RendererBase{
 public:
@@ -61,9 +61,9 @@ protected:
     
     void generateDrawCalls();
     
-    void drawRenderGroup(NRE_RenderGroup*);
-    void drawRenderGroupZPrePass(NRE_RenderGroup*);
-    void drawRenderGroupBoundingBox(NRE_RenderGroup*);
+    void drawRenderGroup(NRE_RenderGroup&);
+    void drawRenderGroupZPrePass(NRE_RenderGroup&);
+    void drawRenderGroupBoundingBox(NRE_RenderGroup&);
     
     void setupBoundingBoxProgram();
 };

@@ -67,6 +67,8 @@ public:
     NRE_GL3_API();
     ~NRE_GL3_API();
     
+    void update();
+    
     void destroy();
     
     std::string getRenderingAPI();
@@ -153,6 +155,18 @@ private:
     
     void check_prog_uniform_(std::size_t, const std::string&, const std::string&);
     void check_vao_vbo_(std::size_t, std::size_t, const std::string&);
+    
+    
+    // this is useful for preventing OpenGL glBind* command repetitions
+    GLuint active_vbo_{0};
+    GLuint active_vao_{0};
+    GLuint active_ubo_{0};
+    GLuint active_prog_{0};
+    // every VAO in OpenGL stores its Index Buffer
+    std::unordered_map<GLuint, GLuint> vao_ibos_;
+    
+    
+    
 };
 
 
