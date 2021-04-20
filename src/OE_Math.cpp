@@ -202,10 +202,66 @@ std::vector<float> OE_GetBoundingBoxVertexBuffer(float max_x, float min_x, float
 
 std::vector<float> OE_GetBoundingSphereVertexBuffer(float r1, float r2, size_t n){
     std::vector<float> vbo;
+    
+    // push top vertex
+    vbo.push_back(0.0f);
+    vbo.push_back(0.0f);
+    vbo.push_back(r1);
+    
+    // push top vertex normal
+    vbo.push_back(0.0f);
+    vbo.push_back(0.0f);
+    vbo.push_back(r1);
+    
+    for (uint32_t k = 0; k < 2 * n; k++){
+        for (uint32_t m = 1; m < n; m++){
+            
+            // push once for position
+            vbo.push_back(r2*std::cos(M_PI / n * k)*std::sin(M_PI / n * m));
+            vbo.push_back(r2*std::sin(M_PI / n * k)*std::sin(M_PI / n * m));
+            vbo.push_back(r1*std::cos(M_PI / n * m));
+            // and once for normal
+            vbo.push_back(r2*std::cos(M_PI / n * k)*std::sin(M_PI / n * m));
+            vbo.push_back(r2*std::sin(M_PI / n * k)*std::sin(M_PI / n * m));
+            vbo.push_back(r1*std::cos(M_PI / n * m));
+        }
+    }
+    
+    // push bottom vertex
+    vbo.push_back(0.0f);
+    vbo.push_back(0.0f);
+    vbo.push_back(-r1);
+    
+    // push bottom vertex normal
+    vbo.push_back(0.0f);
+    vbo.push_back(0.0f);
+    vbo.push_back(-r1);
+    
     return vbo;
 }
 
 std::vector<uint32_t> OE_GetBoundingSphereIndexBuffer(float r1, float r2, size_t n){
     std::vector<uint32_t> ibo;
+    
+    for (uint32_t k = 0; k < 2 * n; k++){
+        
+        ibo.push_back(0);
+        ibo.push_back(1 + (n - 1) * k);
+        ibo.push_back(1 + (n - 1) * ((k + 1) % (2*n)));
+        
+        for (uint32_t m = 1; m < n - 1; m++){
+            // one square
+            ibo.push_back(m + (n - 1) * k);
+            ibo.push_back(m + 1 + (n - 1) * k);
+            ibo.push_back(m + (n - 1) * ((k + 1) % (2*n)));
+            
+            ibo.push_back(m + (n - 1) * ((k + 1) % (2*n)));
+            ibo.push_back(m + 1 + (n - 1) * k);
+            ibo.push_back(m + 1 + (n - 1) * ((k + 1) % (2*n)));
+        }
+        ibo.push_back(n - 1 + (n - 1) * k);
+        ibo.push_back((n - 1)*(2*n) + 1);
+        ibo.push_back(n - 1 + (n - 1) * ((k + 1) % (2*n)));
+    }
     return ibo;
 }

@@ -1,4 +1,5 @@
 #include <Renderer/NRE_GL3_Shaders.h>
+#include <iostream>
 
 using namespace std;
 
@@ -46,7 +47,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 }
             );
         } 
-        else if ((vs.type == NRE_GPU_VS_REGULAR) || (vs.type == NRE_GPU_VS_BOUNDING_BOX)){
+        else if ((vs.type == NRE_GPU_VS_REGULAR) || (vs.type == NRE_GPU_VS_BOUNDING_BOX) || (vs.type == NRE_GPU_VS_BOUNDING_SPHERE)){
             
             // setup inputs
             output = NRE_Shader(
@@ -99,11 +100,11 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     }
                 ));
             }
-            else {
+            else if (vs.type == NRE_GPU_VS_BOUNDING_BOX) {
                 
                 // handle bounding box case
                 // here one does not need to consider rotation, since the (non-naive) bounding box
-                // already accounts for rotation
+                // already accounts for rotation, but needs to handle scale
                 output.append(NRE_Shader(
                     void main(){
                         normals = oe_normals;
@@ -125,6 +126,27 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                         gl_Position = final_mat*temp_position;
                     }
                 ));
+            }
+            else if (vs.type == NRE_GPU_VS_BOUNDING_SPHERE) {
+                
+                // handle bounding sphere case
+                // here one does not need to consider rotation, since the sphere
+                // already accounts for rotation, but needs appropriate scaling
+                                
+                output.append(NRE_Shader(
+                    void main(){
+                        normals = oe_normals;
+                        mat4 final_mat = PV_Matrix;
+                        
+                        vec3 delta_pos = vec3(Model_Matrix[3][0], Model_Matrix[3][1], Model_Matrix[3][2]);
+                        vec4 temp_position = vec4(oe_position*max(abs(scaling_max_data.w), abs(scaling_min_data.w))+delta_pos, 1.0);
+                        
+                        position = temp_position.xyz;
+                        gl_Position = final_mat*temp_position;
+                    }
+                ));
+            }
+            else {
             }
         }
         

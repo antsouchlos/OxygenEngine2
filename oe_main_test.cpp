@@ -52,15 +52,18 @@ int toggle_mouse_locked_state( oe::task, string event_name){
     return 0;
 }
 
-int set_renderer_mode_normals( oe::task, string event_name){
+int renderer_toggle_bounding_spheres( oe::task, string event_name){
     
-    oe::set_shading_mode(oe::renderer::shading_mode::normals);
+    oe::toggle_bounding_spheres_rendering();
     return 0;
 }
 
-int set_renderer_mode_regular( oe::task, string event_name){
+int set_renderer_mode_normals( oe::task, string event_name){
     
-    oe::set_shading_mode(oe::renderer::shading_mode::regular);
+    if (oe::get_shading_mode() == oe::renderer::shading_mode::regular)
+        oe::set_shading_mode(oe::renderer::shading_mode::normals);
+    else
+        oe::set_shading_mode(oe::renderer::shading_mode::regular);
     return 0;
 }
 
@@ -155,7 +158,7 @@ int OnLoadObject(oe::task load_event_task, string event_name){
     
     // Useful for debugging
     oe::set_event_func("keyboard-f5+", &set_renderer_mode_normals);
-    oe::set_event_func("keyboard-f6+", &set_renderer_mode_regular);
+    oe::set_event_func("keyboard-f6+", &renderer_toggle_bounding_spheres);
     oe::set_event_func("keyboard-f7+", &renderer_toggle_wireframe);
     oe::set_event_func("keyboard-f8+", &renderer_toggle_bounding_boxes);
     
@@ -177,8 +180,8 @@ int main(){
 	//oe::load_world_func("monkeys.csl", &OnLoadObject);
 	//oe::load_world_func("csl_very_large_object_test.csl", &OnLoadObject);
 	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
-	//oe::load_world_func("some_car.csl", &OnLoadObject);
-    oe::load_world_func("OE_Demo.csl", &OnLoadObject);
+	oe::load_world_func("some_car.csl", &OnLoadObject);
+    //oe::load_world_func("OE_Demo.csl", &OnLoadObject);
 	
 	//taskMgr.Start();
     oe::start();
