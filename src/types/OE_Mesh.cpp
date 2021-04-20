@@ -41,6 +41,9 @@ void OE_Mesh32::calculateProperBoundingBox(){
     this->data->vertices.min_y = rotated_initial_pos[1];
     this->data->vertices.min_z = rotated_initial_pos[2];
     
+    this->data->vertices.max_radius = 0.0f;
+    this->data->vertices.min_radius = 0.0f;
+    
     for (size_t i=0; i < this->data->vertices.positions.size(); i+=3){
             
             OE_Vec3 rotated_pos = rot_matrix * OE_Vec3(this->data->vertices.positions[i], this->data->vertices.positions[i+1], this->data->vertices.positions[i+2]);
@@ -69,7 +72,14 @@ void OE_Mesh32::calculateProperBoundingBox(){
             }
             if (rotated_pos[2] > this->data->vertices.max_z){
                 this->data->vertices.max_z = rotated_pos[2];
-               
+            }
+            
+            auto radius = OE_Length(rotated_pos);
+            if (radius > this->data->vertices.max_radius){
+                this->data->vertices.max_radius = radius;
+            }
+            if (radius < this->data->vertices.min_radius){
+                this->data->vertices.min_radius = radius;
             }
     }
     

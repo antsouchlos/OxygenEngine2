@@ -64,6 +64,15 @@ OE_Quat OE_Normalize(OE_Quat quat){
     return OE_Quat(temp);
 }
 
+float OE_Length(OE_Vec3 vec3){
+    return std::sqrt(std::pow(vec3[0], 2) + std::pow(vec3[1], 2) + std::pow(vec3[2], 2));
+}
+
+float OE_Length(OE_Vec4 vec4){
+    return std::sqrt(std::pow(vec4[0], 2) + std::pow(vec4[1], 2) + std::pow(vec4[2], 2) + std::pow(vec4[3], 2));
+}
+
+
 std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4 matrix){
     vector<float> output; output.reserve(16);
     

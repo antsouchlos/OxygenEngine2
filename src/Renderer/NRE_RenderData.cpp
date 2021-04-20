@@ -228,6 +228,8 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         this->meshes[id].min_y = mesh->data->vertices.min_y;
         this->meshes[id].min_z = mesh->data->vertices.min_z;
         
+        this->meshes[id].max_radius = mesh->data->vertices.max_radius;
+        this->meshes[id].min_radius = mesh->data->vertices.min_radius;
     }
     else{
         this->meshes[id].data = OE_Mat4x4ToSTDVector(mesh->GetModelMatrix());
@@ -248,6 +250,9 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
             this->meshes[id].min_x = mesh->data->vertices.min_x;
             this->meshes[id].min_y = mesh->data->vertices.min_y;
             this->meshes[id].min_z = mesh->data->vertices.min_z;
+            
+            this->meshes[id].max_radius = mesh->data->vertices.max_radius;
+            this->meshes[id].min_radius = mesh->data->vertices.min_radius;
             
         }
         
@@ -467,20 +472,16 @@ void NRE_Renderer::updateMeshGPUData(){
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_y);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_z);
             
-            // final element is sphere radius candidate
-            auto max_radius = std::sqrt(std::pow(this->meshes[mesh.first].max_x, 2) + std::pow(this->meshes[mesh.first].max_y, 2) + std::pow(this->meshes[mesh.first].max_z, 2));
-            
-            this->meshes[mesh.first].data.push_back(max_radius);
+            // final element is sphere radius candidate            
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_radius);
             
             // populate scaling_min_data
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_x);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_y);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_z);
             
-            // final element is sphere radius candidate
-            auto min_radius = std::sqrt(std::pow(this->meshes[mesh.first].min_x, 2) + std::pow(this->meshes[mesh.first].min_y, 2) + std::pow(this->meshes[mesh.first].min_z, 2));
-            
-            this->meshes[mesh.first].data.push_back(min_radius);
+            // final element is sphere radius candidate            
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_radius);
             
             
             if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
