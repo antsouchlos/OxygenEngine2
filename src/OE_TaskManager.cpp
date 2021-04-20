@@ -62,8 +62,8 @@ void OE_ThreadStruct::updateTaskList(){
     // add all tasks of the previous frame
     for (auto x: std::exchange(this->pending_tasks, {})){
         if (this->task_names.count(x.name) == 1){
-            cout << "OE: Task Manager WARNING: Already existing task: " << x.name << endl;
-            OE_WriteToLog("OE: Task Manager WARNING: Already existing task: " + x.name);
+            cout << "[OE Warning] Task Manager: Already existing task: " << x.name << endl;
+            OE_WriteToLog("[OE Warning] Task Manager: Already existing task: " + x.name);
             
             // reset previous task
             for (size_t i=0; i<this->tasks.size(); i++){
