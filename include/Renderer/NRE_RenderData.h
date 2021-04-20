@@ -68,7 +68,7 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
     
     std::vector<NRE_GPU_VertexLayoutInput> vao_input;
     
-    float max_x{0.0f}, min_x{0.0f}, max_y{0.0f}, min_y{0.0f}, max_z{0.0f}, min_z{0.0f};
+    float max_x{0.0f}, min_x{0.0f}, max_y{0.0f}, min_y{0.0f}, max_z{0.0f}, min_z{0.0f}, max_radius{0.0f}, min_radius{0.0f};
     
     std::vector<float> genBoundingBoxVBO();
     
