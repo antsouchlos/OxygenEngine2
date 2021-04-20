@@ -212,6 +212,8 @@ std::vector<float> OE_GetBoundingBoxVertexBuffer(float max_x, float min_x, float
 std::vector<float> OE_GetBoundingSphereVertexBuffer(float r1, float r2, size_t n){
     std::vector<float> vbo;
     
+    assert(n % 2 == 0);
+    
     // push top vertex
     vbo.push_back(0.0f);
     vbo.push_back(0.0f);
@@ -251,6 +253,8 @@ std::vector<float> OE_GetBoundingSphereVertexBuffer(float r1, float r2, size_t n
 
 std::vector<uint32_t> OE_GetBoundingSphereIndexBuffer(float r1, float r2, size_t n){
     std::vector<uint32_t> ibo;
+    
+    assert(n % 2 == 0);
     
     for (uint32_t k = 0; k < 2 * n; k++){
         
