@@ -35,9 +35,17 @@ public:
     
     
     // bounding box data
-    std::size_t prog_bbox;
-    bool setup_bbox_prog{false};
+    std::size_t prog_bbox{0};
+    std::size_t vbo_bbox{0};
+    std::size_t vao_bbox{0};
     
+    std::size_t prog_sphere{0};
+    std::size_t vbo_sphere{0};
+    std::size_t vao_sphere{0};
+    std::size_t ibo_sphere{0};
+    
+    bool setup_bbox_prog{false};
+    bool setup_sphere_prog{false};
     
 protected:
     
