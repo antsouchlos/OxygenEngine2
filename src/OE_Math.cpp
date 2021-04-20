@@ -228,13 +228,13 @@ std::vector<float> OE_GetBoundingSphereVertexBuffer(float r1, float r2, size_t n
         for (uint32_t m = 1; m < n; m++){
             
             // push once for position
-            vbo.push_back(r2*std::cos(M_PI / n * k)*std::sin(M_PI / n * m));
-            vbo.push_back(r2*std::sin(M_PI / n * k)*std::sin(M_PI / n * m));
-            vbo.push_back(r1*std::cos(M_PI / n * m));
+            vbo.push_back(r2*std::cos(oe::PI / n * k)*std::sin(oe::PI / n * m));
+            vbo.push_back(r2*std::sin(oe::PI / n * k)*std::sin(oe::PI / n * m));
+            vbo.push_back(r1*std::cos(oe::PI / n * m));
             // and once for normal
-            vbo.push_back(r2*std::cos(M_PI / n * k)*std::sin(M_PI / n * m));
-            vbo.push_back(r2*std::sin(M_PI / n * k)*std::sin(M_PI / n * m));
-            vbo.push_back(r1*std::cos(M_PI / n * m));
+            vbo.push_back(r2*std::cos(oe::PI / n * k)*std::sin(oe::PI / n * m));
+            vbo.push_back(r2*std::sin(oe::PI / n * k)*std::sin(oe::PI / n * m));
+            vbo.push_back(r1*std::cos(oe::PI / n * m));
         }
     }
     
