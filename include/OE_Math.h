@@ -69,9 +69,7 @@ public:
     OE_Quat operator * (const OE_Quat&);
 };//*/
 
-
-// gen PI : glm::pi<float>()
-/*#define OE_Pi2         glm::half_pi
+/*
 
 #define OE_Abs         glm::abs
 #define OE_Pow         glm::pow
@@ -93,6 +91,9 @@ OE_Mat4x4 OE_Scale(OE_Mat4x4, OE_Vec3);
 OE_Mat4x4 OE_Quat2Mat4x4(OE_Quat);
 OE_Vec4 OE_Normalize(OE_Vec4);
 OE_Quat OE_Normalize(OE_Quat);
+
+float OE_Length(OE_Vec3);
+float OE_Length(OE_Vec4);
 
 /*#define OE_Mat2Euler       glm::eulerAngles
 #define OE_Slerp        glm::slerp

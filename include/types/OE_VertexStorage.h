@@ -56,6 +56,9 @@ class OE_VertexStorage{
         float max_x{0.0f}, max_y{0.0f}, max_z{0.0f};
         float min_x{0.0f}, min_y{0.0f}, min_z{0.0f};
         
+        float max_radius{0.0f};
+        float min_radius{0.0f};
+        
         void calculateNaiveBoundingBox();
         
         bool calculatedBoundingBox{false};
