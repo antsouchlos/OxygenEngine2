@@ -199,3 +199,13 @@ std::vector<float> OE_GetBoundingBoxVertexBuffer(float max_x, float min_x, float
     
     return output;
 }
+
+std::vector<float> OE_GetBoundingSphereVertexBuffer(float r1, float r2, size_t n){
+    std::vector<float> vbo;
+    return vbo;
+}
+
+std::vector<uint32_t> OE_GetBoundingSphereIndexBuffer(float r1, float r2, size_t n){
+    std::vector<uint32_t> ibo;
+    return ibo;
+}

@@ -105,4 +105,7 @@ OE_Quat OE_QuatFromAxisAngle(float, float, float, float);
 
 std::vector<float> OE_GetBoundingBoxVertexBuffer(float, float, float, float, float, float);
 
+std::vector<float> OE_GetBoundingSphereVertexBuffer(float, float, size_t);
+std::vector<uint32_t> OE_GetBoundingSphereIndexBuffer(float, float, size_t);
+
 #endif // FMATH_H_INCLUDED

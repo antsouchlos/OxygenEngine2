@@ -36,6 +36,8 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
             
                 layout(std140) uniform OE_Mesh32{
                     mat4 Model_Matrix;
+                    vec4 scaling_max_data;
+                    vec4 scaling_min_data;
                 };
                 
                 void main(){
@@ -77,6 +79,8 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
             
                 layout(std140) uniform OE_Mesh32{
                     mat4 Model_Matrix;
+                    vec4 scaling_max_data;
+                    vec4 scaling_min_data;
                 };
             ));
             
@@ -106,9 +110,19 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                         mat4 final_mat = PV_Matrix;
                         
                         vec3 delta_pos = vec3(Model_Matrix[3][0], Model_Matrix[3][1], Model_Matrix[3][2]);
-                        vec4 temp_position = vec4(oe_position+delta_pos, 1.0);
+                        vec4 temp_position = vec4(oe_position*scaling_max_data.xyz+delta_pos, 1.0);
+                        if (oe_position.x*abs(oe_position.x) < 0.0){
+                            temp_position.x = abs(oe_position.x)*scaling_min_data.x+delta_pos.x;
+                        }
+                        if (oe_position.y*abs(oe_position.y) < 0.0){
+                            temp_position.y = abs(oe_position.y)*scaling_min_data.y+delta_pos.y;
+                        }
+                        if (oe_position.z*abs(oe_position.z) < 0.0){
+                            temp_position.z = abs(oe_position.z)*scaling_min_data.z+delta_pos.z;
+                        }
+                        
                         position = temp_position.xyz;
-                        gl_Position = final_mat*vec4(oe_position+delta_pos, 1.0);
+                        gl_Position = final_mat*temp_position;
                     }
                 ));
             }
@@ -177,6 +191,8 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             
                 layout(std140) uniform OE_Mesh32{
                     mat4 Model_Matrix;
+                    vec4 scaling_max_data;
+                    vec4 scaling_min_data;
                 };
             ));
             output.append("\n");
@@ -217,6 +233,8 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             
                 layout(std140) uniform OE_Mesh32{
                     mat4 Model_Matrix;
+                    vec4 scaling_max_data;
+                    vec4 scaling_min_data;
                 };
             ));
             output.append("\n");
