@@ -28,6 +28,10 @@
 #define FE_EPSILON 0.000001f
 #define OE_EPSILON 0.000001f
 
+namespace oe{
+    const auto PI = glm::pi<float>();
+};
+
 // This is done, so that in the event we want to change the math library
 // it will be easy
 
