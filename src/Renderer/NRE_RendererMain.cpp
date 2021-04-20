@@ -29,7 +29,9 @@ bool NRE_Renderer::init(){
     this->lights.clear();
     this->scenes.clear();
     this->viewports.clear();
-    //this->render_groups.clear();
+    
+    this->setup_bbox_prog = false;
+    this->setup_sphere_prog = false;
     
     // reset all GPU data
     if (api != nullptr){
@@ -216,10 +218,28 @@ void NRE_Renderer::drawRenderGroupBoundingBox(NRE_RenderGroup& ren_group){
      
     this->api->setUniformState(this->meshes[ren_group.mesh].ubo, this->prog_bbox, 1, 0, 0);
     this->api->setUniformState(this->cameras[ren_group.camera].ubo, this->prog_bbox, 0, 0, 0);        
-    this->api->draw(this->prog_bbox, this->meshes[ren_group.mesh].vao_bbox);
+    this->api->draw(this->prog_bbox, this->vao_bbox);
 }
 
 void NRE_Renderer::setupBoundingBoxProgram(){
+    
+    // the same vbo and vao are used for every object
+    // The vbo holds a cube with side 1 that is scaled appropriately in the shader
+    // through the uniform block variable 'scaling_data'
+    
+    this->vbo_bbox = this->api->newVertexBuffer();
+    auto bbox_data = OE_GetBoundingBoxVertexBuffer(1.0f, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f);
+    this->api->setVertexBufferMemoryData(this->vbo_bbox, bbox_data, NRE_GPU_STATIC);
+    
+    typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
+    this->vao_bbox = this->api->newVertexLayout();
+    
+    std::vector<VLI> vao_bbox_data;
+    vao_bbox_data.push_back(VLI(this->vbo_bbox, 0, 3, 6));
+    vao_bbox_data.push_back(VLI(this->vbo_bbox, 3, 3, 6));
+    
+    this->api->setVertexLayoutFormat(this->vao_bbox, vao_bbox_data);
+    
     this->prog_bbox = this->api->newProgram();
         
     NRE_GPU_VertexShader vs_bbox;

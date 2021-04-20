@@ -97,7 +97,6 @@ bool NRE_Renderer::updateData(){
         }
         
         this->screen->restart_renderer = false;
-        this->setup_bbox_prog = false;
     }
     
     // Update element data
@@ -471,6 +470,25 @@ void NRE_Renderer::updateMeshGPUData(){
         
         // update per frame data
         if (this->meshes[mesh.first].changed){
+            
+            // populate scaling_max_data
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_x);
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_y);
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_z);
+            
+            auto max_all = std::max(std::max(this->meshes[mesh.first].max_x, this->meshes[mesh.first].max_y), this->meshes[mesh.first].max_z);
+            
+            this->meshes[mesh.first].data.push_back(max_all);
+            
+            // populate scaling_min_data
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_x);
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_y);
+            this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_z);
+            
+            auto min_all = std::min(std::min(this->meshes[mesh.first].min_x, this->meshes[mesh.first].min_y), this->meshes[mesh.first].min_z);
+            
+            this->meshes[mesh.first].data.push_back(min_all);
+            
             
             if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
                 this->meshes[mesh.first].size = this->meshes[mesh.first].data.size();
