@@ -72,8 +72,10 @@ protected:
     void drawRenderGroup(NRE_RenderGroup&);
     void drawRenderGroupZPrePass(NRE_RenderGroup&);
     void drawRenderGroupBoundingBox(NRE_RenderGroup&);
+    void drawRenderGroupBoundingSphere(NRE_RenderGroup&);
     
     void setupBoundingBoxProgram();
+    void setupBoundingSphereProgram();
 };
 
 #endif

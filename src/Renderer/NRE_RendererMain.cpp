@@ -114,6 +114,7 @@ bool NRE_Renderer::updateSingleThread(){
         // optionally draw a bounding box for each object (in wireframe mode)
         bool temp = this->api->use_wireframe;
         bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
+        bool render_spheres = this->render_bounding_spheres.load(std::memory_order_relaxed);
         this->api->use_wireframe = true;
     
         if (render_bboxes){
@@ -126,6 +127,21 @@ bool NRE_Renderer::updateSingleThread(){
             for (auto x: this->scenes[scene_id].render_groups){
                 if (x.camera == camera_id){
                     this->drawRenderGroupBoundingBox(x);
+                    this->scenes[scene_id].render_groups.replace(x);
+                }
+            }
+            this->scenes[scene_id].render_groups.update();
+        }
+        if (render_spheres){
+            this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
+            if (!this->setup_sphere_prog){
+        
+                this->setupBoundingSphereProgram();
+                this->setup_sphere_prog = true;
+            }
+            for (auto x: this->scenes[scene_id].render_groups){
+                if (x.camera == camera_id){
+                    this->drawRenderGroupBoundingSphere(x);
                     this->scenes[scene_id].render_groups.replace(x);
                 }
             }
@@ -221,6 +237,14 @@ void NRE_Renderer::drawRenderGroupBoundingBox(NRE_RenderGroup& ren_group){
     this->api->draw(this->prog_bbox, this->vao_bbox);
 }
 
+void NRE_Renderer::drawRenderGroupBoundingSphere(NRE_RenderGroup& ren_group){
+    
+    this->api->setUniformState(this->meshes[ren_group.mesh].ubo, this->prog_sphere, 1, 0, 0);
+    this->api->setUniformState(this->cameras[ren_group.camera].ubo, this->prog_sphere, 0, 0, 0);        
+    this->api->draw(this->prog_sphere, this->vao_sphere, this->ibo_sphere);
+}
+
+
 void NRE_Renderer::setupBoundingBoxProgram(){
     
     // the same vbo and vao are used for every object
@@ -260,6 +284,52 @@ void NRE_Renderer::setupBoundingBoxProgram(){
     if (this->api->getProgramUniformSlot(this->prog_bbox, "OE_Material") != -2){
         this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
     }
+}
+
+void NRE_Renderer::setupBoundingSphereProgram(){
+    
+    // the same VBO, VAO and IBO are used for every object
+    // it holds a sphere with radius one
+    
+    this->vbo_sphere = this->api->newVertexBuffer();
+    this->ibo_sphere = this->api->newIndexBuffer();
+    
+    auto sphere_vbo_data = OE_GetBoundingSphereVertexBuffer(1.0f, 1.0f, 16);
+    auto sphere_ibo_data = OE_GetBoundingSphereIndexBuffer(1.0f, 1.0f, 16);
+    
+    this->api->setVertexBufferMemoryData(this->vbo_sphere, sphere_vbo_data, NRE_GPU_STATIC);
+    this->api->setIndexBufferMemoryData(this->ibo_sphere, sphere_ibo_data, NRE_GPU_STATIC);
+    
+    typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
+    this->vao_sphere = this->api->newVertexLayout();
+    
+    std::vector<VLI> vao_sphere_data;
+    vao_sphere_data.push_back(VLI(this->vbo_sphere, 0, 3, 6));
+    vao_sphere_data.push_back(VLI(this->vbo_sphere, 3, 3, 6));
+    
+    this->api->setVertexLayoutFormat(this->vao_sphere, vao_sphere_data);
+    
+    this->prog_sphere = this->api->newProgram();
+        
+    NRE_GPU_VertexShader vs_sphere;
+    NRE_GPU_PixelShader fs_sphere;
+        
+    vs_sphere.type = NRE_GPU_VS_BOUNDING_SPHERE;
+    vs_sphere.num_of_uvs = 0;
+        
+    fs_sphere.type = NRE_GPU_FS_NORMALS;
+    fs_sphere.num_of_uvs = 0;
+        
+    this->api->setProgramVS(this->prog_sphere, vs_sphere);
+    this->api->setProgramFS(this->prog_sphere, fs_sphere);
+        
+    this->api->setupProgram(this->prog_sphere);
+    this->api->setProgramUniformSlot(this->prog_sphere, "OE_Camera", 0);
+    this->api->setProgramUniformSlot(this->prog_sphere, "OE_Mesh32", 1);
+    if (this->api->getProgramUniformSlot(this->prog_sphere, "OE_Material") != -2){
+        this->api->setProgramUniformSlot(this->prog_sphere, "OE_Material", 2);
+    }
+    
 }
 
 void NRE_Renderer::generateDrawCalls(){

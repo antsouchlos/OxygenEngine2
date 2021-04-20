@@ -420,6 +420,9 @@ namespace oe{
     
     void render_bounding_boxes(bool);
     void toggle_bounding_boxes_rendering();
+    
+    void render_bounding_spheres(bool);
+    void toggle_bounding_spheres_rendering();
 };
 
 

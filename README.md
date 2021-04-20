@@ -251,6 +251,10 @@ One can now swap worlds in the demo with keys 1 and 2. Swapping between 'challen
 
 Blender addon improvements. Now can export rotations and material colors correctly in all cases. Also exports a default viewport config.
 
+2021/04/21 - philsegeler
+
+NRE: Added initial bounding spheres rendering. Needs only a few improvements.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -268,8 +272,8 @@ UPDATE 2020/11/12: It was enhanced.
 
 - ~~Basic Material and Lighting support.~~(DONE)
 - ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
-- ~~Support multiple shaders~~
-- Implement rendering of bounding spheres
+- ~~Support multiple shaders~~(DONE)
+- ~~Implement rendering of bounding spheres~~(DONE)
 - Implement rendering of cones
 - Implement sorting front-to-back or back-to-front of objects
 - Implement Directional Light rendering pass.
