@@ -64,6 +64,10 @@ void NRE_GL3_API::update(){
     this->active_vao_ = 0;
     this->active_vbo_ = 0;
     this->active_ubo_ = 0;
+    
+    for (auto x: this->vao_ibos_){
+        this->vao_ibos_[x.first] = 0;
+    }
 }
 
 void NRE_GL3_API::destroy(){
@@ -168,8 +172,8 @@ std::size_t NRE_GL3_API::newVertexBuffer(){
 std::size_t NRE_GL3_API::newVertexLayout(){  
     cur_vao++;
     this->vaos[cur_vao] = NRE_GL3_VertexArray();
-    this->vao_ibos_[cur_vao] = 0;
     glGenVertexArrays(1, &vaos[cur_vao].handle);
+    this->vao_ibos_[vaos[cur_vao].handle] = 0;
     return cur_vao;
 }
 std::size_t NRE_GL3_API::newIndexBuffer(){

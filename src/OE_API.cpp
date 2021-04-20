@@ -611,3 +611,25 @@ void oe::toggle_bounding_boxes_rendering(){
     }
     OE_Main->renderer_mutex.unlockMutex();
 }
+
+void oe::render_bounding_spheres(bool value){
+    OE_API_Helpers::checkIfInit();
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->render_bounding_spheres = value;
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
+void oe::toggle_bounding_spheres_rendering(){
+    OE_API_Helpers::checkIfInit();
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->lockMutex();
+        if (OE_Main->renderer->render_bounding_spheres)
+            OE_Main->renderer->render_bounding_spheres = false;
+        else
+            OE_Main->renderer->render_bounding_spheres = true;
+        OE_Main->renderer->unlockMutex();
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}

@@ -415,8 +415,6 @@ void NRE_Renderer::updateMeshGPUData(){
             this->meshes[mesh.first].vbo      = this->api->newVertexBuffer();
             this->meshes[mesh.first].vao      = this->api->newVertexLayout();
             this->meshes[mesh.first].ubo      = this->api->newUniformBuffer();
-            this->meshes[mesh.first].vbo_bbox = this->api->newVertexBuffer();
-            this->meshes[mesh.first].vao_bbox = this->api->newVertexLayout();
             this->meshes[mesh.first].has_init = true;
         }
         
@@ -458,14 +456,7 @@ void NRE_Renderer::updateMeshGPUData(){
             
             this->api->setVertexLayoutFormat(this->meshes[mesh.first].vao, this->meshes[mesh.first].vao_input);
             this->meshes[mesh.first].vao_initialized = true;
-            
-            /// update bounding box data
-            this->api->setVertexBufferMemoryData(this->meshes[mesh.first].vbo_bbox, this->meshes[mesh.first].genBoundingBoxVBO(), NRE_GPU_STREAM);
-            
-            std::vector<VLI> vao_bbox_data;
-            vao_bbox_data.push_back(VLI(this->meshes[mesh.first].vbo_bbox, 0, 3, 6));
-            vao_bbox_data.push_back(VLI(this->meshes[mesh.first].vbo_bbox, 3, 3, 6));
-            this->api->setVertexLayoutFormat(this->meshes[mesh.first].vao_bbox, vao_bbox_data);
+
         }
         
         // update per frame data
@@ -476,18 +467,20 @@ void NRE_Renderer::updateMeshGPUData(){
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_y);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_z);
             
-            auto max_all = std::max(std::max(this->meshes[mesh.first].max_x, this->meshes[mesh.first].max_y), this->meshes[mesh.first].max_z);
+            // final element is sphere radius candidate
+            auto max_radius = std::sqrt(std::pow(this->meshes[mesh.first].max_x, 2) + std::pow(this->meshes[mesh.first].max_y, 2) + std::pow(this->meshes[mesh.first].max_z, 2));
             
-            this->meshes[mesh.first].data.push_back(max_all);
+            this->meshes[mesh.first].data.push_back(max_radius);
             
             // populate scaling_min_data
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_x);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_y);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].min_z);
             
-            auto min_all = std::min(std::min(this->meshes[mesh.first].min_x, this->meshes[mesh.first].min_y), this->meshes[mesh.first].min_z);
+            // final element is sphere radius candidate
+            auto min_radius = std::sqrt(std::pow(this->meshes[mesh.first].min_x, 2) + std::pow(this->meshes[mesh.first].min_y, 2) + std::pow(this->meshes[mesh.first].min_z, 2));
             
-            this->meshes[mesh.first].data.push_back(min_all);
+            this->meshes[mesh.first].data.push_back(min_radius);
             
             
             if (this->meshes[mesh.first].size != this->meshes[mesh.first].data.size()){
@@ -497,9 +490,6 @@ void NRE_Renderer::updateMeshGPUData(){
             
             this->api->setUniformBufferData(this->meshes[mesh.first].ubo, this->meshes[mesh.first].data, 0);
             
-            if (this->render_bounding_boxes){
-                this->api->setVertexBufferData(this->meshes[mesh.first].vbo_bbox, this->meshes[mesh.first].genBoundingBoxVBO(), 0);
-            }
             this->meshes[mesh.first].changed = false;
         }
     }
@@ -579,12 +569,6 @@ void NRE_Renderer::deleteMesh(std::size_t id){
     }
     if (this->meshes[id].ubo !=0){
         this->api->deleteUniformBuffer(this->meshes[id].ubo);
-    }
-    if (this->meshes[id].vbo_bbox !=0){
-        this->api->deleteVertexBuffer(this->meshes[id].vbo_bbox);
-    }
-    if (this->meshes[id].vao_bbox !=0){
-        this->api->deleteVertexLayout(this->meshes[id].vao_bbox);
     }
     
     // delete buffers of vertex groups
