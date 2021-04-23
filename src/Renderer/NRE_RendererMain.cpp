@@ -26,7 +26,8 @@ bool NRE_Renderer::init(){
     this->materials.clear();
     this->vgroups.clear();
     this->meshes.clear();
-    this->lights.clear();
+    this->dir_lights.clear();
+    this->pt_lights.clear();
     this->scenes.clear();
     this->viewports.clear();
     
@@ -53,7 +54,7 @@ bool NRE_Renderer::init(){
 
 bool NRE_Renderer::updateSingleThread(){
     
-    this->api->update();
+    this->api->update(this->screen->resolution_x, this->screen->resolution_y);
     
     // generate draw calls
     this->generateDrawCalls();
