@@ -78,7 +78,15 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
     std::set<size_t> vgroups;
 };
 
-struct NRE_LightRenderData : public NRE_BaseObject{
+struct NRE_PointLightRenderData : public NRE_BaseObject{
+    OE_Mat4x4       model_mat;
+
+    std::size_t     ubo{0};
+    unsigned int    offset{0};
+    unsigned int    size{0};
+};
+
+struct NRE_DirectionalLightRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
 
     std::size_t     ubo{0};
@@ -92,7 +100,8 @@ struct NRE_SceneRenderData : public NRE_BaseObject{
     
     std::set<std::size_t> cameras;
     std::set<std::size_t> meshes;
-    std::set<std::size_t> lights;
+    std::set<std::size_t> dir_lights;
+    std::set<std::size_t> pt_lights;
     std::set<std::size_t> materials;
     
     NRE_DrawCallContainer render_groups;

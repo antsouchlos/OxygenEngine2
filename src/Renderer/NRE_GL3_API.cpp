@@ -59,7 +59,18 @@ NRE_GL3_API::~NRE_GL3_API(){
     
 }
 
-void NRE_GL3_API::update(){
+void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
+    
+    this->x = x_in;
+    this->y = y_in;
+    
+    glDepthMask(GL_TRUE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    
+    if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
+        glEnable(GL_FRAMEBUFFER_SRGB);
+    
     this->active_prog_ = 0;
     this->active_vao_ = 0;
     this->active_vbo_ = 0;

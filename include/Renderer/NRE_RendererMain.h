@@ -24,7 +24,8 @@ public:
     std::map<std::size_t, NRE_MaterialRenderData> materials;
     std::map<std::size_t, NRE_VGroupRenderData> vgroups;
     std::map<std::size_t, NRE_MeshRenderData> meshes;
-    std::map<std::size_t, NRE_LightRenderData> lights;
+    std::map<std::size_t, NRE_DirectionalLightRenderData> dir_lights;
+    std::map<std::size_t, NRE_PointLightRenderData> pt_lights;
     std::map<std::size_t, NRE_SceneRenderData> scenes;
     std::map<std::size_t, NRE_ViewportRenderData> viewports;    
     
