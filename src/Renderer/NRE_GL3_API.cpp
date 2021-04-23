@@ -61,8 +61,11 @@ NRE_GL3_API::~NRE_GL3_API(){
 
 void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
     
-    this->x = x_in;
-    this->y = y_in;
+    if (x_in != this->x or y_in != this->y){
+        glViewport(0, 0, x_in, y_in);
+        this->x = x_in;
+        this->y = y_in;
+    }
     
     glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
