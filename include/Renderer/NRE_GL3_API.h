@@ -67,7 +67,7 @@ public:
     NRE_GL3_API();
     ~NRE_GL3_API();
     
-    void update();
+    void update(uint32_t, uint32_t);
     
     void destroy();
     

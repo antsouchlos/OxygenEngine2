@@ -142,18 +142,21 @@ bool NRE_Renderer::updateData(){
     for (auto obj : OE_World::objectsList.deleted()){
         
         if (this->meshes.count(obj.id_) == 1){
-                
             this->scenes[this->meshes[obj.id_].scene_id].render_groups.removeMesh(obj.id_);
             this->deleted_meshes.insert(obj.id_);
         }
-        
-        if (this->lights.count(obj.id_) == 1){
-            this->lights.erase(obj.id_);
+        else if (this->dir_lights.count(obj.id_) == 1){
+            this->dir_lights.erase(obj.id_);
         }
-
-        if (this->cameras.count(obj.id_) == 1){
+        else if (this->pt_lights.count(obj.id_) == 1){
+            this->pt_lights.erase(obj.id_);
+        }
+        else if (this->cameras.count(obj.id_) == 1){
             this->scenes[this->cameras[obj.id_].scene_id].render_groups.removeCamera(obj.id_);
             this->deleted_cameras.insert(obj.id_);
+        }
+        else {
+            
         }
     }
 
@@ -293,7 +296,7 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
         this->cameras[id].ubo = this->api->newUniformBuffer();
 
         auto view_mat = camera->GetViewMatrix();
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.4f, (float)camera->far);
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.4f, (float)camera->far*50.0f);
         
         this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
         this->cameras[id].data.push_back(camera->current_state.pos_x);
@@ -305,7 +308,7 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
     }
     else {
 
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.4f, (float)camera->far);
+        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.4f, (float)camera->far*50.0f);
         auto view_mat = camera->GetViewMatrix();
         
         this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
@@ -334,8 +337,11 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
             else if (this->meshes.count(x) != 0){
                 this->scenes[id].meshes.insert(x);
             }
-            else if (this->lights.count(x) != 0){
-                this->scenes[id].lights.insert(x);
+            else if (this->dir_lights.count(x) != 0){
+                this->scenes[id].pt_lights.insert(x);
+            }
+            else if (this->pt_lights.count(x) != 0){
+                this->scenes[id].dir_lights.insert(x);
             }
         }
         
@@ -361,7 +367,8 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
     else {
         
         this->scenes[id].cameras.clear();
-        this->scenes[id].lights.clear();
+        this->scenes[id].dir_lights.clear();
+        this->scenes[id].pt_lights.clear();
         this->scenes[id].meshes.clear();
         
         // group objects
@@ -372,8 +379,11 @@ void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> sce
             else if (this->meshes.count(x) != 0){
                 this->scenes[id].meshes.insert(x);
             }
-            else if (this->lights.count(x) != 0){
-                this->scenes[id].lights.insert(x);
+            else if (this->dir_lights.count(x) != 0){
+                this->scenes[id].dir_lights.insert(x);
+            }
+            else if (this->pt_lights.count(x) != 0){
+                this->scenes[id].pt_lights.insert(x);
             }
         }
         

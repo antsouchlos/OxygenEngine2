@@ -125,12 +125,6 @@ void OE_SDL_WindowSystem::finishInit(){
     
     SDL_GetWindowSize(window, &this->resolution_x, &this->resolution_y);
     glViewport(0, 0, this->resolution_x, this->resolution_y);
-    glDepthMask(GL_TRUE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    
-    if (!this->isES)
-        glEnable(GL_FRAMEBUFFER_SRGB);
     
     SDL_GL_SwapWindow(this->window);
     
@@ -176,9 +170,9 @@ bool OE_SDL_WindowSystem::update(){
     }
     unlockMutex();
     
-    glDepthMask(GL_TRUE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    //glDepthMask(GL_TRUE);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     
     this->event_handler.updateInput();
     this->mouse_moved = false;

@@ -49,7 +49,7 @@ public:
     NRE_GPU_API();
     virtual ~NRE_GPU_API();
     
-    virtual void update();
+    virtual void update(uint32_t, uint32_t);
     virtual void destroy();
     
     virtual std::string getRenderingAPI();
@@ -102,6 +102,9 @@ public:
     virtual void setRenderMode(NRE_GPU_RENDERMODE);
     
     std::atomic<bool>           use_wireframe{false};
+    
+    uint32_t x{0};
+    uint32_t y{0};
 };
 
 #endif 
