@@ -203,24 +203,27 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
     output.append("\n");
     
     if (fs.type == NRE_GPU_FS_MATERIAL){
-        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
-             // setup uniforms
-            output.append(NRE_Shader(
-                layout(std140) uniform OE_Camera{
-                    mat4 PV_Matrix;
-                    vec4 camera_pos;
-                };
+        
+        // setup uniforms
+        output.append(NRE_Shader(
+            layout(std140) uniform OE_Camera{
+                mat4 PV_Matrix;
+                vec4 camera_pos;
+            };
             
-                layout(std140) uniform OE_Mesh32{
-                    mat4 Model_Matrix;
-                    vec4 scaling_max_data;
-                    vec4 scaling_min_data;
-                };
-            ));
-            output.append("\n");
-            output.append(NRE_Shader(
+            layout(std140) uniform OE_Mesh32{
+                mat4 Model_Matrix;
+                vec4 scaling_max_data;
+                vec4 scaling_min_data;
+            };
             
             out vec4 fragColor;
+        ));
+        output.append("\n");
+        
+        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
+            
+            output.append(NRE_Shader(
             
             void main(){
                 
@@ -246,23 +249,7 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             ));
         } else {
             
-            // setup uniforms
             output.append(NRE_Shader(
-                layout(std140) uniform OE_Camera{
-                    mat4 PV_Matrix;
-                    vec4 camera_pos;
-                };
-            
-                layout(std140) uniform OE_Mesh32{
-                    mat4 Model_Matrix;
-                    vec4 scaling_max_data;
-                    vec4 scaling_min_data;
-                };
-            ));
-            output.append("\n");
-            output.append(NRE_Shader(
-            
-            out vec4 fragColor;            
             
             void main(){
                 

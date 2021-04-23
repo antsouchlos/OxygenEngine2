@@ -162,17 +162,11 @@ bool OE_SDL_WindowSystem::update(){
     // Change viewport resolution if desired
     int x; int y;
     SDL_GetWindowSize(window, &x, &y);
-    lockMutex();
-    if (x != this->resolution_x || y != this->resolution_y){
-        glViewport(0, 0, x, y);
-        this->resolution_x = x;
-        this->resolution_y = y;
-    }
-    unlockMutex();
     
-    //glDepthMask(GL_TRUE);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    lockMutex();
+    this->resolution_x = x;
+    this->resolution_y = y;
+    unlockMutex();
     
     this->event_handler.updateInput();
     this->mouse_moved = false;
