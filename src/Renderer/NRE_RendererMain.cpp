@@ -194,7 +194,7 @@ bool NRE_Renderer::updateSingleThread(){
     
     this->api->copyFrameBuffer(this->framebuffer, 0);
     this->api->useFrameBuffer(0);
-    this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
+    //this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
     return true;
 }
 
