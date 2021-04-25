@@ -76,9 +76,10 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
-    
-    if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
+#ifndef OE_WINDOWS
+    if ((NRE_GPU_ShaderBase::backend == NRE_GPU_GL))
         glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
     
     this->active_prog_ = 0;
     this->active_vao_ = 0;
@@ -200,12 +201,16 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
     switch (type){
         case NRE_GPU_RGB:
             return GL_RGB;
+        case NRE_GPU_SRGB:
+            return GL_SRGB8;
         case NRE_GPU_RGB_U16:
             return GL_RGB16UI;
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
             return GL_RGBA;
+        case NRE_GPU_SRGBA:
+            return GL_SRGB8_ALPHA8;
         case NRE_GPU_RGBA_U16:
             return GL_RGBA16UI;
         case NRE_GPU_DEPTHSTENCIL:
@@ -218,11 +223,15 @@ int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
      switch (type){
         case NRE_GPU_RGB:
             return GL_RGB;
+        case NRE_GPU_SRGB:
+            return GL_RGB;
         case NRE_GPU_RGB_U16:
             return GL_RGB_INTEGER;
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
+            return GL_RGBA;
+        case NRE_GPU_SRGBA:
             return GL_RGBA;
         case NRE_GPU_RGBA_U16:
             return GL_RGBA_INTEGER;
@@ -236,11 +245,15 @@ int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
      switch (type){
         case NRE_GPU_RGB:
             return GL_UNSIGNED_BYTE;
+        case NRE_GPU_SRGB:
+            return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGB_U16:
             return GL_UNSIGNED_SHORT;
         case NRE_GPU_FLOAT:
             return GL_FLOAT;
         case NRE_GPU_RGBA:
+            return GL_UNSIGNED_BYTE;
+        case NRE_GPU_SRGBA:
             return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGBA_U16:
             return GL_UNSIGNED_SHORT;
@@ -583,9 +596,10 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
     }
     else {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        
+        #ifndef OE_WINDOWS
         if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
             glEnable(GL_FRAMEBUFFER_SRGB);
+        #endif
     }
     glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
     //if (glGetError() > 0)
@@ -609,8 +623,10 @@ void NRE_GL3_API::useFrameBuffer(std::size_t id){
     }
     else {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        #ifndef OE_WINDOWS
         if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
             glEnable(GL_FRAMEBUFFER_SRGB);
+        #endif
     }
 }
 
