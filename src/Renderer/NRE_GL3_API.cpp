@@ -606,6 +606,8 @@ void NRE_GL3_API::useFrameBuffer(std::size_t id){
     }
     else {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
+            glEnable(GL_FRAMEBUFFER_SRGB);
     }
 }
 
