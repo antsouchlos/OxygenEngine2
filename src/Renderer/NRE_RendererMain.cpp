@@ -192,9 +192,17 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->use_wireframe = temp;
     }
     
-    this->api->copyFrameBuffer(this->framebuffer, 0);
+    //this->api->copyFrameBuffer(this->framebuffer, 0);
+    
     this->api->useFrameBuffer(0);
-    //this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
+    this->api->use_wireframe = false;
+    this->api->setRenderMode(NRE_GPU_REGULAR_BACKFACE);
+    
+    this->api->setTextureSlot(this->colortexture, 0);
+    this->api->setProgramTextureSlot(this->colortexture, "tex_output", 0);
+    
+    this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
+    
     return true;
 }
 

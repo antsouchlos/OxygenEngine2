@@ -52,6 +52,8 @@ struct NRE_GL3_UniformBuffer{
 struct NRE_GL3_ProgramUniformState{
     std::string name;
     GLint slot{0};
+    GLenum type{GL_FLOAT}; //unused in Uniform blocks
+    size_t size{0}; //unused in Uniform Blocks
 };
 
 struct NRE_GL3_Program{
@@ -115,8 +117,14 @@ public:
     void setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
+    
     void setProgramUniformBlockSlot(std::size_t, std::string, int);
     int  getProgramUniformBlockSlot(std::size_t, std::string);
+    
+    void setProgramTextureSlot(std::size_t, std::string, int);
+    void setProgramUniformData(std::size_t, std::string, uint32_t);
+    void setProgramUniformData(std::size_t, std::string, std::vector<uint32_t>);
+    int  getProgramUniformSlot(std::size_t, std::string);
     
     void setUniformBlockState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     void deleteUniformBuffer(std::size_t);
@@ -190,11 +198,14 @@ private:
     void check_vao_id_(std::size_t, const std::string&);
     void check_prog_id_(std::size_t, const std::string&);
     
+    void check_prog_uniform_block_(std::size_t, const std::string&, const std::string&);
     void check_prog_uniform_(std::size_t, const std::string&, const std::string&);
     void check_vao_vbo_(std::size_t, std::size_t, const std::string&);
     
     void check_fbo_id_(std::size_t, const std::string&);
     void check_texture_id_(std::size_t, const std::string&);
+    
+    void get_program_all_uniforms_(std::size_t);
     
     int teximage_internalformat_(NRE_GPU_TEXTURE_TYPE);
     int teximage_format_(NRE_GPU_TEXTURE_TYPE);

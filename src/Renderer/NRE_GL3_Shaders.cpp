@@ -182,8 +182,10 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             in vec2 position;
             out vec4 fragColor;
             
+            uniform sampler2D tex_output;
+            
             void main(){
-                fragColor = vec4(vec3(0.5), 1.0);
+                fragColor = pow(abs(texture(tex_output, position/2.0 +0.5)), vec4(1.0/2.2));
             }
         ));
         return NRE_GPU_ShaderBase::shader_prefix + output;
@@ -234,35 +236,9 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
         ));
         output.append("\n");
         
-        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
+        
             
-            output.append(NRE_Shader(
-            
-            void main(){
-                
-                vec3 light_pos = vec3( camera_pos);
-                
-                vec3 s = normalize(light_pos-position);
-                vec3 v = normalize(-position);
-                
-                vec3 specular = vec3(0.0);
-                
-                float sDotN = abs(dot(s, normals));
-                
-                if (sDotN > 0.0){
-                    //specular = vec3(0.5);
-                    specular = vec3(pow(sDotN,2.0/ mat_specular_hardness));
-                }
-                
-                vec3 dif_output = clamp(mat_diffuse.rgb*max(sDotN, 0.2), 0.0, 1.0);
-                
-                //fragColor = vec4(abs(normals), 1.0);
-                fragColor = vec4(pow(dif_output, vec3(1.0/2.2)), 1.0);
-            }
-            ));
-        } else {
-            
-            output.append(NRE_Shader(
+        output.append(NRE_Shader(
             
             void main(){
                 
@@ -285,23 +261,11 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
                 //fragColor = vec4(abs(normals), 1.0);
                 fragColor = vec4(dif_output, 1.0);
             }
-            ));
-        }
+        ));
+        
     }
     else if (fs.type == NRE_GPU_FS_NORMALS){
-        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
-            output.append(NRE_Shader(
-            
-            out vec4 fragColor;
-            
-            //const vec3 light_pos = vec3( 13.37035561, -12.76134396, 10.10574818);
-            
-            void main(){
-                
-                fragColor = vec4(pow(abs(normals), vec3(1.0/2.2)), 1.0);
-            }
-            ));
-        } else {
+        
             output.append(NRE_Shader(
             
             out vec4 fragColor;
@@ -313,7 +277,7 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
                 fragColor = vec4(abs(normals), 1.0);
             }
             ));
-        }
+        
     }
     
     return NRE_GPU_ShaderBase::shader_prefix + output;
