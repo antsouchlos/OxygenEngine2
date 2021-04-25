@@ -6,7 +6,12 @@ using namespace std;
 
 OE_SDL_WindowSystem::OE_SDL_WindowSystem(){
     this->winsys = OE_SDL;
+#ifdef OE_PLATFORM_LINUX
     this->os = OE_LINUX;
+#endif
+#ifdef OE_PLATFORM_WINDOWS
+    this->os = OE_WINDOWS;
+#endif
 }
 
 OE_SDL_WindowSystem::~OE_SDL_WindowSystem(){
@@ -115,13 +120,13 @@ void OE_SDL_WindowSystem::finishInit(){
     else
         gladLoadGLES2Loader(SDL_GL_GetProcAddress);
     
-    printf("Vendor:   %s\n", glGetString(GL_VENDOR));
-    printf("Renderer: %s\n", glGetString(GL_RENDERER));
-    printf("Version:  %s\n", glGetString(GL_VERSION));
+    printf("Vendor:   '%s'\n", glGetString(GL_VENDOR));
+    printf("Renderer: '%s'\n", glGetString(GL_RENDERER));
+    printf("Version:  '%s'\n", glGetString(GL_VERSION));
     
-    OE_WriteToLog(string("Vendor:   ") + string((const char*)glGetString(GL_VENDOR)) + "\n");
-    OE_WriteToLog(string("Renderer: ") + string((const char*)glGetString(GL_RENDERER)) + "\n");
-    OE_WriteToLog(string("Version:  ") + string((const char*)glGetString(GL_VERSION)) + "\n");
+    OE_WriteToLog(string("Vendor:   '") + string((const char*)glGetString(GL_VENDOR)) + "'\n");
+    OE_WriteToLog(string("Renderer: '") + string((const char*)glGetString(GL_RENDERER)) + "'\n");
+    OE_WriteToLog(string("Version:  '") + string((const char*)glGetString(GL_VERSION)) + "'\n");
     SDL_GL_SetSwapInterval(1);
     
     SDL_GetWindowSize(window, &this->resolution_x, &this->resolution_y);
