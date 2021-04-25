@@ -169,6 +169,7 @@ bool NRE_Renderer::updateSingleThread(){
     }
     
     this->api->copyFrameBuffer(this->framebuffer, 0);
+    this->api->useFrameBuffer(0);
     return true;
 }
 
