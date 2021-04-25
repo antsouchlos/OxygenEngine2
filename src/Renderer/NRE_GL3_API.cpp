@@ -78,7 +78,7 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
     
     
     if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
-        glEnable(GL_FRAMEBUFFER_SRGB);
+        glDisable(GL_FRAMEBUFFER_SRGB);
     
     this->active_prog_ = 0;
     this->active_vao_ = 0;
