@@ -76,7 +76,7 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
-#ifndef OE_WINDOWS
+#ifndef OE_PLATFORM_WINDOWS
     if ((NRE_GPU_ShaderBase::backend == NRE_GPU_GL))
         glDisable(GL_FRAMEBUFFER_SRGB);
 #endif
@@ -596,7 +596,7 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
     }
     else {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        #ifndef OE_WINDOWS
+        #ifndef OE_PLATFORM_WINDOWS
         if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
             glEnable(GL_FRAMEBUFFER_SRGB);
         #endif
@@ -623,7 +623,7 @@ void NRE_GL3_API::useFrameBuffer(std::size_t id){
     }
     else {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        #ifndef OE_WINDOWS
+        #ifndef OE_PLATFORM_WINDOWS
         if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
             glEnable(GL_FRAMEBUFFER_SRGB);
         #endif
