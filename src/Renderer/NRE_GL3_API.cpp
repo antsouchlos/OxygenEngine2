@@ -583,6 +583,9 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
     }
     else {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        
+        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
+            glEnable(GL_FRAMEBUFFER_SRGB);
     }
     glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
     //if (glGetError() > 0)
