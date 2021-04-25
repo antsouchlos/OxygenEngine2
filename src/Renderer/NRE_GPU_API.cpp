@@ -34,6 +34,8 @@ std::size_t NRE_GPU_API::newVertexLayout(){ return 0;}
 std::size_t NRE_GPU_API::newIndexBuffer(){ return 0;}
 std::size_t NRE_GPU_API::newProgram(){ return 0;}
 std::size_t NRE_GPU_API::newUniformBuffer(){ return 0;}
+std::size_t NRE_GPU_API::newFrameBuffer(){ return 0;}
+std::size_t NRE_GPU_API::newTexture(){ return 0;}
 
 
 void NRE_GPU_API::setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE){}
@@ -58,6 +60,15 @@ void NRE_GPU_API::deleteUniformBuffer(std::size_t){}
 void NRE_GPU_API::setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>){}
 void NRE_GPU_API::deleteVertexLayout(std::size_t){}
 
+void NRE_GPU_API::setTextureFormat(std::size_t, NRE_GPU_TEXTURE_TYPE, NRE_GPU_TEXTURE_FILTER, uint32_t, uint32_t, int){}
+void NRE_GPU_API::setFrameBufferTexture(std::size_t, std::size_t, int){}
+void NRE_GPU_API::setTextureSlot(std::size_t, int){}
+void NRE_GPU_API::deleteTexture(std::size_t){}
+
+void NRE_GPU_API::copyFrameBuffer(std::size_t, std::size_t){}
+void NRE_GPU_API::useFrameBuffer(std::size_t){}
+void NRE_GPU_API::clearFrameBuffer(std::size_t){}
+void NRE_GPU_API::deleteFrameBuffer(std::size_t){}
 
 void NRE_GPU_API::setProgramVS(std::size_t, NRE_GPU_VertexShader){}
 void NRE_GPU_API::setProgramFS(std::size_t, NRE_GPU_PixelShader){}

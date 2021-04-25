@@ -49,12 +49,26 @@ bool NRE_Renderer::init(){
         NRE_GPU_ShaderBase::init(NRE_GPU_GLES, this->screen->major, this->screen->minor);
     }
     
+    this->framebuffer = this->api->newFrameBuffer();
+    this->rendertexture = this->api->newTexture();
+    this->depthtexture = this->api->newTexture();
+    
+    this->api->setTextureFormat(this->rendertexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setFrameBufferTexture(this->framebuffer, this->rendertexture, 0);
+    this->api->setFrameBufferTexture(this->framebuffer, this->depthtexture, 0);
+    
+    
+    
     return true;
 }
 
 bool NRE_Renderer::updateSingleThread(){
     
     this->api->update(this->screen->resolution_x, this->screen->resolution_y);
+    
+    this->api->setTextureFormat(this->rendertexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     
     // generate draw calls
     this->generateDrawCalls();
@@ -72,6 +86,9 @@ bool NRE_Renderer::updateSingleThread(){
     cout << "NRE Materials: " << this->materials.size() << endl;
     cout << "NRE Meshes: " << this->meshes.size() << endl;
     cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
+    
+    this->api->useFrameBuffer(this->framebuffer);
+    this->api->clearFrameBuffer(this->framebuffer);
     
     if (this->loaded_viewport != 0){
         
@@ -150,6 +167,8 @@ bool NRE_Renderer::updateSingleThread(){
         }
         this->api->use_wireframe = temp;
     }
+    
+    this->api->copyFrameBuffer(this->framebuffer, 0);
     return true;
 }
 

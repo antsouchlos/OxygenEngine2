@@ -37,6 +37,20 @@ enum NRE_GPU_RENDERMODE{
     NRE_GPU_TRANSPARENT_BACKFACE
 };
 
+enum NRE_GPU_TEXTURE_TYPE{
+    NRE_GPU_RGB,
+    NRE_GPU_RGB_U16,
+    NRE_GPU_FLOAT,
+    NRE_GPU_RGBA,
+    NRE_GPU_RGBA_U16,
+    NRE_GPU_DEPTHSTENCIL
+};
+
+enum NRE_GPU_TEXTURE_FILTER{
+    NRE_GPU_LINEAR,
+    NRE_GPU_NEAREST
+};
+
 
 /** NRE_GPU_API provides a platform-independent
   * interface for accessing the GPU on differing
@@ -59,6 +73,8 @@ public:
     virtual std::size_t newIndexBuffer();
     virtual std::size_t newProgram();
     virtual std::size_t newUniformBuffer();
+    virtual std::size_t newFrameBuffer();
+    virtual std::size_t newTexture();
     
     virtual void setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     virtual void setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t);
@@ -82,6 +98,15 @@ public:
     virtual void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
     virtual void deleteVertexLayout(std::size_t);
     
+    virtual void setTextureFormat(std::size_t, NRE_GPU_TEXTURE_TYPE, NRE_GPU_TEXTURE_FILTER, uint32_t, uint32_t, int);
+    virtual void setFrameBufferTexture(std::size_t, std::size_t, int);
+    virtual void setTextureSlot(std::size_t, int);
+    virtual void deleteTexture(std::size_t);
+    
+    virtual void copyFrameBuffer(std::size_t, std::size_t);
+    virtual void useFrameBuffer(std::size_t);
+    virtual void clearFrameBuffer(std::size_t);
+    virtual void deleteFrameBuffer(std::size_t);
     
     virtual void setProgramVS(std::size_t, NRE_GPU_VertexShader);
     virtual void setProgramFS(std::size_t, NRE_GPU_PixelShader);

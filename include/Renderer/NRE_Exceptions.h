@@ -79,6 +79,38 @@ namespace nre {
             std::string func_;
     };
     
+    class invalid_framebuffer: public oe::renderer_error {
+        public:
+            
+            invalid_framebuffer(std::size_t id, const std::string &func){
+                name_ = "nre::invalid_framebuffer";
+                id_ = std::to_string(id);
+                func_ = func;
+            }
+            std::string what() const throw() {
+                return "Calling GPU API function '" + func_ + "' with invalid framebuffer ID: '" + id_ + "'.";
+            };
+            
+            std::string id_;
+            std::string func_;
+    };
+    
+    class invalid_texture: public oe::renderer_error {
+        public:
+            
+            invalid_texture(std::size_t id, const std::string &func){
+                name_ = "nre::invalid_texture";
+                id_ = std::to_string(id);
+                func_ = func;
+            }
+            std::string what() const throw() {
+                return "Calling GPU API function '" + func_ + "' with invalid texture ID: '" + id_ + "'.";
+            };
+            
+            std::string id_;
+            std::string func_;
+    };
+    
     class invalid_vertex_layout_buffer: public oe::renderer_error {
         public:
             
