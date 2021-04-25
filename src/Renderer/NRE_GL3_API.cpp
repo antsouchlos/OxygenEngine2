@@ -43,6 +43,10 @@ bool NRE_GL3_Program::operator< (const NRE_GL3_Program& other) const{
     return false;
 }
 
+bool NRE_GL3_Texture::hasChanged(NRE_GPU_TEXTURE_TYPE type_in, NRE_GPU_TEXTURE_FILTER filter_in, int x_in, int y_in, int mipmaps_in){
+    return (this->type == type_in) and (this->filter = filter_in) and (this->x == x_in) and (this->y == y_in) and (this->mipmaps == mipmaps_in);
+}
+
 // ------------------------ API ---------------------- //
 
 std::size_t NRE_GL3_API::getVAOSize(std::size_t id){
@@ -67,9 +71,11 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
         this->y = y_in;
     }
     
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    
     
     if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
         glEnable(GL_FRAMEBUFFER_SRGB);
@@ -93,6 +99,10 @@ void NRE_GL3_API::destroy(){
         glDeleteBuffers(1, &x.second.handle);
     for (auto x: std::exchange(ubos, {}))
         glDeleteBuffers(1, &x.second.handle);
+    for (auto x: std::exchange(fbos, {}))
+        glDeleteFramebuffers(1, &x.second.handle);
+    for (auto x: std::exchange(textures, {}))
+        glDeleteTextures(1, &x.second.handle);
     for (auto x: std::exchange(prog_db, {})){
         glDeleteProgram(x.second);
     }
@@ -169,10 +179,78 @@ void NRE_GL3_API::check_prog_uniform_(std::size_t id, const std::string& name, c
 }
 
 void NRE_GL3_API::check_vao_vbo_(std::size_t id , std::size_t vbo_id, const std::string& func){
-     if(this->vbos.count(vbo_id) == 0){
+    if(this->vbos.count(vbo_id) == 0){
         throw nre::invalid_vertex_layout_buffer(id, vbo_id, func);
     }
 }
+
+void NRE_GL3_API::check_fbo_id_(std::size_t id, const std::string& func){
+    if(this->fbos.count(id) == 0){
+        throw nre::invalid_framebuffer(id, func);
+    }
+}
+
+void NRE_GL3_API::check_texture_id_(std::size_t id, const std::string& func){
+    if(this->textures.count(id) == 0){
+        throw nre::invalid_texture(id, func);
+    }
+}
+
+int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
+    switch (type){
+        case NRE_GPU_RGB:
+            return GL_RGB;
+        case NRE_GPU_RGB_U16:
+            return GL_RGB16UI;
+        case NRE_GPU_FLOAT:
+            return GL_RGB32F;
+        case NRE_GPU_RGBA:
+            return GL_RGBA;
+        case NRE_GPU_RGBA_U16:
+            return GL_RGBA16UI;
+        case NRE_GPU_DEPTHSTENCIL:
+            return GL_DEPTH24_STENCIL8;
+    };
+    return GL_RGB;
+}
+
+int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
+     switch (type){
+        case NRE_GPU_RGB:
+            return GL_RGB;
+        case NRE_GPU_RGB_U16:
+            return GL_RGB_INTEGER;
+        case NRE_GPU_FLOAT:
+            return GL_RGB32F;
+        case NRE_GPU_RGBA:
+            return GL_RGBA;
+        case NRE_GPU_RGBA_U16:
+            return GL_RGBA_INTEGER;
+        case NRE_GPU_DEPTHSTENCIL:
+            return GL_DEPTH_STENCIL;
+    };
+    return GL_RGB;
+}
+
+int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
+     switch (type){
+        case NRE_GPU_RGB:
+            return GL_UNSIGNED_BYTE;
+        case NRE_GPU_RGB_U16:
+            return GL_UNSIGNED_SHORT;
+        case NRE_GPU_FLOAT:
+            return GL_FLOAT;
+        case NRE_GPU_RGBA:
+            return GL_UNSIGNED_BYTE;
+        case NRE_GPU_RGBA_U16:
+            return GL_UNSIGNED_SHORT;
+        case NRE_GPU_DEPTHSTENCIL:
+            return GL_UNSIGNED_INT_24_8;
+    };
+    return GL_UNSIGNED_BYTE;
+}
+
+
 
 //---------------------Create Objects-----------------------------//
 
@@ -207,6 +285,20 @@ std::size_t NRE_GL3_API::newUniformBuffer(){
     this->ubos[cur_ubo] = NRE_GL3_UniformBuffer();
     glGenBuffers(1, &ubos[cur_ubo].handle);
     return cur_ubo;
+}
+
+std::size_t NRE_GL3_API::newFrameBuffer(){ 
+    cur_fbo++;
+    this->fbos[cur_fbo] = NRE_GL3_FrameBuffer();
+    glGenFramebuffers(1, &fbos[cur_fbo].handle);
+    return cur_fbo;
+}
+
+std::size_t NRE_GL3_API::newTexture(){ 
+    cur_texture++;
+    this->textures[cur_texture] = NRE_GL3_Texture();
+    glGenTextures(1, &textures[cur_texture].handle);
+    return cur_texture;
 }
 
 //---------------------Vertex Buffer-----------------------------//
@@ -411,6 +503,116 @@ void NRE_GL3_API::deleteVertexLayout(std::size_t id){
     glDeleteVertexArrays(1, &this->vaos[id].handle);
     this->active_vao_ = 0;
     this->vaos.erase(id);
+}
+
+//-----------------------Textures and Framebuffers -------------//
+
+void NRE_GL3_API::setTextureFormat(std::size_t id, NRE_GPU_TEXTURE_TYPE type, NRE_GPU_TEXTURE_FILTER filter, uint32_t x_in, uint32_t y_in, int mipmap_count){
+    this->check_texture_id_(id, "setTextureFormat");
+    
+    if (this->textures[id].hasChanged(type, filter, x_in, y_in, mipmap_count)) return;
+    
+    this->textures[id].type = type;
+    this->textures[id].filter = filter;
+    this->textures[id].x = x_in;
+    this->textures[id].y = y_in;
+    this->textures[id].mipmaps = mipmap_count;
+    
+    
+    glBindTexture(GL_TEXTURE_2D, this->textures[id].handle);
+    glTexImage2D(GL_TEXTURE_2D, 0, teximage_internalformat_(type), x_in, y_in, 0, teximage_format_(type), teximage_type_(type), 0);
+    if (mipmap_count == 0 and filter == NRE_GPU_LINEAR){
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+    } 
+    else if (mipmap_count == 0 and filter == NRE_GPU_NEAREST){
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  
+    }
+    else{
+        //TODO
+    }
+    if (glGetError() > 0)
+        cout << glGetError() << endl;
+}
+
+void NRE_GL3_API::setFrameBufferTexture(std::size_t fbo_id, std::size_t texture_id, int slot){
+    this->check_fbo_id_(fbo_id, "setFrameBufferTexture");
+    this->check_texture_id_(texture_id, "setFrameBufferTexture");
+    assert ((slot >= 0) and (slot < 3));
+    
+    this->fbos[fbo_id].texture = texture_id;
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[fbo_id].handle);
+    glBindTexture(GL_TEXTURE_2D, this->textures[texture_id].handle);
+    
+    if (this->textures[texture_id].type != NRE_GPU_DEPTHSTENCIL){
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_TEXTURE_2D, this->textures[texture_id].handle, 0);  
+    }
+    else {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, this->textures[texture_id].handle, 0);  
+    }
+    
+    if (glGetError() > 0)
+        cout << glGetError() << endl;
+    
+}
+
+void NRE_GL3_API::setTextureSlot(std::size_t id, int){
+    this->check_texture_id_(id, "setTextureSlot");
+}
+
+void NRE_GL3_API::deleteTexture(std::size_t id){
+    this->check_texture_id_(id, "deleteTexture");
+    glDeleteTextures(1, &this->textures[id].handle);
+    this->textures.erase(id);
+}
+
+void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
+    this->check_fbo_id_(src, "copyFrameBuffer");
+    this->check_texture_id_(this->fbos[src].texture, "copyFrameBuffer");
+    
+    auto x_tmp = this->textures[this->fbos[src].texture].x;
+    auto y_tmp = this->textures[this->fbos[src].texture].y;
+    
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, this->fbos[src].handle);
+    if (target != 0){
+        this->check_fbo_id_(target, "copyFrameBuffer");
+        this->check_texture_id_(this->fbos[target].texture, "copyFrameBuffer");
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbos[target].handle);
+    }
+    else {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+    glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+    //if (glGetError() > 0)
+    //    cout << glGetError() << endl;
+}
+
+void NRE_GL3_API::clearFrameBuffer(std::size_t id){
+    this->check_fbo_id_(id, "copyFrameBuffer");
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[id].handle);
+    glDepthMask(GL_TRUE);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    
+}
+
+void NRE_GL3_API::useFrameBuffer(std::size_t id){
+    if (id != 0){
+        this->check_fbo_id_(id, "copyFrameBuffer");
+        glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[id].handle);
+    }
+    else {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+}
+
+void NRE_GL3_API::deleteFrameBuffer(std::size_t id){
+    this->check_fbo_id_(id, "deleteFrameBuffer");
+    glDeleteFramebuffers(1, &this->fbos[id].handle);
+    this->fbos.erase(id);
 }
 
 //---------------------Shader Programs-----------------------------//
@@ -668,6 +870,7 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, int offset, int 
     if (this->active_vao_ != this->vaos[vao_id].handle){
         glBindVertexArray(this->vaos[vao_id].handle);
         this->active_vao_ = this->vaos[vao_id].handle;
+        this->active_vbo_ = 0;
     }
     glDrawArrays(GL_TRIANGLES, offset, count);
 }
@@ -685,6 +888,7 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id){
     if (this->active_vao_ != this->vaos[vao_id].handle){
         glBindVertexArray(this->vaos[vao_id].handle);
         this->active_vao_ = this->vaos[vao_id].handle;
+        this->active_vbo_ = 0;
     }
     glDrawArrays(GL_TRIANGLES, 0, this->getVAOSize(vao_id));
 }
@@ -703,6 +907,7 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     if (this->active_vao_ != this->vaos[vao_id].handle){
         glBindVertexArray(this->vaos[vao_id].handle);
         this->active_vao_ = this->vaos[vao_id].handle;
+        this->active_vbo_ = 0;
     }
     if (this->vao_ibos_[this->active_vao_] != this->ibos[ibo_id].handle){
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
@@ -725,6 +930,7 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     if (this->active_vao_ != this->vaos[vao_id].handle){
         glBindVertexArray(this->vaos[vao_id].handle);
         this->active_vao_ = this->vaos[vao_id].handle;
+        this->active_vbo_ = 0;
     }
     if (this->vao_ibos_[this->active_vao_] != this->ibos[ibo_id].handle){
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);

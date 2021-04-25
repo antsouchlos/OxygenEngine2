@@ -18,6 +18,25 @@ struct NRE_GL3_IndexBuffer{
     NRE_GPU_BUFFER_USAGE    usage;
 };
 
+struct NRE_GL3_FrameBuffer{
+    GLuint handle;
+    //int components{0};
+    //bool depth{false};
+    //bool stencil{false};
+    std::size_t texture{0};
+};
+
+struct NRE_GL3_Texture{
+    GLuint handle;
+    NRE_GPU_TEXTURE_TYPE type;
+    NRE_GPU_TEXTURE_FILTER filter;
+    int x{0};
+    int y{0};
+    int mipmaps{0};
+    
+    bool hasChanged(NRE_GPU_TEXTURE_TYPE, NRE_GPU_TEXTURE_FILTER, int, int, int);
+};
+
 struct NRE_GL3_VertexArray{
     GLuint                                  handle;
     std::vector<NRE_GPU_VertexLayoutInput>  layout;
@@ -78,6 +97,8 @@ public:
     std::size_t newIndexBuffer();
     std::size_t newProgram();
     std::size_t newUniformBuffer();
+    std::size_t newFrameBuffer();
+    std::size_t newTexture();
     
     void setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t);
@@ -100,6 +121,16 @@ public:
     
     void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
     void deleteVertexLayout(std::size_t);
+    
+    void setTextureFormat(std::size_t, NRE_GPU_TEXTURE_TYPE, NRE_GPU_TEXTURE_FILTER, uint32_t, uint32_t, int);
+    void setFrameBufferTexture(std::size_t, std::size_t, int);
+    void setTextureSlot(std::size_t, int);
+    void deleteTexture(std::size_t);
+    
+    void copyFrameBuffer(std::size_t, std::size_t);
+    void useFrameBuffer(std::size_t);
+    void clearFrameBuffer(std::size_t);
+    void deleteFrameBuffer(std::size_t);
     
     void setProgramVS(std::size_t, NRE_GPU_VertexShader);
     void setProgramFS(std::size_t, NRE_GPU_PixelShader);
@@ -126,12 +157,16 @@ protected:
     std::size_t cur_ibo{0};
     std::size_t cur_vao{0};
     std::size_t cur_ubo{0};
+    std::size_t cur_fbo{0};
+    std::size_t cur_texture{0};
     std::size_t cur_prog{0};
     
     std::unordered_map<std::size_t, NRE_GL3_VertexBuffer>     vbos;
     std::unordered_map<std::size_t, NRE_GL3_IndexBuffer>      ibos;
     std::unordered_map<std::size_t, NRE_GL3_VertexArray>      vaos;
     std::unordered_map<std::size_t, NRE_GL3_UniformBuffer>    ubos;
+    std::unordered_map<std::size_t, NRE_GL3_FrameBuffer>      fbos;
+    std::unordered_map<std::size_t, NRE_GL3_Texture>          textures;
     std::unordered_map<std::size_t, NRE_GL3_Program>          progs;
     
     std::size_t getVAOSize(std::size_t);
@@ -156,6 +191,12 @@ private:
     void check_prog_uniform_(std::size_t, const std::string&, const std::string&);
     void check_vao_vbo_(std::size_t, std::size_t, const std::string&);
     
+    void check_fbo_id_(std::size_t, const std::string&);
+    void check_texture_id_(std::size_t, const std::string&);
+    
+    int teximage_internalformat_(NRE_GPU_TEXTURE_TYPE);
+    int teximage_format_(NRE_GPU_TEXTURE_TYPE);
+    int teximage_type_(NRE_GPU_TEXTURE_TYPE);
     
     // this is useful for preventing OpenGL glBind* command repetitions
     GLuint active_vbo_{0};

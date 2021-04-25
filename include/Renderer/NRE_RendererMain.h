@@ -45,6 +45,11 @@ public:
     std::size_t vao_sphere{0};
     std::size_t ibo_sphere{0};
     
+    std::size_t framebuffer{0};
+    std::size_t rendertexture{0};
+    std::size_t depthtexture{0};
+    
+    
     bool setup_bbox_prog{false};
     bool setup_sphere_prog{false};
     
