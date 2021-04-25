@@ -19,15 +19,15 @@ GLenum NRE2GL_BufferUse(NRE_GPU_BUFFER_USAGE usage){
 }
 
 // get index of a uniform variable in a shader program
-std::size_t NRE_GL3_Program::hasUniform(std::string name){
+std::size_t NRE_GL3_Program::hasUniformBlock(std::string name){
     size_t index = 0;
-    for (auto x: this->uniforms){
+    for (auto x: this->uniform_blocks){
         if (x.name == name){
             return index; 
         }
         index++;
     }
-    return this->uniforms.size();
+    return this->uniform_blocks.size();
 }
 
 bool NRE_GL3_Program::operator< (const NRE_GL3_Program& other) const{
@@ -174,7 +174,7 @@ void NRE_GL3_API::check_prog_id_(std::size_t id, const std::string& func){
 }
     
 void NRE_GL3_API::check_prog_uniform_(std::size_t id, const std::string& name, const std::string& func){
-    if (this->progs[id].hasUniform(name) == this->progs[id].uniforms.size()){
+    if (this->progs[id].hasUniformBlock(name) == this->progs[id].uniform_blocks.size()){
         throw nre::invalid_program_uniform(id, name, func);
     }
 }
@@ -449,17 +449,17 @@ void NRE_GL3_API::setUniformBufferData(std::size_t id, const std::vector<uint32_
     glBufferSubData(GL_UNIFORM_BUFFER, static_cast<GLuint>(offset)*sizeof(uint32_t), v.size()*sizeof(uint32_t), &v[0]);
 }
 
-void NRE_GL3_API::setProgramUniformSlot(std::size_t id, std::string name, int slot){
+void NRE_GL3_API::setProgramUniformBlockSlot(std::size_t id, std::string name, int slot){
     
     this->check_prog_id_(id, "setProgramUniformSlot");
     this->check_prog_uniform_(id, name, "setProgramUniformSlot");
     
-    this->progs[id].uniforms[this->progs[id].hasUniform(name)].slot = slot;
+    this->progs[id].uniform_blocks[this->progs[id].hasUniformBlock(name)].slot = slot;
     
-    glUniformBlockBinding(this->progs[id].handle, this->progs[id].hasUniform(name), slot);
+    glUniformBlockBinding(this->progs[id].handle, this->progs[id].hasUniformBlock(name), slot);
 }
 
-void NRE_GL3_API::setUniformState(std::size_t id, std::size_t program, int slot, std::size_t offset, std::size_t length){
+void NRE_GL3_API::setUniformBlockState(std::size_t id, std::size_t program, int slot, std::size_t offset, std::size_t length){
     
     this->check_ubo_id_(id, "setUniformState");
     this->check_ubo_offset_length_(id, offset + length, "setUniformState");
@@ -471,10 +471,10 @@ void NRE_GL3_API::setUniformState(std::size_t id, std::size_t program, int slot,
         glBindBufferRange(GL_UNIFORM_BUFFER, slot, this->ubos[id].handle, static_cast<GLuint>(offset), static_cast<GLuint>(length));
 }
 
-int  NRE_GL3_API::getProgramUniformSlot(std::size_t id, std::string name){
+int  NRE_GL3_API::getProgramUniformBlockSlot(std::size_t id, std::string name){
     this->check_prog_id_(id, "getProgramUniformSlot");
-    if (this->progs[id].hasUniform(name) != this->progs[id].uniforms.size()){
-        return this->progs[id].uniforms[this->progs[id].hasUniform(name)].slot;
+    if (this->progs[id].hasUniformBlock(name) != this->progs[id].uniform_blocks.size()){
+        return this->progs[id].uniform_blocks[this->progs[id].hasUniformBlock(name)].slot;
     }
     return -2;
 }
@@ -774,7 +774,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     if (this->prog_db.count(this->progs[id]) > 0){
         
         this->progs[id].handle = this->prog_db[this->progs[id]];
-        this->progs[id].uniforms.clear();
+        this->progs[id].uniform_blocks.clear();
         
         /// get all active uniform blocks (again)
         GLint numBlocks=0;
@@ -792,7 +792,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
             auto ubo_state = NRE_GL3_ProgramUniformState();
             ubo_state.name = actual_name;
             ubo_state.slot = -1;
-            this->progs[id].uniforms.push_back(ubo_state);
+            this->progs[id].uniform_blocks.push_back(ubo_state);
         }
         
         return;
@@ -864,7 +864,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         auto ubo_state = NRE_GL3_ProgramUniformState();
         ubo_state.name = actual_name;
         ubo_state.slot = -1;
-        this->progs[id].uniforms.push_back(ubo_state);
+        this->progs[id].uniform_blocks.push_back(ubo_state);
     }
     
 }

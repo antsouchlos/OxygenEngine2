@@ -238,16 +238,16 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup &ren_group){
         this->api->setProgramFS(ren_group.program, ren_group.fs);
         
         this->api->setupProgram(ren_group.program);
-        this->api->setProgramUniformSlot(ren_group.program, "OE_Camera", 0);
-        this->api->setProgramUniformSlot(ren_group.program, "OE_Mesh32", 1);
-        if (this->api->getProgramUniformSlot(ren_group.program, "OE_Material") != -2){
-            this->api->setProgramUniformSlot(ren_group.program, "OE_Material", 2);
+        this->api->setProgramUniformBlockSlot(ren_group.program, "OE_Camera", 0);
+        this->api->setProgramUniformBlockSlot(ren_group.program, "OE_Mesh32", 1);
+        if (this->api->getProgramUniformBlockSlot(ren_group.program, "OE_Material") != -2){
+            this->api->setProgramUniformBlockSlot(ren_group.program, "OE_Material", 2);
         }
     }
     
-    this->api->setUniformState(this->meshes[ren_group.mesh].ubo, ren_group.program, 1, 0, 0);
-    this->api->setUniformState(this->cameras[ren_group.camera].ubo, ren_group.program, 0, 0, 0);
-    this->api->setUniformState(this->materials[ren_group.material].ubo, ren_group.program, 2, 0, 0);
+    this->api->setUniformBlockState(this->meshes[ren_group.mesh].ubo, ren_group.program, 1, 0, 0);
+    this->api->setUniformBlockState(this->cameras[ren_group.camera].ubo, ren_group.program, 0, 0, 0);
+    this->api->setUniformBlockState(this->materials[ren_group.material].ubo, ren_group.program, 2, 0, 0);
     this->api->draw(ren_group.program, this->meshes[ren_group.mesh].vao, this->vgroups[ren_group.vgroup].ibo);
 }
 
@@ -266,27 +266,27 @@ void NRE_Renderer::drawRenderGroupZPrePass(NRE_RenderGroup& ren_group){
         this->api->setProgramVS(ren_group.z_prepass_program, ren_group.vs_z_prepass);
         
         this->api->setupProgram(ren_group.z_prepass_program);
-        this->api->setProgramUniformSlot(ren_group.z_prepass_program, "OE_Camera", 0);
-        this->api->setProgramUniformSlot(ren_group.z_prepass_program, "OE_Mesh32", 1);
+        this->api->setProgramUniformBlockSlot(ren_group.z_prepass_program, "OE_Camera", 0);
+        this->api->setProgramUniformBlockSlot(ren_group.z_prepass_program, "OE_Mesh32", 1);
     }
     
-    this->api->setUniformState(this->meshes[ren_group.mesh].ubo, ren_group.z_prepass_program, 1, 0, 0);
-    this->api->setUniformState(this->cameras[ren_group.camera].ubo, ren_group.z_prepass_program, 0, 0, 0);
+    this->api->setUniformBlockState(this->meshes[ren_group.mesh].ubo, ren_group.z_prepass_program, 1, 0, 0);
+    this->api->setUniformBlockState(this->cameras[ren_group.camera].ubo, ren_group.z_prepass_program, 0, 0, 0);
     this->api->draw(ren_group.z_prepass_program, this->meshes[ren_group.mesh].vao, this->vgroups[ren_group.vgroup].ibo);
     
 }
 
 void NRE_Renderer::drawRenderGroupBoundingBox(NRE_RenderGroup& ren_group){
      
-    this->api->setUniformState(this->meshes[ren_group.mesh].ubo, this->prog_bbox, 1, 0, 0);
-    this->api->setUniformState(this->cameras[ren_group.camera].ubo, this->prog_bbox, 0, 0, 0);        
+    this->api->setUniformBlockState(this->meshes[ren_group.mesh].ubo, this->prog_bbox, 1, 0, 0);
+    this->api->setUniformBlockState(this->cameras[ren_group.camera].ubo, this->prog_bbox, 0, 0, 0);        
     this->api->draw(this->prog_bbox, this->vao_bbox);
 }
 
 void NRE_Renderer::drawRenderGroupBoundingSphere(NRE_RenderGroup& ren_group){
     
-    this->api->setUniformState(this->meshes[ren_group.mesh].ubo, this->prog_sphere, 1, 0, 0);
-    this->api->setUniformState(this->cameras[ren_group.camera].ubo, this->prog_sphere, 0, 0, 0);        
+    this->api->setUniformBlockState(this->meshes[ren_group.mesh].ubo, this->prog_sphere, 1, 0, 0);
+    this->api->setUniformBlockState(this->cameras[ren_group.camera].ubo, this->prog_sphere, 0, 0, 0);        
     this->api->draw(this->prog_sphere, this->vao_sphere, this->ibo_sphere);
 }
 
@@ -325,10 +325,10 @@ void NRE_Renderer::setupBoundingBoxProgram(){
     this->api->setProgramFS(this->prog_bbox, fs_bbox);
         
     this->api->setupProgram(this->prog_bbox);
-    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Camera", 0);
-    this->api->setProgramUniformSlot(this->prog_bbox, "OE_Mesh32", 1);
-    if (this->api->getProgramUniformSlot(this->prog_bbox, "OE_Material") != -2){
-        this->api->setProgramUniformSlot(this->prog_bbox, "OE_Material", 2);
+    this->api->setProgramUniformBlockSlot(this->prog_bbox, "OE_Camera", 0);
+    this->api->setProgramUniformBlockSlot(this->prog_bbox, "OE_Mesh32", 1);
+    if (this->api->getProgramUniformBlockSlot(this->prog_bbox, "OE_Material") != -2){
+        this->api->setProgramUniformBlockSlot(this->prog_bbox, "OE_Material", 2);
     }
 }
 
@@ -340,8 +340,8 @@ void NRE_Renderer::setupBoundingSphereProgram(){
     this->vbo_sphere = this->api->newVertexBuffer();
     this->ibo_sphere = this->api->newIndexBuffer();
     
-    auto sphere_vbo_data = OE_GetBoundingSphereVertexBuffer(1.0f, 1.0f, 32);
-    auto sphere_ibo_data = OE_GetBoundingSphereIndexBuffer(1.0f, 1.0f, 32);
+    auto sphere_vbo_data = OE_GetBoundingSphereVertexBuffer(1.0f, 1.0f, 16);
+    auto sphere_ibo_data = OE_GetBoundingSphereIndexBuffer(1.0f, 1.0f, 16);
     
     this->api->setVertexBufferMemoryData(this->vbo_sphere, sphere_vbo_data, NRE_GPU_STATIC);
     this->api->setIndexBufferMemoryData(this->ibo_sphere, sphere_ibo_data, NRE_GPU_STATIC);
@@ -370,10 +370,10 @@ void NRE_Renderer::setupBoundingSphereProgram(){
     this->api->setProgramFS(this->prog_sphere, fs_sphere);
         
     this->api->setupProgram(this->prog_sphere);
-    this->api->setProgramUniformSlot(this->prog_sphere, "OE_Camera", 0);
-    this->api->setProgramUniformSlot(this->prog_sphere, "OE_Mesh32", 1);
-    if (this->api->getProgramUniformSlot(this->prog_sphere, "OE_Material") != -2){
-        this->api->setProgramUniformSlot(this->prog_sphere, "OE_Material", 2);
+    this->api->setProgramUniformBlockSlot(this->prog_sphere, "OE_Camera", 0);
+    this->api->setProgramUniformBlockSlot(this->prog_sphere, "OE_Mesh32", 1);
+    if (this->api->getProgramUniformBlockSlot(this->prog_sphere, "OE_Material") != -2){
+        this->api->setProgramUniformBlockSlot(this->prog_sphere, "OE_Material", 2);
     }
     
 }
