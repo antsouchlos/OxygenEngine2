@@ -68,8 +68,10 @@ struct NRE_GL3_Program{
     bool prog_created{false};
     GLuint handle{0};
     
-    std::vector<NRE_GL3_ProgramUniformState> uniforms;
+    std::vector<NRE_GL3_ProgramUniformState> uniform_blocks;
+    std::size_t hasUniformBlock(std::string);
     
+    std::vector<NRE_GL3_ProgramUniformState> uniforms;
     std::size_t hasUniform(std::string);
     
     // this is needed for it to be in an std::set
@@ -113,10 +115,10 @@ public:
     void setUniformBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setUniformBufferData(std::size_t, const std::vector<float>&, std::size_t);
     void setUniformBufferData(std::size_t, const std::vector<uint32_t>&, std::size_t);
-    void setProgramUniformSlot(std::size_t, std::string, int);
-    int  getProgramUniformSlot(std::size_t, std::string);
+    void setProgramUniformBlockSlot(std::size_t, std::string, int);
+    int  getProgramUniformBlockSlot(std::size_t, std::string);
     
-    void setUniformState(std::size_t, std::size_t, int, std::size_t, std::size_t);
+    void setUniformBlockState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     void deleteUniformBuffer(std::size_t);
     
     void setVertexLayoutFormat(std::size_t, std::vector<NRE_GPU_VertexLayoutInput>);
