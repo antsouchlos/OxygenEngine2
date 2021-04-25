@@ -49,17 +49,41 @@ bool NRE_Renderer::init(){
         NRE_GPU_ShaderBase::init(NRE_GPU_GLES, this->screen->major, this->screen->minor);
     }
     
+    // setup offscreen framebuffer
     this->framebuffer = this->api->newFrameBuffer();
-    this->rendertexture = this->api->newTexture();
+    this->colortexture = this->api->newTexture();
     this->depthtexture = this->api->newTexture();
     
-    this->api->setTextureFormat(this->rendertexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->colortexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
-    this->api->setFrameBufferTexture(this->framebuffer, this->rendertexture, 0);
+    this->api->setFrameBufferTexture(this->framebuffer, this->colortexture, 0);
     this->api->setFrameBufferTexture(this->framebuffer, this->depthtexture, 0);
     
+    // setup fullscreen quad
+    this->vbo_fullscreen_quad = this->api->newVertexBuffer();
+    this->vao_fullscreen_quad = this->api->newVertexLayout();
     
+    this->api->setVertexBufferMemoryData(this->vbo_fullscreen_quad, {1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, 1.0f}, NRE_GPU_STATIC);
     
+    typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
+    std::vector<VLI> vao_quad_data;
+    vao_quad_data.push_back(VLI(this->vbo_fullscreen_quad, 0, 2, 2));
+    this->api->setVertexLayoutFormat(this->vao_fullscreen_quad, vao_quad_data);
+    
+    // setup gamma correction program
+    this->gamma_cor_prog = this->api->newProgram();
+        
+    NRE_GPU_VertexShader vs_gamma;
+    NRE_GPU_PixelShader fs_gamma;
+        
+    vs_gamma.type = NRE_GPU_VS_UNDEFINED;
+    vs_gamma.fullscreenQuad = true;
+    fs_gamma.type = NRE_GPU_FS_GAMMA;
+        
+    this->api->setProgramVS(this->gamma_cor_prog, vs_gamma);
+    this->api->setProgramFS(this->gamma_cor_prog, fs_gamma);
+        
+    this->api->setupProgram(this->gamma_cor_prog);
     return true;
 }
 
@@ -67,7 +91,7 @@ bool NRE_Renderer::updateSingleThread(){
     
     this->api->update(this->screen->resolution_x, this->screen->resolution_y);
     
-    this->api->setTextureFormat(this->rendertexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->colortexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     
     // generate draw calls
@@ -170,6 +194,7 @@ bool NRE_Renderer::updateSingleThread(){
     
     this->api->copyFrameBuffer(this->framebuffer, 0);
     this->api->useFrameBuffer(0);
+    this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
     return true;
 }
 
