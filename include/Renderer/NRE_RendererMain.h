@@ -35,7 +35,7 @@ public:
     std::set<std::size_t> deleted_scenes;
     
     
-    // bounding box data
+    // bounding box and sphere data
     std::size_t prog_bbox{0};
     std::size_t vbo_bbox{0};
     std::size_t vao_bbox{0};
@@ -45,10 +45,17 @@ public:
     std::size_t vao_sphere{0};
     std::size_t ibo_sphere{0};
     
+    // data for offscreen framebuffer
     std::size_t framebuffer{0};
-    std::size_t rendertexture{0};
+    std::size_t colortexture{0};
     std::size_t depthtexture{0};
     
+    // data for fullscreen quad
+    std::size_t vbo_fullscreen_quad{0};
+    std::size_t vao_fullscreen_quad{0};
+    
+    // gamma correction program
+    std::size_t gamma_cor_prog{0};
     
     bool setup_bbox_prog{false};
     bool setup_sphere_prog{false};

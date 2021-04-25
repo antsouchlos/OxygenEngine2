@@ -15,12 +15,13 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
     
     if (vs.fullscreenQuad){
         output = NRE_Shader(
-            layout (location=0) in vec3 oe_position;
+            layout (location=0) in vec2 oe_position;
             
-            out vec4 position;
+            out vec2 position;
             
             void main(){
-                position = vec4(oe_position, 0.0, 1.0);
+                position = oe_position;
+                gl_Position = vec4(oe_position, 0.0, 1.0);
             }
         );
     }
@@ -165,12 +166,24 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
         output.append("precision mediump float; \n");
     }
     
-    if (fs.type == NRE_GPU_FS_UNDEFINED){
+    if ((fs.type == NRE_GPU_FS_UNDEFINED) or (fs.type == NRE_GPU_FS_SIMPLE)){
         output.append(NRE_Shader(
+            in vec2 position;
             out vec4 fragColor;
             
             void main(){
-                fragColor = vec4(1.0);
+                fragColor = vec4(vec3(0.5), 1.0);
+            }
+        ));
+        return NRE_GPU_ShaderBase::shader_prefix + output;
+    }
+    else if (fs.type == NRE_GPU_FS_GAMMA){
+        output.append(NRE_Shader(
+            in vec2 position;
+            out vec4 fragColor;
+            
+            void main(){
+                fragColor = vec4(vec3(0.5), 1.0);
             }
         ));
         return NRE_GPU_ShaderBase::shader_prefix + output;
