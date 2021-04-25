@@ -94,6 +94,11 @@ public:
     virtual void setProgramUniformBlockSlot(std::size_t, std::string, int);
     virtual int  getProgramUniformBlockSlot(std::size_t, std::string);
     
+    virtual void setProgramTextureSlot(std::size_t, std::string, int);
+    virtual void setProgramUniformData(std::size_t, std::string, uint32_t);
+    virtual void setProgramUniformData(std::size_t, std::string, std::vector<uint32_t>);
+    virtual int  getProgramUniformSlot(std::size_t, std::string);
+    
     virtual void setUniformBlockState(std::size_t, std::size_t, int, std::size_t, std::size_t);
     virtual void deleteUniformBuffer(std::size_t);
     
