@@ -18,7 +18,7 @@ GLenum NRE2GL_BufferUse(NRE_GPU_BUFFER_USAGE usage){
     return buf_usage;
 }
 
-// get index of a uniform variable in a shader program
+// get index of a uniform block variable in a shader program
 std::size_t NRE_GL3_Program::hasUniformBlock(std::string name){
     size_t index = 0;
     for (auto x: this->uniform_blocks){
@@ -28,6 +28,18 @@ std::size_t NRE_GL3_Program::hasUniformBlock(std::string name){
         index++;
     }
     return this->uniform_blocks.size();
+}
+
+// get index of a uniform variable in a shader program
+std::size_t NRE_GL3_Program::hasUniform(std::string name){
+    size_t index = 0;
+    for (auto x: this->uniforms){
+        if (x.name == name){
+            return index; 
+        }
+        index++;
+    }
+    return this->uniforms.size();
 }
 
 bool NRE_GL3_Program::operator< (const NRE_GL3_Program& other) const{
@@ -75,11 +87,6 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
     glDepthMask(GL_TRUE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    
-#ifndef OE_PLATFORM_WINDOWS
-    if ((NRE_GPU_ShaderBase::backend == NRE_GPU_GL))
-        glDisable(GL_FRAMEBUFFER_SRGB);
-#endif
     
     this->active_prog_ = 0;
     this->active_vao_ = 0;
@@ -173,8 +180,14 @@ void NRE_GL3_API::check_prog_id_(std::size_t id, const std::string& func){
     }
 }
     
-void NRE_GL3_API::check_prog_uniform_(std::size_t id, const std::string& name, const std::string& func){
+void NRE_GL3_API::check_prog_uniform_block_(std::size_t id, const std::string& name, const std::string& func){
     if (this->progs[id].hasUniformBlock(name) == this->progs[id].uniform_blocks.size()){
+        throw nre::invalid_program_uniform_block(id, name, func);
+    }
+}
+
+void NRE_GL3_API::check_prog_uniform_(std::size_t id, const std::string& name, const std::string& func){
+    if (this->progs[id].hasUniform(name) == this->progs[id].uniforms.size()){
         throw nre::invalid_program_uniform(id, name, func);
     }
 }
@@ -194,6 +207,52 @@ void NRE_GL3_API::check_fbo_id_(std::size_t id, const std::string& func){
 void NRE_GL3_API::check_texture_id_(std::size_t id, const std::string& func){
     if(this->textures.count(id) == 0){
         throw nre::invalid_texture(id, func);
+    }
+}
+
+void NRE_GL3_API::get_program_all_uniforms_(std::size_t id){
+    
+    /// get all active uniform blocks (again)
+    GLint numBlocks=0;
+    glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
+    for(int ida=0; ida< numBlocks; ida++){
+
+        GLint name_length=0;
+
+        glGetActiveUniformBlockiv(this->progs[id].handle, ida, GL_UNIFORM_BLOCK_NAME_LENGTH, &name_length);
+
+        GLchar ubo_name[name_length];
+        glGetActiveUniformBlockName(this->progs[id].handle, ida, name_length, NULL, &ubo_name[0]);
+
+        string actual_name = string(ubo_name);
+        auto ubo_state = NRE_GL3_ProgramUniformState();
+        ubo_state.name = actual_name;
+        ubo_state.slot = -1;
+        this->progs[id].uniform_blocks.push_back(ubo_state);
+    }
+    
+    GLint numUniforms=0;
+    glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORMS, &numUniforms);
+    for(GLint ida=0; ida< numUniforms; ida++){
+
+        GLint name_length=0;
+        GLuint idb = ida;
+        
+        glGetActiveUniformsiv(this->progs[id].handle, 1, &idb, GL_UNIFORM_NAME_LENGTH, &name_length);
+
+        GLchar uniform_name[name_length];
+        GLenum var_enum;
+        GLint uniform_size;
+        glGetActiveUniform(this->progs[id].handle, ida, name_length, &name_length, &uniform_size, &var_enum, &uniform_name[0]);
+
+        string actual_name = string(uniform_name);
+        auto uniform_state = NRE_GL3_ProgramUniformState();
+        uniform_state.name = actual_name;
+        uniform_state.slot = -1;
+        uniform_state.type = var_enum;
+        uniform_state.size = uniform_size;
+        //cout << uniform_state.name << " " << uniform_state.type << " " << uniform_state.size << endl;
+        this->progs[id].uniforms.push_back(uniform_state);
     }
 }
 
@@ -449,10 +508,49 @@ void NRE_GL3_API::setUniformBufferData(std::size_t id, const std::vector<uint32_
     glBufferSubData(GL_UNIFORM_BUFFER, static_cast<GLuint>(offset)*sizeof(uint32_t), v.size()*sizeof(uint32_t), &v[0]);
 }
 
+//----------------------Uniform State ----------------//
+
+void NRE_GL3_API::setProgramTextureSlot(std::size_t id, std::string name, int slot){
+    this->check_prog_id_(id, "setProgramTextureSlot");
+    this->check_prog_uniform_(id, name, "setProgramTextureSlot");
+    
+    if (this->active_prog_ != this->progs[id].handle){
+        glUseProgram(this->progs[id].handle);
+        this->active_prog_ = this->progs[id].handle;
+    }
+    auto uniform_type_enum = this->progs[id].uniforms[this->progs[id].hasUniform(name)].type;
+    if ((uniform_type_enum == GL_SAMPLER_2D) or (uniform_type_enum == GL_SAMPLER_2D_SHADOW)){
+        glUniform1i(this->progs[id].hasUniform(name), slot);
+    }
+    else {
+        cout << "[NRE Warning] No sampler2D uniform named '" << name << "' in program ID: " << id << "." << endl;
+        OE_WriteToLog("[NRE Warning] No sampler2D uniform named '" + name + "' in program ID: " + to_string(id) + ".");
+    }
+}
+void NRE_GL3_API::setProgramUniformData(std::size_t id, std::string name, uint32_t data){
+    this->check_prog_id_(id, "setProgramUniformData");
+    this->check_prog_uniform_(id, name, "setProgramUniformData");
+    //TODO
+    
+}
+void NRE_GL3_API::setProgramUniformData(std::size_t id, std::string name, std::vector<uint32_t> data){
+    this->check_prog_id_(id, "setProgramUniformData");
+    this->check_prog_uniform_(id, name, "setProgramUniformData");
+    //TODO
+}
+
+int  NRE_GL3_API::getProgramUniformSlot(std::size_t id, std::string name){
+    this->check_prog_id_(id, "getProgramUniformSlot");
+    if (this->progs[id].hasUniform(name) != this->progs[id].uniforms.size()){
+        return this->progs[id].uniforms[this->progs[id].hasUniform(name)].slot;
+    }
+    return -2;
+}
+
 void NRE_GL3_API::setProgramUniformBlockSlot(std::size_t id, std::string name, int slot){
     
-    this->check_prog_id_(id, "setProgramUniformSlot");
-    this->check_prog_uniform_(id, name, "setProgramUniformSlot");
+    this->check_prog_id_(id, "setProgramUniformBlockSlot");
+    this->check_prog_uniform_block_(id, name, "setProgramUniformBlockSlot");
     
     this->progs[id].uniform_blocks[this->progs[id].hasUniformBlock(name)].slot = slot;
     
@@ -461,9 +559,9 @@ void NRE_GL3_API::setProgramUniformBlockSlot(std::size_t id, std::string name, i
 
 void NRE_GL3_API::setUniformBlockState(std::size_t id, std::size_t program, int slot, std::size_t offset, std::size_t length){
     
-    this->check_ubo_id_(id, "setUniformState");
-    this->check_ubo_offset_length_(id, offset + length, "setUniformState");
-    this->check_prog_id_(program, "setUniformState");
+    this->check_ubo_id_(id, "setUniformBlockState");
+    this->check_ubo_offset_length_(id, offset + length, "setUniformBlockState");
+    this->check_prog_id_(program, "setUniformBlockState");
     
     if(length == 0)
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, this->ubos[id].handle);
@@ -472,7 +570,7 @@ void NRE_GL3_API::setUniformBlockState(std::size_t id, std::size_t program, int 
 }
 
 int  NRE_GL3_API::getProgramUniformBlockSlot(std::size_t id, std::string name){
-    this->check_prog_id_(id, "getProgramUniformSlot");
+    this->check_prog_id_(id, "getProgramUniformBlockSlot");
     if (this->progs[id].hasUniformBlock(name) != this->progs[id].uniform_blocks.size()){
         return this->progs[id].uniform_blocks[this->progs[id].hasUniformBlock(name)].slot;
     }
@@ -571,8 +669,10 @@ void NRE_GL3_API::setFrameBufferTexture(std::size_t fbo_id, std::size_t texture_
     
 }
 
-void NRE_GL3_API::setTextureSlot(std::size_t id, int){
+void NRE_GL3_API::setTextureSlot(std::size_t id, int slot){
     this->check_texture_id_(id, "setTextureSlot");
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, this->textures[id].handle);
 }
 
 void NRE_GL3_API::deleteTexture(std::size_t id){
@@ -596,10 +696,6 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
     }
     else {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        #ifndef OE_PLATFORM_WINDOWS
-        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
-            glEnable(GL_FRAMEBUFFER_SRGB);
-        #endif
     }
     glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
     //if (glGetError() > 0)
@@ -623,10 +719,6 @@ void NRE_GL3_API::useFrameBuffer(std::size_t id){
     }
     else {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        #ifndef OE_PLATFORM_WINDOWS
-        if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL)
-            glEnable(GL_FRAMEBUFFER_SRGB);
-        #endif
     }
 }
 
@@ -777,23 +869,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         this->progs[id].uniform_blocks.clear();
         
         /// get all active uniform blocks (again)
-        GLint numBlocks=0;
-        glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
-        for(int ida=0; ida< numBlocks; ida++){
-
-            GLint name_length=0;
-
-            glGetActiveUniformBlockiv(this->progs[id].handle, ida, GL_UNIFORM_BLOCK_NAME_LENGTH, &name_length);
-
-            GLchar ubo_name[name_length];
-            glGetActiveUniformBlockName(this->progs[id].handle, ida, name_length, NULL, &ubo_name[0]);
-
-            string actual_name = string(ubo_name);
-            auto ubo_state = NRE_GL3_ProgramUniformState();
-            ubo_state.name = actual_name;
-            ubo_state.slot = -1;
-            this->progs[id].uniform_blocks.push_back(ubo_state);
-        }
+        this->get_program_all_uniforms_(id);
         
         return;
     }
@@ -850,22 +926,7 @@ void NRE_GL3_API::setupProgram(std::size_t id){
     this->active_prog_ = this->progs[id].handle;
     
     /// get all active uniform blocks
-    GLint numBlocks=0;
-    glGetProgramiv(this->progs[id].handle, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
-    for(int ida=0; ida< numBlocks; ida++){
-
-        GLint name_length=10;
-        glGetActiveUniformBlockiv(this->progs[id].handle, ida, GL_UNIFORM_BLOCK_NAME_LENGTH, &name_length);
-
-        GLchar ubo_name[name_length];
-        glGetActiveUniformBlockName(this->progs[id].handle, ida, name_length, NULL, &ubo_name[0]);
-
-        string actual_name = string(ubo_name);
-        auto ubo_state = NRE_GL3_ProgramUniformState();
-        ubo_state.name = actual_name;
-        ubo_state.slot = -1;
-        this->progs[id].uniform_blocks.push_back(ubo_state);
-    }
+    this->get_program_all_uniforms_(id);
     
 }
 

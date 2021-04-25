@@ -163,6 +163,24 @@ namespace nre {
             std::string uniform_;
     };
     
+    class invalid_program_uniform_block: public oe::renderer_error {
+        public:
+            
+            invalid_program_uniform_block(std::size_t id, std::string uniform, const std::string &func){
+                name_ = "nre::invalid_program_uniform_block";
+                id_ = std::to_string(id);
+                func_ = func;
+                uniform_ = uniform;
+            }
+            std::string what() const throw() {
+                return "Calling GPU API function '" + func_ + "' with shader program ID: '" + id_ + "' having no uniform BLOCK variable named '" + uniform_ + "'.\n\tNote that it might be optimized out by the shader compiler (for example on Intel GPUs on Windows).";
+            };
+            
+            std::string id_;
+            std::string func_;
+            std::string uniform_;
+    };
+    
     
     class invalid_buffer_offset_length: public oe::renderer_error {
         public:
