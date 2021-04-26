@@ -93,6 +93,7 @@ class OE_RendererBase : public OE_THREAD_SAFETY_OBJECT {
     std::atomic<bool>           use_wireframe{false};
     std::atomic<bool>           render_bounding_boxes{false};
     std::atomic<bool>           render_bounding_spheres{false};
+    std::atomic<bool>           use_HDR{false};
 };
 
 /** This is a dummy class aimed to be a base class for

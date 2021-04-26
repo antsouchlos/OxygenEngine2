@@ -423,6 +423,9 @@ namespace oe{
     
     void render_bounding_spheres(bool);
     void toggle_bounding_spheres_rendering();
+    
+    void render_HDR(bool);
+    void toggle_render_HDR();
 };
 
 
