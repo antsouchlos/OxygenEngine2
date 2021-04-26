@@ -633,3 +633,25 @@ void oe::toggle_bounding_spheres_rendering(){
     }
     OE_Main->renderer_mutex.unlockMutex();
 }
+
+void oe::render_HDR(bool value){
+    OE_API_Helpers::checkIfInit();
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->use_HDR = value;
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
+void oe::toggle_render_HDR(){
+    OE_API_Helpers::checkIfInit();
+    OE_Main->renderer_mutex.lockMutex();
+    if (OE_Main->renderer != nullptr){
+        OE_Main->renderer->lockMutex();
+        if (OE_Main->renderer->use_HDR)
+            OE_Main->renderer->use_HDR = false;
+        else
+            OE_Main->renderer->use_HDR = true;
+        OE_Main->renderer->unlockMutex();
+    }
+    OE_Main->renderer_mutex.unlockMutex();
+}
