@@ -71,7 +71,8 @@ int OnLoadObject(oe::task, string);
 
 int renderer_toggle_wireframe( oe::task, string event_name){
     
-    oe::toggle_wireframe_rendering();
+    //oe::toggle_wireframe_rendering();
+    oe::toggle_render_HDR();
     return 0;
 }
 
