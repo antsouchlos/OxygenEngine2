@@ -70,7 +70,7 @@ void NRE_GPU_API::setFrameBufferTexture(std::size_t, std::size_t, int){}
 void NRE_GPU_API::setTextureSlot(std::size_t, int){}
 void NRE_GPU_API::deleteTexture(std::size_t){}
 
-void NRE_GPU_API::copyFrameBuffer(std::size_t, std::size_t){}
+void NRE_GPU_API::copyFrameBuffer(std::size_t, std::size_t, NRE_GPU_FRAMEBUFFER_COPY){}
 void NRE_GPU_API::useFrameBuffer(std::size_t){}
 void NRE_GPU_API::clearFrameBuffer(std::size_t){}
 void NRE_GPU_API::deleteFrameBuffer(std::size_t){}

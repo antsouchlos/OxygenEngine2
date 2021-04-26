@@ -34,7 +34,8 @@ enum NRE_GPU_RENDERMODE{
     NRE_GPU_Z_PREPASS_BACKFACE,
     NRE_GPU_AFTERPREPASS_BACKFACE,
     NRE_GPU_REGULAR_BOTH,
-    NRE_GPU_TRANSPARENT_BACKFACE
+    NRE_GPU_TRANSPARENT_BACKFACE,
+    NRE_GPU_FULLSCREEN_QUAD
 };
 
 enum NRE_GPU_TEXTURE_TYPE{
@@ -44,6 +45,7 @@ enum NRE_GPU_TEXTURE_TYPE{
     NRE_GPU_FLOAT,
     NRE_GPU_RGBA,
     NRE_GPU_RGB10_A2,
+    NRE_GPU_RGBA16F,
     NRE_GPU_SRGBA,
     NRE_GPU_RGBA_U16,
     NRE_GPU_DEPTHSTENCIL
@@ -54,6 +56,11 @@ enum NRE_GPU_TEXTURE_FILTER{
     NRE_GPU_NEAREST
 };
 
+enum NRE_GPU_FRAMEBUFFER_COPY{
+    NRE_GPU_FBO_COLOR,
+    NRE_GPU_FBO_DEPTHSTENCIL,
+    NRE_GPU_FBO_ALL
+};
 
 /** NRE_GPU_API provides a platform-independent
   * interface for accessing the GPU on differing
@@ -111,7 +118,7 @@ public:
     virtual void setTextureSlot(std::size_t, int);
     virtual void deleteTexture(std::size_t);
     
-    virtual void copyFrameBuffer(std::size_t, std::size_t);
+    virtual void copyFrameBuffer(std::size_t, std::size_t, NRE_GPU_FRAMEBUFFER_COPY);
     virtual void useFrameBuffer(std::size_t);
     virtual void clearFrameBuffer(std::size_t);
     virtual void deleteFrameBuffer(std::size_t);

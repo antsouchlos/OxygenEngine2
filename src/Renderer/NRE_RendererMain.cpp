@@ -192,11 +192,11 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->use_wireframe = temp;
     }
     
-    //this->api->copyFrameBuffer(this->framebuffer, 0);
+    this->api->copyFrameBuffer(this->framebuffer, 0, NRE_GPU_FBO_DEPTHSTENCIL);
     
     this->api->useFrameBuffer(0);
     this->api->use_wireframe = false;
-    this->api->setRenderMode(NRE_GPU_REGULAR_BACKFACE);
+    this->api->setRenderMode(NRE_GPU_FULLSCREEN_QUAD);
     
     this->api->setTextureSlot(this->colortexture, 0);
     this->api->setProgramTextureSlot(this->colortexture, "tex_output", 0);
