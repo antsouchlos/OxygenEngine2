@@ -255,6 +255,13 @@ Blender addon improvements. Now can export rotations and material colors correct
 
 NRE: Added initial bounding spheres rendering. Needs only a few improvements.
 
+2021/04/26 - philsegeler
+
+Under the hood renderer improvements and necessary additions:
+- Added multiple framebuffer support (now offscreen rendering to a higher resolution buffer is happening)
+- Added proper cross-platform gamma support
+- Added post-processing shader possibility
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
