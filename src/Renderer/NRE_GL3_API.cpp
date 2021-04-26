@@ -270,6 +270,8 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
             return GL_RGBA;
         case NRE_GPU_RGB10_A2:
             return GL_RGB10_A2;
+        case NRE_GPU_RGBA16F:
+            return GL_RGBA16F;
         case NRE_GPU_SRGBA:
             return GL_SRGB8_ALPHA8;
         case NRE_GPU_RGBA_U16:
@@ -293,6 +295,8 @@ int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
         case NRE_GPU_RGBA:
             return GL_RGBA;
         case NRE_GPU_RGB10_A2:
+            return GL_RGBA;
+        case NRE_GPU_RGBA16F:
             return GL_RGBA;
         case NRE_GPU_SRGBA:
             return GL_RGBA;
@@ -318,6 +322,8 @@ int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
             return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGB10_A2:
             return GL_UNSIGNED_INT_2_10_10_10_REV;
+        case NRE_GPU_RGBA16F:
+            return GL_FLOAT;
         case NRE_GPU_SRGBA:
             return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGBA_U16:
@@ -687,7 +693,7 @@ void NRE_GL3_API::deleteTexture(std::size_t id){
     this->textures.erase(id);
 }
 
-void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
+void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target, NRE_GPU_FRAMEBUFFER_COPY method){
     this->check_fbo_id_(src, "copyFrameBuffer");
     this->check_texture_id_(this->fbos[src].texture, "copyFrameBuffer");
     
@@ -703,7 +709,14 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target){
     else {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
-    glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+    if (method == NRE_GPU_FBO_COLOR){
+    glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    } else if (method == NRE_GPU_FBO_DEPTHSTENCIL){
+        glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+    }
+    else {
+        glBlitFramebuffer(0,0, x_tmp, y_tmp, 0, 0, x_tmp, y_tmp, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+    }
     //if (glGetError() > 0)
     //    cout << glGetError() << endl;
 }
@@ -1076,6 +1089,19 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         
         glDisable(GL_CULL_FACE);
     }
+    else if (rendermode == NRE_GPU_FULLSCREEN_QUAD){
+        glDisable(GL_BLEND);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glColorMask(1, 1, 1, 1);
+        glDepthMask(GL_FALSE);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_BACK); /// cull back face
+        glFrontFace (GL_CCW);
+    }
+    
     else {
         // TODO
     }

@@ -137,7 +137,7 @@ public:
     void setTextureSlot(std::size_t, int);
     void deleteTexture(std::size_t);
     
-    void copyFrameBuffer(std::size_t, std::size_t);
+    void copyFrameBuffer(std::size_t, std::size_t, NRE_GPU_FRAMEBUFFER_COPY);
     void useFrameBuffer(std::size_t);
     void clearFrameBuffer(std::size_t);
     void deleteFrameBuffer(std::size_t);
