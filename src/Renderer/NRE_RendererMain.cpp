@@ -54,7 +54,7 @@ bool NRE_Renderer::init(){
     this->colortexture = this->api->newTexture();
     this->depthtexture = this->api->newTexture();
     
-    this->api->setTextureFormat(this->colortexture, NRE_GPU_RGB, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->colortexture, NRE_GPU_RGB10_A2, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     this->api->setFrameBufferTexture(this->framebuffer, this->colortexture, 0);
     this->api->setFrameBufferTexture(this->framebuffer, this->depthtexture, 0);

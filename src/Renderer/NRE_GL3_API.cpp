@@ -268,6 +268,8 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
             return GL_RGB32F;
         case NRE_GPU_RGBA:
             return GL_RGBA;
+        case NRE_GPU_RGB10_A2:
+            return GL_RGB10_A2;
         case NRE_GPU_SRGBA:
             return GL_SRGB8_ALPHA8;
         case NRE_GPU_RGBA_U16:
@@ -289,6 +291,8 @@ int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
+            return GL_RGBA;
+        case NRE_GPU_RGB10_A2:
             return GL_RGBA;
         case NRE_GPU_SRGBA:
             return GL_RGBA;
@@ -312,6 +316,8 @@ int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
             return GL_FLOAT;
         case NRE_GPU_RGBA:
             return GL_UNSIGNED_BYTE;
+        case NRE_GPU_RGB10_A2:
+            return GL_UNSIGNED_INT_2_10_10_10_REV;
         case NRE_GPU_SRGBA:
             return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGBA_U16:

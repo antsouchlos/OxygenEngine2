@@ -185,7 +185,16 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             uniform sampler2D tex_output;
             
             void main(){
-                fragColor = pow(abs(texture(tex_output, position/2.0 +0.5)), vec4(1.0/2.2));
+                vec4 sampled_data = texture(tex_output, position/2.0 +0.5);
+                for (int i=0; i <4; i++){
+                    if (sampled_data[i] <= 0.00314){
+                        sampled_data[i] = sampled_data[i]*12.92;
+                    }
+                    else{
+                        sampled_data[i] = 1.055*pow(sampled_data[i], 1.0/2.4) - 0.055;
+                    }
+                }
+                fragColor = sampled_data;
             }
         ));
         return NRE_GPU_ShaderBase::shader_prefix + output;
