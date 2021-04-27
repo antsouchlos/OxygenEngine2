@@ -71,8 +71,8 @@ int OnLoadObject(oe::task, string);
 
 int renderer_toggle_wireframe( oe::task, string event_name){
     
-    //oe::toggle_wireframe_rendering();
-    oe::toggle_render_HDR();
+    oe::toggle_wireframe_rendering();
+    //oe::toggle_render_HDR();
     return 0;
 }
 
@@ -181,8 +181,8 @@ int main(){
 	//oe::load_world_func("monkeys.csl", &OnLoadObject);
 	//oe::load_world_func("csl_very_large_object_test.csl", &OnLoadObject);
 	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
-	//oe::load_world_func("some_car.csl", &OnLoadObject);
-    oe::load_world_func("OE_Demo.csl", &OnLoadObject);
+	oe::load_world_func("audi_r8.csl", &OnLoadObject);
+    //oe::load_world_func("OE_Demo.csl", &OnLoadObject);
 	
 	//taskMgr.Start();
     oe::start();
