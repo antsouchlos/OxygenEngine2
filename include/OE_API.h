@@ -424,6 +424,7 @@ namespace oe{
     void render_bounding_spheres(bool);
     void toggle_bounding_spheres_rendering();
     
+    // These two do not require a call to OE_RestartRenderer
     void render_HDR(bool);
     void toggle_render_HDR();
 };
