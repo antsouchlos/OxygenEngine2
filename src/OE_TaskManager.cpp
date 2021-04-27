@@ -130,7 +130,7 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     this->done = false;
     
     this->CreateNewThread("default");
-    //this->CreateNewThread("something else");
+    this->CreateNewThread("something else");
     //this->CreateUnsyncThread("independent", &test_unsync_thread, nullptr);
     return 0;
 }
