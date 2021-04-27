@@ -32,6 +32,8 @@ class OE_Light : public OE_Object{
         OE_RGBColor                 color;
         float                       intensity;
         float                       fov, range;
+        
+        int priotity{0};
 };
 
 

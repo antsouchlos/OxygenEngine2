@@ -1092,10 +1092,10 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     else if (rendermode == NRE_GPU_FULLSCREEN_QUAD){
         glDisable(GL_BLEND);
         
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
+        glDisable(GL_DEPTH_TEST);
+        //glDepthFunc(GL_LEQUAL);
         glColorMask(1, 1, 1, 1);
-        glDepthMask(GL_FALSE);
+        glDepthMask(GL_TRUE);
         
         glEnable (GL_CULL_FACE);
         glCullFace (GL_BACK); /// cull back face
