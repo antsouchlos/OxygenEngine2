@@ -153,6 +153,13 @@ namespace oe{
             std::string name_;
     };
     
+    class networking_error {
+        public:
+            virtual std::string what() const throw() = 0;
+            virtual ~networking_error() = default;
+            std::string name_;
+    };
+    
     // sub classes
 }
 
