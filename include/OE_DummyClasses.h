@@ -120,6 +120,7 @@ class OE_PhysicsEngineBase : public OE_THREAD_SAFETY_OBJECT {
 /** This is a dummy class aimed to be a base class for
  *  a netwotking manager
  */
+
 class OE_NetworkingBase : public OE_THREAD_SAFETY_OBJECT {
     public:
     OE_NetworkingBase();
@@ -130,6 +131,7 @@ class OE_NetworkingBase : public OE_THREAD_SAFETY_OBJECT {
     virtual void destroy();
     
     std::atomic<bool> done{false};
+    std::string       name{"default"};
 };
 
 #endif
