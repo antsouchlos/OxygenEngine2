@@ -1,4 +1,5 @@
 #include <OE_DummyClasses.h>
+#include <OE_API.h>
 
 // Dummy definitions of the class methods
 // so that the classes can stand on their own and be used
@@ -82,4 +83,27 @@ bool OE_PhysicsEngineBase::updateMultiThread(OE_Task* task, int thread_num){
 
 void OE_PhysicsEngineBase::destroy(){
     return;
+}
+
+OE_NetworkingBase::OE_NetworkingBase(){}
+OE_NetworkingBase::~OE_NetworkingBase(){}
+    
+void OE_NetworkingBase::init(){}
+    
+int OE_NetworkingBase::execute(OE_Task){
+    
+    //int a =0;
+    
+    while(!done){
+        // manage networking stuff, use your own threads etc.
+        // YOU control the loop. Upon a call on this->destroy() it should stop though
+        // use oe::create_event() and oe::broadcastEvent() to communicate with the engine 
+        //cout << "OE_Networking is running" << ++a << endl;
+        oe::pause(10);
+    }
+    return 0;
+    
+}
+void OE_NetworkingBase::destroy(){
+    done = true;
 }

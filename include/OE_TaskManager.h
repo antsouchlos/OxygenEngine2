@@ -114,6 +114,8 @@ class OE_TaskManager: public OE_MutexCondition
         OE_THREAD_SAFETY_OBJECT             window_mutex;
         OE_WindowSystemBase*                window{nullptr};
         
+        OE_NetworkingBase*                  network{nullptr};
+        
         std::shared_ptr<OE_World>   world{nullptr};
         
         std::shared_ptr<OE_World>   pending_world{nullptr}; // for loading a world
@@ -169,6 +171,9 @@ class OE_TaskManager: public OE_MutexCondition
         
     private:
         
+        void syncBeginFrame();
+        void syncEndFrame();
+        
         void updateWorld();
         void runThreadTasks(const std::string&);
         void sortThreadTasks(const std::string&);
@@ -187,6 +192,7 @@ class OE_TaskManager: public OE_MutexCondition
         void tryRun_winsys_init(int, int, std::string, bool, void*);
         void tryRun_physics_init();
         void tryRun_renderer_init();
+        void tryRun_network_init();
 };
 
 #endif
