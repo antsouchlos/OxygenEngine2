@@ -80,6 +80,12 @@ int OE_TaskManager::tryRun_unsync_thread(OE_UnsyncThreadData* actual_data){
         cout << error_str;
         OE_WriteToLog(error_str);
     }
+    catch(oe::networking_error& e){
+        std::string error_str = "[SLC Error] " + e.name_ + " thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
+        error_str += "\t" + e.what() + "\n";
+        cout << error_str;
+        OE_WriteToLog(error_str);
+    }
     catch(std::exception& e){
         std::string error_str = "[OE Error] std::exception variant thrown in unsync thread: '" + unsync_task.GetName() + "'" +"\n";
         error_str += "\t" + string(e.what()) + "\n";
@@ -340,6 +346,29 @@ void OE_TaskManager::tryRun_renderer_init(){
     }
     catch(...){
         std::string error_str = "[NRE Error] Could not initialize renderer due to thrown exception in renderer->init()";
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
+}
+
+void OE_TaskManager::tryRun_network_init(){
+    try{
+        this->network->init();
+    }
+    catch(oe::networking_error &e){
+        std::string error_str =  "[SLC Error] " + e.name_ + " thrown in networking initialization";
+        error_str += "\n\t" + e.what();
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
+    catch(std::exception &e){
+        std::string error_str =  "[SLC Error] " + string(typeid(e).name()) + " thrown in networking initialization";
+        error_str += "\n\t" + string(e.what());
+        cout << error_str << endl;
+        OE_WriteToLog(error_str + "\n");
+    }
+    catch(...){
+        std::string error_str = "[SLC Error] Could not initialize networking due to thrown exception in network->init()";
         cout << error_str << endl;
         OE_WriteToLog(error_str + "\n");
     }

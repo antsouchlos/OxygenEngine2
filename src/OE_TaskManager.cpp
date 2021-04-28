@@ -3,7 +3,7 @@
 #include <OE_TaskManager.h>
 #include <Renderer/NRE_RendererMain.h>
 #include <OE_SDL_WindowSystem.h>
-
+#include <OE_API.h>
 
 using namespace std;
 
@@ -120,7 +120,10 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     this->physics = new OE_PhysicsEngineBase();
     this->tryRun_physics_init();
     this->physics_mutex.unlockMutex();
-
+    
+    this->network = new OE_NetworkingBase();
+    this->tryRun_network_init();
+    
     this->createCondition();
     this->createCondition();
     this->createCondition();
@@ -131,7 +134,7 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
     this->CreateNewThread("default");
     this->CreateNewThread("something else");
-    //this->CreateUnsyncThread("independent", &test_unsync_thread, nullptr);
+    oe::create_unsync_thread_method("network", &OE_NetworkingBase::execute, this->network);
     return 0;
 }
 
@@ -168,24 +171,9 @@ void OE_TaskManager::CreateNewThread(string thread_name){
     unlockMutex();
 }
 
-// This is for removing finished unsynchronized threads
-// Otherwise they will pile up and waste memory on longer gaming sessions
-void OE_TaskManager::removeFinishedUnsyncThreads(){
-    lockMutex();
-    for (const auto &x: this->finished_unsync_threadIDs){
-        SDL_DetachThread(this->unsync_threadIDs[x]);
-        this->unsync_threadIDs.erase(x);
-    }
-    this->finished_unsync_threadIDs.clear();
-    unlockMutex();
-}
+// SYNCHRONIZATION
 
-/************************
- *  STEP
- * ***********************/
-
-void OE_TaskManager::Step(){
-    //synchronize at start
+void OE_TaskManager::syncBeginFrame(){
     lockMutex();
     started_threads++;
     
@@ -197,16 +185,9 @@ void OE_TaskManager::Step(){
         condWait(1);
     }
     unlockMutex();
-    
-    this->tryRun_renderer_updateSingleThread();
-    
-    done = this->tryRun_winsys_update();
-    // count how many times the step function has been called
-    countar++;
-    
-    // THIS is where obsolete unsync threads are cleaned up
-    this->removeFinishedUnsyncThreads();
-    
+}
+
+void OE_TaskManager::syncEndFrame(){
     lockMutex();
     completed_threads++;
 
@@ -240,6 +221,26 @@ void OE_TaskManager::Step(){
         condWait(2);
     }
     unlockMutex();
+}
+
+/************************
+ *  STEP
+ * ***********************/
+
+void OE_TaskManager::Step(){
+    //synchronize at start
+    this->syncBeginFrame();
+    
+    this->tryRun_renderer_updateSingleThread();
+    
+    done = this->tryRun_winsys_update();
+    // count how many times the step function has been called
+    countar++;
+    
+    // THIS is where obsolete unsync threads are cleaned up
+    this->removeFinishedUnsyncThreads();
+    
+    this->syncEndFrame();
 
     
     if (this->world != nullptr){
@@ -274,6 +275,10 @@ void OE_TaskManager::Destroy(){
     lockMutex();
     completed_threads++;
     unlockMutex();
+    
+    
+    this->network->destroy();
+    
     int thread_output = 0;
     for (auto thread : this->threadIDs){
         SDL_WaitThread(thread.second, &thread_output);
@@ -297,6 +302,7 @@ void OE_TaskManager::Destroy(){
     delete this->renderer;
     delete this->physics;
     delete this->window;
+    delete this->network;
     
     if (this->world != nullptr)
         this->world = nullptr;
@@ -314,18 +320,7 @@ void OE_TaskManager::updateThread(const string name){
     // obtain the queue in which the tasks are executed if the task queue if changed
     while(!done){
         //synchronize at start
-        lockMutex();
-        started_threads++;
-        
-        if (started_threads > getReadyThreads()){
-            started_threads = 0;
-            condBroadcast(1);
-        }
-        else{
-            
-            condWait(1);
-        }
-        unlockMutex();
+        this->syncBeginFrame();
         
         auto ticks = this->getTicks();
         if(this->threads[name].changed){
@@ -333,6 +328,7 @@ void OE_TaskManager::updateThread(const string name){
         }
         this->runThreadTasks(name);
         
+        // this if statement should normally be redundant but it crashes without it. No idea why
         if(this->threads[name].synchronize == true){
             
             // for physics engine
@@ -375,25 +371,25 @@ void OE_TaskManager::updateThread(const string name){
             this->tryRun_physics_updateMultiThread(name, comp_threads_copy);
             /**************************/
             
-            /// add this thread to already
-            /// finished-thread counter
-            lockMutex();
-            completed_threads++;            
-            if(completed_threads > getReadyThreads()){
-                /// if this is the last motheyacking thread
-                /// that slows down the game, signal all other threads
-                /// to continue and reset the counter
-                completed_threads = 0;
-                condBroadcast(2);
-            }
-            else{
-                /// if this is NOT dat last sh**
-                /// wait indefinitely for a signal from the last thread
-                condWait(2);
-            }
-            unlockMutex();
+            this->syncEndFrame();
         }
     }
+}
+
+/************************
+ *  OTHER FUNCS
+ * ***********************/
+
+// This is for removing finished unsynchronized threads
+// Otherwise they will pile up and waste memory on longer gaming sessions
+void OE_TaskManager::removeFinishedUnsyncThreads(){
+    lockMutex();
+    for (const auto &x: this->finished_unsync_threadIDs){
+        SDL_DetachThread(this->unsync_threadIDs[x]);
+        this->unsync_threadIDs.erase(x);
+    }
+    this->finished_unsync_threadIDs.clear();
+    unlockMutex();
 }
 
 int OE_TaskManager::getReadyThreads(){
@@ -409,9 +405,7 @@ int OE_TaskManager::getReadyThreads(){
     return number_of_threads;
 }
 
-/************************
- *  OTHER FUNCS
- * ***********************/
+
 
 void OE_TaskManager::updateWorld(){
     lockMutex();
