@@ -262,6 +262,10 @@ Under the hood renderer improvements and necessary additions:
 - Added proper cross-platform gamma support
 - Added post-processing shader possibility
 
+2021/04/28 - philsegeler
+
+Added ```OE_NetworkingBase``` base class for Silicon in ```OE_DummyClasses.h/.cpp```. It runs asynchronously to the main engine. the networking manager can communicate through ```oe::create_event(...)``` and ```oe::broadcast_event()``` with ```OE_TaskManager```.
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
