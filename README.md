@@ -289,7 +289,7 @@ UPDATE 2020/11/12: It was enhanced.
 - Implement sorting front-to-back or back-to-front of objects
 - Implement Directional Light rendering pass.
 - Implement Point+Area Light-Indexed rendering pass.
-- Support multiple render targets and framebuffers in the Renderer API
+- ~~Support multiple render targets and framebuffers in the Renderer API~~(DONE)
 - Implement Light Indexed Deferred Renderer.
 - Integration of the ```SDL2_image``` library and basic Texture streaming support with diffuse maps.
 - Integration of the ```SDL2_ttf``` + ```'freetype``` libraries and basic font loading and text-rendering support.

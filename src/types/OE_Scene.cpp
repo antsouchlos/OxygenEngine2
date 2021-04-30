@@ -60,19 +60,19 @@ string OE_Scene::to_str(){
     }
     
     for (const auto& x: this->objects){
-        if(OE_World::objectsList[x].p_->getType() == "MESH32"){
+        if(OE_World::objectsList[x].p_->getType() == OE_OBJECT_MESH){
             output.append(OE_World::objectsList[x].p_->to_str());
             output.append("\n");
         }
     }
     for (const auto& x: this->objects){
-        if(OE_World::objectsList[x].p_->getType() == "LIGHT"){
+        if(OE_World::objectsList[x].p_->getType() == OE_OBJECT_LIGHT){
             output.append(OE_World::objectsList[x].p_->to_str());
             output.append("\n");
         }
     }
     for (const auto& x: this->objects){
-        if(OE_World::objectsList[x].p_->getType() == "CAMERA"){
+        if(OE_World::objectsList[x].p_->getType() == OE_OBJECT_CAMERA){
             output.append(OE_World::objectsList[x].p_->to_str());
             output.append("\n");
         }
