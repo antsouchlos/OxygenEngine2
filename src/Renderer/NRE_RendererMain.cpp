@@ -1,6 +1,7 @@
 #include <OE_Math.h>
 #include <Renderer/NRE_RendererMain.h>
 #include <Renderer/NRE_GL3_API.h>
+#include <iostream>
 
 using namespace std;
 
@@ -90,6 +91,7 @@ bool NRE_Renderer::init(){
     this->api->setProgramFS(this->gamma_cor_prog, fs_gamma);
         
     this->api->setupProgram(this->gamma_cor_prog);
+    this->api->setProgramTextureSlot(this->gamma_cor_prog, "tex_output", 0);
     return true;
 }
 
@@ -124,9 +126,9 @@ bool NRE_Renderer::updateSingleThread(){
     
     this->api->useFrameBuffer(this->framebuffer);
     this->api->clearFrameBuffer(this->framebuffer);
-    
+
     if (this->loaded_viewport != 0){
-        
+
         auto lv = this->loaded_viewport;
         
         if (this->viewports[lv].cameras.size() == 0){
@@ -164,7 +166,7 @@ bool NRE_Renderer::updateSingleThread(){
         }
         this->scenes[scene_id].render_groups.update();
     
-        // optionally draw a bounding box for each object (in wireframe mode)
+        // optionally draw a bounding box/sphere for each object (in wireframe mode)
         bool temp = this->api->use_wireframe;
         bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
         bool render_spheres = this->render_bounding_spheres.load(std::memory_order_relaxed);
@@ -210,7 +212,6 @@ bool NRE_Renderer::updateSingleThread(){
     this->api->setRenderMode(NRE_GPU_FULLSCREEN_QUAD);
     
     this->api->setTextureSlot(this->colortexture, 0);
-    this->api->setProgramTextureSlot(this->colortexture, "tex_output", 0);
     
     this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
     
