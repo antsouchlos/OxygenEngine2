@@ -13,6 +13,14 @@ struct OE_ObjectData{
     std::vector<float> to_arr() const;
 };
 
+enum OE_OBJECT_TYPE{
+    OE_OBJECT_UNDEFINED,
+    OE_OBJECT_MESH,
+    OE_OBJECT_LIGHT,
+    OE_OBJECT_CAMERA
+};
+
+
 /** OE_Object is the base class for all objects in a scene
  *  It is the basis for Mesh, Light, Camera, Particle etc.
  */
@@ -32,7 +40,7 @@ class OE_Object : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         OE_Object(const std::string&);
         virtual ~OE_Object();
         
-        virtual std::string getType() const;
+        virtual OE_OBJECT_TYPE getType() const;
         virtual std::string to_str() const;        
         
         OE_Quat GetRot();

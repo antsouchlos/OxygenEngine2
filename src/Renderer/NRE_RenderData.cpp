@@ -80,7 +80,7 @@ bool NRE_Renderer::updateData(){
         }
         
         for (auto obj : OE_World::objectsList){
-            if (obj.p_->getType() == "MESH32"){
+            if (obj.p_->getType() == OE_OBJECT_MESH){
                 auto mesh = static_pointer_cast<OE_Mesh32>(obj.p_);
                 mesh->data->vbo_exists = false;
                 mesh->data->ibos_exist = false;
@@ -106,16 +106,16 @@ bool NRE_Renderer::updateData(){
     }
         
     for (auto obj : OE_World::objectsList.changed()){
-        if (obj.p_->getType() == "MESH32"){
+        if (obj.p_->getType() == OE_OBJECT_MESH){
            this->handleMeshData(obj.id_, static_pointer_cast<OE_Mesh32>(obj.p_));
         }
-        else if (obj.p_->getType() == "LIGHT"){
+        else if (obj.p_->getType() == OE_OBJECT_LIGHT){
             this->handleLightData(obj.id_, static_pointer_cast<OE_Light>(obj.p_));
         }
     }
     
     for (auto obj : OE_World::objectsList.changed()){
-        if (obj.p_->getType() == "CAMERA"){
+        if (obj.p_->getType() == OE_OBJECT_CAMERA){
            this->handleCameraData(obj.id_, static_pointer_cast<OE_Camera>(obj.p_));
            camera_ids.push_back(obj.id_);
         }

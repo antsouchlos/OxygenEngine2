@@ -40,7 +40,7 @@ void OE_World::setup(){
         for (auto scene : OE_World::scenesList){
             
             for (auto obj : scene.p_->objects){
-                if (OE_World::objectsList[obj].p_->getType() == "CAMERA"){
+                if (OE_World::objectsList[obj].p_->getType() == OE_OBJECT_CAMERA){
                     
                     // create and store default viewport config
                     std::shared_ptr<OE_ViewportConfig> vp_config = std::make_shared<OE_ViewportConfig>();

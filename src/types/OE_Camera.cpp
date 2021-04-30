@@ -23,8 +23,8 @@ OE_Camera::~OE_Camera(){
     
 }
 
-string OE_Camera::getType() const{
-    return "CAMERA";
+OE_OBJECT_TYPE OE_Camera::getType() const{
+    return OE_OBJECT_CAMERA;
 }
 
 string OE_Camera::to_str() const{

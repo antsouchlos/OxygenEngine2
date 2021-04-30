@@ -16,7 +16,7 @@ class OE_Camera : public OE_Object {
         OE_Camera(const std::string&);
         ~OE_Camera();
         
-        std::string getType() const;
+        OE_OBJECT_TYPE getType() const;
         std::string to_str() const;
         
 //    protected:
