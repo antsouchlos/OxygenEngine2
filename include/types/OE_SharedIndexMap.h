@@ -203,7 +203,7 @@ public:
     
     void force_append_now(const std::string& name, std::shared_ptr<T> element){
         lockMutex();
-        this->force_appendUNSAFE(name, element);
+        this->force_appendUNSAFE_now(name, element);
         unlockMutex();
     }
     
@@ -216,6 +216,7 @@ public:
         }
         this->elements_[element->id] = element;
         this->id2name_[element->id] = name;
+        this->changed_.add(element->id);
     }
     
     std::string to_str(){

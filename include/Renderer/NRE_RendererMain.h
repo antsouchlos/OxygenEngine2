@@ -24,8 +24,12 @@ public:
     std::map<std::size_t, NRE_MaterialRenderData> materials;
     std::map<std::size_t, NRE_VGroupRenderData> vgroups;
     std::map<std::size_t, NRE_MeshRenderData> meshes;
+    
     std::map<std::size_t, NRE_DirectionalLightRenderData> dir_lights;
     std::map<std::size_t, NRE_PointLightRenderData> pt_lights;
+    bool has_dir_lights_changed{false};
+    bool has_pt_lights_changed{false};
+    
     std::map<std::size_t, NRE_SceneRenderData> scenes;
     std::map<std::size_t, NRE_ViewportRenderData> viewports;    
     
@@ -75,6 +79,7 @@ protected:
     void updateMeshGPUData();
     void updateMaterialGPUData();
     void updateCameraGPUData();
+    void updateLightGPUData();
     
     void deleteCamera(std::size_t);
     void deleteMaterial(std::size_t);
