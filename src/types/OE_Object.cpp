@@ -38,8 +38,8 @@ string OE_Object::to_str() const{
     return "NOTHING";
 }
 
-string OE_Object::getType() const{
-    return "OBJECT";
+OE_OBJECT_TYPE OE_Object::getType() const{
+    return OE_OBJECT_UNDEFINED;
 }
 
 void OE_Object::SetRot(OE_Quat quat){

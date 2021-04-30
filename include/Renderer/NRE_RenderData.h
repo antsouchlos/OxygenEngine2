@@ -80,7 +80,11 @@ struct NRE_MeshRenderData : public NRE_BaseObject{
 
 struct NRE_PointLightRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
-
+    
+    OE_RGBColor                 color;
+    float                       intensity{0.0f};
+    float                       range{0.0f};
+    
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
@@ -88,7 +92,10 @@ struct NRE_PointLightRenderData : public NRE_BaseObject{
 
 struct NRE_DirectionalLightRenderData : public NRE_BaseObject{
     OE_Mat4x4       model_mat;
-
+    OE_RGBColor                 color;
+    float                       intensity;
+    
+    
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};

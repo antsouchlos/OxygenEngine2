@@ -23,7 +23,8 @@ class OE_Light : public OE_Object{
         OE_Light(const std::string&);
         ~OE_Light();
         
-        std::string getType() const;
+        std::vector<float> GetLightGPUData();
+        OE_OBJECT_TYPE getType() const;
         std::string to_str() const;
         
 //    protected:

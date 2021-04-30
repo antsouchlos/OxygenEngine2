@@ -88,8 +88,8 @@ void OE_Mesh32::calculateProperBoundingBox(){
 }
 
 
-string OE_Mesh32::getType() const{
-    return "MESH32";
+OE_OBJECT_TYPE OE_Mesh32::getType() const{
+    return OE_OBJECT_MESH;
 }
 
 std::string OE_Mesh32::to_str() const{

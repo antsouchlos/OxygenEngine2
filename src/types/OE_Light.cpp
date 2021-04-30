@@ -27,8 +27,36 @@ OE_Light::~OE_Light(){
     
 }
 
-string OE_Light::getType() const{
-    return "LIGHT";
+std::vector<float> OE_Light::GetLightGPUData(){
+    std::vector<float> output;
+    
+    // point_light
+    if (this->light_type == 1){
+        output.push_back(this->current_state.pos_x);
+        output.push_back(this->current_state.pos_y);
+        output.push_back(this->current_state.pos_z);
+        output.push_back(this->intensity);
+        
+        output.push_back(this->color.r);
+        output.push_back(this->color.g);
+        output.push_back(this->color.b);
+        output.push_back(this->range);
+        
+    }
+    // sun light (directional)
+    else if (this->light_type == 2){
+        
+    } 
+    else {
+        //UNDEFINED
+    }
+    
+    
+    return output;
+}
+
+OE_OBJECT_TYPE OE_Light::getType() const{
+    return OE_OBJECT_LIGHT;
 }
 
 string OE_Light::to_str() const{
