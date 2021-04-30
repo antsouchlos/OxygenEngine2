@@ -104,7 +104,10 @@ bool NRE_Renderer::updateData(){
     for (auto mat : OE_World::materialsList.changed()){
         this->handleMaterialData(mat.id_, mat.p_);
     }
-        
+    
+    this->has_dir_lights_changed = false;
+    this->has_pt_lights_changed = false;
+    
     for (auto obj : OE_World::objectsList.changed()){
         if (obj.p_->getType() == OE_OBJECT_MESH){
            this->handleMeshData(obj.id_, static_pointer_cast<OE_Mesh32>(obj.p_));
@@ -138,7 +141,7 @@ bool NRE_Renderer::updateData(){
             this->deleted_materials.insert(mat.id_);
         }
     }
-        
+
     for (auto obj : OE_World::objectsList.deleted()){
         
         if (this->meshes.count(obj.id_) == 1){
@@ -147,9 +150,11 @@ bool NRE_Renderer::updateData(){
         }
         else if (this->dir_lights.count(obj.id_) == 1){
             this->dir_lights.erase(obj.id_);
+            this->has_dir_lights_changed = true;
         }
         else if (this->pt_lights.count(obj.id_) == 1){
             this->pt_lights.erase(obj.id_);
+            this->has_pt_lights_changed = true;
         }
         else if (this->cameras.count(obj.id_) == 1){
             this->scenes[this->cameras[obj.id_].scene_id].render_groups.removeCamera(obj.id_);
@@ -171,7 +176,7 @@ bool NRE_Renderer::updateData(){
         if (this->viewports.count(vpc.id_) == 1){
             this->viewports.erase(vpc.id_);
             if (this->loaded_viewport == vpc.id_){
-                this->loaded_viewport = 0;
+                this->loaded_viewport = 0; // needed for compatibility with older .csl with no viewportconfigs
             }
         }
     }
@@ -276,7 +281,6 @@ void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, std::sh
 void NRE_Renderer::handleMaterialData(std::size_t id, std::shared_ptr<OE_Material> mat){
     if (this->materials.count(id) == 0){
         this->materials[id] = NRE_MaterialRenderData(); this->materials[id].id = id;
-        this->materials[id].ubo = this->api->newUniformBuffer();
         this->materials[id].data = mat->GetRendererData();
         this->materials[id].changed = true;
     } 
@@ -293,7 +297,6 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
         // but offload the actual OpenGL commands for later, since this runs in a performance
         // critical section
         this->cameras[id] = NRE_CameraRenderData(); this->cameras[id].id = id;
-        this->cameras[id].ubo = this->api->newUniformBuffer();
 
         auto view_mat = camera->GetViewMatrix();
         auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.3f, (float)camera->far*50.0f);
@@ -322,7 +325,42 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
 }
 
 void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> light){
-    
+    if (light->light_type == 1){
+        //POINT LIGHT
+        if (this->pt_lights.count(id) == 0){
+            this->pt_lights[id] = NRE_PointLightRenderData(); this->pt_lights[id].id = id;
+            
+            this->pt_lights[id].model_mat = light->GetModelMatrix();
+            this->pt_lights[id].color     = light->color;
+            this->pt_lights[id].intensity = light->intensity;
+            this->pt_lights[id].range     = light->range;
+            
+            //this->pt_lights[id].data = light->GetLightGPUData();
+            this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
+            this->pt_lights[id].changed = true;
+            
+            this->has_pt_lights_changed = true;
+        }
+        else {
+            this->pt_lights[id].model_mat = light->GetModelMatrix();
+            this->pt_lights[id].color     = light->color;
+            this->pt_lights[id].intensity = light->intensity;
+            this->pt_lights[id].range     = light->range;
+            
+            //this->pt_lights[id].data = light->GetLightGPUData();
+            this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
+            this->pt_lights[id].changed = true;
+        }
+    }
+    else if (light->light_type == 2){
+        //DIRECTIONAL LIGHT
+    }
+    else if (light->light_type == 3){
+        // SPOTLIGHT
+    }
+    else{
+        //NOTHING
+    }
 }
 
 void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> scene){
@@ -513,6 +551,12 @@ void NRE_Renderer::updateMeshGPUData(){
 
 void NRE_Renderer::updateMaterialGPUData(){
     for (auto mat: this->materials){
+        
+        if (!this->materials[mat.first].has_init){
+            this->materials[mat.first].ubo = this->api->newUniformBuffer();
+            this->materials[mat.first].has_init = true;
+        }
+        
         if (this->materials[mat.first].changed){
             
             if (this->materials[mat.first].size != this->materials[mat.first].data.size()){
@@ -533,6 +577,11 @@ void NRE_Renderer::updateMaterialGPUData(){
 
 void NRE_Renderer::updateCameraGPUData(){
     for (auto cam: this->cameras){
+        
+        if (!this->cameras[cam.first].has_init){
+            this->cameras[cam.first].ubo = this->api->newUniformBuffer();
+            this->cameras[cam.first].has_init = true;
+        }
         if (this->cameras[cam.first].changed){
             
             if (this->cameras[cam.first].size != this->cameras[cam.first].data.size()){
@@ -550,6 +599,27 @@ void NRE_Renderer::updateCameraGPUData(){
     }
     this->deleted_cameras.clear();
 }
+void NRE_Renderer::updateLightGPUData(){
+    for (auto l: this->pt_lights){
+        
+        if (!this->pt_lights[l.first].has_init){
+            this->pt_lights[l.first].ubo = this->api->newUniformBuffer();
+            this->pt_lights[l.first].has_init = true;
+        }
+        if (this->pt_lights[l.first].changed){
+            
+            if (this->pt_lights[l.first].size != this->pt_lights[l.first].data.size()){
+                this->pt_lights[l.first].size = this->pt_lights[l.first].data.size();
+                this->api->setUniformBufferMemory(this->pt_lights[l.first].ubo, this->pt_lights[l.first].size, NRE_GPU_DYNAMIC);
+            }
+            
+            this->api->setUniformBufferData(this->pt_lights[l.first].ubo, this->pt_lights[l.first].data, 0);
+            this->pt_lights[l.first].changed = false;
+        }
+    }
+}
+
+// deletes
 
 void NRE_Renderer::deleteCamera(std::size_t id){
     
