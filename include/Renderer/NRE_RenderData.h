@@ -19,6 +19,10 @@ struct NRE_BaseObject{
 struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
     OE_Mat4x4       view_mat;
+    OE_Mat4x4       model_mat;
+    
+    float           near{0.0f};
+    float           far{0.0f};
     
     std::size_t     scene_id{0};
     std::size_t     ubo{0};

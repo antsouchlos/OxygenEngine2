@@ -316,16 +316,21 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
         this->cameras[id] = NRE_CameraRenderData(); this->cameras[id].id = id;
     }
     
+    this->cameras[id].near = (float)camera->near+0.3f;
+    this->cameras[id].far = (float)camera->far + 50.0f;
+    
     auto view_mat = camera->GetViewMatrix();
-    auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.3f, (float)camera->far*50.0f);
+    auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, this->cameras[id].near, this->cameras[id].far);
     
     this->cameras[id].view_mat = view_mat;
+    this->cameras[id].model_mat = camera->GetModelMatrix();
     this->cameras[id].perspective_view_mat = perspective_mat*view_mat;
     
     this->cameras[id].data = OE_Mat4x4ToSTDVector(this->cameras[id].perspective_view_mat);
-    this->cameras[id].data.push_back(camera->current_state.pos_x);
-    this->cameras[id].data.push_back(camera->current_state.pos_y);
-    this->cameras[id].data.push_back(camera->current_state.pos_z);
+
+    this->cameras[id].data.push_back(this->cameras[id].model_mat[3].x);
+    this->cameras[id].data.push_back(this->cameras[id].model_mat[3].y);
+    this->cameras[id].data.push_back(this->cameras[id].model_mat[3].z);
     this->cameras[id].data.push_back(1.0f);
     this->cameras[id].changed = true;
 }
@@ -341,7 +346,7 @@ void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> lig
         this->pt_lights[id].model_mat = light->GetModelMatrix();
         this->pt_lights[id].color     = light->color;
         this->pt_lights[id].intensity = light->intensity;
-        this->pt_lights[id].range     = light->range;
+        this->pt_lights[id].range     = light->range/20.0f;
             
         //this->pt_lights[id].data = light->GetLightGPUData();
         this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
