@@ -39,6 +39,9 @@ public:
     std::set<std::size_t> deleted_scenes;
     
     
+    // light draw calls
+    std::set<NRE_PointLightDrawCall, std::greater<NRE_PointLightDrawCall>> pt_visible_lights;
+    
     // bounding box and sphere data
     std::size_t prog_bbox{0};
     std::size_t vbo_bbox{0};
@@ -86,6 +89,7 @@ protected:
     void deleteMesh(std::size_t);
     
     void generateDrawCalls();
+    void sortPointLights(std::size_t, std::size_t);
     
     void drawRenderGroup(NRE_RenderGroup&);
     void drawRenderGroupZPrePass(NRE_RenderGroup&);
