@@ -18,6 +18,7 @@ struct NRE_BaseObject{
 
 struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
+    OE_Mat4x4       perspective_mat;
     OE_Mat4x4       view_mat;
     OE_Mat4x4       model_mat;
     

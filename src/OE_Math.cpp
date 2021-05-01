@@ -11,6 +11,17 @@ using namespace std;
 
 // overloading operators
 
+OE_Vec4 OE_Vec4::operator + (const OE_Vec4& other){
+    auto temp = static_cast<glm::vec4>(*this) + static_cast<glm::vec4>(other);
+    return OE_Vec4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+OE_Vec4 OE_Vec4::operator - (const OE_Vec4& other){
+    auto temp = static_cast<glm::vec4>(*this) - static_cast<glm::vec4>(other);
+    return OE_Vec4(temp[0], temp[1], temp[2], temp[3]);
+}
+
+
 OE_Quat::OE_Quat(glm::quat q){
     this->w = q.w;
     this->x = q.x;
@@ -28,6 +39,12 @@ OE_Mat4x4 OE_Mat4x4::operator * (const OE_Mat4x4& other){
     auto temp = static_cast<glm::mat4>(*this) * static_cast<glm::mat4>(other);
     return OE_Mat4x4(temp[0], temp[1], temp[2], temp[3]);
 }
+
+OE_Vec4 OE_Mat4x4::operator * (const OE_Vec4& other){
+    auto temp = static_cast<glm::mat4>(*this) * static_cast<glm::vec4>(other);
+    return OE_Vec4(temp[0], temp[1], temp[2], temp[3]);
+}
+
 
 OE_Quat OE_Quat::operator * (const OE_Quat& other){
     auto temp = static_cast<glm::quat>(*this) * static_cast<glm::quat>(other);
@@ -105,6 +122,13 @@ OE_Mat4x4 OE_Perspective(float fov, float aspect, float near, float far){
 	return output;
 
 }
+
+OE_Vec4  OE_GetClipCoords(OE_Mat4x4 perspective, OE_Vec4 view_coords){
+    OE_Vec4 temp = perspective*view_coords;
+    OE_Vec4 temp2 = OE_Vec4(temp[0]/temp.w, temp[1]/temp.w, temp[2]/temp.w, temp[3]/temp.w);
+    return temp2;
+}
+
 
 OE_Quat OE_QuatFromAxisAngle(float a, float xx, float yy, float zz){
     float factor = std::sin( a / 2.0f );
