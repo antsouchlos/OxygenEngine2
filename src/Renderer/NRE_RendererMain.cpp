@@ -212,9 +212,9 @@ bool NRE_Renderer::updateSingleThread(){
             this->setupBoundingSphereProgram();
             this->setup_sphere_prog = true;
         }
-        this->api->setRenderMode(NRE_GPU_REGULAR_FRONTFACE);
-        for (auto l: this->pt_lights){
-            this->api->setUniformBlockState(this->pt_lights[l.first].ubo, this->prog_sphere, 1, 0, 0);
+        this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
+        for (auto l: this->pt_visible_lights){
+            this->api->setUniformBlockState(this->pt_lights[l.id].ubo, this->prog_sphere, 1, 0, 0);
             this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_sphere, 0, 0, 0);        
             this->api->draw(this->prog_sphere, this->vao_sphere, this->ibo_sphere);
         }
@@ -238,16 +238,26 @@ bool NRE_Renderer::updateSingleThread(){
 
 void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
     this->pt_visible_lights.clear();
-    cout << "lights: " << this->meshes.size() <<  " " << this->cameras.size() << endl;
+    
     for (auto l: this->scenes[scene_id].pt_lights){
+        
+        // all calculations are happening in view space
+        auto light_view_pos = this->cameras[camera_id].view_mat*this->pt_lights[l].model_mat[3];
             
-        auto light_world_pos = this->pt_lights[l].model_mat[3];
-            
-            
-            
+        auto light_camview_radius = light_view_pos - OE_Vec4(this->pt_lights[l].range, this->pt_lights[l].range, this->pt_lights[l].range, 0.0f);
+        
+        bool is_behind_camera = light_camview_radius.z > (-this->cameras[camera_id].near);
+        bool is_too_far_away = (light_camview_radius.z + 2*this->pt_lights[l].range) < (-this->cameras[camera_id].far);
+        // only choose lights that have effects inside the view frustum.
+        // This means that up to 254 lights in range of the camera will be active at once
+        // This means the scene can have many many more lights overall. All that matters
+        // is what's VISIBLE
+        if ((not is_behind_camera) and (not is_too_far_away)){
         auto point_light = NRE_PointLightDrawCall(l, (this->cameras[camera_id].perspective_view_mat*this->pt_lights[l].model_mat[3])[2], 0);
         this->pt_visible_lights.insert(point_light);
+        }
     }
+    cout << "pt size " << this->pt_visible_lights.size() << endl;
 }
 
 void NRE_Renderer::drawRenderGroup(NRE_RenderGroup &ren_group){
