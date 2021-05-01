@@ -18,6 +18,7 @@ struct NRE_BaseObject{
 
 struct NRE_CameraRenderData : public NRE_BaseObject{
     OE_Mat4x4       perspective_view_mat;
+    OE_Mat4x4       view_mat;
     
     std::size_t     scene_id{0};
     std::size_t     ubo{0};
@@ -88,6 +89,17 @@ struct NRE_PointLightRenderData : public NRE_BaseObject{
     std::size_t     ubo{0};
     unsigned int    offset{0};
     unsigned int    size{0};
+};
+
+struct NRE_PointLightDrawCall{
+    
+    NRE_PointLightDrawCall() = default;
+    NRE_PointLightDrawCall(std::size_t, float, std::size_t);
+    std::size_t id{0};
+    float       z{0.0f};
+    std::size_t priority{0};
+    
+    bool operator > (const NRE_PointLightDrawCall&) const;
 };
 
 struct NRE_DirectionalLightRenderData : public NRE_BaseObject{

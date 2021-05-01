@@ -32,6 +32,19 @@ protected:
         unlockMutex();
     }
     
+    void clear_internally(){
+
+        for (auto x: elements_){
+            this->deleted_.add(x.first);
+        }
+        elements_.clear();
+        changed_.clear();
+        
+        names_.clear();
+        id2name_.clear();
+
+    }
+    
 public:
     
     std::unordered_map<std::size_t, std::string> id2name_;
@@ -90,7 +103,7 @@ public:
     void extend(OE_SharedIndexMap<T>& other, bool override_names){
         lockMutex();
         
-        other.synchronize();
+        other.synchronize(false);
         
         if (!override_names){
             for (auto x: other){
@@ -235,7 +248,7 @@ public:
         this->changed_.clear();
     }
     
-    void synchronize() noexcept {
+    void synchronize(bool clear_all) noexcept {
         
         lockMutex();
         
@@ -249,6 +262,9 @@ public:
         }
         
         deleted_.clear();
+        
+        if (clear_all)
+            this->clear_internally();
         
         elements_.reserve(elements_.size() + pending_elements_.size());
         id2name_.reserve(id2name_.size() + pending_elements_.size());
@@ -517,6 +533,7 @@ public:
     Deleted deleted(){
         return this->deleted_;
     }
+    
 };
 
 #endif

@@ -55,7 +55,26 @@ bool NRE_SceneRenderData::existsRenderGroup(const NRE_RenderGroup& ren_group){
     return this->render_groups.contains(ren_group);
 }
 
+NRE_PointLightDrawCall::NRE_PointLightDrawCall(std::size_t id_in, float z_in, std::size_t priority_in){
+    this->id = id_in;
+    this->z = z_in;
+    this->priority = priority_in;
+}
 
+bool NRE_PointLightDrawCall::operator > (const NRE_PointLightDrawCall& other) const{
+    if (this->priority == other.priority){
+        if (std::abs(this->z - other.z) < 0.0000001f){
+            return this->id > other.id;
+        }
+        else{
+            return this->z > other.z;
+        }
+    }
+    else{
+        return this->priority > other.priority;
+    }
+    return false;
+}
 
 
 bool NRE_Renderer::updateData(){
@@ -140,6 +159,7 @@ bool NRE_Renderer::updateData(){
             this->scenes[this->materials[mat.id_].scene_id].render_groups.removeMaterial(mat.id_);
             this->deleted_materials.insert(mat.id_);
         }
+        
     }
 
     for (auto obj : OE_World::objectsList.deleted()){
@@ -281,13 +301,10 @@ void NRE_Renderer::handleVGroupData(std::size_t mesh_id, std::size_t id, std::sh
 void NRE_Renderer::handleMaterialData(std::size_t id, std::shared_ptr<OE_Material> mat){
     if (this->materials.count(id) == 0){
         this->materials[id] = NRE_MaterialRenderData(); this->materials[id].id = id;
-        this->materials[id].data = mat->GetRendererData();
-        this->materials[id].changed = true;
-    } 
-    else{
-        this->materials[id].data = mat->GetRendererData();
-        this->materials[id].changed = true;
     }
+    
+    this->materials[id].data = mat->GetRendererData();
+    this->materials[id].changed = true;
 }
 
 void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> camera){
@@ -297,31 +314,20 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
         // but offload the actual OpenGL commands for later, since this runs in a performance
         // critical section
         this->cameras[id] = NRE_CameraRenderData(); this->cameras[id].id = id;
-
-        auto view_mat = camera->GetViewMatrix();
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.3f, (float)camera->far*50.0f);
-        
-        this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
-        this->cameras[id].data.push_back(camera->current_state.pos_x);
-        this->cameras[id].data.push_back(camera->current_state.pos_y);
-        this->cameras[id].data.push_back(camera->current_state.pos_z);
-        this->cameras[id].data.push_back(1.0f);
-        this->cameras[id].changed = true;
-        
     }
-    else {
-
-        auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.3f, (float)camera->far*50.0f);
-        auto view_mat = camera->GetViewMatrix();
-        
-        this->cameras[id].data = OE_Mat4x4ToSTDVector(perspective_mat*view_mat);
-        this->cameras[id].data.push_back(camera->current_state.pos_x);
-        this->cameras[id].data.push_back(camera->current_state.pos_y);
-        this->cameras[id].data.push_back(camera->current_state.pos_z);
-        this->cameras[id].data.push_back(1.0f);
-        this->cameras[id].changed = true;
-        
-    }
+    
+    auto view_mat = camera->GetViewMatrix();
+    auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, (float)camera->near+0.3f, (float)camera->far*50.0f);
+    
+    this->cameras[id].view_mat = view_mat;
+    this->cameras[id].perspective_view_mat = perspective_mat*view_mat;
+    
+    this->cameras[id].data = OE_Mat4x4ToSTDVector(this->cameras[id].perspective_view_mat);
+    this->cameras[id].data.push_back(camera->current_state.pos_x);
+    this->cameras[id].data.push_back(camera->current_state.pos_y);
+    this->cameras[id].data.push_back(camera->current_state.pos_z);
+    this->cameras[id].data.push_back(1.0f);
+    this->cameras[id].changed = true;
 }
 
 void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> light){
@@ -329,28 +335,26 @@ void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> lig
         //POINT LIGHT
         if (this->pt_lights.count(id) == 0){
             this->pt_lights[id] = NRE_PointLightRenderData(); this->pt_lights[id].id = id;
-            
-            this->pt_lights[id].model_mat = light->GetModelMatrix();
-            this->pt_lights[id].color     = light->color;
-            this->pt_lights[id].intensity = light->intensity;
-            this->pt_lights[id].range     = light->range;
-            
-            //this->pt_lights[id].data = light->GetLightGPUData();
-            this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
-            this->pt_lights[id].changed = true;
-            
             this->has_pt_lights_changed = true;
         }
-        else {
-            this->pt_lights[id].model_mat = light->GetModelMatrix();
-            this->pt_lights[id].color     = light->color;
-            this->pt_lights[id].intensity = light->intensity;
-            this->pt_lights[id].range     = light->range;
+        
+        this->pt_lights[id].model_mat = light->GetModelMatrix();
+        this->pt_lights[id].color     = light->color;
+        this->pt_lights[id].intensity = light->intensity;
+        this->pt_lights[id].range     = light->range;
             
-            //this->pt_lights[id].data = light->GetLightGPUData();
-            this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
-            this->pt_lights[id].changed = true;
-        }
+        //this->pt_lights[id].data = light->GetLightGPUData();
+        this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
+        this->pt_lights[id].data.push_back(1.0f);
+        this->pt_lights[id].data.push_back(1.0f);
+        this->pt_lights[id].data.push_back(1.0f);         
+        this->pt_lights[id].data.push_back(light->range/20.0f);
+        this->pt_lights[id].data.push_back(1.0f);
+        this->pt_lights[id].data.push_back(1.0f);
+        this->pt_lights[id].data.push_back(1.0f);       
+        this->pt_lights[id].data.push_back(light->range/20.0f);
+            
+        this->pt_lights[id].changed = true;
     }
     else if (light->light_type == 2){
         //DIRECTIONAL LIGHT
@@ -366,96 +370,62 @@ void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> lig
 void NRE_Renderer::handleSceneData(std::size_t id, std::shared_ptr<OE_Scene> scene){
     if (this->scenes.count(id) == 0){
         this->scenes[id] = NRE_SceneRenderData(); this->scenes[id].id = id;
-        
-        // group objects
-        for (auto x: scene->objects){
-            if (this->cameras.count(x) != 0){
-                this->scenes[id].cameras.insert(x);
-            }
-            else if (this->meshes.count(x) != 0){
-                this->scenes[id].meshes.insert(x);
-            }
-            else if (this->dir_lights.count(x) != 0){
-                this->scenes[id].pt_lights.insert(x);
-            }
-            else if (this->pt_lights.count(x) != 0){
-                this->scenes[id].dir_lights.insert(x);
-            }
-        }
-        
-        // store the scene each camera is in
-        for (auto cam : this->scenes[id].cameras){
-            this->cameras[cam].scene_id = id;
-            this->cameras[cam].changed = true;
-        }
-        // store the scene each mesh is in
-        for (auto mat : this->scenes[id].materials){
-            this->materials[mat].scene_id = id;
-            this->materials[mat].changed = true;
-        }
-        // store the scene each material is in
-        for (auto mesh : this->scenes[id].meshes){
-            this->meshes[mesh].scene_id = id;
-            this->meshes[mesh].changed = true;
-        }
-        
-        this->scenes[id].materials = scene->materials;
-        this->scenes[id].changed = true;
-    } 
-    else {
-        
+    }
+    else{
         this->scenes[id].cameras.clear();
         this->scenes[id].dir_lights.clear();
         this->scenes[id].pt_lights.clear();
         this->scenes[id].meshes.clear();
-        
-        // group objects
-        for (auto x: scene->objects){
-            if (this->cameras.count(x) != 0){
-                this->scenes[id].cameras.insert(x);
-            }
-            else if (this->meshes.count(x) != 0){
-                this->scenes[id].meshes.insert(x);
-            }
-            else if (this->dir_lights.count(x) != 0){
-                this->scenes[id].dir_lights.insert(x);
-            }
-            else if (this->pt_lights.count(x) != 0){
-                this->scenes[id].pt_lights.insert(x);
-            }
-        }
-        
-        // store the scene each camera is in
-        for (auto cam : this->scenes[id].cameras){
-            this->cameras[cam].scene_id = id;
-            this->cameras[cam].changed = true;
-        }
-        
-        this->scenes[id].materials = scene->materials;
-        this->scenes[id].changed = true;
     }
+    
+    // group objects
+    for (auto x: scene->objects){
+        if (this->cameras.count(x) != 0){
+            this->scenes[id].cameras.insert(x);
+        }
+        else if (this->meshes.count(x) != 0){
+            this->scenes[id].meshes.insert(x);
+        }
+        else if (this->dir_lights.count(x) != 0){
+            this->scenes[id].dir_lights.insert(x);
+        }
+        else if (this->pt_lights.count(x) != 0){
+            this->scenes[id].pt_lights.insert(x);
+        }
+    }
+        
+    // store the scene each camera is in
+    for (auto cam : this->scenes[id].cameras){
+        this->cameras[cam].scene_id = id;
+        this->cameras[cam].changed = true;
+    }
+    // store the scene each mesh is in
+    for (auto mat : this->scenes[id].materials){
+        this->materials[mat].scene_id = id;
+        this->materials[mat].changed = true;
+    }
+    // store the scene each material is in
+    for (auto mesh : this->scenes[id].meshes){
+        this->meshes[mesh].scene_id = id;
+        this->meshes[mesh].changed = true;
+    }
+    
+    this->scenes[id].materials = scene->materials;
+    this->scenes[id].changed = true;
 }
 
 void NRE_Renderer::handleViewportData(std::size_t id, std::shared_ptr<OE_ViewportConfig> vp_config){
     if (this->viewports.count(id) == 0){
         this->viewports[id] = NRE_ViewportRenderData(); this->viewports[id].id = id;
         this->viewports[id].has_init = true;
-        
-        this->viewports[id].layers = vp_config->layers;
-        this->viewports[id].cameras = vp_config->cameras;
-        this->viewports[id].camera_modes = vp_config->camera_modes;
-        this->viewports[id].layer_combine_modes = vp_config->layer_combine_modes;
-        this->viewports[id].split_screen_positions = vp_config->split_screen_positions;
-        this->viewports[id].changed = true;
     }
-    else {
-        this->viewports[id].layers = vp_config->layers;
-        this->viewports[id].cameras = vp_config->cameras;
-        this->viewports[id].camera_modes = vp_config->camera_modes;
-        this->viewports[id].layer_combine_modes = vp_config->layer_combine_modes;
-        this->viewports[id].split_screen_positions = vp_config->split_screen_positions;
-        this->viewports[id].changed = true;
-    }
+    
+    this->viewports[id].layers = vp_config->layers;
+    this->viewports[id].cameras = vp_config->cameras;
+    this->viewports[id].camera_modes = vp_config->camera_modes;
+    this->viewports[id].layer_combine_modes = vp_config->layer_combine_modes;
+    this->viewports[id].split_screen_positions = vp_config->split_screen_positions;
+    this->viewports[id].changed = true;
 }
 
 //---------------------------------Update actual GPU data------------------------------//
