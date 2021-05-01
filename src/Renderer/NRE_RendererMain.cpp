@@ -115,6 +115,7 @@ bool NRE_Renderer::updateSingleThread(){
     this->updateMeshGPUData();
     this->updateMaterialGPUData();
     this->updateCameraGPUData();
+    this->updateLightGPUData();
     
     // render viewport
     this->api->use_wireframe = this->use_wireframe.load(std::memory_order_relaxed);
@@ -155,7 +156,10 @@ bool NRE_Renderer::updateSingleThread(){
             }
         }
         this->scenes[scene_id].render_groups.update();
-    
+        
+        //sort point lights
+        this->sortPointLights(scene_id, camera_id);
+        
         // draw everything normally
         this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
         for (auto x: this->scenes[scene_id].render_groups){
@@ -202,6 +206,20 @@ bool NRE_Renderer::updateSingleThread(){
             }
             this->scenes[scene_id].render_groups.update();
         }
+        
+        //temporary TEST LIGHTS
+        if (!this->setup_sphere_prog){
+            this->setupBoundingSphereProgram();
+            this->setup_sphere_prog = true;
+        }
+        this->api->setRenderMode(NRE_GPU_REGULAR_FRONTFACE);
+        for (auto l: this->pt_lights){
+            this->api->setUniformBlockState(this->pt_lights[l.first].ubo, this->prog_sphere, 1, 0, 0);
+            this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_sphere, 0, 0, 0);        
+            this->api->draw(this->prog_sphere, this->vao_sphere, this->ibo_sphere);
+        }
+        ////////////////////
+        
         this->api->use_wireframe = temp;
     }
     
@@ -216,6 +234,20 @@ bool NRE_Renderer::updateSingleThread(){
     this->api->draw(this->gamma_cor_prog, this->vao_fullscreen_quad);
     
     return true;
+}
+
+void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
+    this->pt_visible_lights.clear();
+    cout << "lights: " << this->meshes.size() <<  " " << this->cameras.size() << endl;
+    for (auto l: this->scenes[scene_id].pt_lights){
+            
+        auto light_world_pos = this->pt_lights[l].model_mat[3];
+            
+            
+            
+        auto point_light = NRE_PointLightDrawCall(l, (this->cameras[camera_id].perspective_view_mat*this->pt_lights[l].model_mat[3])[2], 0);
+        this->pt_visible_lights.insert(point_light);
+    }
 }
 
 void NRE_Renderer::drawRenderGroup(NRE_RenderGroup &ren_group){
@@ -238,7 +270,7 @@ void NRE_Renderer::drawRenderGroup(NRE_RenderGroup &ren_group){
                 ren_group.fs.type = NRE_GPU_FS_NORMALS;
                 break;
             case OE_RENDERER_NO_LIGHTS_SHADING:
-                
+                 ren_group.fs.type = NRE_GPU_FS_MATERIAL;
                 break;
             case OE_RENDERER_DIR_LIGHTS_SHADING:
                 

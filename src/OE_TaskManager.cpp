@@ -410,12 +410,12 @@ int OE_TaskManager::getReadyThreads(){
 void OE_TaskManager::updateWorld(){
     lockMutex();
     
-    OE_World::objectsList.synchronize();
-    OE_World::materialsList.synchronize();
-    OE_World::texturesList.synchronize();
-    OE_World::tcmsList.synchronize();
-    OE_World::viewportsList.synchronize();
-    OE_World::scenesList.synchronize();
+    OE_World::objectsList.synchronize(this->pending_world != nullptr);
+    OE_World::materialsList.synchronize(this->pending_world != nullptr);
+    OE_World::texturesList.synchronize(this->pending_world != nullptr);
+    OE_World::tcmsList.synchronize(this->pending_world != nullptr);
+    OE_World::viewportsList.synchronize(this->pending_world != nullptr);
+    OE_World::scenesList.synchronize(this->pending_world != nullptr);
     
     
     if (this->pending_world != nullptr){
