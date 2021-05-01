@@ -262,11 +262,11 @@ void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
         
         auto light_clip_radius_min_y = OE_GetClipCoords(persp_mat, light_view_pos - OE_Vec4(0.0f, this->pt_lights[l].range, 0.0f, 0.0f));
         
-        bool is_too_left  = light_clip_radius_max_x.x < -1.0f;
-        bool is_too_right = light_clip_radius_min_x.x > 1.0f;
+        bool is_too_left  = light_clip_radius_max_x.x < -1.02f;
+        bool is_too_right = light_clip_radius_min_x.x > 1.02f;
 
-        bool is_too_above = light_clip_radius_max_y.y < -1.0f;
-        bool is_too_below = light_clip_radius_min_y.y > 1.0f;
+        bool is_too_above = light_clip_radius_max_y.y < -1.02f;
+        bool is_too_below = light_clip_radius_min_y.y > 1.02f;
         
         // only choose lights that have effects inside the view frustum.
         // This means that up to 254 lights in range of the camera will be active at once
@@ -277,7 +277,7 @@ void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
         this->pt_visible_lights.insert(point_light);
         }
     }
-    cout << "pt size " << this->pt_visible_lights.size() << endl;
+    //cout << "pt size " << this->pt_visible_lights.size() << endl;
 }
 
 void NRE_Renderer::drawRenderGroup(NRE_RenderGroup &ren_group){
