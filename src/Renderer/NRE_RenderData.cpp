@@ -323,6 +323,7 @@ void NRE_Renderer::handleCameraData(std::size_t id, std::shared_ptr<OE_Camera> c
     auto perspective_mat = OE_Perspective(camera->fov, camera->aspect_ratio, this->cameras[id].near, this->cameras[id].far);
     
     this->cameras[id].view_mat = view_mat;
+    this->cameras[id].perspective_mat = perspective_mat;
     this->cameras[id].model_mat = camera->GetModelMatrix();
     this->cameras[id].perspective_view_mat = perspective_mat*view_mat;
     
@@ -349,7 +350,7 @@ void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> lig
         this->pt_lights[id].range     = light->range/20.0f;
             
         //this->pt_lights[id].data = light->GetLightGPUData();
-        this->pt_lights[id].data = OE_Mat4x4ToSTDVector(light->GetModelMatrix());
+        this->pt_lights[id].data = OE_Mat4x4ToSTDVector(this->pt_lights[id].model_mat);
         this->pt_lights[id].data.push_back(1.0f);
         this->pt_lights[id].data.push_back(1.0f);
         this->pt_lights[id].data.push_back(1.0f);         

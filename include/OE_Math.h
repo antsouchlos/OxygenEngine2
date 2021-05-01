@@ -36,12 +36,16 @@ namespace oe{
 // it will be easy
 
 class OE_Vec4 : public glm::vec4{
+public:
     
     using glm::vec4::vec4;
+    OE_Vec4 operator + (const OE_Vec4&);
+    OE_Vec4 operator - (const OE_Vec4&);
     
 };
 
 class OE_Vec3 : public glm::vec3{
+public:
     
     using glm::vec3::vec3;
     
@@ -52,6 +56,8 @@ public:
     using glm::mat4::mat4;
     
     OE_Mat4x4 operator * (const OE_Mat4x4&);
+    OE_Vec4 operator * (const OE_Vec4&);
+    
     
 };
 
@@ -105,6 +111,8 @@ float OE_Length(OE_Vec4);
 
 std::vector<float> OE_Mat4x4ToSTDVector(OE_Mat4x4);
 OE_Mat4x4 OE_Perspective(float, float, float, float);
+
+OE_Vec4   OE_GetClipCoords(OE_Mat4x4, OE_Vec4);
 
 OE_Quat OE_QuatFromAxisAngle(float, float, float, float);
 
