@@ -351,14 +351,15 @@ void NRE_Renderer::handleLightData(std::size_t id, std::shared_ptr<OE_Light> lig
             
         //this->pt_lights[id].data = light->GetLightGPUData();
         this->pt_lights[id].data = OE_Mat4x4ToSTDVector(this->pt_lights[id].model_mat);
-        this->pt_lights[id].data.push_back(1.0f);
+        /*this->pt_lights[id].data.push_back(1.0f);
         this->pt_lights[id].data.push_back(1.0f);
         this->pt_lights[id].data.push_back(1.0f);         
         this->pt_lights[id].data.push_back(light->range/20.0f);
         this->pt_lights[id].data.push_back(1.0f);
         this->pt_lights[id].data.push_back(1.0f);
         this->pt_lights[id].data.push_back(1.0f);       
-        this->pt_lights[id].data.push_back(light->range/20.0f);
+        this->pt_lights[id].data.push_back(light->range/20.0f);*/
+        this->pt_lights[id].data[15] = light->range/20.0f;
             
         this->pt_lights[id].changed = true;
     }
@@ -576,7 +577,7 @@ void NRE_Renderer::updateCameraGPUData(){
     this->deleted_cameras.clear();
 }
 void NRE_Renderer::updateLightGPUData(){
-    for (auto l: this->pt_lights){
+    /*for (auto l: this->pt_lights){
         
         if (!this->pt_lights[l.first].has_init){
             this->pt_lights[l.first].ubo = this->api->newUniformBuffer();
@@ -592,7 +593,13 @@ void NRE_Renderer::updateLightGPUData(){
             this->api->setUniformBufferData(this->pt_lights[l.first].ubo, this->pt_lights[l.first].data, 0);
             this->pt_lights[l.first].changed = false;
         }
+    }*/
+    std::vector<float> pt_light_data;
+    for (auto l: this->pt_visible_lights){
+        pt_light_data.insert(pt_light_data.end(), this->pt_lights[l.id].data.begin(), this->pt_lights[l.id].data.end());
     }
+    this->api->setUniformBufferMemory(this->pt_light_ubo, pt_light_data.size(), NRE_GPU_STREAM);
+    this->api->setUniformBufferData(this->pt_light_ubo, pt_light_data, 0);
 }
 
 // deletes

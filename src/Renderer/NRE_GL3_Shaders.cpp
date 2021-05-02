@@ -14,7 +14,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
     output.append("invariant gl_Position;\n");
     
     if (vs.fullscreenQuad){
-        output = NRE_Shader(
+        output.append(NRE_Shader(
             layout (location=0) in vec2 oe_position;
             
             out vec2 position;
@@ -23,12 +23,12 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 position = oe_position;
                 gl_Position = vec4(oe_position, 0.0, 1.0);
             }
-        );
+        ));
     }
     else {
         
         if (vs.type == NRE_GPU_VS_Z_PREPASS){
-            output = NRE_Shader(
+            output.append(NRE_Shader(
                 layout (location = 0) in vec3 oe_position;
                 
                 layout(std140) uniform OE_Camera{
@@ -46,15 +46,46 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     mat4 final_mat = PV_Matrix*Model_Matrix;
                     gl_Position = final_mat*vec4(oe_position, 1.0);
                 }
-            );
+            ));
         } 
+        else if (vs.type == NRE_GPU_VS_LIGHT){
+            output.append(NRE_Shader(
+                layout (location = 0) in vec3 oe_position;
+                layout (location = 1) in vec3 oe_normals;
+                
+                out vec3 position;
+                out vec3 normals;
+                
+                layout(std140) uniform OE_Camera{
+                    mat4 PV_Matrix;
+                    vec4 camera_pos;
+                };
+                
+                layout(std140) uniform OE_Lights{
+                    mat4 Model_Matrix[255];
+                };
+                
+                void main(){
+                    normals = oe_normals;
+                    mat4 model_copy = Model_Matrix[gl_InstanceID];
+                    float scale = model_copy[3][3];
+                    mat4 final_mat = PV_Matrix;
+                    
+                    vec3 delta_pos = vec3(model_copy[3][0], model_copy[3][1], model_copy[3][2]);
+                    vec4 temp_position = vec4(oe_position*scale + delta_pos, 1.0);
+                        
+                    position = temp_position.xyz;
+                    gl_Position = final_mat*temp_position;
+                }
+            ));
+        }
         else if ((vs.type == NRE_GPU_VS_REGULAR) || (vs.type == NRE_GPU_VS_BOUNDING_BOX) || (vs.type == NRE_GPU_VS_BOUNDING_SPHERE)){
             
             // setup inputs
-            output = NRE_Shader(
+            output.append(NRE_Shader(
                 layout (location = 0) in vec3 oe_position;
                 layout (location = 1) in vec3 oe_normals;
-            );
+            ));
             output.append("\n");
             for (size_t i=0; i< vs.num_of_uvs; i++){
                 output.append("layout (location=" + to_string(2+i) + ") in vec2 oe_uvs" + to_string(i) + ";");
