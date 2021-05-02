@@ -50,6 +50,16 @@ bool NRE_Renderer::init(){
         NRE_GPU_ShaderBase::init(NRE_GPU_GLES, this->screen->major, this->screen->minor);
     }
     
+    this->initOffscreenFrameBuffer();
+    this->initFullscreenQuad();
+    this->initGammaCorrectionProg();
+    this->initGPUSphere();
+    this->initLightUBOProgram();    
+    
+    return true;
+}
+
+void NRE_Renderer::initOffscreenFrameBuffer(){
     // setup offscreen framebuffer
     this->framebuffer = this->api->newFrameBuffer();
     this->colortexture = this->api->newTexture();
@@ -65,7 +75,9 @@ bool NRE_Renderer::init(){
     
     this->api->setFrameBufferTexture(this->framebuffer, this->colortexture, 0);
     this->api->setFrameBufferTexture(this->framebuffer, this->depthtexture, 0);
-    
+}
+
+void NRE_Renderer::initFullscreenQuad(){
     // setup fullscreen quad
     this->vbo_fullscreen_quad = this->api->newVertexBuffer();
     this->vao_fullscreen_quad = this->api->newVertexLayout();
@@ -76,7 +88,9 @@ bool NRE_Renderer::init(){
     std::vector<VLI> vao_quad_data;
     vao_quad_data.push_back(VLI(this->vbo_fullscreen_quad, 0, 2, 2));
     this->api->setVertexLayoutFormat(this->vao_fullscreen_quad, vao_quad_data);
-    
+}
+
+void NRE_Renderer::initGammaCorrectionProg(){
     // setup gamma correction program
     this->gamma_cor_prog = this->api->newProgram();
         
@@ -92,8 +106,57 @@ bool NRE_Renderer::init(){
         
     this->api->setupProgram(this->gamma_cor_prog);
     this->api->setProgramTextureSlot(this->gamma_cor_prog, "tex_output", 0);
-    return true;
 }
+
+void NRE_Renderer::initGPUSphere(){
+    // the same VBO, VAO and IBO are used for every object
+    // it holds a sphere with radius one
+    
+    this->vbo_sphere = this->api->newVertexBuffer();
+    this->ibo_sphere = this->api->newIndexBuffer();
+    
+    auto sphere_vbo_data = OE_GetBoundingSphereVertexBuffer(1.0f, 1.0f, 16);
+    auto sphere_ibo_data = OE_GetBoundingSphereIndexBuffer(1.0f, 1.0f, 16);
+    
+    this->api->setVertexBufferMemoryData(this->vbo_sphere, sphere_vbo_data, NRE_GPU_STATIC);
+    this->api->setIndexBufferMemoryData(this->ibo_sphere, sphere_ibo_data, NRE_GPU_STATIC);
+    
+    typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
+    this->vao_sphere = this->api->newVertexLayout();
+    
+    std::vector<VLI> vao_sphere_data;
+    vao_sphere_data.push_back(VLI(this->vbo_sphere, 0, 3, 6));
+    vao_sphere_data.push_back(VLI(this->vbo_sphere, 3, 3, 6));
+    
+    this->api->setVertexLayoutFormat(this->vao_sphere, vao_sphere_data);
+}
+
+void NRE_Renderer::initLightUBOProgram(){
+    
+    // setup point light ubo
+    this->pt_light_ubo = this->api->newUniformBuffer();
+    
+    // setup light program
+    this->prog_light = this->api->newProgram();
+        
+    NRE_GPU_VertexShader vs_light;
+    NRE_GPU_PixelShader fs_light;
+        
+    vs_light.type = NRE_GPU_VS_LIGHT;
+    vs_light.num_of_uvs = 0;
+        
+    fs_light.type = NRE_GPU_FS_NORMALS;
+    fs_light.num_of_uvs = 0;
+        
+    this->api->setProgramVS(this->prog_light, vs_light);
+    this->api->setProgramFS(this->prog_light, fs_light);
+        
+    this->api->setupProgram(this->prog_light);
+    this->api->setProgramUniformBlockSlot(this->prog_light, "OE_Camera", 0);
+    this->api->setProgramUniformBlockSlot(this->prog_light, "OE_Lights", 1);
+}
+
+//------------------------updateSIngleThread-------------------//
 
 bool NRE_Renderer::updateSingleThread(){
     
@@ -115,7 +178,7 @@ bool NRE_Renderer::updateSingleThread(){
     this->updateMeshGPUData();
     this->updateMaterialGPUData();
     this->updateCameraGPUData();
-    this->updateLightGPUData();
+    
     
     // render viewport
     this->api->use_wireframe = this->use_wireframe.load(std::memory_order_relaxed);
@@ -159,6 +222,7 @@ bool NRE_Renderer::updateSingleThread(){
         
         //sort point lights
         this->sortPointLights(scene_id, camera_id);
+        this->updateLightGPUData();
         
         // draw everything normally
         this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
@@ -208,17 +272,13 @@ bool NRE_Renderer::updateSingleThread(){
         }
         
         //temporary TEST LIGHTS
-        if (!this->setup_sphere_prog){
-            this->setupBoundingSphereProgram();
-            this->setup_sphere_prog = true;
-        }
         this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
-        for (auto l: this->pt_visible_lights){
-            this->api->setUniformBlockState(this->pt_lights[l.id].ubo, this->prog_sphere, 1, 0, 0);
-            this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_sphere, 0, 0, 0);        
-            this->api->draw(this->prog_sphere, this->vao_sphere, this->ibo_sphere);
-        }
-        ////////////////////
+
+        this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
+        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+
+        ///////////////////*/
         
         this->api->use_wireframe = temp;
     }
@@ -415,27 +475,6 @@ void NRE_Renderer::setupBoundingBoxProgram(){
 }
 
 void NRE_Renderer::setupBoundingSphereProgram(){
-    
-    // the same VBO, VAO and IBO are used for every object
-    // it holds a sphere with radius one
-    
-    this->vbo_sphere = this->api->newVertexBuffer();
-    this->ibo_sphere = this->api->newIndexBuffer();
-    
-    auto sphere_vbo_data = OE_GetBoundingSphereVertexBuffer(1.0f, 1.0f, 16);
-    auto sphere_ibo_data = OE_GetBoundingSphereIndexBuffer(1.0f, 1.0f, 16);
-    
-    this->api->setVertexBufferMemoryData(this->vbo_sphere, sphere_vbo_data, NRE_GPU_STATIC);
-    this->api->setIndexBufferMemoryData(this->ibo_sphere, sphere_ibo_data, NRE_GPU_STATIC);
-    
-    typedef NRE_GPU_VertexLayoutInput VLI; // for clarity
-    this->vao_sphere = this->api->newVertexLayout();
-    
-    std::vector<VLI> vao_sphere_data;
-    vao_sphere_data.push_back(VLI(this->vbo_sphere, 0, 3, 6));
-    vao_sphere_data.push_back(VLI(this->vbo_sphere, 3, 3, 6));
-    
-    this->api->setVertexLayoutFormat(this->vao_sphere, vao_sphere_data);
     
     this->prog_sphere = this->api->newProgram();
         

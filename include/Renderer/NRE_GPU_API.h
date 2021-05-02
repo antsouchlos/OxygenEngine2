@@ -142,6 +142,9 @@ public:
     virtual void draw(std::size_t, std::size_t, std::size_t, int, int);
     virtual void draw(std::size_t, std::size_t, std::size_t);
     
+    virtual void draw_instanced(std::size_t, std::size_t, std::size_t);
+    virtual void draw_instanced(std::size_t, std::size_t, std::size_t, std::size_t);
+    
     virtual void setRenderMode(NRE_GPU_RENDERMODE);
     
     std::atomic<bool>           use_wireframe{false};

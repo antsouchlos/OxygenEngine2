@@ -39,8 +39,10 @@ public:
     std::set<std::size_t> deleted_scenes;
     
     
-    // light draw calls
+    // point light draw calls and ubo/program
     std::set<NRE_PointLightDrawCall, std::greater<NRE_PointLightDrawCall>> pt_visible_lights;
+    std::size_t pt_light_ubo{0};
+    std::size_t prog_light{0};
     
     // bounding box and sphere data
     std::size_t prog_bbox{0};
@@ -98,6 +100,12 @@ protected:
     
     void setupBoundingBoxProgram();
     void setupBoundingSphereProgram();
+    void initLightUBOProgram();
+    
+    void initOffscreenFrameBuffer();
+    void initFullscreenQuad();
+    void initGammaCorrectionProg();
+    void initGPUSphere();
 };
 
 #endif

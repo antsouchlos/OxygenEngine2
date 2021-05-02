@@ -159,6 +159,9 @@ public:
     void draw(std::size_t, std::size_t, std::size_t, int, int);
     void draw(std::size_t, std::size_t, std::size_t);
     
+    void draw_instanced(std::size_t, std::size_t, std::size_t);
+    void draw_instanced(std::size_t, std::size_t, std::size_t, std::size_t);
+    
     void setRenderMode(NRE_GPU_RENDERMODE);
     
 protected:

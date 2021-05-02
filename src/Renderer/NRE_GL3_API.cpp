@@ -1041,6 +1041,48 @@ void NRE_GL3_API::draw(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_
     glDrawElements(GL_TRIANGLES, this->ibos[ibo_id].size, GL_UNSIGNED_INT, (GLvoid*)NULL);
 }
 
+void NRE_GL3_API::draw_instanced(std::size_t prog_id, std::size_t vao_id, std::size_t instancecount){
+    
+    this->check_prog_id_(prog_id, "draw");
+    this->check_vao_id_(vao_id, "draw");
+    this->setupProgram(prog_id);
+    
+    if (this->active_prog_ != this->progs[prog_id].handle){
+        glUseProgram(this->progs[prog_id].handle);
+        this->active_prog_ = this->progs[prog_id].handle;
+    }
+    if (this->active_vao_ != this->vaos[vao_id].handle){
+        glBindVertexArray(this->vaos[vao_id].handle);
+        this->active_vao_ = this->vaos[vao_id].handle;
+        this->active_vbo_ = 0;
+    }
+    glDrawArraysInstanced(GL_TRIANGLES, 0, this->getVAOSize(vao_id), instancecount);
+}
+
+void NRE_GL3_API::draw_instanced(std::size_t prog_id, std::size_t vao_id, std::size_t ibo_id, std::size_t instancecount){
+    
+    this->check_prog_id_(prog_id, "draw");
+    this->check_vao_id_(vao_id, "draw");
+    this->check_ibo_id_(ibo_id, "draw");
+    this->setupProgram(prog_id);
+    
+    if (this->active_prog_ != this->progs[prog_id].handle){
+        glUseProgram(this->progs[prog_id].handle);
+        this->active_prog_ = this->progs[prog_id].handle;
+    }
+    if (this->active_vao_ != this->vaos[vao_id].handle){
+        glBindVertexArray(this->vaos[vao_id].handle);
+        this->active_vao_ = this->vaos[vao_id].handle;
+        this->active_vbo_ = 0;
+    }
+    if (this->vao_ibos_[this->active_vao_] != this->ibos[ibo_id].handle){
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibos[ibo_id].handle);
+        this->vao_ibos_[this->active_vao_] = this->ibos[ibo_id].handle;
+    }
+
+    glDrawElementsInstanced(GL_TRIANGLES, this->ibos[ibo_id].size, GL_UNSIGNED_INT, (GLvoid*)NULL, instancecount);
+}
+
 void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     
     if (rendermode == NRE_GPU_Z_PREPASS_BACKFACE){
