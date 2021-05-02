@@ -336,6 +336,10 @@ void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
         auto point_light = NRE_PointLightDrawCall(l, (this->cameras[camera_id].perspective_view_mat*this->pt_lights[l].model_mat[3])[2], 0);
         this->pt_visible_lights.insert(point_light);
         }
+        
+        // set limit to 255 lights
+        if (this->pt_visible_lights.size() >= 255)
+            break;
     }
     //cout << "pt size " << this->pt_visible_lights.size() << endl;
 }
