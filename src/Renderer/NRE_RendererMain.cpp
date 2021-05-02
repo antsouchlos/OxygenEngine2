@@ -338,6 +338,11 @@ void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
         }
         
         // set limit to 255 lights
+        // why you ask?
+        // Well firstly 255 lights is already a LOT of lights inside the view frustum. More lights are not that good for performance
+        // Secondly the minimum required OpenGL Uniform buffer limit can only contain 256 matrices,
+        // so i can only place up to 255 lights (light with index 0 inside the shaders symbolizes the lack of lights)
+        // Thirdly, spot lights will be handed in a separate pass with another texture
         if (this->pt_visible_lights.size() >= 255)
             break;
     }
