@@ -43,18 +43,24 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 };
                 
                 void main(){
+                    //float Fcoef = 2.0 / log2(150.0 + 1.0);
+                    
                     mat4 final_mat = PV_Matrix*Model_Matrix;
                     gl_Position = final_mat*vec4(oe_position, 1.0);
+                    
+                    //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+                    //gl_Position.z *= gl_Position.w;
                 }
             ));
         } 
         else if (vs.type == NRE_GPU_VS_LIGHT){
             output.append(NRE_Shader(
                 layout (location = 0) in vec3 oe_position;
-                layout (location = 1) in vec3 oe_normals;
+                //layout (location = 1) in vec3 oe_normals;
                 
-                out vec3 position;
-                out vec3 normals;
+                //out vec3 position;
+                //out vec3 normals;
+                flat out int instance_num;
                 
                 layout(std140) uniform OE_Camera{
                     mat4 PV_Matrix;
@@ -66,7 +72,10 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 };
                 
                 void main(){
-                    normals = oe_normals;
+                    //float Fcoef = 2.0 / log2(150.0 + 1.0);
+                    
+                    //normals = oe_normals;
+                    instance_num = int(gl_InstanceID);
                     mat4 model_copy = Model_Matrix[gl_InstanceID];
                     float scale = model_copy[3][3];
                     mat4 final_mat = PV_Matrix;
@@ -74,8 +83,11 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     vec3 delta_pos = vec3(model_copy[3][0], model_copy[3][1], model_copy[3][2]);
                     vec4 temp_position = vec4(oe_position*scale + delta_pos, 1.0);
                         
-                    position = temp_position.xyz;
+                    //position = temp_position.xyz;
                     gl_Position = final_mat*temp_position;
+                    
+                    //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+                    //gl_Position.z *= gl_Position.w;
                 }
             ));
         }
@@ -123,12 +135,17 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 // handle regular case
                 output.append(NRE_Shader(
                     void main(){
+                        //float Fcoef = 2.0 / log2(150.0 + 1.0);
+                        
                         normals = mat3(Model_Matrix)*oe_normals;
                         mat4 final_mat = PV_Matrix*Model_Matrix;
                 
                         vec4 temp_position = Model_Matrix*vec4(oe_position, 1.0);
                         position = temp_position.xyz;
                         gl_Position = final_mat*vec4(oe_position, 1.0);
+                        
+                        //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+                        //gl_Position.z *= gl_Position.w;
                     }
                 ));
             }
@@ -139,6 +156,8 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 // already accounts for rotation, but needs to handle scale
                 output.append(NRE_Shader(
                     void main(){
+                        //float Fcoef = 2.0 / log2(150.0 + 1.0);
+                        
                         normals = oe_normals;
                         mat4 final_mat = PV_Matrix;
                         
@@ -156,6 +175,9 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                         
                         position = temp_position.xyz;
                         gl_Position = final_mat*temp_position;
+                        
+                        //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+                        //gl_Position.z *= gl_Position.w;
                     }
                 ));
             }
@@ -167,6 +189,8 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                                 
                 output.append(NRE_Shader(
                     void main(){
+                        //float Fcoef = 2.0 / log2(150.0 + 1.0);
+                        
                         normals = oe_normals;
                         mat4 final_mat = PV_Matrix;
                         
@@ -175,6 +199,9 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                         
                         position = temp_position.xyz;
                         gl_Position = final_mat*temp_position;
+                        
+                        //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+                        //gl_Position.z *= gl_Position.w;
                     }
                 ));
             }
@@ -229,6 +256,18 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
             }
         ));
         return NRE_GPU_ShaderBase::shader_prefix + output;
+    }
+    else if (fs.type == NRE_GPU_FS_LIGHT_INDEX){
+         output.append(NRE_Shader(
+            flat in int instance_num;
+             
+            out uvec4 fragColor;
+             
+            void main(){
+                fragColor = uvec4((instance_num & 3) << 6, (instance_num & 12) << 4, (instance_num & 48) << 2, (instance_num & 192));
+            }
+             
+        ));
     }
     
     output.append(NRE_Shader(
