@@ -54,7 +54,7 @@ bool NRE_Renderer::init(){
     this->initFullscreenQuad();
     this->initGammaCorrectionProg();
     this->initGPUSphere();
-    this->initLightUBOProgram();    
+    this->initLightUBOProgramFBO();    
     
     return true;
 }
@@ -131,7 +131,7 @@ void NRE_Renderer::initGPUSphere(){
     this->api->setVertexLayoutFormat(this->vao_sphere, vao_sphere_data);
 }
 
-void NRE_Renderer::initLightUBOProgram(){
+void NRE_Renderer::initLightUBOProgramFBO(){
     
     // setup point light ubo
     this->pt_light_ubo = this->api->newUniformBuffer();
@@ -145,7 +145,7 @@ void NRE_Renderer::initLightUBOProgram(){
     vs_light.type = NRE_GPU_VS_LIGHT;
     vs_light.num_of_uvs = 0;
         
-    fs_light.type = NRE_GPU_FS_NORMALS;
+    fs_light.type = NRE_GPU_FS_LIGHT_INDEX;
     fs_light.num_of_uvs = 0;
         
     this->api->setProgramVS(this->prog_light, vs_light);
@@ -154,6 +154,15 @@ void NRE_Renderer::initLightUBOProgram(){
     this->api->setupProgram(this->prog_light);
     this->api->setProgramUniformBlockSlot(this->prog_light, "OE_Camera", 0);
     this->api->setProgramUniformBlockSlot(this->prog_light, "OE_Lights", 1);
+    
+    // setup light own texture and framebuffer to be used for storing the indices
+    this->tex_light = this->api->newTexture();
+    
+    this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA_U8, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    
+    this->fbo_light = this->api->newFrameBuffer();
+    this->api->setFrameBufferTexture(this->fbo_light, this->tex_light, 0);
+    this->api->setFrameBufferTexture(this->fbo_light, this->depthtexture, 0);
 }
 
 //------------------------updateSIngleThread-------------------//
@@ -169,6 +178,8 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->setTextureFormat(this->colortexture, NRE_GPU_RGBA16F, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
         this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     }
+    // update light texture
+    this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA_U8, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     
     // generate draw calls
     this->generateDrawCalls();
@@ -189,7 +200,7 @@ bool NRE_Renderer::updateSingleThread(){
     cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
     
     this->api->useFrameBuffer(this->framebuffer);
-    this->api->clearFrameBuffer(this->framebuffer);
+    this->api->clearFrameBuffer(this->framebuffer, NRE_GPU_FBO_ALL);
 
     if (this->loaded_viewport != 0){
 
@@ -224,7 +235,23 @@ bool NRE_Renderer::updateSingleThread(){
         this->sortPointLights(scene_id, camera_id);
         this->updateLightGPUData();
         
+        this->api->useFrameBuffer(this->fbo_light);
+        this->api->clearFrameBuffer(this->fbo_light, NRE_GPU_FBO_COLORSTENCIL);
+        
+        this->api->setRenderMode(NRE_GPU_LIGHT_PREPASS);
+        
+        this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
+        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+        
+        this->api->setRenderMode(NRE_GPU_LIGHT_AFTERPASS);
+        
+        this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
+        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+        
         // draw everything normally
+        this->api->useFrameBuffer(this->framebuffer);
         this->api->setRenderMode(NRE_GPU_AFTERPREPASS_BACKFACE);
         for (auto x: this->scenes[scene_id].render_groups){
             if (x.camera == camera_id){
@@ -272,11 +299,9 @@ bool NRE_Renderer::updateSingleThread(){
         }
         
         //temporary TEST LIGHTS
-        this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
+        //this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
 
-        this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
-        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
-        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+        
 
         ///////////////////*/
         

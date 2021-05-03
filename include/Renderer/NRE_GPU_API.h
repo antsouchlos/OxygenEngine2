@@ -45,12 +45,14 @@ enum NRE_GPU_TEXTURE_TYPE{
     NRE_GPU_RGB,
     NRE_GPU_SRGB,
     NRE_GPU_RGB_U16,
+    NRE_GPU_RGB_U8,
     NRE_GPU_FLOAT,
     NRE_GPU_RGBA,
     NRE_GPU_RGB10_A2,
     NRE_GPU_RGBA16F,
     NRE_GPU_SRGBA,
     NRE_GPU_RGBA_U16,
+    NRE_GPU_RGBA_U8,
     NRE_GPU_DEPTHSTENCIL
 };
 
@@ -62,6 +64,7 @@ enum NRE_GPU_TEXTURE_FILTER{
 enum NRE_GPU_FRAMEBUFFER_COPY{
     NRE_GPU_FBO_COLOR,
     NRE_GPU_FBO_DEPTHSTENCIL,
+    NRE_GPU_FBO_COLORSTENCIL,
     NRE_GPU_FBO_ALL
 };
 
@@ -123,7 +126,7 @@ public:
     
     virtual void copyFrameBuffer(std::size_t, std::size_t, NRE_GPU_FRAMEBUFFER_COPY);
     virtual void useFrameBuffer(std::size_t);
-    virtual void clearFrameBuffer(std::size_t);
+    virtual void clearFrameBuffer(std::size_t, NRE_GPU_FRAMEBUFFER_COPY);
     virtual void deleteFrameBuffer(std::size_t);
     
     virtual void setProgramVS(std::size_t, NRE_GPU_VertexShader);

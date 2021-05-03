@@ -85,6 +85,7 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
+    glStencilMask(0xFF);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
@@ -264,6 +265,8 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
             return GL_SRGB8;
         case NRE_GPU_RGB_U16:
             return GL_RGB16UI;
+        case NRE_GPU_RGB_U8:
+            return GL_RGB8UI;
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
@@ -276,6 +279,8 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
             return GL_SRGB8_ALPHA8;
         case NRE_GPU_RGBA_U16:
             return GL_RGBA16UI;
+        case NRE_GPU_RGBA_U8:
+            return GL_RGBA8UI;
         case NRE_GPU_DEPTHSTENCIL:
             return GL_DEPTH24_STENCIL8;
     };
@@ -290,6 +295,8 @@ int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
             return GL_RGB;
         case NRE_GPU_RGB_U16:
             return GL_RGB_INTEGER;
+        case NRE_GPU_RGB_U8:
+            return GL_RGB_INTEGER;
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
@@ -301,6 +308,8 @@ int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
         case NRE_GPU_SRGBA:
             return GL_RGBA;
         case NRE_GPU_RGBA_U16:
+            return GL_RGBA_INTEGER;
+        case NRE_GPU_RGBA_U8:
             return GL_RGBA_INTEGER;
         case NRE_GPU_DEPTHSTENCIL:
             return GL_DEPTH_STENCIL;
@@ -316,6 +325,8 @@ int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
             return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGB_U16:
             return GL_UNSIGNED_SHORT;
+        case NRE_GPU_RGB_U8:
+            return GL_UNSIGNED_BYTE;
         case NRE_GPU_FLOAT:
             return GL_FLOAT;
         case NRE_GPU_RGBA:
@@ -328,6 +339,8 @@ int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
             return GL_UNSIGNED_BYTE;
         case NRE_GPU_RGBA_U16:
             return GL_UNSIGNED_SHORT;
+        case NRE_GPU_RGBA_U8:
+            return GL_UNSIGNED_BYTE;
         case NRE_GPU_DEPTHSTENCIL:
             return GL_UNSIGNED_INT_24_8;
     };
@@ -721,19 +734,34 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target, NRE_GPU_F
     //    cout << glGetError() << endl;
 }
 
-void NRE_GL3_API::clearFrameBuffer(std::size_t id){
-    this->check_fbo_id_(id, "copyFrameBuffer");
+void NRE_GL3_API::clearFrameBuffer(std::size_t id, NRE_GPU_FRAMEBUFFER_COPY clear){
+    this->check_fbo_id_(id, "clearFrameBuffer");
     
     glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[id].handle);
     glDepthMask(GL_TRUE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    if (clear == NRE_GPU_FBO_ALL){
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+    else if (clear == NRE_GPU_FBO_COLOR){
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    else if (clear == NRE_GPU_FBO_DEPTHSTENCIL){
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+    else if (clear == NRE_GPU_FBO_COLORSTENCIL){
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+    else{
+        
+    }
     
 }
 
 void NRE_GL3_API::useFrameBuffer(std::size_t id){
     if (id != 0){
-        this->check_fbo_id_(id, "copyFrameBuffer");
+        this->check_fbo_id_(id, "useFrameBuffer");
         glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[id].handle);
     }
     else {
@@ -1087,6 +1115,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     
     if (rendermode == NRE_GPU_Z_PREPASS_BACKFACE){
         glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST); 
         
         glEnable (GL_CULL_FACE);
         glCullFace (GL_BACK); /// cull back face
@@ -1099,6 +1128,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     }
     else if (rendermode == NRE_GPU_REGULAR_FRONTFACE){
         glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST); 
         
         glEnable (GL_DEPTH_TEST); // enable depth-testing
         glDepthFunc (GL_LESS);
@@ -1111,6 +1141,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     }
     else if (rendermode == NRE_GPU_REGULAR_BACKFACE){
         glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST); 
         
         glEnable (GL_DEPTH_TEST); // enable depth-testing
         glDepthFunc (GL_LESS);
@@ -1123,6 +1154,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     }
     else if (rendermode == NRE_GPU_AFTERPREPASS_BACKFACE){
         glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST); 
         
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -1135,6 +1167,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     }
     else if (rendermode == NRE_GPU_REGULAR_BOTH){
         glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST); 
         
         glEnable (GL_DEPTH_TEST); // enable depth-testing
         glDepthFunc (GL_LESS);
@@ -1146,6 +1179,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
     else if (rendermode == NRE_GPU_FULLSCREEN_QUAD){
         glDisable(GL_BLEND);
         
+        glDisable(GL_STENCIL_TEST); 
         glDisable(GL_DEPTH_TEST);
         //glDepthFunc(GL_LEQUAL);
         glColorMask(1, 1, 1, 1);
@@ -1155,7 +1189,42 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         glCullFace (GL_BACK); /// cull back face
         glFrontFace (GL_CCW);
     }
-    
+    else if (rendermode == NRE_GPU_LIGHT_PREPASS){
+        glDisable(GL_BLEND);
+        
+        glEnable(GL_STENCIL_TEST); 
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+        glStencilOp(GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        glColorMask(0, 0, 0, 0);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_BACK); /// cull back face
+        glFrontFace (GL_CCW);
+    }
+    else if (rendermode == NRE_GPU_LIGHT_AFTERPASS){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_CONSTANT_COLOR);
+        glBlendColor(0.25, 0.25, 0.25, 0.25);
+        
+        glEnable(GL_STENCIL_TEST); 
+        glStencilFunc(GL_EQUAL, 0, 0xFF);
+        glStencilMask(0x00);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_GEQUAL);
+        glColorMask(1, 1, 1, 1);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_FRONT); /// cull front face
+        glFrontFace (GL_CCW);
+    }
     else {
         // TODO
     }
