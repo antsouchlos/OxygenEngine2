@@ -16,11 +16,6 @@
 class OE_TaskManager;
 
 
-// TODO: Don't do that.
-// This is a helper function for the interpreter
-void OE_ReverseBitset(std::bitset<64>&);
-
-
 // TODO: Make use of RAII in every type class
 // TODO: Everywhere, where num_of* is used, instead just call *.elements.at("*").size(). No extra
 // 		 variable is necessary
