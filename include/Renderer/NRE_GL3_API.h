@@ -34,7 +34,7 @@ struct NRE_GL3_Texture{
     int y{0};
     int mipmaps{0};
     
-    bool hasChanged(NRE_GPU_TEXTURE_TYPE, NRE_GPU_TEXTURE_FILTER, int, int, int);
+    bool hasNotChanged(NRE_GPU_TEXTURE_TYPE, NRE_GPU_TEXTURE_FILTER, int, int, int);
 };
 
 struct NRE_GL3_VertexArray{

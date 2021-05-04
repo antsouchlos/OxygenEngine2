@@ -5,12 +5,19 @@
 #include <types/OE_VertexGroup.h>
 #include <memory>
 #include <functional>
+#include <bitset>
 
 class OE_Mesh32;
 
 struct OE_IndexBufferReady{
 	std::vector<uint32_t> data;
 };
+
+// TODO: Don't do that.
+// This is a helper function for the unordered index buffer
+void OE_ReverseBitset32(std::bitset<64>&);
+
+
 
 /* This classes optimize the storage by either using
  * an ordered or an unordered map transparently

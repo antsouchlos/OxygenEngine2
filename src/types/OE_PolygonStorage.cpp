@@ -28,7 +28,16 @@ std::size_t OE_IndexBufferWrapperBase::size(){
     return 0;
 }
 
-    
+// This is a helper function for the unordered index buffer
+void OE_ReverseBitset32(std::bitset<64>& bitseta){
+    std::bitset<64> temp;
+    for (size_t i=0;i < 32; i++){
+        temp[i] = bitseta[31-i];
+    }   
+    bitseta = temp;
+}
+
+
 // These should NOT by empty
 
 OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(uint32_t num_of_indices){
@@ -42,7 +51,7 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(uint32_t num_of_indices){
             for (size_t i=0; i < num_of_indices; i++){
                 std::bitset<64> temp(lhs[i]);
                 if (i%4 >= 2){
-                    OE_ReverseBitset(temp);
+                    OE_ReverseBitset32(temp);
                 }
                 if(i%2 != 0){
                     temp = temp << 32;
