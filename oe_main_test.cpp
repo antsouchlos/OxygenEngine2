@@ -18,15 +18,15 @@ int update_monkey_rot_x( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, 0.1f, 0.0f));
     //oe::change_object_rot("\"Suzanne\"", oe::vec4(0.1f, 1.0f, 0.0f, 0.0f));
-    //oe::ChangeObjectScale("Suzanne", oe::vec3(0.0f, 0.1f, 0.0f));
+    //oe::change_object_scale("\"Suzanne\"", oe::vec3(0.0f, 0.1f, 0.0f));
     return 0;
 }
 
 int update_monkey_rot_neg_x( oe::task, string event_name){
 
     oe::change_object_local_pos("\"Camera\"", oe::vec3(0.0f, -0.1f, 0.0f));
-    //oe::ChangeObjectRot("Suzanne", oe::vec4(-0.1f, 1.0f, 0.0f, 0.0f));
-    //oe::ChangeObjectScale("Suzanne", oe::vec3(0.0f, -0.1f, 0.0f));
+    //oe::change_object_rot("\"Suzanne\"", oe::vec4(-0.1f, 1.0f, 0.0f, 0.0f));
+    //oe::change_object_scale("\"Suzanne\"", oe::vec3(0.0f, -0.1f, 0.0f));
     return 0;
 }
 

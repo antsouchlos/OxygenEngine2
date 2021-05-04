@@ -55,8 +55,8 @@ bool NRE_GL3_Program::operator< (const NRE_GL3_Program& other) const{
     return false;
 }
 
-bool NRE_GL3_Texture::hasChanged(NRE_GPU_TEXTURE_TYPE type_in, NRE_GPU_TEXTURE_FILTER filter_in, int x_in, int y_in, int mipmaps_in){
-    return (this->type == type_in) and (this->filter = filter_in) and (this->x == x_in) and (this->y == y_in) and (this->mipmaps == mipmaps_in);
+bool NRE_GL3_Texture::hasNotChanged(NRE_GPU_TEXTURE_TYPE type_in, NRE_GPU_TEXTURE_FILTER filter_in, int x_in, int y_in, int mipmaps_in){
+    return (this->type == type_in) and (this->filter == filter_in) and (this->x == x_in) and (this->y == y_in) and (this->mipmaps == mipmaps_in);
 }
 
 // ------------------------ API ---------------------- //
@@ -260,7 +260,7 @@ void NRE_GL3_API::get_program_all_uniforms_(std::size_t id){
 int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
     switch (type){
         case NRE_GPU_RGB:
-            return GL_RGB;
+            return GL_RGB8;
         case NRE_GPU_SRGB:
             return GL_SRGB8;
         case NRE_GPU_RGB_U16:
@@ -270,7 +270,7 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
-            return GL_RGBA;
+            return GL_RGBA8;
         case NRE_GPU_RGB10_A2:
             return GL_RGB10_A2;
         case NRE_GPU_RGBA16F:
@@ -646,7 +646,7 @@ void NRE_GL3_API::deleteVertexLayout(std::size_t id){
 void NRE_GL3_API::setTextureFormat(std::size_t id, NRE_GPU_TEXTURE_TYPE type, NRE_GPU_TEXTURE_FILTER filter, uint32_t x_in, uint32_t y_in, int mipmap_count){
     this->check_texture_id_(id, "setTextureFormat");
     
-    if (this->textures[id].hasChanged(type, filter, x_in, y_in, mipmap_count)) return;
+    if (this->textures[id].hasNotChanged(type, filter, x_in, y_in, mipmap_count)) return;
     
     this->textures[id].type = type;
     this->textures[id].filter = filter;

@@ -7,16 +7,6 @@
 // TODO: Don't do that.
 using namespace std;
 
-// This is a helper function for the interpreter
-void OE_ReverseBitset(std::bitset<64>& bitseta){
-    std::bitset<64> temp;
-    for (size_t i=0;i < 32; i++){
-        temp[i] = bitseta[31-i];
-    }   
-    bitseta = temp;
-}
-
-
 namespace csl {
 	int Interpreter::sv_to_int(std::string_view sv) {
 		int result = 0;
@@ -294,6 +284,11 @@ namespace csl {
 		uint32_t max_uv_num			= 0;	// TODO: Just a temp thing, until a proper solution
 											// is found (Need to know the max number of uvs on a
 											// vertex, before vertices are loaded)
+											
+											// Answer by phil: You need to know the max SIZE of the uvmaps. ->
+											// How many elements the oe::uvmap_data.elements contains/2
+											// and get the max, if more than one uvmap exists
+											// The solution i believe is to load all uvmapdata before initalizing the mesh
 
 		mesh_ptr result = std::make_shared<oe::mesh>(num_of_vertices, num_of_normals,
 										num_of_triangles, num_of_uvs, max_uv_num);

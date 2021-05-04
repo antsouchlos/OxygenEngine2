@@ -263,7 +263,9 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         this->meshes[id].data = OE_Mat4x4ToSTDVector(mesh->GetModelMatrix());
         
         bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
-        if (render_bboxes){
+        bool render_spheres = this->render_bounding_spheres.load(std::memory_order_relaxed);
+        
+        if (render_bboxes or render_spheres){
             //---- <TEMPORARY> ----//
             // This should not be done here but in the physics engine
             mesh->calculateProperBoundingBox();
