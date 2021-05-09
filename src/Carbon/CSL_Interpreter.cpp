@@ -272,8 +272,8 @@ namespace csl {
 
 
 	mesh_ptr Interpreter::process_mesh(const element& mesh_e) {
-		uint32_t num_of_vertices	= mesh_e.list_assignments.at("vertices").size();
-		uint32_t num_of_normals		= mesh_e.list_assignments.at("normals").size();
+		uint32_t num_of_vertices	= mesh_e.list_assignments.at("vertices").size()/3;
+		uint32_t num_of_normals		= mesh_e.list_assignments.at("normals").size()/3;
 		uint32_t num_of_triangles	= mesh_e.elements.at("Triangle").size();
 		uint32_t num_of_uvs			= 0;
 		
