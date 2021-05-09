@@ -245,8 +245,8 @@ void OE_TaskManager::Step(){
     
     if (this->world != nullptr){
         
-        this->physics->world = this->world;
-        this->renderer->world = this->world;
+        //this->physics->world = this->world;
+        //this->renderer->world = this->world;
         //auto t=clock();
         this->tryRun_renderer_updateData();
         //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
@@ -425,6 +425,9 @@ void OE_TaskManager::updateWorld(){
         this->world->setup();
     }
     this->pending_world = nullptr;
+    
+    this->physics->world = this->world;
+    this->renderer->world = this->world;
     unlockMutex();
 }
 
