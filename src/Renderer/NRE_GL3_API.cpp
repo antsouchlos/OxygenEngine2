@@ -739,7 +739,9 @@ void NRE_GL3_API::clearFrameBuffer(std::size_t id, NRE_GPU_FRAMEBUFFER_COPY clea
     
     glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[id].handle);
     glDepthMask(GL_TRUE);
+    glColorMask(1, 1, 1, 1);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    
     if (clear == NRE_GPU_FBO_ALL){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
