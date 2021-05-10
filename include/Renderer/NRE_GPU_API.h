@@ -126,7 +126,7 @@ public:
     
     virtual void copyFrameBuffer(std::size_t, std::size_t, NRE_GPU_FRAMEBUFFER_COPY);
     virtual void useFrameBuffer(std::size_t);
-    virtual void clearFrameBuffer(std::size_t, NRE_GPU_FRAMEBUFFER_COPY);
+    virtual void clearFrameBuffer(std::size_t, NRE_GPU_FRAMEBUFFER_COPY, float);
     virtual void deleteFrameBuffer(std::size_t);
     
     virtual void setProgramVS(std::size_t, NRE_GPU_VertexShader);

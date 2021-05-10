@@ -734,13 +734,13 @@ void NRE_GL3_API::copyFrameBuffer(std::size_t src, std::size_t target, NRE_GPU_F
     //    cout << glGetError() << endl;
 }
 
-void NRE_GL3_API::clearFrameBuffer(std::size_t id, NRE_GPU_FRAMEBUFFER_COPY clear){
+void NRE_GL3_API::clearFrameBuffer(std::size_t id, NRE_GPU_FRAMEBUFFER_COPY clear, float alpha_value){
     this->check_fbo_id_(id, "clearFrameBuffer");
     
     glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[id].handle);
     glDepthMask(GL_TRUE);
     glColorMask(1, 1, 1, 1);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, alpha_value);
     
     if (clear == NRE_GPU_FBO_ALL){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
