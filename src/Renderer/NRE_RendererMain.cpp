@@ -200,7 +200,7 @@ bool NRE_Renderer::updateSingleThread(){
     cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
     
     this->api->useFrameBuffer(this->framebuffer);
-    this->api->clearFrameBuffer(this->framebuffer, NRE_GPU_FBO_ALL);
+    this->api->clearFrameBuffer(this->framebuffer, NRE_GPU_FBO_ALL, 1.0f);
 
     if (this->loaded_viewport != 0){
 
@@ -236,7 +236,7 @@ bool NRE_Renderer::updateSingleThread(){
         this->updateLightGPUData();
         
         this->api->useFrameBuffer(this->fbo_light);
-        this->api->clearFrameBuffer(this->fbo_light, NRE_GPU_FBO_COLORSTENCIL);
+        this->api->clearFrameBuffer(this->fbo_light, NRE_GPU_FBO_COLORSTENCIL, 0.0f);
         
         this->api->setRenderMode(NRE_GPU_LIGHT_PREPASS);
         
