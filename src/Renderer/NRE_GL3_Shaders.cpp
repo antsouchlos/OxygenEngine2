@@ -60,7 +60,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 
                 //out vec3 position;
                 //out vec3 normals;
-                flat out int instance_num;
+                flat out float instance_num;
                 
                 layout(std140) uniform OE_Camera{
                     mat4 PV_Matrix;
@@ -75,7 +75,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     //float Fcoef = 2.0 / log2(150.0 + 1.0);
                     
                     //normals = oe_normals;
-                    instance_num = int(gl_InstanceID);
+                    instance_num = gl_InstanceID/255.0;
                     mat4 model_copy = Model_Matrix[gl_InstanceID];
                     float scale = model_copy[3][3];
                     mat4 final_mat = PV_Matrix;
@@ -259,15 +259,17 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
     }
     else if (fs.type == NRE_GPU_FS_LIGHT_INDEX){
          output.append(NRE_Shader(
-            flat in int instance_num;
+            flat in float instance_num;
              
-            out uvec4 fragColor;
+            out vec4 fragColor;
              
             void main(){
-                fragColor = uvec4((instance_num & 3) << 6, (instance_num & 12) << 4, (instance_num & 48) << 2, (instance_num & 192));
+                //fragColor = uvec4((instance_num & 3) << 6, (instance_num & 12) << 4, (instance_num & 48) << 2, (instance_num & 192));
+                fragColor = vec4(instance_num, 1.0-instance_num, instance_num, 1.0-instance_num);
             }
              
         ));
+        return NRE_GPU_ShaderBase::shader_prefix + output;
     }
     
     output.append(NRE_Shader(
