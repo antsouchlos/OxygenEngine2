@@ -183,7 +183,8 @@ int main(){
 	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
 	//oe::load_world_func("audi_r8.csl", &OnLoadObject);
     oe::load_world_func("OE_Demo.csl", &OnLoadObject);
-	
+	//oe::load_world_func("lights_simple.csl", &OnLoadObject);
+    
 	//taskMgr.Start();
     oe::start();
     

@@ -158,7 +158,7 @@ void NRE_Renderer::initLightUBOProgramFBO(){
     // setup light own texture and framebuffer to be used for storing the indices
     this->tex_light = this->api->newTexture();
     
-    this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA_U8, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     
     this->fbo_light = this->api->newFrameBuffer();
     this->api->setFrameBufferTexture(this->fbo_light, this->tex_light, 0);
@@ -179,7 +179,7 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     }
     // update light texture
-    this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA_U8, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+    this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
     
     // generate draw calls
     this->generateDrawCalls();
@@ -238,16 +238,16 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->useFrameBuffer(this->fbo_light);
         this->api->clearFrameBuffer(this->fbo_light, NRE_GPU_FBO_COLORSTENCIL, 0.0f);
         
-        this->api->setRenderMode(NRE_GPU_LIGHT_PREPASS);
+        this->api->setRenderMode(NRE_GPU_LIGHT_PREPASS_2);
         
         this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
         this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
         this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
         
-        this->api->setRenderMode(NRE_GPU_LIGHT_AFTERPASS);
+        this->api->setRenderMode(NRE_GPU_LIGHT_AFTERPASS_RG);
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
         
-        this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
-        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
+        this->api->setRenderMode(NRE_GPU_LIGHT_AFTERPASS_BA);
         this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
         
         // draw everything normally
