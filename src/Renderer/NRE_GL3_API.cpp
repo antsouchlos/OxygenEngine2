@@ -1197,7 +1197,7 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         glEnable(GL_STENCIL_TEST); 
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
-        glStencilOp(GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_ZERO);
         
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
@@ -1222,6 +1222,60 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         glDepthMask(GL_FALSE);
         glDepthFunc(GL_GEQUAL);
         glColorMask(1, 1, 1, 1);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_FRONT); /// cull front face
+        glFrontFace (GL_CCW);
+    }
+    else if (rendermode == NRE_GPU_LIGHT_PREPASS_2){
+        glDisable(GL_BLEND);
+        
+        glEnable(GL_STENCIL_TEST); 
+        glStencilFunc(GL_ALWAYS, 5, 0xFF);
+        glStencilMask(0xFF);
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_ZERO);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        glColorMask(0, 0, 0, 0);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_BACK); /// cull back face
+        glFrontFace (GL_CCW);
+    }
+    else if (rendermode == NRE_GPU_LIGHT_AFTERPASS_RG){
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_MAX);
+        
+        glEnable(GL_STENCIL_TEST); 
+        glStencilFunc(GL_GREATER, 2, 0xFF);
+        glStencilMask(0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_GEQUAL);
+        glColorMask(1, 1, 0, 0);
+        
+        glEnable (GL_CULL_FACE);
+        glCullFace (GL_FRONT); /// cull front face
+        glFrontFace (GL_CCW);
+        
+    }
+    else if (rendermode == NRE_GPU_LIGHT_AFTERPASS_BA){
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_MAX);
+        
+        glEnable(GL_STENCIL_TEST); 
+        glStencilFunc(GL_EQUAL, 0, 0xFF);
+        glStencilMask(0xFF);
+        glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+        
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_GEQUAL);
+        glColorMask(0, 0, 1, 1);
         
         glEnable (GL_CULL_FACE);
         glCullFace (GL_FRONT); /// cull front face
