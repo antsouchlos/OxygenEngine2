@@ -46,6 +46,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     //float Fcoef = 2.0 / log2(150.0 + 1.0);
                     
                     //mat4 final_mat = PV_Matrix*Model_Matrix;
+                    gl_Position.w = 1.0;
                     gl_Position = PV_Matrix*(Model_Matrix*vec4(oe_position, 1.0));
                     
                     //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
@@ -74,8 +75,8 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 void main(){
                     //float Fcoef = 2.0 / log2(150.0 + 1.0);
                     
-                    //normals = oe_normals;
-                    instance_num = gl_InstanceID/255.0;
+                    
+                    
                     mat4 model_copy = Model_Matrix[gl_InstanceID];
                     float scale = model_copy[3][3];
                     mat4 final_mat = PV_Matrix;
@@ -84,6 +85,9 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     vec4 temp_position = vec4(oe_position*scale + delta_pos, 1.0);
                         
                     //position = temp_position.xyz;
+                    float instance_float = float(gl_InstanceID);
+                    instance_num =  instance_float/256.0 + 1.0/256.0;
+                    gl_Position.w = 1.0;
                     gl_Position = final_mat*temp_position;
                     
                     //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
@@ -142,6 +146,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                 
                         vec4 temp_position = Model_Matrix*vec4(oe_position, 1.0);
                         position = temp_position.xyz;
+                        gl_Position.w = 1.0;
                         gl_Position = PV_Matrix*(Model_Matrix*vec4(oe_position, 1.0));
                         
                         //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
@@ -174,6 +179,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                         }
                         
                         position = temp_position.xyz;
+                        gl_Position.w = 1.0;
                         gl_Position = final_mat*temp_position;
                         
                         //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
@@ -198,6 +204,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                         vec4 temp_position = vec4(oe_position*max(abs(scaling_max_data.w), abs(scaling_min_data.w))+delta_pos, 1.0);
                         
                         position = temp_position.xyz;
+                        gl_Position.w = 1.0;
                         gl_Position = final_mat*temp_position;
                         
                         //gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;

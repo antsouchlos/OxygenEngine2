@@ -43,9 +43,7 @@ public:
     
     virtual ~NRE_GPU_ShaderBase();
     virtual std::string genShader();
-    
-    
-    
+    virtual std::string info();
     
 };
 
@@ -59,11 +57,11 @@ public:
     bool operator == (const NRE_GPU_VertexShader&) const;
     
     std::string genShader();
+    std::string info();
     
     bool fullscreenQuad{false};
     std::size_t num_of_uvs{0};
     NRE_GPU_VS_TYPE type{NRE_GPU_VS_UNDEFINED};
-    
     
 };
 
@@ -76,6 +74,7 @@ public:
     bool operator< (const NRE_GPU_PixelShader&) const;
     
     std::string genShader();
+    std::string info();
     
     std::size_t num_of_uvs{0};
     NRE_GPU_FS_TYPE type{NRE_GPU_FS_UNDEFINED};
