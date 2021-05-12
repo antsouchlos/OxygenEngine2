@@ -92,6 +92,7 @@ bool NRE_Renderer::updateData(){
         //cout << OE_Main->world->to_str() << endl;
         
         // this also resets the GPU API resources
+        this->destroy();
         this->init();
         
         for (auto mat : OE_World::materialsList){
