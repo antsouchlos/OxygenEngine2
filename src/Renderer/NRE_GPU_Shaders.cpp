@@ -1,5 +1,6 @@
 #include <Renderer/NRE_GL3_Shaders.h>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -46,6 +47,10 @@ std::string NRE_GPU_ShaderBase::genShader(){
     return "";
 }
 
+std::string NRE_GPU_ShaderBase::info(){
+    return "";
+}
+
 // Vertex Shader
 
 NRE_GPU_VertexShader::NRE_GPU_VertexShader(){
@@ -88,6 +93,33 @@ std::string NRE_GPU_VertexShader::genShader(){
     return "";
 }
 
+std::string NRE_GPU_VertexShader::info(){
+    
+    stringstream ss;
+    switch(this->type){
+        case NRE_GPU_VS_UNDEFINED:
+            ss << "VS_UNDEFINED";
+            break;
+        case NRE_GPU_VS_Z_PREPASS:
+            ss << "VS_Z_PREPASS";
+            break;
+        case NRE_GPU_VS_REGULAR:
+            ss << "VS_REGULAR";
+            break;
+        case NRE_GPU_VS_BOUNDING_BOX:
+            ss << "VS_BOUNDING_BOX";
+            break;
+        case NRE_GPU_VS_BOUNDING_SPHERE:
+            ss << "VS_BOUNDING_SPHERE";
+            break;
+        case NRE_GPU_VS_LIGHT:
+            ss << "VS_LIGHT";
+            break;
+    }
+    
+    return ss.str();
+}
+
 // Fragment/Pixel Shader
 
 NRE_GPU_PixelShader::NRE_GPU_PixelShader(){
@@ -116,4 +148,39 @@ std::string NRE_GPU_PixelShader::genShader(){
     if (NRE_GPU_ShaderBase::backend == NRE_GPU_GL || NRE_GPU_ShaderBase::backend == NRE_GPU_GLES)
         return NRE_GenGL3PixelShader(*this);
     return "";
+}
+
+std::string NRE_GPU_PixelShader::info(){
+    stringstream ss;
+    switch(this->type){
+        case NRE_GPU_FS_UNDEFINED:
+            ss << "FS_UNDEFINED";
+            break;
+        case NRE_GPU_FS_SIMPLE:
+            ss << "FS_SIMPLE";
+            break;
+        case NRE_GPU_FS_GAMMA:
+            ss << "FS_GAMMA";
+            break;
+        case NRE_GPU_FS_MATERIAL:
+            ss << "FS_MATERIAL";
+            break;
+        case NRE_GPU_FS_NORMALS:
+            ss << "FS_NORMALS";
+            break;
+        case NRE_GPU_FS_SIMPLE_LIGHT:
+            ss << "FS_SIMPLE_LIGHT";
+            break;
+        case NRE_GPU_FS_DIR_LIGHT:
+            ss << "FS_DIR_LIGHT";
+            break;
+        case NRE_GPU_FS_INDIR_LIGHTS:
+            ss << "FS_INDIR_LIGHTS";
+            break;
+        case NRE_GPU_FS_LIGHT_INDEX:
+            ss << "FS_LIGHT_INDEX";
+            break;
+    }
+    
+    return ss.str();
 }

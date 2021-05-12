@@ -22,25 +22,6 @@ bool NRE_Renderer::init(){
     cout << "NRE Meshes: " << this->meshes.size() << endl;
     cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
     
-    
-    this->cameras.clear();
-    this->materials.clear();
-    this->vgroups.clear();
-    this->meshes.clear();
-    this->dir_lights.clear();
-    this->pt_lights.clear();
-    this->scenes.clear();
-    this->viewports.clear();
-    
-    this->setup_bbox_prog = false;
-    this->setup_sphere_prog = false;
-    
-    // reset all GPU data
-    if (api != nullptr){
-        api->destroy();
-        delete api;
-    }
-    
     // make sure we use the right API
     this->api = new NRE_GL3_API();
     if (!this->screen->isES){
@@ -297,13 +278,6 @@ bool NRE_Renderer::updateSingleThread(){
             }
             this->scenes[scene_id].render_groups.update();
         }
-        
-        //temporary TEST LIGHTS
-        //this->api->setRenderMode(NRE_GPU_REGULAR_BOTH);
-
-        
-
-        ///////////////////*/
         
         this->api->use_wireframe = temp;
     }
@@ -584,6 +558,20 @@ bool NRE_Renderer::updateMultiThread(OE_Task*, int){
 }
 
 void NRE_Renderer::destroy(){
+    
+    this->cameras.clear();
+    this->materials.clear();
+    this->vgroups.clear();
+    this->meshes.clear();
+    this->dir_lights.clear();
+    this->pt_lights.clear();
+    this->scenes.clear();
+    this->viewports.clear();
+    
+    this->setup_bbox_prog = false;
+    this->setup_sphere_prog = false;
+    
+    // reset all GPU data
     if (api != nullptr){
         api->destroy();
         delete api;

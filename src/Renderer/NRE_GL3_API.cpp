@@ -5,6 +5,62 @@
 
 using namespace std;
 
+// OpenGL debug function
+void APIENTRY openglCallbackFunction(GLenum source,
+                                           GLenum type,
+                                           GLuint id,
+                                           GLenum severity,
+                                           GLsizei length,
+                                           const GLchar* message,
+                                           const void* userParam){
+    
+    
+    stringstream ss;
+    ss << "[NRE GL API debug callback START]" << endl;
+    ss << "message: "<< message << endl;
+    ss << "type: ";
+    switch (type) {
+    case GL_DEBUG_TYPE_ERROR:
+        ss << "ERROR";
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        ss << "DEPRECATED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+        ss << "UNDEFINED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+        ss << "PORTABILITY";
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+        ss << "PERFORMANCE";
+        break;
+    case GL_DEBUG_TYPE_OTHER:
+        ss << "OTHER";
+        break;
+    }
+    ss << endl;
+ 
+    ss << "id: " << id << endl;
+    ss << "severity: ";
+    switch (severity){
+    case GL_DEBUG_SEVERITY_LOW:
+        ss << "LOW";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        ss << "MEDIUM";
+        break;
+    case GL_DEBUG_SEVERITY_HIGH:
+        ss << "HIGH";
+        break;
+    }
+    ss << endl;
+    ss << "[NRE GL API debug callback END]" << endl;
+    cout << ss.str();
+    OE_WriteToLog(ss.str());
+}
+
+
 // small utility function to translate the buffer usages to something opengl understands
 // This should be different on other APIs
 GLenum NRE2GL_BufferUse(NRE_GPU_BUFFER_USAGE usage){
@@ -69,6 +125,20 @@ std::size_t NRE_GL3_API::getVAOSize(std::size_t id){
 
 NRE_GL3_API::NRE_GL3_API(){
     this->vao_ibos_[0] = 0;
+    if(glDebugMessageCallback){
+        cout << "[NRE GL API Info] Register OpenGL debug callback " << endl;
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(openglCallbackFunction, nullptr);
+        GLuint unusedIds = 0;
+        glDebugMessageControl(GL_DONT_CARE,
+            GL_DONT_CARE,
+            GL_DONT_CARE,
+            0,
+            &unusedIds,
+            true);
+    }
+    else
+        cout << "[NRE GL API Info] glDebugMessageCallback not available" << endl;
 }
 
 NRE_GL3_API::~NRE_GL3_API(){
@@ -824,8 +894,11 @@ void NRE_GL3_API::setProgramVS(std::size_t id, std::string data){
         int actual_length = 0;
         char log[2048];
         glGetShaderInfoLog(shader_id, max_length, &actual_length, log);
-        cout << log << endl;
-        OE_WriteToLog(log);
+        
+        stringstream ss;
+        ss << "[NRE GL Shader Warning] in vertex shader: " << this->progs[id].vs.info() << endl << log << endl;
+        cout << ss.str();
+        OE_WriteToLog(ss.str());
     }
 }
 
@@ -859,8 +932,11 @@ void NRE_GL3_API::setProgramFS(std::size_t id, std::string data){
         int actual_length = 0;
         char log[2048];
         glGetShaderInfoLog(shader_id, max_length, &actual_length, log);
-        cout << log << endl;
-        OE_WriteToLog(log);
+        
+        stringstream ss;
+        ss << "[NRE GL Shader Warning] in pixel shader: " << this->progs[id].fs.info() << endl << log << endl;
+        cout << ss.str();
+        OE_WriteToLog(ss.str());
     }
 }
 
@@ -967,8 +1043,11 @@ void NRE_GL3_API::setupProgram(std::size_t id){
         int actual_length = 0;
         char log[2048];
         glGetProgramInfoLog(this->progs[id].handle, max_length, &actual_length, log);
-        cout << log << endl;
-        OE_WriteToLog(log);
+        
+        stringstream ss;
+        ss << "[NRE GL Shader Linking Warning] with shaders: " << this->progs[id].vs.info() << " " << this->progs[id].fs.info() << endl << log << endl;
+        cout << ss.str();
+        OE_WriteToLog(ss.str());
 
     }
     glUseProgram(this->progs[id].handle);
@@ -1231,9 +1310,11 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         glDisable(GL_BLEND);
         
         glEnable(GL_STENCIL_TEST); 
-        glStencilFunc(GL_ALWAYS, 5, 0xFF);
+        glStencilFunc(GL_ALWAYS, 2, 0xFF);
+        //glStencilFunc(GL_GEQUAL, 2, 0xFF);
         glStencilMask(0xFF);
         glStencilOp(GL_KEEP, GL_REPLACE, GL_ZERO);
+        //glStencilOp(GL_KEEP, GL_INCR, GL_DECR);
         
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
@@ -1294,3 +1375,5 @@ void NRE_GL3_API::setRenderMode(NRE_GPU_RENDERMODE rendermode){
         }
     }
 }
+
+
