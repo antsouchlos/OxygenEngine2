@@ -2,10 +2,10 @@ project('Oxygen Engine', ['cpp', 'c'], default_options : ['cpp_std=c++17', 'buil
 
 src = ['src/OE_SDL_WindowSystem.cpp',
        'src/Renderer/glad.c',
-       'src/Renderer/NRE_GL3_API.cpp',
+       'src/Renderer/GL3/NRE_GL3_API.cpp',
        'src/Renderer/NRE_GPU_API.cpp',
        'src/Renderer/NRE_GPU_Shaders.cpp',
-       'src/Renderer/NRE_GL3_Shaders.cpp',
+       'src/Renderer/GL3/NRE_GL3_Shaders.cpp',
        'src/Renderer/NRE_RendererMain.cpp',
        'src/Renderer/NRE_RenderData.cpp',
        'src/Renderer/NRE_DrawCallContainer.cpp',

@@ -1,4 +1,4 @@
-#include <Renderer/NRE_GL3_Shaders.h>
+#include <Renderer/GL3/NRE_GL3_Shaders.h>
 #include <iostream>
 
 using namespace std;
@@ -85,7 +85,7 @@ std::string NRE_GenGL3VertexShader(NRE_GPU_VertexShader vs){
                     vec4 temp_position = vec4(oe_position*scale + delta_pos, 1.0);
                         
                     //position = temp_position.xyz;
-                    float instance_float = float(gl_InstanceID);
+                    float instance_float = float(gl_InstanceID+1);
                     instance_num =  instance_float/256.0 + 1.0/256.0;
                     gl_Position.w = 1.0;
                     gl_Position = final_mat*temp_position;

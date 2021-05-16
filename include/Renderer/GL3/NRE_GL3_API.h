@@ -4,7 +4,7 @@
 
 #include <Renderer/NRE_GPU_API.h>
 #include <Renderer/glad.h>
-#include <Renderer/NRE_GL3_Shaders.h>
+#include <Renderer/GL3/NRE_GL3_Shaders.h>
 
 struct NRE_GL3_VertexBuffer{
     GLuint                  handle;
