@@ -1,4 +1,4 @@
-#include <Renderer/NRE_GL3_API.h>
+#include <Renderer/GL3/NRE_GL3_API.h>
 #include <types/OE_Libs.h>
 
 #define NRE_GL3_VERTEXL_LAYOUT_OFFSET(i) ((GLvoid*)(i))
@@ -329,14 +329,7 @@ void NRE_GL3_API::get_program_all_uniforms_(std::size_t id){
 
 int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
     switch (type){
-        case NRE_GPU_RGB:
-            return GL_RGB8;
-        case NRE_GPU_SRGB:
-            return GL_SRGB8;
-        case NRE_GPU_RGB_U16:
-            return GL_RGB16UI;
-        case NRE_GPU_RGB_U8:
-            return GL_RGB8UI;
+
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
@@ -359,14 +352,6 @@ int NRE_GL3_API::teximage_internalformat_(NRE_GPU_TEXTURE_TYPE type){
 
 int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
      switch (type){
-        case NRE_GPU_RGB:
-            return GL_RGB;
-        case NRE_GPU_SRGB:
-            return GL_RGB;
-        case NRE_GPU_RGB_U16:
-            return GL_RGB_INTEGER;
-        case NRE_GPU_RGB_U8:
-            return GL_RGB_INTEGER;
         case NRE_GPU_FLOAT:
             return GL_RGB32F;
         case NRE_GPU_RGBA:
@@ -389,14 +374,6 @@ int NRE_GL3_API::teximage_format_(NRE_GPU_TEXTURE_TYPE type){
 
 int NRE_GL3_API::teximage_type_(NRE_GPU_TEXTURE_TYPE type){
      switch (type){
-        case NRE_GPU_RGB:
-            return GL_UNSIGNED_BYTE;
-        case NRE_GPU_SRGB:
-            return GL_UNSIGNED_BYTE;
-        case NRE_GPU_RGB_U16:
-            return GL_UNSIGNED_SHORT;
-        case NRE_GPU_RGB_U8:
-            return GL_UNSIGNED_BYTE;
         case NRE_GPU_FLOAT:
             return GL_FLOAT;
         case NRE_GPU_RGBA:

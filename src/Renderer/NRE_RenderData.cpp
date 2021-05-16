@@ -229,9 +229,9 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         // but offload the actual OpenGL commands for later, since this runs in a performance
         // critical section
         
-        auto model_mat = mesh->GetModelMatrix();
+        this->meshes[id].model_mat = mesh->GetModelMatrix();
         
-        this->meshes[id].data = OE_Mat4x4ToSTDVector(model_mat);
+        //this->meshes[id].data = OE_Mat4x4ToSTDVector(model_mat);
         this->meshes[id].changed = true;
         
         // handle Vertex (Triangle) groups
@@ -261,7 +261,7 @@ void NRE_Renderer::handleMeshData(std::size_t id, std::shared_ptr<OE_Mesh32> mes
         this->meshes[id].min_radius = mesh->data->vertices.min_radius;
     }
     else{
-        this->meshes[id].data = OE_Mat4x4ToSTDVector(mesh->GetModelMatrix());
+        this->meshes[id].model_mat = mesh->GetModelMatrix();
         
         bool render_bboxes = this->render_bounding_boxes.load(std::memory_order_relaxed);
         bool render_spheres = this->render_bounding_spheres.load(std::memory_order_relaxed);
@@ -495,6 +495,9 @@ void NRE_Renderer::updateMeshGPUData(){
         // update per frame data
         if (this->meshes[mesh.first].changed){
             
+            
+            this->meshes[mesh.first].data = OE_Mat4x4ToSTDVector(this->meshes[mesh.first].model_mat);
+            
             // populate scaling_max_data
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_x);
             this->meshes[mesh.first].data.push_back(this->meshes[mesh.first].max_y);
@@ -598,8 +601,13 @@ void NRE_Renderer::updateLightGPUData(){
         }
     }*/
     std::vector<float> pt_light_data;
+    int count = 0;
     for (auto l: this->pt_visible_lights){
         pt_light_data.insert(pt_light_data.end(), this->pt_lights[l.id].data.begin(), this->pt_lights[l.id].data.end());
+        
+        count++;
+        if (count > 255)
+            break;
     }
     this->api->setUniformBufferMemory(this->pt_light_ubo, pt_light_data.size(), NRE_GPU_STREAM);
     this->api->setUniformBufferData(this->pt_light_ubo, pt_light_data, 0);
