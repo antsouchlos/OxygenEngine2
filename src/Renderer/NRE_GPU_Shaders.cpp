@@ -1,4 +1,4 @@
-#include <Renderer/NRE_GL3_Shaders.h>
+#include <Renderer/GL3/NRE_GL3_Shaders.h>
 #include <iostream>
 #include <sstream>
 
@@ -31,7 +31,7 @@ void NRE_GPU_ShaderBase::init(NRE_GPU_SHADER_BACKEND backend, int major, int min
             NRE_GPU_ShaderBase::shader_prefix = "#version 150 core \n"
                                  "#extension GL_ARB_explicit_attrib_location"
                                  ": require\n";
-        } 
+        }
         else {
             cout << "WTF" << endl;
         }

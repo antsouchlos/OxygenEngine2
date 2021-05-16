@@ -1,6 +1,6 @@
 #include <OE_Math.h>
 #include <Renderer/NRE_RendererMain.h>
-#include <Renderer/NRE_GL3_API.h>
+#include <Renderer/GL3/NRE_GL3_API.h>
 #include <iostream>
 
 using namespace std;
@@ -222,14 +222,17 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->setRenderMode(NRE_GPU_LIGHT_PREPASS_2);
         
         this->api->setUniformBlockState(this->pt_light_ubo, this->prog_light, 1, 0, 0);
-        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);        
-        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+        this->api->setUniformBlockState(this->cameras[camera_id].ubo, this->prog_light, 0, 0, 0);    
+        
+        int lights_count = this->pt_visible_lights.size();
+        
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, std::min<int>(lights_count, 255));
         
         this->api->setRenderMode(NRE_GPU_LIGHT_AFTERPASS_RG);
-        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, std::min<int>(lights_count, 255));
         
         this->api->setRenderMode(NRE_GPU_LIGHT_AFTERPASS_BA);
-        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, this->pt_visible_lights.size());
+        this->api->draw_instanced(this->prog_light, this->vao_sphere, this->ibo_sphere, std::min<int>(lights_count, 255));
         
         // draw everything normally
         this->api->useFrameBuffer(this->framebuffer);
@@ -300,6 +303,13 @@ void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
     
     auto persp_mat = this->cameras[camera_id].perspective_mat;
     
+    // set limit to 255 lights
+    // why you ask?
+    // Well firstly 255 lights is already a LOT of lights inside the view frustum. More lights are not that good for performance
+    // Secondly the minimum required OpenGL Uniform buffer limit can only contain 256 matrices,
+    // so i can only place up to 255 lights (light with index 0 inside the shaders symbolizes the lack of lights)
+    // Thirdly, spot lights will be handed in a separate pass with another texture
+    
     for (auto l: this->scenes[scene_id].pt_lights){
         
         // calculations happening in view space
@@ -334,16 +344,9 @@ void NRE_Renderer::sortPointLights(std::size_t scene_id, std::size_t camera_id){
         if ((not is_behind_camera) and (not is_too_far_away) and (not is_too_left) and (not is_too_right) and (not is_too_above) and (not is_too_below)){
         auto point_light = NRE_PointLightDrawCall(l, (this->cameras[camera_id].perspective_view_mat*this->pt_lights[l].model_mat[3])[2], 0);
         this->pt_visible_lights.insert(point_light);
+        
         }
         
-        // set limit to 255 lights
-        // why you ask?
-        // Well firstly 255 lights is already a LOT of lights inside the view frustum. More lights are not that good for performance
-        // Secondly the minimum required OpenGL Uniform buffer limit can only contain 256 matrices,
-        // so i can only place up to 255 lights (light with index 0 inside the shaders symbolizes the lack of lights)
-        // Thirdly, spot lights will be handed in a separate pass with another texture
-        if (this->pt_visible_lights.size() >= 255)
-            break;
     }
     //cout << "pt size " << this->pt_visible_lights.size() << endl;
 }
