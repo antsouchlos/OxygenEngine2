@@ -70,14 +70,23 @@ struct NRE_GL3_Program{
     bool prog_created{false};
     GLuint handle{0};
     
+    //std::vector<NRE_GL3_ProgramUniformState> uniform_blocks;
+    //std::size_t hasUniformBlock(std::string);
+    
+    //std::vector<NRE_GL3_ProgramUniformState> uniforms;
+    //std::size_t hasUniform(std::string);
+    
+    // this is needed for it to be in an std::set
+    bool operator< (const NRE_GL3_Program&) const;
+};
+
+struct NRE_GL3_ProgramData{
+    GLuint handle{0};
     std::vector<NRE_GL3_ProgramUniformState> uniform_blocks;
     std::size_t hasUniformBlock(std::string);
     
     std::vector<NRE_GL3_ProgramUniformState> uniforms;
     std::size_t hasUniform(std::string);
-    
-    // this is needed for it to be in an std::set
-    bool operator< (const NRE_GL3_Program&) const;
 };
 
 GLenum NRE2GL_BufferUse(NRE_GPU_BUFFER_USAGE);
@@ -186,7 +195,7 @@ protected:
     
     std::map<NRE_GPU_VertexShader,  GLuint> vs_db;
     std::map<NRE_GPU_PixelShader,   GLuint> fs_db;
-    std::map<NRE_GL3_Program,       GLuint> prog_db;
+    std::map<NRE_GL3_Program,       NRE_GL3_ProgramData> prog_db;
     
 private:
     

@@ -12,6 +12,9 @@ OE_SDL_WindowSystem::OE_SDL_WindowSystem(){
 #ifdef OE_PLATFORM_WINDOWS
     this->os = OE_WINDOWS;
 #endif
+#ifdef OE_PLATFORM_ANDROID
+    this->os = OE_ANDROID;
+#endif
 }
 
 OE_SDL_WindowSystem::~OE_SDL_WindowSystem(){
