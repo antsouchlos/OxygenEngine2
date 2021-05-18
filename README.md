@@ -270,6 +270,10 @@ Added ```OE_NetworkingBase``` base class for Silicon in ```OE_DummyClasses.h/.cp
 
 NRE: Added point light symbolic instanced rendering with shared UBO. Works suprisingly well. Also updated ```oe_shared.zip```.
 
+2021/05/16 - philsegeler
+
+NRE: Prepared for GLES2 compatibility renderer. 
+
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.
 
@@ -284,6 +288,10 @@ This should get the project started again with the basics working, so as to be a
 
 Finally the initial TODO list is ready and done! Now i can start working on the renderer properly!
 UPDATE 2020/11/12: It was enhanced.
+
+Sidelines:
+- Refactor GPU API, introduce renderbuffer, drawdata (NEW)
+- Introduce OpenGL ES 2.0 compatibility renderer. (NEW)
 
 - ~~Basic Material and Lighting support.~~(DONE)
 - ~~Rewrite the scenegraph/renderer/API and CSL_Interpreter to a more efficient types format using a templated OE_SharedIndexMap and ```std::shared_ptr```. (depends on antsouchlos' work on the parser/interpreter)~~(DONE)
