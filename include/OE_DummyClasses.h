@@ -12,7 +12,8 @@
 enum OE_OS : int{
     OE_UNDEFINED=0,
     OE_LINUX=1,
-    OE_WINDOWS=2
+    OE_WINDOWS=2,
+    OE_ANDROID=2
 };
 
 enum OE_WINSYS : int{
