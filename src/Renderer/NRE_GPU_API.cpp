@@ -27,7 +27,7 @@ std::string NRE_GPU_API::getRenderingAPI(){
     return "undefined";
 }
 
-// default implementations of virtual methods of the GPU API (OpenGL/Vulkan/Metal/whatever
+// default implementations of virtual methods of the GPU API (OpenGL/Vulkan/Metal/whatever)
 
 std::size_t NRE_GPU_API::newVertexBuffer(){ return 0;}
 std::size_t NRE_GPU_API::newVertexLayout(){ return 0;}
@@ -36,7 +36,10 @@ std::size_t NRE_GPU_API::newProgram(){ return 0;}
 std::size_t NRE_GPU_API::newUniformBuffer(){ return 0;}
 std::size_t NRE_GPU_API::newFrameBuffer(){ return 0;}
 std::size_t NRE_GPU_API::newTexture(){ return 0;}
-
+std::size_t  NRE_GPU_API::newRenderBuffer(){return 0;}
+    
+void NRE_GPU_API::setRenderBufferType(std::size_t, NRE_GPU_TEXTURE_TYPE, int, int){}
+void NRE_GPU_API::setFrameBufferRenderBuffer(std::size_t, std::size_t, int){}
 
 void NRE_GPU_API::setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE){}
 void NRE_GPU_API::setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t){}

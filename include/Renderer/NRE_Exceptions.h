@@ -15,6 +15,22 @@ namespace nre {
             };
     };
     
+     class invalid_render_buffer: public oe::renderer_error {
+        public:
+            
+            invalid_render_buffer(std::size_t id, const std::string &func){
+                name_ = "nre::invalid_render_buffer";
+                id_ = std::to_string(id);
+                func_ = func;
+            }
+            std::string what() const throw() {
+                return "Calling GPU API function '" + func_ + "' with invalid render buffer ID: '" + id_ + "'.";
+            };
+            
+            std::string id_;
+            std::string func_;
+    };
+    
     class invalid_vertex_buffer: public oe::renderer_error {
         public:
             

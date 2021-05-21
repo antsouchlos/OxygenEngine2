@@ -229,6 +229,18 @@ void OE_TaskManager::syncEndFrame(){
 
 void OE_TaskManager::Step(){
     //synchronize at start
+    if (this->world != nullptr){
+        
+        //this->physics->world = this->world;
+        //this->renderer->world = this->world;
+        //auto t=clock();
+        this->tryRun_renderer_updateData();
+        //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
+    }
+    
+    this->updateWorld();
+    this->window->event_handler.handleAllEvents();
+    
     this->syncBeginFrame();
     
     this->tryRun_renderer_updateSingleThread();
@@ -243,17 +255,7 @@ void OE_TaskManager::Step(){
     this->syncEndFrame();
 
     
-    if (this->world != nullptr){
-        
-        //this->physics->world = this->world;
-        //this->renderer->world = this->world;
-        //auto t=clock();
-        this->tryRun_renderer_updateData();
-        //cout << "NRE UPDATE DATA " << (float)(clock()-t)/CLOCKS_PER_SEC << endl;
-    }
     
-    this->updateWorld();
-    this->window->event_handler.handleAllEvents();
 }
 
 void OE_TaskManager::Start(){
