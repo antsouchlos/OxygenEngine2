@@ -6,6 +6,15 @@
 #include <Renderer/glad.h>
 #include <Renderer/GL3/NRE_GL3_Shaders.h>
 
+struct NRE_GL3_RenderBuffer{
+    GLuint handle{0};
+    NRE_GPU_TEXTURE_TYPE type;
+    int x{0};
+    int y{0};
+    
+    bool hasNotChanged(NRE_GPU_TEXTURE_TYPE, int, int);
+};
+
 struct NRE_GL3_VertexBuffer{
     GLuint                  handle;
     std::size_t             size;
@@ -112,6 +121,10 @@ public:
     std::size_t newUniformBuffer();
     std::size_t newFrameBuffer();
     std::size_t newTexture();
+    std::size_t newRenderBuffer();
+    
+    void setRenderBufferType(std::size_t, NRE_GPU_TEXTURE_TYPE, int, int);
+    void setFrameBufferRenderBuffer(std::size_t, std::size_t, int);
     
     void setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     void setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t);
@@ -175,6 +188,7 @@ public:
     
 protected:
     
+    std::size_t cur_rbo{0};
     std::size_t cur_vbo{0};
     std::size_t cur_ibo{0};
     std::size_t cur_vao{0};
@@ -183,6 +197,7 @@ protected:
     std::size_t cur_texture{0};
     std::size_t cur_prog{0};
     
+    std::unordered_map<std::size_t, NRE_GL3_RenderBuffer>     rbos;
     std::unordered_map<std::size_t, NRE_GL3_VertexBuffer>     vbos;
     std::unordered_map<std::size_t, NRE_GL3_IndexBuffer>      ibos;
     std::unordered_map<std::size_t, NRE_GL3_VertexArray>      vaos;
@@ -199,6 +214,7 @@ protected:
     
 private:
     
+    void check_rbo_id_(std::size_t, const std::string&);
     void check_vbo_id_(std::size_t, const std::string&);
     void check_ubo_id_(std::size_t, const std::string&);
     void check_ibo_id_(std::size_t, const std::string&);

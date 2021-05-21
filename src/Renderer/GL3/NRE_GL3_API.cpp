@@ -115,6 +115,10 @@ bool NRE_GL3_Texture::hasNotChanged(NRE_GPU_TEXTURE_TYPE type_in, NRE_GPU_TEXTUR
     return (this->type == type_in) and (this->filter == filter_in) and (this->x == x_in) and (this->y == y_in) and (this->mipmaps == mipmaps_in);
 }
 
+bool NRE_GL3_RenderBuffer::hasNotChanged(NRE_GPU_TEXTURE_TYPE type_in, int x_in, int y_in){
+    return (this->type == type_in) and (this->x == x_in) and (this->y == y_in);
+}
+
 // ------------------------ API ---------------------- //
 
 std::size_t NRE_GL3_API::getVAOSize(std::size_t id){
@@ -170,6 +174,8 @@ void NRE_GL3_API::update(uint32_t x_in, uint32_t y_in){
 }
 
 void NRE_GL3_API::destroy(){
+    for (auto x: std::exchange(rbos, {}))
+        glDeleteRenderbuffers(1, &x.second.handle);
     for (auto x: std::exchange(vbos, {}))
         glDeleteBuffers(1, &x.second.handle);
     for (auto x: std::exchange(vaos, {}))
@@ -204,6 +210,12 @@ std::string NRE_GL3_API::getRenderingAPI(){
 }
 
 //-------------------Handle errors--------------------------------//
+
+void NRE_GL3_API::check_rbo_id_(std::size_t id, const std::string& func){
+    if(this->rbos.count(id) == 0){
+        throw nre::invalid_render_buffer(id, func);
+    }
+}
 
 void NRE_GL3_API::check_vbo_id_(std::size_t id, const std::string& func){
     if(this->vbos.count(id) == 0){
@@ -443,6 +455,48 @@ std::size_t NRE_GL3_API::newTexture(){
     this->textures[cur_texture] = NRE_GL3_Texture();
     glGenTextures(1, &textures[cur_texture].handle);
     return cur_texture;
+}
+
+std::size_t  NRE_GL3_API::newRenderBuffer(){
+    cur_rbo++;
+    this->rbos[cur_rbo] = NRE_GL3_RenderBuffer();
+    glGenRenderbuffers(1, &rbos[cur_rbo].handle);
+    return cur_rbo;
+}
+    
+//--------------------Render Buffer -------------------------------//
+    
+void  NRE_GL3_API::setRenderBufferType(std::size_t id, NRE_GPU_TEXTURE_TYPE a_type, int x, int y){
+    this->check_rbo_id_(id, "setRenderBufferType");
+    
+    if (this->rbos[id].hasNotChanged(a_type, x, y)){
+        return;
+    }
+    
+    this->rbos[id].type = a_type;
+    this->rbos[id].x = a_type;
+    this->rbos[id].y = a_type;
+    
+    glBindRenderbuffer(GL_RENDERBUFFER, this->rbos[id].handle);
+    glRenderbufferStorage(GL_RENDERBUFFER, this->teximage_internalformat_(a_type), x, y);
+}
+
+void  NRE_GL3_API::setFrameBufferRenderBuffer(std::size_t fbo_id, std::size_t rbo_id, int slot){
+    this->check_rbo_id_(rbo_id, "setFrameBufferRenderBuffer");
+    this->check_fbo_id_(fbo_id, "setFrameBufferRenderBuffer");
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, this->fbos[fbo_id].handle);
+    glBindRenderbuffer(GL_RENDERBUFFER, this->rbos[rbo_id].handle);
+    
+    if (this->rbos[rbo_id].type != NRE_GPU_DEPTHSTENCIL){
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_RENDERBUFFER, this->rbos[rbo_id].handle);  
+    }
+    else {
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->rbos[rbo_id].handle);  
+    }
+    
+    if (glGetError() > 0)
+        cout << glGetError() << endl;
 }
 
 //---------------------Vertex Buffer-----------------------------//
