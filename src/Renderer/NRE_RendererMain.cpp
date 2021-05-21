@@ -44,18 +44,21 @@ void NRE_Renderer::initOffscreenFrameBuffer(){
     // setup offscreen framebuffer
     this->framebuffer = this->api->newFrameBuffer();
     this->colortexture = this->api->newTexture();
-    this->depthtexture = this->api->newTexture();
+    this->depthrbo = this->api->newRenderBuffer();
     
     if (this->use_HDR.load(std::memory_order_relaxed) == false){
         this->api->setTextureFormat(this->colortexture, NRE_GPU_RGB10_A2, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
-        this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        //this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        this->api->setRenderBufferType(this->depthrbo, NRE_GPU_DEPTHSTENCIL, this->screen->resolution_x, this->screen->resolution_y);
     } else {
         this->api->setTextureFormat(this->colortexture, NRE_GPU_RGBA16F, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
-        this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        //this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        this->api->setRenderBufferType(this->depthrbo, NRE_GPU_DEPTHSTENCIL, this->screen->resolution_x, this->screen->resolution_y);
     }
     
     this->api->setFrameBufferTexture(this->framebuffer, this->colortexture, 0);
-    this->api->setFrameBufferTexture(this->framebuffer, this->depthtexture, 0);
+    //this->api->setFrameBufferTexture(this->framebuffer, this->depthtexture, 0);
+    this->api->setFrameBufferRenderBuffer(this->framebuffer, this->depthrbo, 0);
 }
 
 void NRE_Renderer::initFullscreenQuad(){
@@ -143,7 +146,7 @@ void NRE_Renderer::initLightUBOProgramFBO(){
     
     this->fbo_light = this->api->newFrameBuffer();
     this->api->setFrameBufferTexture(this->fbo_light, this->tex_light, 0);
-    this->api->setFrameBufferTexture(this->fbo_light, this->depthtexture, 0);
+    this->api->setFrameBufferRenderBuffer(this->fbo_light, this->depthrbo, 0);
 }
 
 //------------------------updateSIngleThread-------------------//
@@ -154,10 +157,12 @@ bool NRE_Renderer::updateSingleThread(){
     
     if (this->use_HDR.load(std::memory_order_relaxed) == false){
         this->api->setTextureFormat(this->colortexture, NRE_GPU_RGB10_A2, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
-        this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        //this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        this->api->setRenderBufferType(this->depthrbo, NRE_GPU_DEPTHSTENCIL, this->screen->resolution_x, this->screen->resolution_y);
     } else {
         this->api->setTextureFormat(this->colortexture, NRE_GPU_RGBA16F, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
-        this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        //this->api->setTextureFormat(this->depthtexture, NRE_GPU_DEPTHSTENCIL, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
+        this->api->setRenderBufferType(this->depthrbo, NRE_GPU_DEPTHSTENCIL, this->screen->resolution_x, this->screen->resolution_y);
     }
     // update light texture
     this->api->setTextureFormat(this->tex_light, NRE_GPU_RGBA, NRE_GPU_NEAREST, this->screen->resolution_x, this->screen->resolution_y, 0);
