@@ -60,7 +60,7 @@ public:
     // data for offscreen framebuffer
     std::size_t framebuffer{0};
     std::size_t colortexture{0};
-    std::size_t depthtexture{0};
+    std::size_t depthrbo{0};
     
     // data for fullscreen quad
     std::size_t vbo_fullscreen_quad{0};
