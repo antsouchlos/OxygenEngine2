@@ -90,6 +90,10 @@ public:
     virtual std::size_t newUniformBuffer();
     virtual std::size_t newFrameBuffer();
     virtual std::size_t newTexture();
+    virtual std::size_t newRenderBuffer();
+    
+    virtual void setRenderBufferType(std::size_t, NRE_GPU_TEXTURE_TYPE, int, int);
+    virtual void setFrameBufferRenderBuffer(std::size_t, std::size_t, int);
     
     virtual void setVertexBufferMemory(std::size_t, std::size_t, NRE_GPU_BUFFER_USAGE);
     virtual void setVertexBufferData(std::size_t, const std::vector<float>&, std::size_t);
