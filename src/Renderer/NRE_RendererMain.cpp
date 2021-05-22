@@ -89,7 +89,7 @@ void NRE_Renderer::initGammaCorrectionProg(){
     this->api->setProgramFS(this->gamma_cor_prog, fs_gamma);
         
     this->api->setupProgram(this->gamma_cor_prog);
-    this->api->setProgramTextureSlot(this->gamma_cor_prog, "tex_output", 0);
+    //this->api->setProgramTextureSlot(this->gamma_cor_prog, "tex_output", 0);
 }
 
 void NRE_Renderer::initGPUSphere(){
@@ -290,7 +290,7 @@ bool NRE_Renderer::updateSingleThread(){
         this->api->use_wireframe = temp;
     }
     
-    this->api->copyFrameBuffer(this->framebuffer, 0, NRE_GPU_FBO_DEPTHSTENCIL);
+    //this->api->copyFrameBuffer(this->framebuffer, 0, NRE_GPU_FBO_DEPTHSTENCIL);
     
     this->api->useFrameBuffer(0);
     this->api->use_wireframe = false;

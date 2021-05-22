@@ -1,0 +1,17 @@
+[binaries]
+c = 'emcc'
+cpp = 'em++'
+ar = 'emar'
+
+[built-in options]
+c_args = ['-s', 'WASM=1', '-s','EXPORT_ALL=1', '-s', 'USE_SDL=2', '-s', 'USE_WEBGL2=1', '-s', 'SINGLE_FILE', '-s', 'FULL_ES3=1','-s', 'NO_DISABLE_EXCEPTION_CATCHING','--embed-file', '../test_csl_assets@/']
+c_link_args = ['-s','EXPORT_ALL=1', '-s', 'USE_SDL=2', '-s', 'USE_WEBGL2=1', '-s', 'SINGLE_FILE', '-s', 'FULL_ES3=1','-s', 'NO_DISABLE_EXCEPTION_CATCHING','--preload-file', 'test_csl_assets','--embed-file', '../test_csl_assets@/']
+cpp_args = ['-s', 'WASM=1', '-s','EXPORT_ALL=1', '-s', 'USE_SDL=2', '-s', 'USE_WEBGL2=1', '-s', 'SINGLE_FILE', '-s', 'FULL_ES3=1','-s', 'NO_DISABLE_EXCEPTION_CATCHING','--embed-file', '../test_csl_assets@/']
+cpp_link_args = ['-s','EXPORT_ALL=1', '-s', 'USE_SDL=2', '-s', 'USE_WEBGL2=1', '-s', 'SINGLE_FILE', '-s', 'FULL_ES3=1','-s', 'NO_DISABLE_EXCEPTION_CATCHING','--embed-file', '../test_csl_assets@/']
+
+[host_machine]
+
+system = 'emscripten'
+cpu_family = 'wasm32'
+cpu = 'wasm32'
+endian = 'little'

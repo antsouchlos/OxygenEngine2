@@ -9,7 +9,9 @@
 #define OE_PLATFORM_LINUX
 #define OE_RENDERER_OPENGL
 
+#include <Renderer/glad.h>
 #include <SDL2/SDL.h>
+
 
 #elif defined(_WIN32)
 
@@ -18,6 +20,16 @@
 #define OE_RENDERER_OPENGL
 #define SDL_MAIN_HANDLED
 
+#include <Renderer/glad.h>
+#include <SDL.h>
+
+#elif defined(__EMSCRIPTEN__)
+
+#define OE_PLATFORM_WEB
+#define OE_RENDERER_GLES
+
+#include <emscripten.h>
+#include <Renderer/glad.h>
 #include <SDL.h>
 
 #else
@@ -26,6 +38,7 @@
 #define OE_PLATFORM_UNKNOWN
 #define OE_RENDERER_OPENGL
 
+#include <Renderer/glad.h>
 #include <SDL2/SDL.h>
 
 #endif

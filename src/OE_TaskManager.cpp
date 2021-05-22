@@ -258,12 +258,17 @@ void OE_TaskManager::Step(){
     
 }
 
+
 void OE_TaskManager::Start(){
     done = false;
     // starts and maintains the game engine
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(&oe::step, 0, true);
+#else
     while (!(done)){
         this->Step();
     }
+#endif
     // if an error occurs or the program ends cleanup
     this->Destroy();
 }
