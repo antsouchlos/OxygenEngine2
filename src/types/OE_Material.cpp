@@ -45,7 +45,7 @@ std::vector<float> OE_Material::GetRendererData(){
     return output;
 }
 
-string OE_Material::to_str(){
+string OE_Material::to_str() const{
     string output = outputTypeTag("Material", {{"name", "\"" + OE_World::materialsList.id2name_[this->id] + "\""}});
     output.append("\n");
     CSL_WriterBase::indent = CSL_WriterBase::indent + 1;

@@ -32,7 +32,7 @@ OE_Texture::~OE_Texture(){
 
 } 
 
-string OE_Texture::to_str(){
+string OE_Texture::to_str() const{
     
     string output = outputTypeTag("Texture", {{"name", "\"" + OE_World::texturesList.id2name_[this->id] + "\""}});
     output.append("\n");

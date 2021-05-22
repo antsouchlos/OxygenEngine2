@@ -62,7 +62,7 @@ class CSL_WriterBase{
         CSL_WriterBase();
         virtual ~CSL_WriterBase();
         
-        virtual std::string to_str();
+        virtual std::string to_str() const;
         
         static std::string outputVar(const std::string&, const std::string&);
         static std::string outputTypeVar(const std::string&, const std::string&);

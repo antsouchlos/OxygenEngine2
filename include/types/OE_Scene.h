@@ -25,7 +25,7 @@ class OE_Scene : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
         OE_Scene(const std::string&);
         ~OE_Scene();
         
-        std::string to_str();
+        std::string to_str() const;
         
     //protected:
         

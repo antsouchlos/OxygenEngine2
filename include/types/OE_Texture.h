@@ -20,7 +20,7 @@ class OE_Texture: public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase{
         OE_Texture(const std::string&);
         ~OE_Texture();
         
-        std::string to_str();
+        std::string to_str() const;
 
 //    protected:
         int         source;

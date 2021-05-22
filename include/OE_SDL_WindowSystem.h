@@ -2,7 +2,6 @@
 #define OE_SDL_WINDOWSYSTEM_H
 
 #include <OE_DummyClasses.h>
-#include <Renderer/glad.h>
 #include <types/OE_Libs.h>
 
 class OE_SDL_WindowSystem: public OE_WindowSystemBase {

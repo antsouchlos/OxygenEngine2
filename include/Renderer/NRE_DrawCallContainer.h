@@ -5,7 +5,7 @@
 #include <set>
 #include <iterator>
 
-class NRE_RenderGroup;
+struct NRE_RenderGroup;
 
 class NRE_DrawCallContainer {
 public:

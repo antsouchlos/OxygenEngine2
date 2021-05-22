@@ -1,0 +1,4 @@
+rm -rf builddir
+meson builddir --cross-file emscripten_linux.cross
+cp cross_config/oe_test.html builddir/oe_test.html
+meson compile -C builddir
