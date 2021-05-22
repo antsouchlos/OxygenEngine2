@@ -44,8 +44,9 @@ OE_IndexBufferUnorderedMap::OE_IndexBufferUnorderedMap(uint32_t num_of_indices){
     auto lambda_hash = [num_of_indices](const uint32_t* lhs){
         
             // Make sure we are in a 64 bit system
+#ifndef __EMSCRIPTEN__
             static_assert(sizeof(size_t) == 8, "Not in 64 bit? What is this? An ancient system?"); 
-        
+#endif
             std::bitset<64> lhs_bits;
         
             for (size_t i=0; i < num_of_indices; i++){

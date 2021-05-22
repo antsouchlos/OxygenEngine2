@@ -43,7 +43,7 @@ void OE_THREAD_SAFETY_OBJECT::unlockMutex(){
 CSL_WriterBase::CSL_WriterBase(){}
 CSL_WriterBase::~CSL_WriterBase(){}
 
-std::string CSL_WriterBase::to_str(){
+std::string CSL_WriterBase::to_str() const{
     return "";
 }
 

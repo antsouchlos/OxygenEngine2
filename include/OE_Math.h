@@ -4,7 +4,10 @@
 #include <types/OE_TypesBase.h>
 
 //#include <glm/glm.hpp>
+#ifndef __EMSCRIPTEN__
 #define GLM_FORCE_SSE3
+#endif
+
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>

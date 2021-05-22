@@ -76,6 +76,8 @@ class OE_Triangle32 : public OE_THREAD_SAFETY_OBJECT, public CSL_WriterBase {
 	friend class OE_PolygonStorage32;
 	friend class CSL_Interpreter;
 	
+    using CSL_WriterBase::to_str;
+    
 	public:
 		
 		OE_Triangle32();
@@ -114,6 +116,8 @@ class OE_PolygonStorage32 {
 	friend class NRE_Renderer;
 	
 	public:
+        
+        
 		OE_PolygonStorage32(uint32_t num_of_vertices, uint32_t num_of_normals,
 						uint32_t num_of_triangles, uint32_t num_of_uvs, uint32_t max_uv_num);
 		// TODO: Rule of 5

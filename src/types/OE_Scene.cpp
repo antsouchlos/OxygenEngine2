@@ -38,7 +38,7 @@ OE_Scene::~OE_Scene(){
     this->textures.clear();*/
 }
 
-string OE_Scene::to_str(){
+string OE_Scene::to_str() const{
     
     string output = outputTypeTag("Scene", {{"name", "\"" + OE_World::scenesList.id2name_[this->id] + "\""}});
     output.append("\n");
