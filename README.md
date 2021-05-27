@@ -72,6 +72,30 @@ libwinpthread-1.dll
 
 are in the ```builddir``` directory and must be distributed together with the ```.exe``` files.
 
+### Compile for Web
+
+Prerequisites: emscripten, meson, ninja
+
+Run this script, which takes care of the dirty work for you automatically.
+Note that SDL2 is already included in emscripten.
+```
+$ ./cross_web
+```
+
+It is also possible to use ```meson compile -C builddir```, but only AFTER the above script
+has been run at least ONCE to generate the ```builddir``` directory and apply the needed hacks.
+
+On another terminal in order to launch a webserver on the base directory, run:
+```
+python -m http.server
+```
+
+After that on your Chrome/Chromium browser (Firefox is not supported yet) go to:
+```
+localhost:8000/builddir/oe_test.html
+```
+or wherever you put your webserver. Now the engine demo should run.
+
 ### Installing the blender plugin
 
 Prerequisites: Blender (duh!)
@@ -277,6 +301,10 @@ NRE: Prepared for GLES2 compatibility renderer.
 2021/05/21 - philsegeler
 
 NRE: Added renderbuffer + fixed uniforms in programs
+
+2021/05/27 - philsegeler
+
+Added WebGL version running on Chrome only. Loading times have gone x10+.
 
 ## Initial TODO list for philsegeler
 This should get the project started again with the basics working, so as to be able to add **actual** new features.

@@ -8,7 +8,6 @@ using namespace std;
 
 int OE_API_Helpers::load_world(OE_Task task, string filename){
 
-    cout << "trying to load the file" << endl;
 	csl::interpret_file(filename);
 
     oe::broadcast_event("loaded-" + filename);
