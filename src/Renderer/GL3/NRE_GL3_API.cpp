@@ -324,7 +324,10 @@ void NRE_GL3_API::get_program_all_uniforms_(std::size_t id){
 #ifndef __EMSCRIPTEN__
         glGetActiveUniformsiv(this->prog_db[this->progs[id]].handle, 1, &idb, GL_UNIFORM_NAME_LENGTH, &name_length);
 #else
-        glGetProgramiv(this->prog_db[this->progs[id]].handle, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &name_length);
+        
+        glGetProgramiv(this->prog_db[this->progs[id]].handle, GL_ACTIVE_UNIFORM_MAX_LENGTH
+, &name_length);
+        //cout << "uniforms:" << ida << " name length:" << name_length << endl;
 #endif
         GLchar uniform_name[name_length];
         GLenum var_enum;

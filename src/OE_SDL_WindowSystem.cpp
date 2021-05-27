@@ -58,18 +58,15 @@ bool OE_SDL_WindowSystem::init(int x, int y, string titlea, bool isFullscreen, v
     SDL_Init(SDL_INIT_VIDEO);
 #endif
     
-    cout << "it runs until now" << endl;
-    
     if (!this->fullscreen)
 #ifndef __EMSCRIPTEN__
         this->window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
 #else
-        this->window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_OPENGL);
+        this->window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 #endif
     else
         this->window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_OPENGL);
     
-     cout << "it runs until now" << endl;
 #ifndef __EMSCRIPTEN__
     this->context = SDL_GL_CreateContext(this->window);
     if (context == NULL){

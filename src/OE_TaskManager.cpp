@@ -6,6 +6,7 @@
 #include <OE_API.h>
 
 using namespace std;
+using namespace oe;
 
 OE_TaskManager* OE_ThreadData::taskMgr = nullptr;
 
@@ -17,32 +18,50 @@ OE_ThreadStruct::~OE_ThreadStruct(){
     
 }
 
-extern "C" int oxygen_engine_update_thread(void* data){
+#ifdef __EMSCRIPTEN__
+std::atomic<bool> oe_threads_ready_to_start = false;
+#endif 
 
-    // fetch the task manager and the thread from the pointer
+extern "C" int oxygen_engine_update_thread(void* data){
     
+#ifdef __EMSCRIPTEN__
+    while (!oe_threads_ready_to_start)
+        SDL_Delay(1);
+#endif
+    // fetch the task manager and the thread from the pointer
     // execute all functions which are bind to that thread
     OE_ThreadData* actual_data = static_cast<OE_ThreadData*>(data);
     
+    //cout << "this is actual data " << actual_data << " " << OE_Main << endl;
     // update physics task
-    OE_ThreadData::taskMgr->threads[actual_data->name].physics_task = OE_Task(actual_data->name + "-physics", 0, 0, OE_ThreadData::taskMgr->getTicks());
+    OE_Main->threads[actual_data->name].physics_task = OE_Task(actual_data->name + "-physics", 0, 0, OE_ThreadData::taskMgr->getTicks());
     
-    OE_ThreadData::taskMgr->updateThread(actual_data->name);
+    OE_Main->updateThread(actual_data->name);
+
     delete actual_data;
     return 0;
 }
 
 extern "C" int oxygen_engine_update_unsync_thread(void* data){
     
+#ifdef __EMSCRIPTEN__
+    while (!oe_threads_ready_to_start)
+        SDL_Delay(1);
+#endif
     // execute detached threads
     OE_UnsyncThreadData* actual_data = static_cast<OE_UnsyncThreadData*>(data);
     
-    int output = actual_data->taskMgr->tryRun_unsync_thread(actual_data);
+    int output = OE_Main->tryRun_unsync_thread(actual_data);
     
-    actual_data->taskMgr->lockMutex();
-    actual_data->taskMgr->finished_unsync_threadIDs.insert(actual_data->name);
-    actual_data->taskMgr->unlockMutex();
+    OE_Main->lockMutex();
+    OE_Main->finished_unsync_threadIDs.insert(actual_data->name);
+    OE_Main->unlockMutex();
+#ifdef __EMSCRIPTEN__
+    actual_data->~OE_UnsyncThreadData();
+    ::operator delete(actual_data, std::align_val_t(16));
+#else
     delete actual_data;
+#endif
     return output;
 }
 
@@ -134,13 +153,25 @@ int OE_TaskManager::Init(std::string titlea, int x, int y, bool fullscreen){
     
     this->CreateNewThread("default");
     this->CreateNewThread("something else");
+#ifdef __EMSCRIPTEN__
+    
+#endif
     oe::create_unsync_thread_method("network", &OE_NetworkingBase::execute, this->network);
+    
+#ifdef __EMSCRIPTEN__
+    oe_threads_ready_to_start = true;
+#endif
+    //cout << "just ran init" << endl;
     return 0;
 }
 
 void OE_TaskManager::CreateUnsyncThread(string thread_name, const OE_METHOD func){
     
-    OE_UnsyncThreadData* threaddata = new OE_UnsyncThreadData();
+#ifdef __EMSCRIPTEN__
+    auto threaddata = new(std::align_val_t(16)) OE_UnsyncThreadData();
+#else
+    auto threaddata = new OE_UnsyncThreadData();
+#endif
     threaddata->func = func;
     threaddata->name = thread_name;
     threaddata->taskMgr = this;
@@ -239,6 +270,7 @@ void OE_TaskManager::Step(){
     }
     
     this->updateWorld();
+    //cout << "overcome critical part" << endl;
     this->window->event_handler.handleAllEvents();
     
     this->syncBeginFrame();
@@ -253,7 +285,6 @@ void OE_TaskManager::Step(){
     this->removeFinishedUnsyncThreads();
     
     this->syncEndFrame();
-
     
     
 }
@@ -325,10 +356,10 @@ void OE_TaskManager::Destroy(){
 
 void OE_TaskManager::updateThread(const string name){
     // obtain the queue in which the tasks are executed if the task queue if changed
+   
     while(!done){
         //synchronize at start
         this->syncBeginFrame();
-        
         auto ticks = this->getTicks();
         if(this->threads[name].changed){
             this->sortThreadTasks(name);
