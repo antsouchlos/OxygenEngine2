@@ -23,7 +23,11 @@ bool NRE_Renderer::init(){
     cout << "NRE Vgroups: " << this->vgroups.size() << endl;*/
     
     // make sure we use the right API
-    this->api = new NRE_GL3_API();
+#ifdef __EMSCRIPTEN__
+    this->api = new(std::align_val_t(16)) NRE_GL3_API();
+#else
+    this->api = std::make_unique<NRE_GL3_API>();
+#endif
     if (!this->screen->isES){
         NRE_GPU_ShaderBase::init(NRE_GPU_GL, this->screen->major, this->screen->minor);
     } 
@@ -581,7 +585,10 @@ void NRE_Renderer::destroy(){
     
     // reset all GPU data
     if (api != nullptr){
-        api->destroy();
-        delete api;
+#ifdef __EMSCRIPTEN__
+        this->api->~NRE_GPU_API();
+      ::operator delete(this->api, std::align_val_t(16));  
+#endif        
+        this->api = nullptr;
     }
 }    

@@ -16,9 +16,12 @@ public:
     
     bool updateMultiThread(OE_Task*, int);
     void destroy();
-
-    NRE_GPU_API* api{nullptr};
     
+#ifdef __EMSCRIPTEN__
+    NRE_GPU_API* api{nullptr};
+#else
+    std::unique_ptr<NRE_GPU_API> api{nullptr};
+#endif
     std::size_t loaded_viewport{0};
     std::map<std::size_t, NRE_CameraRenderData> cameras;
     std::map<std::size_t, NRE_MaterialRenderData> materials;

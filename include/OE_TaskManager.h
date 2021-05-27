@@ -10,6 +10,12 @@
 #include <queue>
 
 
+#ifdef __EMSCRIPTEN__
+        // these variables controls when the other threads start in a web environment
+        // because webassembly/javascript do not allow threads to be created on the fly
+extern std::atomic<bool>                               oe_threads_ready_to_start;
+#endif
+
 class OE_TaskManager;
 
 
