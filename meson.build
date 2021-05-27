@@ -55,6 +55,6 @@ if meson.get_compiler('c', native : false).get_id() != 'emscripten'
     executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')
     executable('OE_Test', sources : 'oe_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')
 else
-    executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')
+    #executable('CSL_Test', sources : 'csl_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')
     executable('OE_Test', sources : 'oe_main_test.cpp', dependencies : [oe_dep], win_subsystem: 'windows')
 endif

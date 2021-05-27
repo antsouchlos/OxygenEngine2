@@ -125,10 +125,10 @@ int test_task3(oe::task task){
     
     //cout << " task3";
     if (oe::is_key_just_pressed("keyboard-1")){
-        oe::load_world_func("OE_Demo.csl", &OnLoadObject);
+        oe::load_world_func("assets/OE_Demo.csl", &OnLoadObject);
     }
     else if (oe::is_key_just_pressed("keyboard-2")){
-        oe::load_world_func("OE_Demo2.csl", &OnLoadObject);
+        oe::load_world_func("assets/OE_Demo2.csl", &OnLoadObject);
     }
     else {
     
@@ -175,17 +175,17 @@ int main(){
     
     oe::init("Oxygen Engine Demo", 1280, 720, false);
     //oe::pause(20);
-
-	//oe::load_world_func("OE_Mat_light_test.csl", &OnLoadObject);
-	//oe::load_world_func("challenge_car.csl", &OnLoadObject);
-	//oe::load_world_func("monkeys.csl", &OnLoadObject);
-	//oe::load_world_func("csl_very_large_object_test.csl", &OnLoadObject);
-	//oe::load_world_func("OE_VerySimple.csl", &OnLoadObject);
-	//oe::load_world_func("audi_r8.csl", &OnLoadObject);
-    oe::load_world_func("OE_Demo.csl", &OnLoadObject);
-	//oe::load_world_func("lights_simple.csl", &OnLoadObject);
-    
+	//oe::load_world_func("assets/OE_Mat_light_test.csl", &OnLoadObject);
+	//oe::load_world_func("assets/challenge_car.csl", &OnLoadObject);
+	//oe::load_world_func("assets/monkeys.csl", &OnLoadObject);
+	//oe::load_world_func("assets/csl_very_large_object_test.csl", &OnLoadObject);
+	//oe::load_world_func("assets/OE_VerySimple.csl", &OnLoadObject);
+	//oe::load_world_func("assets/audi_r8.csl", &OnLoadObject);
+    oe::load_world_func("assets/OE_Demo2.csl", &OnLoadObject);
+    //oe::load_world_func("assets/OE_Demo2.csl", &OnLoadObject);
+	//oe::load_world_func("assets/lights_simple.csl", &OnLoadObject);
 	//taskMgr.Start();
+    //cout << "this has started " << oe::OE_Main << endl;
     oe::start();
     
     

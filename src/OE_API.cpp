@@ -20,6 +20,7 @@ size_t oe::init(std::string title, int x, int y, bool fullscreen){
 }
 void oe::step(){
     OE_API_Helpers::checkIfInit();
+    //cout << "running step" << endl;
     OE_Main->Step();
 }
 void oe::start(){

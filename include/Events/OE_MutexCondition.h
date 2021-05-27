@@ -3,10 +3,18 @@
 
 #include <types/OE_TypesBase.h>
 
+#ifdef __EMSCRIPTEN__
+    struct OE_EmscriptenBoolConditionWrapper: public OE_THREAD_SAFETY_OBJECT{
+        bool value_{false};
+        
+        void operator = (bool a_val);
+        bool operator ! ();
+    };
+#else
 extern "C" {
     struct SDL_cond;
 }
-
+#endif
 /* This class abstracts away the SDL part of locking mutexes
  * and conditions
  */ 
@@ -22,7 +30,11 @@ public:
     void pause(int);
     unsigned int getTicks();
     // list so that it does not get invalidated by adding new conditions
+#ifdef __EMSCRIPTEN__
+     std::vector<OE_EmscriptenBoolConditionWrapper> conditions;
+#else
     std::vector<SDL_cond*> conditions;
+#endif
 };
 
 #endif

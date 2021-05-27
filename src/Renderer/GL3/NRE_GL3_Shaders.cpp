@@ -228,7 +228,7 @@ std::string NRE_GenGL3PixelShader(NRE_GPU_PixelShader fs){
     std::string output = "\n";
     
     if (NRE_GPU_ShaderBase::backend == NRE_GPU_GLES){
-        output.append("precision mediump float; \n");
+        output.append("precision highp float; \n");
     }
     
     if ((fs.type == NRE_GPU_FS_UNDEFINED) or (fs.type == NRE_GPU_FS_SIMPLE)){
