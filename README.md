@@ -87,12 +87,12 @@ has been run at least ONCE to generate the ```builddir``` directory and apply th
 
 On another terminal in order to launch a webserver on the base directory, run:
 ```
-python -m http.server
+emrun --no_browser builddir/oe_test.html
 ```
 
-After that on your Chrome/Chromium browser (Firefox is not supported yet) go to:
+After that on your browser (Firefox or Chrome/Chromium-based) go to:
 ```
-localhost:8000/builddir/oe_test.html
+http://localhost:6931/oe_test.html
 ```
 or wherever you put your webserver. Now the engine demo should run.
 

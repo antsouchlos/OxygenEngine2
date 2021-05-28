@@ -123,7 +123,7 @@ bool NRE_GL3_RenderBuffer::hasNotChanged(NRE_GPU_TEXTURE_TYPE type_in, int x_in,
 
 std::size_t NRE_GL3_API::getVAOSize(std::size_t id){
     this->check_vao_id_(id, "getVAOSize");
-    return this->vbos[this->vaos[id].layout[0].vertex_buffer].size;
+    return this->vbos[this->vaos[id].layout[0].vertex_buffer].size/this->vaos[id].layout[0].amount;
 }
 
 
