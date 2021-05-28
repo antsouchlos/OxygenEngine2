@@ -601,6 +601,7 @@ void NRE_Renderer::updateLightGPUData(){
         }
     }*/
     std::vector<float> pt_light_data;
+    pt_light_data.reserve(16*255);
     int count = 0;
     for (auto l: this->pt_visible_lights){
         pt_light_data.insert(pt_light_data.end(), this->pt_lights[l.id].data.begin(), this->pt_lights[l.id].data.end());
@@ -608,6 +609,11 @@ void NRE_Renderer::updateLightGPUData(){
         count++;
         if (count > 255)
             break;
+    }
+    
+    // fill the rest with zeros since webgl complains otherwise
+    for (int i=0; i< 16*(255-count); i++){
+        pt_light_data.push_back(0.0f);
     }
     this->api->setUniformBufferMemory(this->pt_light_ubo, pt_light_data.size(), NRE_GPU_STREAM);
     this->api->setUniformBufferData(this->pt_light_ubo, pt_light_data, 0);
