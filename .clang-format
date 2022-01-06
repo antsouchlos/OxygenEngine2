@@ -24,5 +24,6 @@ AlignConsecutiveBitFields: true
 AlignConsecutiveDeclarations: true
 AlignConsecutiveMacros: true
 
+BreakBeforeBraces: Custom
 BraceWrapping:
   BeforeElse: true
