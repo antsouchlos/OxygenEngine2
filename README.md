@@ -14,6 +14,17 @@ Originally it was an ongoing project in 2015-16, but it is stagnated and now is 
 
 ## Installation
 
+### Before running
+
+
+Since the assets needed to run the example programs are quite large, they are located
+in a separate repositry, which is linked as a submodule. This means that before the example
+programs can be executed, the assets submodule as to be cloned:
+
+```shell
+$ git submodule init && git submodule update
+```
+
 ### Compile on Linux
 
 Prerequisites: SDL2, meson and ninja.
