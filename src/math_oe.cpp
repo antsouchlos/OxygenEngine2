@@ -1,9 +1,18 @@
 #include <OE/math_oe.h>
+
+#ifndef OE_USE_NO_SSE_FALLBACK
+#include <pmmintrin.h>
+#include <xmmintrin.h>
+#endif
+
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <iostream>
+
+
 
 using namespace std;
 
@@ -44,6 +53,9 @@ OE_Vec4 OE_Mat4x4::operator*(const OE_Vec4& other) {
     return OE_Vec4(temp[0], temp[1], temp[2], temp[3]);
 }
 
+const float* OE_Mat4x4::get_ptr() {
+    return (const float*)glm::value_ptr(*static_cast<glm::mat4*>(this));
+}
 
 OE_Quat OE_Quat::operator*(const OE_Quat& other) {
     auto temp = static_cast<glm::quat>(*this) * static_cast<glm::quat>(other);
@@ -52,7 +64,10 @@ OE_Quat OE_Quat::operator*(const OE_Quat& other) {
 
 
 // math library functions
-
+OE_Mat4x4 OE_Transpose(OE_Mat4x4 mat4) {
+    auto temp = glm::transpose(static_cast<glm::mat4>(mat4));
+    return OE_Mat4x4(temp[0], temp[1], temp[2], temp[3]);
+}
 
 OE_Mat4x4 OE_Translate(OE_Mat4x4 mat4, OE_Vec3 vec3) {
     auto temp = glm::translate(static_cast<glm::mat4>(mat4), static_cast<glm::vec3>(vec3));
@@ -453,4 +468,226 @@ std::vector<uint32_t> OE_GetBoundingSphereIndexBuffer(float r1, float r2, size_t
         ibo.push_back(n - 1 + (n - 1) * ((k + 1) % (2 * n)));
     }
     return ibo;
+}
+
+std::vector<float> oe::math::vertex_shader_regular_sw_ibo(const std::vector<float>& vbo, const std::vector<uint32_t>& ibo,
+                                                          OE_Mat4x4 model_matrix_in, OE_Mat4x4 mvp_matrix_in, int num_of_uvs) {
+
+    /* This overly complicated function basically accelerates the 3 matrix-vector multiplications
+     * which are normally done inside the vertex shader.
+     *
+     * Why is it needed? Because for my highly performant 1-core Intel Atom netbook, there also exists an integrated "GPU".
+     * This integrated GPU (GMA 3150) also known as GMD (Graphics Media DECELERATOR) does not
+     * support hardware-accelerated vertex shaders, which means they have to run on the CPU.
+     *
+     * Apparently, running the calculations here manually provides visible performance increase (~30%+) against
+     * a vertex shader compiled by mesa for some reason.
+     *
+     * Also this is a first step towards purely software rendering.
+     */
+
+    auto         bufsize = vbo.size();
+    const float* bufptr  = &vbo[0];
+
+    const long int offset          = 6 + num_of_uvs * 2;
+    const long int num_of_vertices = ibo.size();
+
+    std::vector<float> output;
+    output.reserve(num_of_vertices * (offset + 4));
+    output.resize(num_of_vertices * (offset + 4));
+
+#ifndef OE_USE_NO_SSE_FALLBACK
+    const float* model_matrix = model_matrix_in.get_ptr();
+    const float* mvp_matrix   = mvp_matrix_in.get_ptr();
+
+    __m128 model_mat_1 = _mm_loadu_ps(&model_matrix[0]);
+    __m128 model_mat_2 = _mm_loadu_ps(&model_matrix[4]);
+    __m128 model_mat_3 = _mm_loadu_ps(&model_matrix[8]);
+    __m128 model_mat_4 = _mm_loadu_ps(&model_matrix[12]);
+
+    __m128 mvp_mat_1 = _mm_loadu_ps(&mvp_matrix[0]);
+    __m128 mvp_mat_2 = _mm_loadu_ps(&mvp_matrix[4]);
+    __m128 mvp_mat_3 = _mm_loadu_ps(&mvp_matrix[8]);
+    __m128 mvp_mat_4 = _mm_loadu_ps(&mvp_matrix[12]);
+
+    for (long int i = 0; i < num_of_vertices; i++) {
+
+        __m128 vertex_x = _mm_set1_ps(bufptr[ibo[i] * offset]);
+        __m128 vertex_y = _mm_set1_ps(bufptr[ibo[i] * offset + 1]);
+        __m128 vertex_z = _mm_set1_ps(bufptr[ibo[i] * offset + 2]);
+
+        __m128 normal_x = _mm_set1_ps(bufptr[ibo[i] * offset + 3]);
+        __m128 normal_y = _mm_set1_ps(bufptr[ibo[i] * offset + 4]);
+        __m128 normal_z = _mm_set1_ps(bufptr[ibo[i] * offset + 5]);
+
+        __m128 mm_x = _mm_mul_ps(vertex_x, model_mat_1);
+        __m128 mm_y = _mm_mul_ps(vertex_y, model_mat_2);
+        __m128 mm_z = _mm_mul_ps(vertex_z, model_mat_3);
+
+        __m128 mm_xy  = _mm_add_ps(mm_x, mm_y);
+        __m128 mm_zw  = _mm_add_ps(mm_z, model_mat_4);
+        __m128 mm1234 = _mm_add_ps(mm_xy, mm_zw);
+        _mm_storeu_ps(&output[i * (offset + 4)], mm1234);
+
+        __m128 mmn_x = _mm_mul_ps(normal_x, model_mat_1);
+        __m128 mmn_y = _mm_mul_ps(normal_y, model_mat_2);
+        __m128 mmn_z = _mm_mul_ps(normal_z, model_mat_3);
+
+        __m128 mmn_xy  = _mm_add_ps(mmn_x, mmn_y);
+        __m128 mmn1234 = _mm_add_ps(mmn_xy, mmn_z);
+
+        _mm_storeu_ps(&output[i * (offset + 4) + 3], mmn1234);
+
+        __m128 mvp1 = _mm_mul_ps(vertex_x, mvp_mat_1);
+        __m128 mvp2 = _mm_mul_ps(vertex_y, mvp_mat_2);
+        __m128 mvp3 = _mm_mul_ps(vertex_z, mvp_mat_3);
+
+        __m128 mvp12   = _mm_add_ps(mvp1, mvp2);
+        __m128 mvp34   = _mm_add_ps(mvp3, mvp_mat_4);
+        __m128 mvp1234 = _mm_add_ps(mvp12, mvp34);
+
+        _mm_storeu_ps(&output[i * (offset + 4) + 6], mvp1234);
+
+        for (int uv = 0; uv < num_of_uvs; uv++) {
+            std::memcpy(&output[i * (offset + 4) + 10 + uv * 2], &bufptr[ibo[i] * offset + 6 + uv * 2], 8);
+        }
+    }
+
+#else
+
+    for (long int i = 0; i < num_of_vertices; i++) {
+        OE_Vec4 vertex = OE_Vec4(bufptr[ibo[i] * offset], bufptr[ibo[i] * offset + 1], bufptr[ibo[i] * offset + 2], 1.0f);
+        OE_Vec4 normal = OE_Vec4(bufptr[ibo[i] * offset + 3], bufptr[ibo[i] * offset + 4], bufptr[ibo[i] * offset + 5], 0.0f);
+
+        OE_Vec4 vertex_transformed = model_matrix_in * vertex;
+        OE_Vec4 normal_transformed = model_matrix_in * normal;
+        OE_Vec4 vertex_everything  = mvp_matrix_in * vertex;
+
+
+        for (int coord = 0; coord < 3; coord++) {
+            output[i * (offset + 4) + coord]     = vertex_transformed[coord];
+            output[i * (offset + 4) + coord + 3] = normal_transformed[coord];
+            output[i * (offset + 4) + coord + 6] = vertex_everything[coord];
+        }
+
+        output[i * (offset + 4) + 9] = vertex_everything[3];
+
+        for (int uv = 0; uv < num_of_uvs; uv++) {
+            std::memcpy(&output[i * (offset + 4) + 10 + uv * 2], &bufptr[ibo[i] * offset + 6 + uv * 2], 8);
+        }
+    }
+
+#endif
+    return output;
+}
+
+std::vector<float> oe::math::vertex_shader_regular_sw(const std::vector<float>& vbo, OE_Mat4x4 model_matrix_in,
+                                                      OE_Mat4x4 mvp_matrix_in, int num_of_uvs) {
+
+    /* This overly complicated function basically accelerates the 3 matrix-vector multiplications
+     * which are normally done inside the vertex shader.
+     *
+     * Why is it needed? Because for my highly performant 1-core Intel Atom netbook, there also exists an integrated "GPU".
+     * This integrated GPU (GMA 3150) also known as GMD (Graphics Media DECELERATOR) does not
+     * support hardware-accelerated vertex shaders, which means they have to run on the CPU.
+     *
+     * Apparently, running the calculations here manually provides visible performance increase (~30%+) against
+     * a vertex shader compiled by mesa for some reason.
+     *
+     * Also this is a first step towards purely software rendering.
+     */
+
+    auto         bufsize = vbo.size();
+    const float* bufptr  = &vbo[0];
+
+    const long int offset          = 6 + num_of_uvs * 2;
+    const long int num_of_vertices = bufsize / offset;
+
+    std::vector<float> output;
+    output.reserve(num_of_vertices * (offset + 4));
+    output.resize(num_of_vertices * (offset + 4));
+
+#ifndef OE_USE_NO_SSE_FALLBACK
+    const float* model_matrix = model_matrix_in.get_ptr();
+    const float* mvp_matrix   = mvp_matrix_in.get_ptr();
+
+    __m128 model_mat_1 = _mm_loadu_ps(&model_matrix[0]);
+    __m128 model_mat_2 = _mm_loadu_ps(&model_matrix[4]);
+    __m128 model_mat_3 = _mm_loadu_ps(&model_matrix[8]);
+    __m128 model_mat_4 = _mm_loadu_ps(&model_matrix[12]);
+
+    __m128 mvp_mat_1 = _mm_loadu_ps(&mvp_matrix[0]);
+    __m128 mvp_mat_2 = _mm_loadu_ps(&mvp_matrix[4]);
+    __m128 mvp_mat_3 = _mm_loadu_ps(&mvp_matrix[8]);
+    __m128 mvp_mat_4 = _mm_loadu_ps(&mvp_matrix[12]);
+
+    for (long int i = 0; i < num_of_vertices; i++) {
+
+        __m128 vertex_x = _mm_set1_ps(bufptr[i * offset]);
+        __m128 vertex_y = _mm_set1_ps(bufptr[i * offset + 1]);
+        __m128 vertex_z = _mm_set1_ps(bufptr[i * offset + 2]);
+
+        __m128 normal_x = _mm_set1_ps(bufptr[i * offset + 3]);
+        __m128 normal_y = _mm_set1_ps(bufptr[i * offset + 4]);
+        __m128 normal_z = _mm_set1_ps(bufptr[i * offset + 5]);
+
+        __m128 mm_x = _mm_mul_ps(vertex_x, model_mat_1);
+        __m128 mm_y = _mm_mul_ps(vertex_y, model_mat_2);
+        __m128 mm_z = _mm_mul_ps(vertex_z, model_mat_3);
+
+        __m128 mm_xy  = _mm_add_ps(mm_x, mm_y);
+        __m128 mm_zw  = _mm_add_ps(mm_z, model_mat_4);
+        __m128 mm1234 = _mm_add_ps(mm_xy, mm_zw);
+        _mm_storeu_ps(&output[i * (offset + 4)], mm1234);
+
+        __m128 mmn_x = _mm_mul_ps(normal_x, model_mat_1);
+        __m128 mmn_y = _mm_mul_ps(normal_y, model_mat_2);
+        __m128 mmn_z = _mm_mul_ps(normal_z, model_mat_3);
+
+        __m128 mmn_xy  = _mm_add_ps(mmn_x, mmn_y);
+        __m128 mmn1234 = _mm_add_ps(mmn_xy, mmn_z);
+
+        _mm_storeu_ps(&output[i * (offset + 4) + 3], mmn1234);
+
+        __m128 mvp1 = _mm_mul_ps(vertex_x, mvp_mat_1);
+        __m128 mvp2 = _mm_mul_ps(vertex_y, mvp_mat_2);
+        __m128 mvp3 = _mm_mul_ps(vertex_z, mvp_mat_3);
+
+        __m128 mvp12   = _mm_add_ps(mvp1, mvp2);
+        __m128 mvp34   = _mm_add_ps(mvp3, mvp_mat_4);
+        __m128 mvp1234 = _mm_add_ps(mvp12, mvp34);
+
+        _mm_storeu_ps(&output[i * (offset + 4) + 6], mvp1234);
+
+        for (int uv = 0; uv < num_of_uvs; uv++) {
+            std::memcpy(&output[i * (offset + 4) + 10 + uv * 2], &bufptr[i * offset + 6 + uv * 2], 8);
+        }
+    }
+
+#else
+
+    for (long int i = 0; i < num_of_vertices; i++) {
+        OE_Vec4 vertex = OE_Vec4(bufptr[i * offset], bufptr[i * offset + 1], bufptr[i * offset + 2], 1.0f);
+        OE_Vec4 normal = OE_Vec4(bufptr[i * offset + 3], bufptr[i * offset + 4], bufptr[i * offset + 5], 0.0f);
+
+        OE_Vec4 vertex_transformed = model_matrix_in * vertex;
+        OE_Vec4 normal_transformed = model_matrix_in * normal;
+        OE_Vec4 vertex_everything  = mvp_matrix_in * vertex;
+
+
+        for (int coord = 0; coord < 3; coord++) {
+            output[i * (offset + 4) + coord]     = vertex_transformed[coord];
+            output[i * (offset + 4) + coord + 3] = normal_transformed[coord];
+            output[i * (offset + 4) + coord + 6] = vertex_everything[coord];
+        }
+
+        output[i * (offset + 4) + 9] = vertex_everything[3];
+
+        for (int uv = 0; uv < num_of_uvs; uv++) {
+            std::memcpy(&output[i * (offset + 4) + 10 + uv * 2], &bufptr[i * offset + 6 + uv * 2], 8);
+        }
+    }
+
+#endif
+    return output;
 }

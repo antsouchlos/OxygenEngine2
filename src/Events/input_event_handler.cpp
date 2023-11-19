@@ -9,7 +9,7 @@ oe::input_event_handler_t::input_event_handler_t() {
         {SDL_BUTTON_LEFT, "1"}, {SDL_BUTTON_RIGHT, "2"}, {SDL_BUTTON_MIDDLE, "3"}, {SDL_BUTTON_X1, "4"}, {SDL_BUTTON_X2, "5"}};
     keyList_ = {
         {SDLK_0, "0"},         {SDLK_1, "1"},           {SDLK_2, "2"},           {SDLK_3, "3"},         {SDLK_4, "4"},
-        {SDLK_5, "0"},         {SDLK_6, "6"},           {SDLK_7, "7"},           {SDLK_8, "8"},         {SDLK_9, "9"},
+        {SDLK_5, "5"},         {SDLK_6, "6"},           {SDLK_7, "7"},           {SDLK_8, "8"},         {SDLK_9, "9"},
         {SDLK_a, "a"},         {SDLK_b, "b"},           {SDLK_c, "c"},           {SDLK_d, "d"},         {SDLK_e, "e"},
         {SDLK_f, "f"},         {SDLK_g, "g"},           {SDLK_h, "h"},           {SDLK_i, "i"},         {SDLK_j, "j"},
         {SDLK_k, "k"},         {SDLK_l, "l"},           {SDLK_m, "m"},           {SDLK_n, "n"},         {SDLK_o, "o"},

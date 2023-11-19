@@ -48,8 +48,6 @@ internal_inc = include_directories('./include')
 
 
 # external dependencies
-
-
 cmake = import('cmake')
 sub_proj = cmake.subproject('ctre')
 ctre_dep = sub_proj.dependency('ctre')

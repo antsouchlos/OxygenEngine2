@@ -145,6 +145,9 @@ oe::task_action test_task3(const oe::task_info_t task){
     else if (oe::is_key_just_pressed("keyboard-4")){
         oe::load_world_func("assets/car_gma950.csl", &load_object_handler);
     }
+    else if (oe::is_key_just_pressed("keyboard-5")){
+        oe::load_world_func("assets/OE_VerySimple.csl", &load_object_handler);
+    }
     else {
 
     }
@@ -153,8 +156,8 @@ oe::task_action test_task3(const oe::task_info_t task){
 }
 
 oe::task_action toggle_debug_mode(const oe::task_info_t task){
-    oe::toggle_renderer_sanity_checks();
-    oe::toggle_render_z_prepass();
+    //oe::toggle_renderer_sanity_checks();
+    oe::toggle_software_vertex_shaders();
     return oe::task_action::keep;
 }
 

@@ -1,5 +1,4 @@
-meson builddir --cross-file mingw_linux.cross
-cp -r cross_config/include subprojects/SDL2-2.0.12/
+meson setup builddir --cross-file mingw_linux.cross
 meson compile -C builddir
 cp cross_config/libEGL.dll builddir/libEGL.dll
 cp cross_config/libGLESv2.dll builddir/libGLESv2.dll

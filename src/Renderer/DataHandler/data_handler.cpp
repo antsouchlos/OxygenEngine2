@@ -139,9 +139,22 @@ void nre::data_handler_t::handle_mesh_data(std::size_t id, std::shared_ptr<OE_Me
         this->meshes_[id].uvmaps = mesh->data->vertices.uvmaps.size();
         this->meshes_[id].size   = mesh->data->vbo.size();
 
-        // store the shared pointer
-        this->meshes_[id].mesh = mesh;
+        // handle Vertex (Triangle) groups
+        for (auto vgroup : mesh->data->triangle_groups) {
+            this->handle_vgroup_data(id, vgroup.first, mesh);
+            this->meshes_[id].vgroups.insert(vgroup.first);
+        }
 
+        // store mesh vbo and index buffers
+        mesh->data->vbo_mutex.lockMutex();
+        this->meshes_[id].vbo_data = std::move(mesh->data->vbo);
+        mesh->data->vbo_mutex.unlockMutex();
+
+        mesh->data->ibos_mutex.lockMutex();
+        for (auto vg : this->meshes_[id].vgroups) {
+            this->meshes_[id].ibos_data[vg] = std::move(mesh->data->ibos[vg].data);
+        }
+        mesh->data->ibos_mutex.unlockMutex();
         // setup the Uniform buffer holding the model matrix
         //  but offload the actual OpenGL commands for later, since this runs in a performance
         //  critical section
@@ -150,12 +163,6 @@ void nre::data_handler_t::handle_mesh_data(std::size_t id, std::shared_ptr<OE_Me
 
         // this->meshes_[id].data = OE_Mat4x4ToSTDVector(model_mat);
         this->meshes_[id].changed = true;
-
-        // handle Vertex (Triangle) groups
-        for (auto vgroup : mesh->data->triangle_groups) {
-            this->handle_vgroup_data(id, vgroup.first, mesh);
-            this->meshes_[id].vgroups.insert(vgroup.first);
-        }
 
         // store bounding box
 

@@ -393,6 +393,9 @@ namespace oe {
     void render_HDR(bool);
     void toggle_render_HDR();
 
+    void render_software_vertex_shaders(bool);
+    void toggle_software_vertex_shaders();
+
     void render_z_prepass(bool);
     void toggle_render_z_prepass();
 

@@ -126,7 +126,8 @@ bool nre::renderer_legacy_t::update_data(oe::renderer_update_info update_info, o
     this->render_bounding_spheres_ = update_info.render_bounding_spheres;
     this->use_HDR_                 = update_info.use_hdr;
     this->use_z_prepass_           = update_info.use_z_prepass;
-    bool temp_restart_renderer     = (this->shading_mode_ != update_info.shading_mode);
+    bool temp_restart_renderer     = (this->shading_mode_ != update_info.shading_mode) or
+                                 (use_software_vertex_shaders_ != update_info.use_software_vertex_shaders);
 
     if (temp_restart_renderer) {
         this->destroy();
@@ -135,11 +136,23 @@ bool nre::renderer_legacy_t::update_data(oe::renderer_update_info update_info, o
     else if (has_renderer_restarted) {
         this->init(this->init_info_, update_info, winsys_info);
     }
-    this->shading_mode_ = update_info.shading_mode;
+    this->shading_mode_                = update_info.shading_mode;
+    this->use_software_vertex_shaders_ = update_info.use_software_vertex_shaders;
     data_.update(temp_restart_renderer or has_renderer_restarted,
                  this->render_bounding_boxes_ or this->render_bounding_spheres_);
 
     return true;
+}
+
+
+void nre::renderer_legacy_t::update_software_vertex_shaders(size_t camera_id, size_t scene_id) {
+    for (auto mesh : data_.scenes_[scene_id].meshes) {
+        auto mvp_mat   = data_.cameras_[camera_id].perspective_view_mat * data_.meshes_[mesh].model_mat;
+        auto model_mat = data_.meshes_[mesh].model_mat;
+        auto updated_vertices =
+            oe::math::vertex_shader_regular_sw(data_.meshes_[mesh].vbo_data, model_mat, mvp_mat, data_.meshes_[mesh].uvmaps);
+        nre::gpu::set_vertex_buf_memory_and_data(data_.meshes_[mesh].vbo, updated_vertices, nre::gpu::STREAM);
+    }
 }
 
 //------------------------updateSIngleThread-------------------//
@@ -213,7 +226,8 @@ bool nre::renderer_legacy_t::update_single_thread(oe::renderer_update_info updat
         auto scene_id  = data_.cameras_[camera_id].scene_id;
 
         // draw everything required for the z prepass, which also populates the depth buffer
-        if (update_info.use_z_prepass) {
+        // NOTE: Automatically disabled if software vertex shaders are in use
+        if (update_info.use_z_prepass and not this->use_software_vertex_shaders_) {
             nre::gpu::set_render_mode(nre::gpu::Z_PREPASS_BACKFACE);
             for (auto x : this->sce_ren_groups_[scene_id]) {
                 if (x.camera == camera_id) {
@@ -229,11 +243,16 @@ bool nre::renderer_legacy_t::update_single_thread(oe::renderer_update_info updat
 
         // draw everything normally
         nre::gpu::use_framebuffer(this->framebuffer_);
-        if (update_info.use_z_prepass) {
+        if (update_info.use_z_prepass and not this->use_software_vertex_shaders_) {
             nre::gpu::set_render_mode(nre::gpu::AFTERPREPASS_BACKFACE);
         }
         else {
             nre::gpu::set_render_mode(nre::gpu::REGULAR_BACKFACE);
+        }
+
+        // precalculate software vertex shader if necessary
+        if (this->use_software_vertex_shaders_) {
+            this->update_software_vertex_shaders(camera_id, scene_id);
         }
 
         for (auto x : this->sce_ren_groups_[scene_id]) {
@@ -302,8 +321,13 @@ void nre::renderer_legacy_t::drawRenderGroup(nre::render_group& ren_group) {
 
         ren_group.isSetup = true;
 
-        ren_group.vs            = nre::gpu::vertex_shader_t();
-        ren_group.vs.type       = nre::gpu::VS_REGULAR;
+        ren_group.vs = nre::gpu::vertex_shader_t();
+        if (not this->use_software_vertex_shaders_) {
+            ren_group.vs.type = nre::gpu::VS_REGULAR;
+        }
+        else {
+            ren_group.vs.type = nre::gpu::VS_REGULAR_SOFTWARE;
+        }
         ren_group.vs.num_of_uvs = data_.meshes_[ren_group.mesh].uvmaps;
 
 
@@ -337,10 +361,16 @@ void nre::renderer_legacy_t::drawRenderGroup(nre::render_group& ren_group) {
         nre::gpu::setup_program(ren_group.program);
     }
 
-    nre::gpu::set_program_uniform_data(ren_group.program, "Model_Matrix", data_.meshes_[ren_group.mesh].data);
-    nre::gpu::set_program_uniform_data(
-        ren_group.program, "MVP_Matrix",
-        OE_Mat4x4ToSTDVector(data_.cameras_[ren_group.camera].perspective_view_mat * data_.meshes_[ren_group.mesh].model_mat));
+
+    auto mvp_mat   = data_.cameras_[ren_group.camera].perspective_view_mat * data_.meshes_[ren_group.mesh].model_mat;
+    auto model_mat = data_.meshes_[ren_group.mesh].model_mat;
+    // SOFTWARE VERTEX SHADER PREPROCESSING
+    if (not this->use_software_vertex_shaders_) {
+        nre::gpu::set_program_uniform_data(ren_group.program, "Model_Matrix", OE_Mat4x4ToSTDVector(model_mat));
+        nre::gpu::set_program_uniform_data(ren_group.program, "MVP_Matrix", OE_Mat4x4ToSTDVector(mvp_mat));
+    }
+
+
     if (nre::gpu::get_program_uniform_slot(ren_group.program, "mat_diffuse") != -2) {
         nre::gpu::set_program_uniform_data(ren_group.program, "mat_diffuse",
                                            OE_Vec4ToSTDVector(data_.materials_[ren_group.material].get_mat_diffuse()));
@@ -353,7 +383,7 @@ void nre::renderer_legacy_t::drawRenderGroup(nre::render_group& ren_group) {
         nre::gpu::set_program_uniform_data(ren_group.program, "mat_specular_hardness",
                                            data_.materials_[ren_group.material].get_mat_specular_hardness());
     }
-    nre::gpu::set_program_uniform_data(ren_group.program, "Model_Matrix", data_.meshes_[ren_group.mesh].data);
+
     nre::gpu::draw(ren_group.program, data_.meshes_[ren_group.mesh].vao, data_.vgroups_[ren_group.vgroup].ibo);
 }
 
@@ -476,41 +506,51 @@ void nre::renderer_legacy_t::updateMeshGPUData() {
         if (!data_.meshes_[mesh.first].vao_initialized) {
 
             /// vertex buffer
-            data_.meshes_[mesh.first].mesh->data->vbo_mutex.lockMutex();
-            nre::gpu::set_vertex_buf_memory_and_data(data_.meshes_[mesh.first].vbo, data_.meshes_[mesh.first].mesh->data->vbo,
-                                                     nre::gpu::STATIC);
-            data_.meshes_[mesh.first].mesh->data->vbo.clear();
-            data_.meshes_[mesh.first].mesh->data->vbo_mutex.unlockMutex();
-
-
-            /// index buffers
-            data_.meshes_[mesh.first].mesh->data->ibos_mutex.lockMutex();
-            for (auto vg : mesh.second.vgroups) {
-                data_.vgroups_[vg].ibo = nre::gpu::new_index_buf();
-                nre::gpu::set_index_buf_memory_and_data(data_.vgroups_[vg].ibo,
-                                                        data_.meshes_[mesh.first].mesh->data->ibos[vg].data, nre::gpu::STATIC);
-                data_.meshes_[mesh.first].mesh->data->ibos[vg].data.clear();
+            if (!this->use_software_vertex_shaders_) {
+                nre::gpu::set_vertex_buf_memory_and_data(data_.meshes_[mesh.first].vbo, data_.meshes_[mesh.first].vbo_data,
+                                                         nre::gpu::STATIC);
+            }
+            else {
+                long int offset          = 6 + data_.meshes_[mesh.first].uvmaps * 2;
+                long int num_of_vertices = data_.meshes_[mesh.first].vbo_data.size() / offset;
+                nre::gpu::set_vertex_buf_memory(data_.meshes_[mesh.first].vbo, num_of_vertices * (offset + 4),
+                                                nre::gpu::STREAM);
             }
 
-            data_.meshes_[mesh.first].mesh->data->ibos_mutex.unlockMutex();
+            /// index buffers
+            for (auto vg : mesh.second.vgroups) {
+                data_.vgroups_[vg].ibo = nre::gpu::new_index_buf();
+                nre::gpu::set_index_buf_memory_and_data(data_.vgroups_[vg].ibo, data_.meshes_[mesh.first].ibos_data[vg],
+                                                        nre::gpu::STATIC);
+            }
 
             /// vertex layout
             typedef nre::gpu::vertex_layout_input VLI; // for clarity
 
-            data_.meshes_[mesh.first].mesh->data->ibos.clear();
             // delete data_.meshes_[mesh.first].mesh->data->index_buffer;
             // data_.meshes_[mesh.first].mesh->data->index_buffer = nullptr;
 
             data_.meshes_[mesh.first].vao_input.clear();
 
+            int offset = 6;
+
+            if (this->use_software_vertex_shaders_) {
+                offset = offset + 4;
+            }
+
             data_.meshes_[mesh.first].vao_input.push_back(
-                VLI(data_.meshes_[mesh.first].vbo, 0, 3, 6 + data_.meshes_[mesh.first].uvmaps * 2));
+                VLI(data_.meshes_[mesh.first].vbo, 0, 3, offset + data_.meshes_[mesh.first].uvmaps * 2));
             data_.meshes_[mesh.first].vao_input.push_back(
-                VLI(data_.meshes_[mesh.first].vbo, 3, 3, 6 + data_.meshes_[mesh.first].uvmaps * 2));
+                VLI(data_.meshes_[mesh.first].vbo, 3, 3, offset + data_.meshes_[mesh.first].uvmaps * 2));
+
+            if (this->use_software_vertex_shaders_) {
+                data_.meshes_[mesh.first].vao_input.push_back(
+                    VLI(data_.meshes_[mesh.first].vbo, 6, 4, offset + data_.meshes_[mesh.first].uvmaps * 2));
+            }
 
             for (size_t i = 0; i < data_.meshes_[mesh.first].uvmaps; i++) {
                 data_.meshes_[mesh.first].vao_input.push_back(
-                    VLI(data_.meshes_[mesh.first].vbo, 6 + 2 * i, 2, 6 + data_.meshes_[mesh.first].uvmaps * 2));
+                    VLI(data_.meshes_[mesh.first].vbo, offset + 2 * i, 2, offset + data_.meshes_[mesh.first].uvmaps * 2));
             }
 
             nre::gpu::set_vertex_layout_format(data_.meshes_[mesh.first].vao, data_.meshes_[mesh.first].vao_input);

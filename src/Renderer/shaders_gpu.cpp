@@ -93,6 +93,9 @@ std::string nre::gpu::vertex_shader_t::info() const {
     case VS_REGULAR:
         ss << "VS_REGULAR";
         break;
+    case VS_REGULAR_SOFTWARE:
+        ss << "VS_REGULAR_SOFTWARE";
+        break;
     case VS_BOUNDING_BOX:
         ss << "VS_BOUNDING_BOX";
         break;

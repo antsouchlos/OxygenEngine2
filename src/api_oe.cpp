@@ -491,6 +491,22 @@ void oe::toggle_render_HDR() {
     OE_Main->renderer_mutex_.unlockMutex();
 }
 
+void oe::render_software_vertex_shaders(bool value) {
+    OE_API_Helpers::checkIfInit();
+    OE_Main->renderer_mutex_.lockMutex();
+    OE_Main->renderer_info_.use_software_vertex_shaders = value;
+    OE_Main->renderer_mutex_.unlockMutex();
+}
+void oe::toggle_software_vertex_shaders() {
+    OE_API_Helpers::checkIfInit();
+    OE_Main->renderer_mutex_.lockMutex();
+    if (OE_Main->renderer_info_.use_software_vertex_shaders)
+        OE_Main->renderer_info_.use_software_vertex_shaders = false;
+    else
+        OE_Main->renderer_info_.use_software_vertex_shaders = true;
+    OE_Main->renderer_mutex_.unlockMutex();
+}
+
 void oe::render_z_prepass(bool value) {
     OE_API_Helpers::checkIfInit();
     OE_Main->renderer_mutex_.lockMutex();

@@ -41,15 +41,22 @@ std::string nre::gles2::gen_vertex_shader(nre::gpu::vertex_shader_t vs) {
                                      }));
         }
         else if ((vs.type == nre::gpu::VS_REGULAR) || (vs.type == nre::gpu::VS_BOUNDING_BOX) ||
-                 (vs.type == nre::gpu::VS_BOUNDING_SPHERE)) {
+                 (vs.type == nre::gpu::VS_BOUNDING_SPHERE) or (vs.type == nre::gpu::VS_REGULAR_SOFTWARE)) {
+
+            bool use_software_dummy = vs.type == nre::gpu::VS_REGULAR_SOFTWARE;
 
             // setup inputs
             output.append(NRE_Shader(attribute vec3 oe_position; attribute vec3 oe_normals;));
-            output.append("\n");
+
+            if (use_software_dummy) {
+                output.append(NRE_Shader(attribute vec4 oe_position_clip;));
+                output.append("\n");
+            }
             for (size_t i = 0; i < vs.num_of_uvs; i++) {
                 output.append("attribute vec2 oe_uvs" + to_string(i) + ";");
                 output.append("\n");
             }
+
 
             // setup outputs
             output.append(NRE_Shader(varying vec3 position; varying vec3 normals;));
@@ -60,10 +67,17 @@ std::string nre::gles2::gen_vertex_shader(nre::gpu::vertex_shader_t vs) {
             }
 
             // setup uniforms
-            output.append(NRE_Shader(uniform mat4 Model_Matrix;));
+            if (!use_software_dummy) output.append(NRE_Shader(uniform mat4 Model_Matrix;));
 
             // setup final logic
-            if (vs.type == nre::gpu::VS_REGULAR) {
+            if (use_software_dummy) {
+                output.append(NRE_Shader(void main() {
+                    normals     = oe_normals;
+                    position    = oe_position;
+                    gl_Position = oe_position_clip;
+                }));
+            }
+            else if (vs.type == nre::gpu::VS_REGULAR) {
 
 
 

@@ -378,24 +378,11 @@ namespace csl {
         }
 
         void pass_token() {
-#ifdef __EMSCRIPTEN__
             ++token_it_;
-            while ((*token_it_).type == token_type::whitespace)
-                ++token_it_;
-#else
-            ++token_it_;
-#endif
         }
 
         const std::string_view get_token_content() const {
-#ifdef __EMSCRIPTEN__
-            if ((*token_it_).type == token_type::string)
-                return (*token_it_).content.substr(1, (*token_it_).content.size() - 2);
-            else
-                return (*token_it_).content;
-#else
             return (*token_it_).content;
-#endif
         }
     };
 
@@ -404,10 +391,7 @@ namespace csl {
     inline element parse(std::string& input) {
         lexer_t lexer(input);
 
-#ifdef __EMSCRIPTEN__
-        parser_t parser(lexer.begin(), lexer.end());
-#else
-        constexpr auto is_not_whitespace = [](auto token) { return (token.type != token_type::whitespace); };
+        constexpr auto is_not_whitespace    = [](auto token) { return (token.type != token_type::whitespace); };
         constexpr auto remove_string_quotes = [](auto token) -> decltype(token) {
             if (token.type == token_type::string)
                 return {token_type::string, token.content.substr(1, token.content.size() - 2)};
@@ -415,9 +399,8 @@ namespace csl {
                 return token;
         };
 
-        auto token_range = lexer | std::views::filter(is_not_whitespace) | std::views::transform(remove_string_quotes);
+        auto     token_range = lexer | std::views::filter(is_not_whitespace) | std::views::transform(remove_string_quotes);
         parser_t parser(token_range.begin(), token_range.end());
-#endif
 
         return parser.parse();
     }

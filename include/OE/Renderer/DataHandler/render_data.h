@@ -86,8 +86,8 @@ namespace nre {
         std::vector<float> get_scaling_min_data();
         std::vector<float> get_scaling_max_data();
 
-        // the mesh is used too fetch vertices only
-        std::shared_ptr<OE_Mesh32> mesh{nullptr};
+        std::vector<float>                                vbo_data;
+        std::unordered_map<size_t, std::vector<uint32_t>> ibos_data;
 
         std::set<size_t> vgroups;
     };
