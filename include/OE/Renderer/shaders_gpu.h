@@ -10,16 +10,17 @@ namespace nre { namespace gpu {
     // possibility to extend with HLSL/Metal etc.
     enum SHADER_BACKEND : int { UNDEFINED, GL, GLES, GLES2 };
 
-    enum VS_TYPE : uint8_t {
+    enum VS_TYPE {
         VS_UNDEFINED,
         VS_Z_PREPASS,
         VS_REGULAR,
+        VS_REGULAR_SOFTWARE,
         VS_BOUNDING_BOX,
         VS_BOUNDING_SPHERE,
         VS_LIGHT,
     };
 
-    enum FS_TYPE : uint8_t {
+    enum FS_TYPE {
         FS_UNDEFINED,
         FS_SIMPLE,
         FS_GAMMA,

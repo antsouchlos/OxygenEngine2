@@ -12,7 +12,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 // #include <glm/gtc/constants.hpp>
-// #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // #include <glm/ext/vector_trigonometric.hpp>
 // #include <glm/gtc/matrix_inverse.hpp>
@@ -54,8 +54,9 @@ class OE_Mat4x4 : public glm::mat4 {
 public:
     using glm::mat4::mat4;
 
-    OE_Mat4x4 operator*(const OE_Mat4x4&);
-    OE_Vec4   operator*(const OE_Vec4&);
+    OE_Mat4x4    operator*(const OE_Mat4x4&);
+    OE_Vec4      operator*(const OE_Vec4&);
+    const float* get_ptr();
 };
 
 class OE_Mat3x3 : public glm::mat3 {
@@ -87,9 +88,9 @@ public:
 #define OE_Dot          glm::dot
 
 #define OE_Identity     glm::identity
-#define OE_Det          glm::determinant
-#define OE_Transpose    glm::transpose*/
+#define OE_Det          glm::determinant*/
 
+OE_Mat4x4 OE_Transpose(OE_Mat4x4);
 OE_Mat4x4 OE_Translate(OE_Mat4x4, OE_Vec3);
 OE_Mat4x4 OE_Scale(OE_Mat4x4, OE_Vec3);
 
@@ -116,5 +117,9 @@ std::vector<float> OE_GetBoundingBoxVertexBuffer(float, float, float, float, flo
 
 std::vector<float>    OE_GetBoundingSphereVertexBuffer(float, float, size_t);
 std::vector<uint32_t> OE_GetBoundingSphereIndexBuffer(float, float, size_t);
-
+namespace oe { namespace math {
+        std::vector<float> vertex_shader_regular_sw(const std::vector<float>&, OE_Mat4x4, OE_Mat4x4, int);
+        std::vector<float> vertex_shader_regular_sw_ibo(const std::vector<float>&, const std::vector<uint32_t>&, OE_Mat4x4,
+                                                        OE_Mat4x4, int);
+}; };  // namespace oe::math
 #endif // FMATH_H_INCLUDED

@@ -101,6 +101,7 @@ namespace oe {
         bool                  render_bounding_boxes{false};
         bool                  render_bounding_spheres{false};
         bool                  use_z_prepass{true};
+        bool                  use_software_vertex_shaders{false};
         RENDERER_SHADING_MODE shading_mode{RENDERER_REGULAR_SHADING};
 
         /// Without sanity checks the renderer may segfault or silently fail without warning or error messages

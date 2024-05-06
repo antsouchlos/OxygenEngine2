@@ -1148,9 +1148,16 @@ void nre::gles2::api_t::setup_program(std::size_t id) {
 
     if (not(this->progs_[id].vs.fullscreenQuad or (this->progs_[id].vs.type == nre::gpu::VS_Z_PREPASS))) {
         glBindAttribLocation(this->progs_[id].handle, 1, "oe_normals");
+
+        int offset = 2;
+        if (this->progs_[id].vs.type == nre::gpu::VS_REGULAR_SOFTWARE) {
+            glBindAttribLocation(this->progs_[id].handle, 2, "oe_position_clip");
+            offset = offset + 1;
+        }
+
         for (size_t i = 0; i < this->progs_[id].vs.num_of_uvs; i++) {
             std::string attrib_name = "oe_uvs" + to_string(i);
-            glBindAttribLocation(this->progs_[id].handle, i + 2, attrib_name.c_str());
+            glBindAttribLocation(this->progs_[id].handle, i + offset, attrib_name.c_str());
         }
     }
 

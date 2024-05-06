@@ -64,6 +64,7 @@ namespace nre {
         /// These two are in the NRE_RendererUtils.cpp
         void generateDrawCalls();
         void sortPointLights(std::size_t, std::size_t);
+        void update_software_vertex_shaders(size_t, size_t);
         /////////////////////////
 
         void drawRenderGroup(nre::render_group&);
@@ -86,6 +87,7 @@ namespace nre {
         bool                      render_bounding_spheres_{false};
         bool                      use_HDR_{false};
         bool                      use_z_prepass_{false};
+        bool                      use_software_vertex_shaders_{false};
 
         int                    res_x_{0};
         int                    res_y_{0};

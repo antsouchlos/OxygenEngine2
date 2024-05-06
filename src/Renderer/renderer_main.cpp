@@ -509,28 +509,19 @@ void nre::renderer_t::updateMeshGPUData() {
         if (!data_.meshes_[mesh.first].vao_initialized) {
 
             /// vertex buffer
-            data_.meshes_[mesh.first].mesh->data->vbo_mutex.lockMutex();
-            nre::gpu::set_vertex_buf_memory_and_data(data_.meshes_[mesh.first].vbo, data_.meshes_[mesh.first].mesh->data->vbo,
+            nre::gpu::set_vertex_buf_memory_and_data(data_.meshes_[mesh.first].vbo, data_.meshes_[mesh.first].vbo_data,
                                                      nre::gpu::STATIC);
-            data_.meshes_[mesh.first].mesh->data->vbo.clear();
-            data_.meshes_[mesh.first].mesh->data->vbo_mutex.unlockMutex();
-
 
             /// index buffers
-            data_.meshes_[mesh.first].mesh->data->ibos_mutex.lockMutex();
             for (auto vg : mesh.second.vgroups) {
                 data_.vgroups_[vg].ibo = nre::gpu::new_index_buf();
-                nre::gpu::set_index_buf_memory_and_data(data_.vgroups_[vg].ibo,
-                                                        data_.meshes_[mesh.first].mesh->data->ibos[vg].data, nre::gpu::STATIC);
-                data_.meshes_[mesh.first].mesh->data->ibos[vg].data.clear();
+                nre::gpu::set_index_buf_memory_and_data(data_.vgroups_[vg].ibo, data_.meshes_[mesh.first].ibos_data[vg],
+                                                        nre::gpu::STATIC);
             }
-
-            data_.meshes_[mesh.first].mesh->data->ibos_mutex.unlockMutex();
 
             /// vertex layout
             typedef nre::gpu::vertex_layout_input VLI; // for clarity
 
-            data_.meshes_[mesh.first].mesh->data->ibos.clear();
             // delete data_.meshes_[mesh.first].mesh->data->index_buffer;
             // data_.meshes_[mesh.first].mesh->data->index_buffer = nullptr;
 
